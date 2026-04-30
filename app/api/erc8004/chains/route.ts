@@ -1,4 +1,3 @@
-// app/api/erc8004/chains/route.ts
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
@@ -12,7 +11,8 @@ const supabase = createClient(supabaseUrl, supabaseKey!, {
 export async function GET() {
   try {
     const { data, error } = await supabase
-      .from('web_page.erc_8004_statistics')
+      .schema('web_page')
+      .from('erc_8004_statistics')
       .select(`
         chain_name,
         owner_total_count,
@@ -25,10 +25,7 @@ export async function GET() {
 
     if (error) throw error;
 
-    return NextResponse.json({
-      success: true,
-      data: data || []
-    });
+    return NextResponse.json({ success: true, data: data || [] });
   } catch (error: any) {
     console.error('Error fetching chains stats:', error);
     return NextResponse.json({ 

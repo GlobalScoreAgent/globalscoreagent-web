@@ -12,18 +12,22 @@ const supabase = createClient(supabaseUrl, supabaseKey!, {
 export async function GET() {
   try {
     const { data, error } = await supabase
-      .from('web_page.erc_8004_agent_statistics')
-      .select(`
-        statistics_date as date,
-        agent_count as count
-      `)
+      .schema('web_page')
+      .from('erc_8004_agent_statistics')
+      .select('statistics_date, agent_count')   // ← Sin alias aquí
       .order('statistics_date', { ascending: true });
 
     if (error) throw error;
 
+    // Renombramos los campos aquí en JavaScript (más seguro)
+    const formattedData = data?.map(row => ({
+      date: row.statistics_date,
+      count: row.agent_count
+    })) || [];
+
     return NextResponse.json({
       success: true,
-      data: data || []
+      data: formattedData
     });
   } catch (error: any) {
     console.error('Error fetching ERC-8004 stats:', error);

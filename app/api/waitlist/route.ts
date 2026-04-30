@@ -23,9 +23,9 @@ export async function POST(req: NextRequest) {
 
     const emailClean = email.toLowerCase().trim();
 
-    // Insert con upsert (ON CONFLICT DO NOTHING)
     const { error } = await supabase
-      .from('web_page.waitlist')
+      .schema('web_page')                    // ← Corrección importante
+      .from('waitlist')
       .upsert({
         email: emailClean,
         source,
@@ -46,7 +46,6 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error('Waitlist error:', error);
 
-    // Si es error de duplicado, respondemos amigablemente
     if (error.code === '23505' || error.message?.includes('duplicate')) {
       return NextResponse.json({ 
         success: true, 
