@@ -10,6 +10,11 @@ export const metadata: Metadata = {
   },
   description: "HUMI Index: El primer índice de confianza objetivo y diario para agentes autónomos en ERC-8004. Evaluamos, puntuamos y certificamos con estándares transparentes.",
   keywords: ["ERC-8004", "HUMI Index", "agentes IA", "certificación IA", "trust infrastructure", "AI agents", "Global Score Agent"],
+  icons: {
+    icon: '/favicon.ico?v=3',           // ← cambia el número cada vez que actualices el icono
+    shortcut: '/favicon.ico?v=3',
+    apple: '/favicon.ico?v=3',
+  },
 };
 
 export default function RootLayout({
