@@ -1,31 +1,33 @@
 import { NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import { createClient } from '@supabase/supabase-js';
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL?.replace('db.', 'db-') + '&options=-c%20sslmode=require',
-  ssl: { rejectUnauthorized: false },
-  // Forzar IPv4
-  keepAlive: true,
+const supabaseUrl = 'https://mezqyworblseixaypftg.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseKey!, {
+  auth: { persistSession: false }
 });
 
 export async function GET() {
   try {
-    const client = await pool.connect();
-    const result = await client.query('SELECT NOW() as time, version()');
-    client.release();
+    const { data, error } = await supabase
+      .from('index_humi.index_humi_summary')
+      .select('count(*)')
+      .limit(1);
+
+    if (error) throw error;
 
     return NextResponse.json({
       success: true,
-      message: "✅ Conexión exitosa",
-      time: result.rows[0].time,
+      message: "✅ Conexión con Supabase JS Client OK",
+      row_count: data?.[0]?.count || "unknown"
     });
   } catch (error: any) {
-    console.error("Error completo:", error);
+    console.error("Error Supabase:", error);
     return NextResponse.json({
       success: false,
       error: error.message,
-      code: error.code,
-      stack: error.stack?.substring(0, 500)
+      code: error.code
     }, { status: 500 });
   }
 }
