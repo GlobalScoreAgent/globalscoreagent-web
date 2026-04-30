@@ -140,7 +140,64 @@ export default function LegalPage() {
                     : 'We use technical cookies for the proper functioning of the site. We do not use advertising cookies.'}
                 </p>
               </div>
+            </section>
 
+            {/* POLÍTICA DE REEMBOLSOS */}
+            <section>
+              <h2 className="text-3xl font-semibold mb-6 border-b border-gold/30 pb-4">
+                {language === 'es' ? 'Política de Reembolsos' : 'Refund Policy'}
+              </h2>
+              <p className="text-sm text-zinc-500 mb-8">
+                {language === 'es' ? 'Última actualización: 29 de abril de 2026' : 'Last updated: April 29, 2026'}
+              </p>
+
+              <div className="prose prose-invert max-w-none text-zinc-300 leading-relaxed">
+                <h3 className="text-xl font-medium mt-8 mb-4">
+                  {language === 'es' ? '1. Naturaleza de los servicios' : '1. Nature of the Services'}
+                </h3>
+                <p>
+                  {language === 'es' 
+                    ? 'Los servicios de Global Score Agent (HUMI Index, Dashboard y acceso a API) son productos digitales. Una vez que se proporciona acceso a la cuenta o se consumen recursos de la API, los pagos no son reembolsables.' 
+                    : 'Global Score Agent services (HUMI Index, Dashboard and API access) are digital products. Once account access is provided or API resources are consumed, payments are non-refundable.'}
+                </p>
+
+                <h3 className="text-xl font-medium mt-8 mb-4">
+                  {language === 'es' ? '2. Período de garantía' : '2. Guarantee Period'}
+                </h3>
+                <p>
+                  {language === 'es' 
+                    ? 'Ofrecemos un período de 14 días desde la activación de cualquier plan de pago para solicitar reembolso completo, siempre que no se haya consumido más del 10% de los créditos o llamadas contratadas.' 
+                    : 'We offer a 14-day period from the activation of any paid plan to request a full refund, provided that no more than 10% of the contracted credits or calls have been consumed.'}
+                </p>
+
+                <h3 className="text-xl font-medium mt-8 mb-4">
+                  {language === 'es' ? '3. Casos sin derecho a reembolso' : '3. Non-Refundable Cases'}
+                </h3>
+                <p>
+                  {language === 'es' 
+                    ? 'No se otorgarán reembolsos una vez que se haya consumido más del 10% de los créditos, o en casos de violación de los Términos y Condiciones.' 
+                    : 'Refunds will not be granted once more than 10% of the credits have been consumed, or in cases of violation of the Terms and Conditions.'}
+                </p>
+
+                <h3 className="text-xl font-medium mt-8 mb-4">
+                  {language === 'es' ? '4. Procedimiento para solicitar reembolso' : '4. How to Request a Refund'}
+                </h3>
+                <p>
+                  {language === 'es' 
+                    ? 'Para solicitar un reembolso, envíe un correo electrónico a hello@globalscoreagent.com dentro de los 14 días posteriores a la compra, indicando claramente el motivo. Las solicitudes serán revisadas en un plazo máximo de 7 días hábiles.' 
+                    : 'To request a refund, please email hello@globalscoreagent.com within 14 days of purchase, clearly stating the reason. Requests will be reviewed within a maximum of 7 business days.'}
+                </p>
+
+                <h3 className="text-xl font-medium mt-8 mb-4">
+                  {language === 'es' ? '5. Reembolsos procesados' : '5. Processed Refunds'}
+                </h3>
+                <p>
+                  {language === 'es' 
+                    ? 'Los reembolsos aprobados se procesarán a través del mismo método de pago utilizado en un plazo máximo de 10 días hábiles.' 
+                    : 'Approved refunds will be processed through the same payment method used within a maximum of 10 business days.'}
+                </p>
+              </div>
+              
               <div className="mt-16 text-center text-xs text-zinc-500">
  
               </div>
