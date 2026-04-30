@@ -1,31 +1,36 @@
 // app/api/erc8004/stats/route.ts
 import { NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import { createClient } from '@supabase/supabase-js';
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+const supabaseUrl = 'https://mezqyworblseixaypftg.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseKey!, {
+  auth: { persistSession: false }
 });
 
 export async function GET() {
   try {
-    const result = await pool.query(`
-      SELECT 
-        statistics_date::text AS date,
-        agent_count AS count
-      FROM web_page.erc_8004_agent_statistics
-      ORDER BY statistics_date ASC 
-    `);
+    const { data, error } = await supabase
+      .from('web_page.erc_8004_agent_statistics')
+      .select(`
+        statistics_date as date,
+        agent_count as count
+      `)
+      .order('statistics_date', { ascending: true });
+
+    if (error) throw error;
 
     return NextResponse.json({
       success: true,
-      data: result.rows
+      data: data || []
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching ERC-8004 stats:', error);
     return NextResponse.json({ 
       success: false, 
-      error: 'Error al cargar estadísticas de agentes' 
+      error: 'Error al cargar estadísticas de agentes',
+      details: error.message 
     }, { status: 500 });
   }
 }

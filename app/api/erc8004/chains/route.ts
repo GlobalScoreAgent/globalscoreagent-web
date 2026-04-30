@@ -1,35 +1,40 @@
 // app/api/erc8004/chains/route.ts
 import { NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import { createClient } from '@supabase/supabase-js';
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+const supabaseUrl = 'https://mezqyworblseixaypftg.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseKey!, {
+  auth: { persistSession: false }
 });
 
 export async function GET() {
   try {
-    const result = await pool.query(`
-      SELECT 
+    const { data, error } = await supabase
+      .from('web_page.erc_8004_statistics')
+      .select(`
         chain_name,
         owner_total_count,
         agent_total_count,
         agent_active_count,
         agent_active_with_feedbacks
-      FROM web_page.erc_8004_statistics
-      WHERE agent_total_count > 0
-      ORDER BY agent_total_count DESC;
-    `);
+      `)
+      .gt('agent_total_count', 0)
+      .order('agent_total_count', { ascending: false });
+
+    if (error) throw error;
 
     return NextResponse.json({
       success: true,
-      data: result.rows
+      data: data || []
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching chains stats:', error);
     return NextResponse.json({ 
       success: false, 
-      error: 'Error al cargar distribución de cadenas' 
+      error: 'Error al cargar distribución de cadenas',
+      details: error.message 
     }, { status: 500 });
   }
 }

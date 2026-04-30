@@ -1,30 +1,36 @@
 // app/api/erc8004/total-agents/route.ts
 import { NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import { createClient } from '@supabase/supabase-js';
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+const supabaseUrl = 'https://mezqyworblseixaypftg.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseKey!, {
+  auth: { persistSession: false }
 });
 
 export async function GET() {
   try {
-    const result = await pool.query(`
-      SELECT COALESCE(SUM(agent_total_count), 0) as total_agents
-      FROM web_page.erc_8004_statistics
-    `);
+    const { data, error } = await supabase
+      .from('web_page.erc_8004_statistics')
+      .select('agent_total_count')
+      .single(); // Usamos single porque solo queremos el total
 
-    const total = parseInt(result.rows[0].total_agents) || 0;
+    if (error) throw error;
+
+    const total = data ? 
+      (data.agent_total_count || 0) : 0;
 
     return NextResponse.json({
       success: true,
       total
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching total agents:', error);
     return NextResponse.json({ 
       success: false, 
-      error: 'Error al cargar total de agentes' 
+      error: 'Error al cargar total de agentes',
+      details: error.message 
     }, { status: 500 });
   }
 }

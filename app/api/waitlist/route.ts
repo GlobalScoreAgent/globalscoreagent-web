@@ -1,10 +1,12 @@
 // app/api/waitlist/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
+import { createClient } from '@supabase/supabase-js';
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+const supabaseUrl = 'https://mezqyworblseixaypftg.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseKey!, {
+  auth: { persistSession: false }
 });
 
 export async function POST(req: NextRequest) {
@@ -15,32 +17,43 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: 'Email inválido' }, { status: 400 });
     }
 
-    const ipAddress = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    const ipAddress = req.headers.get('x-forwarded-for') 
+                   || req.headers.get('x-real-ip') 
+                   || 'unknown';
 
-    const query = `
-      INSERT INTO web_page.waitlist (register_at, email, source, ip_address)
-      VALUES (now(), $1, $2, $3)
-      ON CONFLICT (email) 
-      DO NOTHING
-      RETURNING id;
-    `;
+    const emailClean = email.toLowerCase().trim();
 
-    const result = await pool.query(query, [email.toLowerCase().trim(), source, ipAddress]);
-
-    if (result.rowCount === 0) {
-      return NextResponse.json({ 
-        success: true, 
-        message: 'Este email ya estaba registrado.' 
+    // Insert con upsert (ON CONFLICT DO NOTHING)
+    const { error } = await supabase
+      .from('web_page.waitlist')
+      .upsert({
+        email: emailClean,
+        source,
+        ip_address: ipAddress,
+        register_at: new Date().toISOString()
+      }, { 
+        onConflict: 'email',
+        ignoreDuplicates: true 
       });
-    }
+
+    if (error) throw error;
 
     return NextResponse.json({ 
       success: true, 
       message: '¡Gracias! Te mantendremos informado.' 
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Waitlist error:', error);
+
+    // Si es error de duplicado, respondemos amigablemente
+    if (error.code === '23505' || error.message?.includes('duplicate')) {
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Este email ya estaba registrado.' 
+      });
+    }
+
     return NextResponse.json({ 
       success: false, 
       error: 'Error al registrar. Inténtalo de nuevo.' 
