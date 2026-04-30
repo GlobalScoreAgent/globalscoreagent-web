@@ -289,10 +289,14 @@ export default function AboutPage() {
   );
 }
 
-// ==================== TARJETA FLIP 3D ACTUALIZADA ====================
+// ==================== TARJETA FLIP 3D (CORREGIDA PARA MÓVIL) ====================
 function PremiumFlipCard({ card, language, isFlipped, onFlip }: any) {
   return (
-    <div onClick={onFlip} className="relative h-80 cursor-pointer group" style={{ perspective: '1500px' }}>
+    <div 
+      onClick={onFlip} 
+      className="relative h-[380px] sm:h-80 md:h-96 cursor-pointer group" 
+      style={{ perspective: '1500px' }}
+    >
       <div 
         className="relative w-full h-full transition-transform duration-700 ease-out" 
         style={{ 
@@ -312,16 +316,17 @@ function PremiumFlipCard({ card, language, isFlipped, onFlip }: any) {
           </h3>
         </div>
 
-        {/* Reverso */}
-        <div className="absolute inset-0 z-10 backface-hidden rounded-3xl p-8 flex flex-col border border-gold/50 shadow-2xl" 
+        {/* Reverso - CORREGIDO PARA MÓVIL */}
+        <div className="absolute inset-0 z-10 backface-hidden rounded-3xl p-5 sm:p-8 flex flex-col border border-gold/50 shadow-2xl overflow-hidden" 
              style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)', background: 'linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 100%)' }}>
-          <p className="text-zinc-200 text-base leading-relaxed text-center flex-1">
+          
+          <p className="text-zinc-200 text-sm sm:text-base leading-tight sm:leading-relaxed text-center flex-1 overflow-auto">
             {language === 'es' ? card.descriptionEs : card.descriptionEn}
           </p>
 
-          {/* Estadísticas (solo para Origen de Datos) */}
+          {/* Estadísticas (solo Origen de Datos) */}
           {card.stats && (
-            <div className="mt-6 pt-6 border-t border-gold/30 text-xs">
+            <div className="mt-6 pt-6 border-t border-gold/30 text-xs sm:text-sm">
               <div className="grid grid-cols-1 gap-3">
                 {card.stats.map((stat: any, index: number) => (
                   <div key={index} className="flex justify-between items-center">
