@@ -10,24 +10,24 @@ const supabase = createClient(supabaseUrl, supabaseKey!, {
 
 export async function GET() {
   try {
-    const { data, error } = await supabase
+    const { count, error } = await supabase
       .from('index_humi.index_humi_summary')
-      .select('count(*)')
-      .limit(1);
+      .select('*', { count: 'exact', head: true });
 
     if (error) throw error;
 
     return NextResponse.json({
       success: true,
-      message: "✅ Conexión con Supabase JS Client OK",
-      row_count: data?.[0]?.count || "unknown"
+      message: "✅ Conexión con Supabase exitosa",
+      total_records: count || 0
     });
   } catch (error: any) {
     console.error("Error Supabase:", error);
     return NextResponse.json({
       success: false,
       error: error.message,
-      code: error.code
+      code: error.code,
+      hint: error.hint || "Revisa que la tabla exista"
     }, { status: 500 });
   }
 }
