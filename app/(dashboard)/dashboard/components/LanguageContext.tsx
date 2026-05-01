@@ -40,6 +40,11 @@ interface Translations {
   cerexTitle: string;           // ← Nuevo
   comingSoon: string;           // ← Nuevo
   dashboardOverviewTitle: string;
+  humiElite: string;
+  humiHighPerformance: string;
+  humiStable: string;
+  humiModerateRisk: string;
+  humiCritical: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -72,6 +77,12 @@ const translations: Record<Language, Translations> = {
     cerexTitle: 'Certificado de Existencia',
     comingSoon: 'Próximamente',
     dashboardOverviewTitle: 'Resumen General Ecosistema ERC-8004',
+    humiElite: 'Elite',
+    humiHighPerformance: 'Alto Rendimiento',
+    humiStable: 'Estables',
+    humiModerateRisk: 'Riesgo Moderado',
+    humiCritical: 'Críticos',
+    
   },
   en: {
     home: 'Home',
@@ -101,7 +112,12 @@ const translations: Record<Language, Translations> = {
     cerowTitle: 'Owner Certificate',
     cerexTitle: 'Existence Certificate',
     comingSoon: 'Coming Soon',
-    dashboardOverviewTitle: 'Overview ERC-8004 Ecosystem'
+    dashboardOverviewTitle: 'Overview ERC-8004 Ecosystem',
+    humiElite: 'Elite',
+    humiHighPerformance: 'High Performance',
+    humiStable: 'Stable',
+    humiModerateRisk: 'Moderate Risk',
+    humiCritical: 'Critical',
   },
 };
 
