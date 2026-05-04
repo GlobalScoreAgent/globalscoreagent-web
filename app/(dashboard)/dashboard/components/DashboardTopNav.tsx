@@ -35,7 +35,7 @@ export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) 
       
       {/* Título dinámico bilingüe */}
       <div className="font-semibold text-2xl tracking-tight">
-        GSA Platform - {pageTitleKey ? t[pageTitleKey] : 'Dashboard'}
+        {t.platformTitle} - {pageTitleKey ? t[pageTitleKey as keyof typeof t] : t.dashboardTitle}
       </div>
 
       <div className="flex items-center gap-6">

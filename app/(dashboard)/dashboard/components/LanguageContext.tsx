@@ -19,9 +19,11 @@ interface Translations {
   cerow: string;
   logout: string;
 
+  // Platform
+  platformTitle: string;
+
   // Top Nav
   dashboardTitle: string;
-  platformTitle: string;
   searchPlaceholder: string;
   profile: string;
   settings: string;
@@ -114,7 +116,7 @@ interface Translations {
 
 const translations: Record<Language, Translations> = {
   es: {
-    home: 'Home',
+    home: 'Inicio',
     agentsDirectory: 'Directorio de Agentes',
     humiIndex: 'Índice HUMI',
     certifications: 'Certificaciones',
@@ -124,7 +126,7 @@ const translations: Record<Language, Translations> = {
     logout: 'Cerrar Sesión',
 
     dashboardTitle: 'Dashboard',
-    platformTitle: 'GSA Platform',
+    platformTitle: 'GSA Plataforma',
     searchPlaceholder: 'Buscar agentes...',
     profile: 'Perfil',
     settings: 'Configuración',
@@ -226,7 +228,7 @@ const translations: Record<Language, Translations> = {
 
     dashboardTitle: 'Dashboard',
     platformTitle: 'GSA Platform',
-    searchPlaceholder: 'Search agents or certifications...',
+    searchPlaceholder: 'Search agents...',
     profile: 'Profile',
     settings: 'Settings',
     subscriptions: 'Subscriptions',
