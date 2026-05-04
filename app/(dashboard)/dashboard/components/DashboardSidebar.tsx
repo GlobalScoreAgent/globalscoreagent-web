@@ -6,9 +6,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { LogOut, Home, Users, BarChart3, Award, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LogOut, Home, Users, BarChart3, Award, ChevronDown, ChevronLeft, ChevronRight, Package } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useLanguage } from './LanguageContext';
+import CertificationsReel from './CertificationsReel';
 
 const navItems = [
   { href: '/dashboard', labelKey: 'home' as const, icon: Home },
@@ -137,6 +138,27 @@ export default function DashboardSidebar() {
           )}
         </div>
       </nav>
+
+      {/* Próximos Productos */}
+      {!isCollapsed && (
+        <div className={`mx-3 mb-4 p-4 rounded-2xl border ${
+          theme === 'dark'
+            ? 'bg-zinc-800/50 border-zinc-700/50'
+            : 'bg-zinc-50 border-zinc-200'
+        }`}>
+          <div className="flex items-center gap-2 mb-3">
+            <Package className="w-4 h-4 text-amber-500" />
+            <span className={`text-sm font-semibold ${
+              theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'
+            }`}>
+              Próximos Productos
+            </span>
+          </div>
+          <div className="max-h-48 overflow-y-auto">
+            <CertificationsReel />
+          </div>
+        </div>
+      )}
 
       {/* Logout */}
       <div className={`p-4 border-t ${

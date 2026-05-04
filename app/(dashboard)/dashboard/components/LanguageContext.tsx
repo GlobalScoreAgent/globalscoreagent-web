@@ -45,6 +45,39 @@ interface Translations {
   humiStable: string;
   humiModerateRisk: string;
   humiCritical: string;
+
+  // Dashboard - Cards y elementos
+  humiIndexTitle: string;
+  metadataRichnessTitle: string;
+  agentNonceTitle: string;
+  last30DaysTitle: string;
+  totalLabel: string;
+  nonceLabel: string;
+  agentsLabel: string;
+  ownersLabel: string;
+  activeLabel: string;
+  feedbacksLabel: string;
+
+  // Dashboard - Descripciones
+  totalAgentsDescription: string;
+  activeAgentsDescription: string;
+  agentsWithFeedbackDescription: string;
+  monitoredWalletsDescription: string;
+  erc8004Label: string;
+  realTimeLabel: string;
+
+  // Dashboard - Tooltips
+  agentsTooltip: string;
+  noncesTooltip: string;
+
+    // Dashboard - Categorías Metadata
+    metadataElite: string;
+    metadataExcellent: string;
+    metadataGood: string;
+    metadataRegular: string;
+    metadataLow: string;
+    metadataPoor: string;
+    averageLabel: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -82,7 +115,40 @@ const translations: Record<Language, Translations> = {
     humiStable: 'Estables',
     humiModerateRisk: 'Riesgo Moderado',
     humiCritical: 'Críticos',
-    
+
+    // Dashboard - Cards y elementos
+    humiIndexTitle: 'Indice',
+    metadataRichnessTitle: 'Riqueza Metadata',
+    agentNonceTitle: 'Agente Nonce',
+    last30DaysTitle: 'Ultimos 30 dias',
+    totalLabel: 'Total',
+    nonceLabel: 'nonce',
+    agentsLabel: 'Agentes',
+    ownersLabel: 'Owners',
+    activeLabel: 'Activos',
+    feedbacksLabel: 'Feedbacks',
+
+    // Dashboard - Descripciones
+    totalAgentsDescription: 'Total de agentes registrados en ERC-8004',
+    activeAgentsDescription: 'Agentes con actividad reciente',
+    agentsWithFeedbackDescription: 'Agentes con retroalimentación',
+    monitoredWalletsDescription: 'Wallets activas siendo monitoreadas en tiempo real',
+    erc8004Label: 'ERC-8004',
+    realTimeLabel: 'Tiempo Real',
+
+    // Dashboard - Tooltips
+    agentsTooltip: 'agentes',
+    noncesTooltip: 'nonces',
+
+    // Dashboard - Categorías Metadata
+    metadataElite: 'Elite',
+    metadataExcellent: 'Excelente',
+    metadataGood: 'Bueno',
+    metadataRegular: 'Regular',
+    metadataLow: 'Baja',
+    metadataPoor: 'Mala',
+    averageLabel: 'Promedio',
+
   },
   en: {
     home: 'Home',
@@ -118,6 +184,39 @@ const translations: Record<Language, Translations> = {
     humiStable: 'Stable',
     humiModerateRisk: 'Moderate Risk',
     humiCritical: 'Critical',
+
+    // Dashboard - Cards y elementos
+    humiIndexTitle: 'Index',
+    metadataRichnessTitle: 'Metadata Richness',
+    agentNonceTitle: 'Agent Nonce',
+    last30DaysTitle: 'Last 30 Days',
+    totalLabel: 'Total',
+    nonceLabel: 'nonce',
+    agentsLabel: 'Agents',
+    ownersLabel: 'Owners',
+    activeLabel: 'Active',
+    feedbacksLabel: 'Feedbacks',
+
+    // Dashboard - Descripciones
+    totalAgentsDescription: 'Total registered agents in ERC-8004',
+    activeAgentsDescription: 'Agents with recent activity',
+    agentsWithFeedbackDescription: 'Agents with feedback',
+    monitoredWalletsDescription: 'Active wallets being monitored in real time',
+    erc8004Label: 'ERC-8004',
+    realTimeLabel: 'Real Time',
+
+    // Dashboard - Tooltips
+    agentsTooltip: 'agents',
+    noncesTooltip: 'nonces',
+
+    // Dashboard - Categorías Metadata
+    metadataElite: 'Elite',
+    metadataExcellent: 'Excellent',
+    metadataGood: 'Good',
+    metadataRegular: 'Regular',
+    metadataLow: 'Low',
+    metadataPoor: 'Poor',
+    averageLabel: 'Average',
   },
 };
 

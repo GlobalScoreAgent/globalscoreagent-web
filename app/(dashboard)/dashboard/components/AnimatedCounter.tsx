@@ -39,7 +39,7 @@ export default function AnimatedCounter({ end, duration = 2000, suffix = '' }: A
   }, [end, duration]);
 
   return (
-    <span className="tabular-nums">
+    <span className="tabular-nums" suppressHydrationWarning>
       {count.toLocaleString('es-ES')}
       {suffix}
     </span>
