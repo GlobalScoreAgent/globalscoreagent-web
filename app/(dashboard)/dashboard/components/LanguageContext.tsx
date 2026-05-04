@@ -11,7 +11,7 @@ type Theme = 'dark' | 'light';
 interface Translations {
   // Sidebar
   home: string;
-  agents: string;
+  agentsDirectory: string;
   humiIndex: string;
   certifications: string;
   roadMap: string;
@@ -71,7 +71,7 @@ interface Translations {
   agentsTooltip: string;
   noncesTooltip: string;
 
-    // Dashboard - Categorías Metadata
+  // Dashboard - Categorías Metadata
     metadataElite: string;
     metadataExcellent: string;
     metadataGood: string;
@@ -79,12 +79,43 @@ interface Translations {
     metadataLow: string;
     metadataPoor: string;
     averageLabel: string;
+
+  // Agentes - Opciones de búsqueda
+  searchGeneral: string;
+  searchNetwork: string;
+  searchName: string;
+  searchDescription: string;
+  searchWallet: string;
+  searchWalletOwner: string;
+  searchMetadata: string;
+  searchSupportedTrust: string;
+  searchSkills: string;
+  searchCapabilities: string;
+  searchTags: string;
+  searchOasfSkills: string;
+  searchOasfDomains: string;
+  searchTechnicalTools: string;
+  searchTechnicalPrompts: string;
+  searchTechnicalCapabilities: string;
+  searchServices: string;
+
+  // Agentes - Etiquetas de tarjetas
+  humiScoreLabel: string;
+
+  // Agentes - Ordenamiento
+  sortByLabel: string;
+  sortLabel: string;
+  sortName: string;
+  sortCreatedDate: string;
+  sortHumiScore: string;
+  sortNonce: string;
+  sortBalance: string;
 }
 
 const translations: Record<Language, Translations> = {
   es: {
     home: 'Home',
-    agents: 'Agentes',
+    agentsDirectory: 'Directorio de Agentes',
     humiIndex: 'Índice HUMI',
     certifications: 'Certificaciones',
     roadMap: 'Próximas Funcionalidades',
@@ -94,7 +125,7 @@ const translations: Record<Language, Translations> = {
 
     dashboardTitle: 'Dashboard',
     platformTitle: 'GSA Platform',
-    searchPlaceholder: 'Buscar agentes o certificaciones...',
+    searchPlaceholder: 'Buscar agentes...',
     profile: 'Perfil',
     settings: 'Configuración',
     subscriptions: 'Subscripciones',
@@ -151,10 +182,41 @@ const translations: Record<Language, Translations> = {
     metadataPoor: 'Mala',
     averageLabel: 'Promedio',
 
+    // Agentes - Opciones de búsqueda
+    searchGeneral: 'General',
+    searchNetwork: 'Red',
+    searchName: 'Nombre',
+    searchDescription: 'Descripción',
+    searchWallet: 'Billetera de Agente',
+    searchWalletOwner: 'Billetera de Propietario',
+    searchMetadata: 'Metadatos',
+    searchSupportedTrust: 'Confianza Soportada',
+    searchSkills: 'Habilidades',
+    searchCapabilities: 'Capacidades',
+    searchTags: 'Etiquetas',
+    searchOasfSkills: 'Habilidades OASF',
+    searchOasfDomains: 'Dominios OASF',
+    searchTechnicalTools: 'Herramientas Técnicas',
+    searchTechnicalPrompts: 'Indicaciones Técnicas',
+    searchTechnicalCapabilities: 'Capacidades Técnicas',
+    searchServices: 'Servicios',
+
+    // Agentes - Etiquetas de tarjetas
+    humiScoreLabel: 'Índice HUMI - Score',
+
+    // Agentes - Ordenamiento
+    sortByLabel: 'Ordenar por',
+    sortLabel: 'Ordenar:',
+    sortName: 'Nombre',
+    sortCreatedDate: 'Fecha de Creación On-Chain',
+    sortHumiScore: 'Score Índice HUMI',
+    sortNonce: 'Nonce',
+    sortBalance: 'Balance',
+
   },
   en: {
     home: 'Home',
-    agents: 'Agents',
+    agentsDirectory: 'Agents Directory',
     humiIndex: 'HUMI Index',
     certifications: 'Certifications',
     roadMap: 'Road Map',
@@ -220,6 +282,37 @@ const translations: Record<Language, Translations> = {
     metadataLow: 'Low',
     metadataPoor: 'Poor',
     averageLabel: 'Average',
+
+    // Agentes - Opciones de búsqueda
+    searchGeneral: 'General',
+    searchNetwork: 'Network',
+    searchName: 'Name',
+    searchDescription: 'Description',
+    searchWallet: 'Wallet',
+    searchWalletOwner: 'Wallet Owner',
+    searchMetadata: 'Metadata',
+    searchSupportedTrust: 'Supported Trust',
+    searchSkills: 'Skills',
+    searchCapabilities: 'Capabilities',
+    searchTags: 'Tags',
+    searchOasfSkills: 'OASF Skills',
+    searchOasfDomains: 'OASF Domains',
+    searchTechnicalTools: 'Technical Tools',
+    searchTechnicalPrompts: 'Technical Prompts',
+    searchTechnicalCapabilities: 'Technical Capabilities',
+    searchServices: 'Services',
+
+    // Agentes - Etiquetas de tarjetas
+    humiScoreLabel: 'HUMI Index - Score',
+
+    // Agentes - Ordenamiento
+    sortByLabel: 'Sort by',
+    sortLabel: 'Sort:',
+    sortName: 'Name',
+    sortCreatedDate: 'On-Chain Creation Date',
+    sortHumiScore: 'HUMI Index Score',
+    sortNonce: 'Nonce',
+    sortBalance: 'Balance',
   },
 };
 

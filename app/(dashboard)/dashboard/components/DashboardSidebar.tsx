@@ -13,7 +13,7 @@ import RoadMapCards from './RoadMapCards';
 
 const navItems = [
   { href: '/dashboard', labelKey: 'home' as const, icon: Home },
-  { href: '/dashboard/agents', labelKey: 'agents' as const, icon: Users },
+  { href: '/dashboard/agents', labelKey: 'agentsDirectory' as const, icon: Users },
   { href: '/dashboard/humi', labelKey: 'humiIndex' as const, icon: BarChart3 },
 ];
 
