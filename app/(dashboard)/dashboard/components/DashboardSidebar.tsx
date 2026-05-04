@@ -6,10 +6,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { LogOut, Home, Users, BarChart3, Award, ChevronDown, ChevronLeft, ChevronRight, Package } from 'lucide-react';
+import { LogOut, Home, Users, BarChart3, ChevronLeft, ChevronRight, Package } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useLanguage } from './LanguageContext';
-import CertificationsReel from './CertificationsReel';
+import RoadMapCards from './RoadMapCards';
 
 const navItems = [
   { href: '/dashboard', labelKey: 'home' as const, icon: Home },
@@ -23,17 +23,11 @@ export default function DashboardSidebar() {
   const { t, theme } = useLanguage();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isCertOpen, setIsCertOpen] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     window.location.href = '/auth/login';
   };
-
-  const certifications = [
-    { href: '/dashboard/certificaciones/cerex', label: 'CEREX' },
-    { href: '/dashboard/certificaciones/cerow', label: 'CEROW' },
-  ];
 
   return (
     <div className={`h-screen border-r flex flex-col transition-all duration-300 ${
@@ -97,66 +91,25 @@ export default function DashboardSidebar() {
           );
         })}
 
-        {/* Certificaciones */}
-        <div className="px-4 py-3">
-          <button
-            onClick={() => !isCollapsed && setIsCertOpen(!isCertOpen)}
-            className={`flex w-full items-center gap-3 text-sm font-medium transition-colors ${
-              theme === 'dark' ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-zinc-900'
-            }`}
-          >
-            <Award className="w-5 h-5" />
-            {!isCollapsed && (
-              <>
-                {t.certifications}
-                <ChevronDown className={`ml-auto w-4 h-4 transition-transform ${isCertOpen ? 'rotate-180' : ''}`} />
-              </>
-            )}
-          </button>
 
-          {isCertOpen && !isCollapsed && (
-            <div className="pl-8 mt-2 space-y-1">
-              {certifications.map((cert) => {
-                const isActive = pathname === cert.href;
-                return (
-                  <Link
-                    key={cert.href}
-                    href={cert.href}
-                    className={`block px-4 py-2.5 rounded-xl text-sm transition-colors ${
-                      isActive
-                        ? theme === 'dark' ? 'bg-zinc-800 text-amber-400' : 'bg-zinc-100 text-amber-600'
-                        : theme === 'dark'
-                        ? 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
-                        : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
-                    }`}
-                  >
-                    {cert.label}
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-        </div>
       </nav>
 
-      {/* Próximos Productos */}
+      {/* Road Map */}
       {!isCollapsed && (
-        <div className={`mx-3 mb-4 p-4 rounded-2xl border ${
+        <div className={`mx-3 mb-4 p-4 rounded-2xl border flex-1 flex flex-col ${
           theme === 'dark'
             ? 'bg-zinc-800/50 border-zinc-700/50'
             : 'bg-zinc-50 border-zinc-200'
         }`}>
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-4">
             <Package className="w-4 h-4 text-amber-500" />
             <span className={`text-sm font-semibold ${
               theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'
             }`}>
-              Próximos Productos
+              {t.roadMap}
             </span>
           </div>
-          <div className="max-h-48 overflow-y-auto">
-            <CertificationsReel />
-          </div>
+          <RoadMapCards />
         </div>
       )}
 

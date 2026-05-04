@@ -14,6 +14,7 @@ interface Translations {
   agents: string;
   humiIndex: string;
   certifications: string;
+  roadMap: string;
   cerex: string;
   cerow: string;
   logout: string;
@@ -84,8 +85,9 @@ const translations: Record<Language, Translations> = {
   es: {
     home: 'Home',
     agents: 'Agentes',
-    humiIndex: 'HUMI Index',
+    humiIndex: 'Índice HUMI',
     certifications: 'Certificaciones',
+    roadMap: 'Próximas Funcionalidades',
     cerex: 'CEREX',
     cerow: 'CEROW',
     logout: 'Cerrar Sesión',
@@ -155,6 +157,7 @@ const translations: Record<Language, Translations> = {
     agents: 'Agents',
     humiIndex: 'HUMI Index',
     certifications: 'Certifications',
+    roadMap: 'Road Map',
     cerex: 'CEREX',
     cerow: 'CEROW',
     logout: 'Log Out',
