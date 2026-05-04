@@ -94,6 +94,7 @@ export default function AgentsPage() {
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [isPaginationDropdownOpen, setIsPaginationDropdownOpen] = useState(false);
 
   const searchOptions = [
     { key: 'searchGeneral', label: t.searchGeneral },
@@ -399,7 +400,7 @@ export default function AgentsPage() {
           </span>
           <div className="relative">
             <button
-              onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+              onClick={() => setIsPaginationDropdownOpen(!isPaginationDropdownOpen)}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors min-w-[80px] ${
                 theme === 'dark'
                   ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
@@ -407,10 +408,10 @@ export default function AgentsPage() {
               }`}
             >
               <span className="text-sm">{itemsPerPage}</span>
-              <ChevronDown size={14} className={`transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown size={14} className={`transition-transform ${isPaginationDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
-            {isSortDropdownOpen && (
+            {isPaginationDropdownOpen && (
               <div className={`absolute top-full left-0 mt-1 w-full border rounded-lg shadow-lg z-20 ${
                 theme === 'dark'
                   ? 'bg-zinc-800 border-zinc-700'
@@ -421,7 +422,7 @@ export default function AgentsPage() {
                     key={num}
                     onClick={() => {
                       setItemsPerPage(num);
-                      setIsSortDropdownOpen(false);
+                      setIsPaginationDropdownOpen(false);
                       setCurrentPage(1); // Reset to first page when changing items per page
                     }}
                     className={`w-full text-left px-3 py-2 text-sm hover:bg-zinc-700 transition-colors ${
