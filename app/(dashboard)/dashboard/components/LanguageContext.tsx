@@ -112,6 +112,19 @@ interface Translations {
   sortHumiScore: string;
   sortNonce: string;
   sortBalance: string;
+
+  // Agentes - Paginación
+  previous: string;
+  next: string;
+  show: string;
+  agentsPerPage: string;
+
+  // Agentes - Estados vacíos
+  noTags: string;
+  noSkills: string;
+
+  // Agentes - Tooltips
+  clearFiltersTooltip: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -215,6 +228,19 @@ const translations: Record<Language, Translations> = {
     sortNonce: 'Nonce',
     sortBalance: 'Balance',
 
+    // Agentes - Paginación
+    previous: 'Anterior',
+    next: 'Siguiente',
+    show: 'Mostrar',
+    agentsPerPage: 'agentes por página',
+
+    // Agentes - Estados vacíos
+    noTags: 'Sin tags',
+    noSkills: 'Sin skills',
+
+    // Agentes - Tooltips
+    clearFiltersTooltip: 'Limpiar filtros específicos',
+
   },
   en: {
     home: 'Home',
@@ -315,6 +341,19 @@ const translations: Record<Language, Translations> = {
     sortHumiScore: 'HUMI Index Score',
     sortNonce: 'Nonce',
     sortBalance: 'Balance',
+
+    // Agentes - Paginación
+    previous: 'Previous',
+    next: 'Next',
+    show: 'Show',
+    agentsPerPage: 'agents per page',
+
+    // Agentes - Estados vacíos
+    noTags: 'No tags',
+    noSkills: 'No skills',
+
+    // Agentes - Tooltips
+    clearFiltersTooltip: 'Clear specific filters',
   },
 };
 
