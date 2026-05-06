@@ -1,14 +1,41 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, ChevronDown, Info, ArrowUpRight, Loader2 } from 'lucide-react';
+import { Search, ChevronDown, Info, ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../components/LanguageContext';
+import { useDashboardStats } from '../components/DashboardLayoutClient';
 import { createClient } from '@/utils/supabase/client';
-import { fetchAgents, fetchAgentAdditionalData, debounce, type AgentsResponse } from './fetchAgents';
-import type { FilterParams } from '@/app/api/dashboard/agents/route';
+
+// Componente Image con fallback automático
+function AgentImage({ src, alt, ...props }: { src: string; alt: string; [key: string]: any }) {
+  const [imageSrc, setImageSrc] = useState(src);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setImageSrc(src);
+    setHasError(false);
+  }, [src]);
+
+  const handleError = () => {
+    if (!hasError) {
+      setHasError(true);
+      setImageSrc('/agent_directory_default.jpg');
+    }
+  };
+
+  return (
+    <Image
+      {...props}
+      src={imageSrc}
+      alt={alt}
+      onError={handleError}
+      unoptimized
+    />
+  );
+}
 
 
 
@@ -61,9 +88,9 @@ function getSortOptions(): { key: string; label: string }[] {
   return [
     { key: 'name', label: 'sortName' },
     { key: 'created_at', label: 'sortCreatedDate' },
-    { key: 'humi_score', label: 'sortHumiScore' },
-    { key: 'nonce', label: 'sortNonce' },
-    { key: 'balance', label: 'sortBalance' },
+    { key: 'current_humi_score', label: 'sortHumiScore' },
+    { key: 'nonce_current', label: 'sortNonce' },
+    { key: 'balance_current', label: 'sortBalance' },
   ];
 }
 
@@ -93,10 +120,54 @@ function sortAgents(agents: any[], sortBy: string, direction: 'asc' | 'desc' = '
   });
 }
 
+// Función para mapear chain names a logos disponibles
+function getChainLogo(chainName: string): string | null {
+  const chainMapping: Record<string, string> = {
+    'Ethereum': '/ETH_logo.png',
+    'Base': '/Base_logo.png',
+    'Base Mainnet': '/Base_logo.png',
+    'BNB': '/BNB_logo.png',
+    'BNB Smart Chain': '/BNB_logo.png',
+    'Arbitrum': '/Arbitrum_logo.png',
+    'Polygon': '/Polygon_logo.png',
+    'Polygon Mainnet': '/Polygon_logo.png',
+  };
+
+  return chainMapping[chainName] || null;
+}
+
+// Componente para mostrar logo de chain con fallback a texto
+function ChainBadge({ chainName }: { chainName: string }) {
+  const logoPath = getChainLogo(chainName);
+
+  if (logoPath) {
+    return (
+      <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-zinc-800/80 text-zinc-300">
+        <img
+          src={logoPath}
+          alt={chainName}
+          width={16}
+          height={16}
+          className="rounded"
+          style={{ minWidth: '16px', minHeight: '16px' }}
+        />
+        <span className="text-xs font-bold">{chainName}</span>
+      </div>
+    );
+  }
+
+  // Fallback a solo texto si no hay logo
+  return (
+    <div className="px-3 py-1 rounded-lg text-xs font-bold bg-zinc-800/80 text-zinc-300">
+      {chainName}
+    </div>
+  );
+}
+
 export default function AgentsPage() {
   const { t, theme } = useLanguage();
-
-  // Filter states
+  const dashboardStats = useDashboardStats();
+  const totalAgents = dashboardStats?.totalAgents || 0;
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOpenFilter, setSelectedOpenFilter] = useState('searchGeneral');
   const [selectedSpecificFilter, setSelectedSpecificFilter] = useState('searchNetwork');
@@ -104,138 +175,227 @@ export default function AgentsPage() {
   const [subFilterSearch, setSubFilterSearch] = useState('');
   const [selectedSort, setSelectedSort] = useState('current_humi_score');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
-
-  // UI states
   const [isOpenDropdownOpen, setIsOpenDropdownOpen] = useState(false);
   const [isSpecificDropdownOpen, setIsSpecificDropdownOpen] = useState(false);
   const [isSubDropdownOpen, setIsSubDropdownOpen] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isPaginationDropdownOpen, setIsPaginationDropdownOpen] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // Data states
+  // Estados para datos de base de datos
   const [chains, setChains] = useState<any[]>([]);
   const [advancedFilters, setAdvancedFilters] = useState<Record<string, string[]>>({});
   const [agents, setAgents] = useState<any[]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [isLoading, setIsLoading] = useState(true);
+  const [totalCount, setTotalCount] = useState(totalAgents || 0);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
-  const [additionalDataCache, setAdditionalDataCache] = useState<Record<string, any>>({});
 
-  // Debounced search ref
-  const debouncedSearchRef = useRef<ReturnType<typeof debounce>>();
+  // Función para obtener agentes desde la API
+  const fetchAgents = async (filters: {
+    searchTerm: string;
+    searchType: string;
+    chainId?: number;
+    sortBy: string;
+    sortDirection: 'asc' | 'desc';
+    page: number;
+    limit: number;
+  }) => {
+    console.log('🎯 Frontend: fetchAgents called with filters:', filters);
 
-  // Load initial data and chains/advanced filters
+    try {
+      setLoading(true);
+      setError(null);
+
+      const params = new URLSearchParams({
+        searchTerm: filters.searchTerm,
+        searchType: filters.searchType,
+        sortBy: filters.sortBy,
+        sortDirection: filters.sortDirection,
+        page: filters.page.toString(),
+        limit: filters.limit.toString(),
+        totalAgents: totalAgents?.toString() || '',
+      });
+
+      if (filters.chainId !== undefined) {
+        params.set('chainId', filters.chainId.toString());
+      }
+
+      const url = `/api/dashboard/agents?${params}`;
+      console.log('🌐 Frontend: Making request to:', url);
+
+      const response = await fetch(url);
+      console.log('📡 Frontend: Response status:', response.status);
+
+      const data = await response.json();
+      console.log('📦 Frontend: Response data:', {
+        count: data.count,
+        totalCount: data.totalCount,
+        agentsCount: data.data?.length,
+        firstAgent: data.data?.[0] ? {
+          id: data.data[0].agent_id,
+          name: data.data[0].name,
+          chain: data.data[0].chain
+        } : null
+      });
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al cargar agentes');
+      }
+
+      setAgents(data.data || []);
+      setTotalCount(data.totalCount || 0);
+    } catch (error) {
+      console.error('❌ Frontend: Error in fetchAgents:', error);
+      setError(error instanceof Error ? error.message : 'Error al cargar agentes');
+      setAgents([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cargar datos iniciales al montar
   useEffect(() => {
-    const loadInitialData = async () => {
+    const loadChains = async () => {
       try {
         const supabase = createClient();
-
-        // Load chains
-        const { data: chainsData, error: chainsError } = await supabase
+        const { data, error } = await supabase
           .schema('web_dashboard')
           .from('chains')
           .select('id, short_name');
 
-        if (chainsError) {
-          console.error('Error loading chains:', chainsError);
+        if (error) {
+          console.error('Error loading chains:', error);
+          setChains([]);
         } else {
-          setChains(chainsData || []);
+          setChains(data || []);
         }
+      } catch (error) {
+        console.error('Error loading chains:', error);
+        setChains([]);
+      }
+    };
 
-        // Load advanced filters
-        const { data: filtersData, error: filtersError } = await supabase
+    const loadAdvancedFilters = async () => {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
           .schema('web_dashboard')
           .from('agent_advanced_filters')
           .select('filter, values');
 
-        if (filtersError) {
-          console.error('Error loading advanced filters:', filtersError);
+        if (error) {
+          console.error('Error loading advanced filters:', error);
+          setAdvancedFilters({});
         } else {
+          // Procesar los datos para crear el objeto de filtros
           const filters: Record<string, string[]> = {};
-          (filtersData || []).forEach((item: any) => {
+          (data || []).forEach((item: any) => {
             try {
               let values: string[];
+
+              // Si ya es un array, usarlo directamente
               if (Array.isArray(item.values)) {
                 values = item.values;
-              } else if (typeof item.values === 'string') {
+              }
+              // Si es un string, intentar parsearlo
+              else if (typeof item.values === 'string') {
                 const cleanString = item.values.trim();
+
+                // Si parece un JSON array válido, parsearlo
                 if (cleanString.startsWith('[') && cleanString.endsWith(']')) {
                   values = JSON.parse(cleanString);
-                } else if (cleanString.includes(',')) {
+                }
+                // Si no es JSON pero parece una lista separada por comas
+                else if (cleanString.includes(',')) {
                   values = cleanString.split(',').map((v: string) => v.trim().replace(/^["']|["']$/g, ''));
-                } else {
+                }
+                // Si es un solo valor, convertirlo a array
+                else {
                   values = [cleanString];
                 }
               } else {
                 values = [];
               }
+
               if (Array.isArray(values)) {
                 filters[item.filter] = values;
               }
             } catch (parseError) {
               console.error('Error parsing filter values for', item.filter, ':', parseError);
+              console.log('Raw value:', item.values);
+              // En caso de error, intentar usar el valor como array vacío
               filters[item.filter] = [];
             }
           });
           setAdvancedFilters(filters);
         }
       } catch (error) {
-        console.error('Error loading initial data:', error);
+        console.error('Error loading advanced filters:', error);
+        setAdvancedFilters({});
       }
     };
 
-    loadInitialData();
+    // Cargar agentes iniciales
+    fetchAgents({
+      searchTerm: '',
+      searchType: 'general',
+      sortBy: selectedSort,
+      sortDirection: sortDirection,
+      page: 1,
+      limit: itemsPerPage,
+    });
+
+    loadChains();
+    loadAdvancedFilters();
   }, []);
 
-  // Load agents with current filters
-  const loadAgents = useCallback(async (filters: FilterParams) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const response = await fetchAgents(filters);
-      setAgents(response.data);
-      setTotalCount(response.count);
-    } catch (error) {
-      console.error('Error loading agents:', error);
-      setError(error instanceof Error ? error.message : 'Error al cargar agentes');
-      setAgents([]);
-      setTotalCount(0);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  // Debounced search effect
+  // useEffect para manejar cambios de página
   useEffect(() => {
-    if (debouncedSearchRef.current) {
-      debouncedSearchRef.current.cancel?.();
+    // Evitar llamada inicial duplicada - solo en la carga inicial del componente
+    if (isInitialLoad) {
+      setIsInitialLoad(false); // Ya no es carga inicial
+      return; // No hacer llamada
     }
 
-    debouncedSearchRef.current = debounce(() => {
-      loadAgents({
-        searchTerm,
-        searchType: selectedOpenFilter as FilterParams['searchType'],
-        chainId: selectedSubFilter !== 'all' && selectedSpecificFilter === 'searchNetwork'
-          ? parseInt(selectedSubFilter)
-          : undefined,
-        sortBy: selectedSort as FilterParams['sortBy'],
-        sortDirection: sortDirection as 'asc' | 'desc',
-        page: currentPage,
-        limit: itemsPerPage,
-      });
-    }, 300);
+    // Hacer llamada a la API para navegación normal
+    fetchAgents({
+      searchTerm: searchTerm,
+      searchType: selectedOpenFilter.replace('search', '').toLowerCase(),
+      chainId: selectedSpecificFilter === 'searchNetwork' && selectedSubFilter !== 'all'
+        ? parseInt(selectedSubFilter)
+        : undefined,
+      sortBy: selectedSort,
+      sortDirection: sortDirection,
+      page: currentPage,
+      limit: itemsPerPage,
+    });
+  }, [currentPage, itemsPerPage, searchTerm, selectedOpenFilter, selectedSpecificFilter, selectedSubFilter, selectedSort, sortDirection]);
 
-    debouncedSearchRef.current();
-
-    return () => {
-      if (debouncedSearchRef.current) {
-        debouncedSearchRef.current.cancel?.();
+  // useEffect para manejar cambios de filtros (con debounce para búsqueda)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (currentPage !== 1) {
+        setCurrentPage(1); // Reset to first page when filters change
+      } else {
+        fetchAgents({
+          searchTerm: searchTerm,
+          searchType: selectedOpenFilter.replace('search', '').toLowerCase(),
+          chainId: selectedSpecificFilter === 'searchNetwork' && selectedSubFilter !== 'all'
+            ? parseInt(selectedSubFilter)
+            : undefined,
+          sortBy: selectedSort,
+          sortDirection: sortDirection,
+          page: 1,
+          limit: itemsPerPage,
+        });
       }
-    };
-  }, [searchTerm, selectedOpenFilter, selectedSubFilter, selectedSpecificFilter, selectedSort, sortDirection, currentPage, itemsPerPage, loadAgents]);
+    }, searchTerm ? 300 : 0); // Debounce solo para búsqueda por texto
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, selectedOpenFilter, selectedSpecificFilter, selectedSubFilter, selectedSort, sortDirection]);
 
   // Opciones de búsqueda abierta (solo texto)
   const openSearchOptions = [
@@ -262,9 +422,75 @@ export default function AgentsPage() {
     { key: 'searchOasfDomains', label: t.searchOasfDomains },
   ];
 
-  // Server-side pagination - agents are already paginated from API
-  const totalPages = Math.ceil(totalCount / itemsPerPage);
-  const paginatedAgents = agents; // Agents are already paginated from the API
+  // Filtrar agentes (por ahora solo búsqueda básica, luego implementaremos filtros avanzados)
+  const filteredAgents = agents.filter((agent: any) => {
+    // Filtro de búsqueda por texto (siempre activo)
+    const matchesSearch = searchTerm === '' ||
+      agent.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      agent.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Filtro específico por red cuando se selecciona "Buscar por red"
+    let matchesSpecificFilter = true;
+    if (selectedSpecificFilter === 'searchNetwork' && selectedSubFilter !== 'all') {
+      // Encontrar el nombre de la cadena correspondiente al ID seleccionado
+      const selectedChain = chains.find(chain => chain.id.toString() === selectedSubFilter);
+      matchesSpecificFilter = selectedChain ? agent.chain === selectedChain.short_name : false;
+    }
+
+    return matchesSearch && matchesSpecificFilter;
+  });
+
+  // Aplicar ordenamiento
+  const sortedAgents = sortAgents(filteredAgents, selectedSort, sortDirection);
+
+  // Paginación - ahora usa server-side data
+  // Debug: verificar valores
+  console.log('Debug - totalCount:', totalCount, 'itemsPerPage:', itemsPerPage);
+
+  // Limitar totalPages a un máximo razonable para evitar UI rota
+  const maxReasonablePages = 10000;
+  const calculatedTotalPages = Math.ceil(totalCount / itemsPerPage);
+  const totalPages = Math.min(calculatedTotalPages, maxReasonablePages);
+
+  console.log('Debug - calculatedTotalPages:', calculatedTotalPages, 'limitedTotalPages:', totalPages);
+
+  const paginatedAgents = agents; // Los agentes ya vienen paginados del servidor
+
+  // Función para generar páginas inteligentes (evita miles de botones)
+  const getVisiblePages = () => {
+    const maxVisiblePages = 10;
+    const pages = [];
+
+    if (totalPages <= maxVisiblePages) {
+      // Si hay pocas páginas, mostrar todas
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Lógica inteligente: primera, última, actual ± 2
+      const startPage = Math.max(1, currentPage - 2);
+      const endPage = Math.min(totalPages, currentPage + 2);
+
+      // Siempre incluir la primera página
+      if (startPage > 1) {
+        pages.push(1);
+        if (startPage > 2) pages.push('...');
+      }
+
+      // Páginas del medio
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+
+      // Siempre incluir la última página
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
+  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -299,29 +525,23 @@ export default function AgentsPage() {
     setCurrentPage(1); // Reset to first page
   };
 
-  const toggleFlip = async (agentId: string) => {
-    const newFlippedCards = new Set(flippedCards);
-    const wasFlipped = newFlippedCards.has(agentId);
-
-    if (wasFlipped) {
-      newFlippedCards.delete(agentId);
-    } else {
-      newFlippedCards.add(agentId);
-      // Load additional data if not already cached
-      if (!additionalDataCache[agentId]) {
-        try {
-          const response = await fetchAgentAdditionalData(agentId);
-          setAdditionalDataCache(prev => ({
-            ...prev,
-            [agentId]: response.data
-          }));
-        } catch (error) {
-          console.error('Error loading additional data:', error);
-        }
+  const toggleFlip = (agentId: string) => {
+    setFlippedCards(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(agentId)) {
+        newSet.delete(agentId);
+      } else {
+        newSet.add(agentId);
+        // Aquí podríamos cargar campos adicionales si fuera necesario
+        loadAdditionalFields(agentId);
       }
-    }
+      return newSet;
+    });
+  };
 
-    setFlippedCards(newFlippedCards);
+  const loadAdditionalFields = async (agentId: string) => {
+    // Por ahora no cargamos campos adicionales, pero la función está lista
+    // para cuando implementemos lazy loading
   };
 
   return (
@@ -566,7 +786,7 @@ export default function AgentsPage() {
 
 
       {/* Mostrar mensaje de carga */}
-      {isLoading && (
+      {loading && (
         <div className="text-center py-12">
           <div className={`text-lg ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>
             Cargando agentes...
@@ -575,7 +795,7 @@ export default function AgentsPage() {
       )}
 
       {/* Mostrar mensaje de error */}
-      {error && !isLoading && (
+      {error && !loading && (
         <div className="text-center py-12">
           <div className={`text-lg ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>
             {error}
@@ -584,7 +804,7 @@ export default function AgentsPage() {
       )}
 
       {/* Mostrar mensaje cuando no hay agentes */}
-      {!isLoading && !error && agents.length === 0 && (
+      {!loading && !error && agents.length === 0 && (
         <div className="text-center py-12">
           <div className={`text-lg ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>
             No se encontraron agentes con los parámetros de búsqueda seleccionados
@@ -593,8 +813,8 @@ export default function AgentsPage() {
       )}
 
       {/* Grid de agentes */}
-      {!isLoading && !error && agents.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      {!loading && !error && agents.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
           {paginatedAgents.map((agent, index) => (
             <motion.div
               key={agent.agent_id}
@@ -644,12 +864,11 @@ export default function AgentsPage() {
                     }} />
 
                     <div className="relative h-52">
-                      <Image
+                      <AgentImage
                         src={agent.image_url}
                         alt={agent.name}
                         fill
                         className="object-contain object-center"
-                        unoptimized
                       />
 
                       {/* HUMI Score Status - Esquina superior derecha */}
@@ -659,14 +878,10 @@ export default function AgentsPage() {
                         </div>
                       </div>
 
-                      {/* Chain Name - Esquina superior izquierda */}
-                      <div className="absolute top-4 left-4 z-10">
-                        <div className={`px-3 py-1 rounded-lg text-xs font-bold ${
-                          theme === 'dark' ? 'bg-zinc-800/80 text-zinc-300' : 'bg-white/80 text-zinc-700'
-                        }`}>
-                          {agent.chain}
+                        {/* Chain Badge - Esquina superior izquierda */}
+                        <div className="absolute top-4 left-4 z-10">
+                          <ChainBadge chainName={agent.chain_name} />
                         </div>
-                      </div>
                     </div>
 
                     <div className="p-6 pt-4">
@@ -721,109 +936,69 @@ export default function AgentsPage() {
 
                       {/* Información detallada */}
                       <div className="space-y-3 text-sm pr-2">
-                        {/* Loading state for additional data */}
-                        {!additionalDataCache[agent.agent_id] && flippedCards.has(agent.agent_id) && (
-                          <div className="flex items-center justify-center py-4">
-                            <Loader2 className="animate-spin h-6 w-6 text-emerald-500" />
-                            <span className={`ml-2 text-sm ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                              Cargando detalles...
+                        {/* Descripción truncada */}
+                        <div className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
+                          <span className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}>📝</span>
+                          <span className="ml-2">
+                            {agent.description ? agent.description.substring(0, 80) + (agent.description.length > 80 ? '...' : '') : 'Sin descripción'}
+                          </span>
+                        </div>
+
+                        {/* Fecha de creación */}
+                        <div className="flex items-center gap-2">
+                          <span className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}>📅</span>
+                          <span className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
+                            {agent.created_at ? new Date(agent.created_at).toLocaleDateString('es-ES') : 'N/A'}
+                          </span>
+                        </div>
+
+                        {/* Wallets en la misma línea */}
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <span className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}>👤</span>
+                            <span className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} font-mono text-xs`}>
+                              {agent.owner_wallet ? `${agent.owner_wallet.substring(0, 6)}...${agent.owner_wallet.substring(agent.owner_wallet.length - 4)}` : 'N/A'}
                             </span>
                           </div>
-                        )}
+                          <div className="flex items-center gap-2">
+                            <span className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}>🤖</span>
+                            <span className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} font-mono text-xs`}>
+                              {agent.transactional_wallets ? `${agent.transactional_wallets.substring(0, 6)}...${agent.transactional_wallets.substring(agent.transactional_wallets.length - 4)}` : 'N/A'}
+                            </span>
+                          </div>
+                        </div>
 
-                        {/* Show data when available */}
-                        {additionalDataCache[agent.agent_id] && (
-                          <>
-                            {/* Descripción truncada */}
-                            <div className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
-                              <span className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}>📝</span>
-                              <span className="ml-2">
-                                {agent.description ? agent.description.substring(0, 80) + (agent.description.length > 80 ? '...' : '') : 'Sin descripción'}
-                              </span>
-                            </div>
+                        {/* Nonce */}
+                        <div className="flex items-center gap-2">
+                          <span className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}>🔢</span>
+                          <span className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
+                            Nonce: {agent.nonce || 'N/A'}
+                          </span>
+                        </div>
 
-                            {/* Fecha de creación */}
-                            <div className="flex items-center gap-2">
-                              <span className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}>📅</span>
-                              <span className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
-                                {agent.created_at ? new Date(agent.created_at).toLocaleDateString('es-ES') : 'N/A'}
-                              </span>
-                            </div>
+                        {/* Tags principales */}
+                        <div className="flex items-start gap-2">
+                          <span className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} mt-0.5`}>🏷️</span>
+                          <div className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} text-xs`}>
+                            <span className="mr-1">Tags:</span>
+                            {agent.tags_filters && Array.isArray(agent.tags_filters) && agent.tags_filters.length > 0
+                              ? agent.tags_filters.slice(0, 3).join(', ')
+                              : t.noTags
+                            }
+                          </div>
+                        </div>
 
-                            {/* Wallets en la misma línea */}
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-2">
-                                <span className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}>👤</span>
-                                <span className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} font-mono text-xs`}>
-                                  {additionalDataCache[agent.agent_id].owner_wallet
-                                    ? `${additionalDataCache[agent.agent_id].owner_wallet.substring(0, 6)}...${additionalDataCache[agent.agent_id].owner_wallet.substring(additionalDataCache[agent.agent_id].owner_wallet.length - 4)}`
-                                    : 'N/A'
-                                  }
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}>🤖</span>
-                                <span className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} font-mono text-xs`}>
-                                  {additionalDataCache[agent.agent_id].transactional_wallets
-                                    ? `${additionalDataCache[agent.agent_id].transactional_wallets.substring(0, 6)}...${additionalDataCache[agent.agent_id].transactional_wallets.substring(additionalDataCache[agent.agent_id].transactional_wallets.length - 4)}`
-                                    : 'N/A'
-                                  }
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Nonce y Balance */}
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-2">
-                                <span className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}>🔢</span>
-                                <span className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
-                                  Nonce: {additionalDataCache[agent.agent_id].nonce_current || 'N/A'}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}>💰</span>
-                                <span className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
-                                  Balance: {additionalDataCache[agent.agent_id].balance_current || 'N/A'}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Tags principales */}
-                            <div className="flex items-start gap-2">
-                              <span className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} mt-0.5`}>🏷️</span>
-                              <div className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} text-xs`}>
-                                <span className="mr-1">Tags:</span>
-                                {additionalDataCache[agent.agent_id].tags_filters && Array.isArray(additionalDataCache[agent.agent_id].tags_filters) && additionalDataCache[agent.agent_id].tags_filters.length > 0
-                                  ? additionalDataCache[agent.agent_id].tags_filters.slice(0, 3).join(', ')
-                                  : t.noTags
-                                }
-                              </div>
-                            </div>
-
-                            {/* Skills principales */}
-                            <div className="flex items-start gap-2">
-                              <span className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} mt-0.5`}>⚡</span>
-                              <div className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} text-xs`}>
-                                <span className="mr-1">Skills:</span>
-                                {additionalDataCache[agent.agent_id].skills_filters && Array.isArray(additionalDataCache[agent.agent_id].skills_filters) && additionalDataCache[agent.agent_id].skills_filters.length > 0
-                                  ? additionalDataCache[agent.agent_id].skills_filters.slice(0, 2).join(', ')
-                                  : t.noSkills
-                                }
-                              </div>
-                            </div>
-
-                            {/* Supported Trust */}
-                            {additionalDataCache[agent.agent_id].supported_trust && (
-                              <div className="flex items-start gap-2">
-                                <span className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} mt-0.5`}>🔒</span>
-                                <div className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} text-xs`}>
-                                  <span className="mr-1">Trust:</span>
-                                  {additionalDataCache[agent.agent_id].supported_trust}
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        )}
+                        {/* Skills principales */}
+                        <div className="flex items-start gap-2">
+                          <span className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} mt-0.5`}>⚡</span>
+                          <div className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} text-xs`}>
+                            <span className="mr-1">Skills:</span>
+                            {agent.skills_filters && Array.isArray(agent.skills_filters) && agent.skills_filters.length > 0
+                              ? agent.skills_filters.slice(0, 2).join(', ')
+                              : t.noSkills
+                            }
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -901,22 +1076,33 @@ export default function AgentsPage() {
             </button>
 
             <div className="flex gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => handlePageChange(page)}
-                  className={`px-3 py-2 rounded-lg border transition-colors ${
-                    currentPage === page
-                      ? theme === 'dark'
-                        ? 'bg-emerald-600 border-emerald-500 text-white'
-                        : 'bg-emerald-500 border-emerald-400 text-white'
-                      : theme === 'dark'
-                        ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
-                        : 'bg-white border-zinc-300 text-zinc-900 hover:bg-zinc-100'
-                  }`}
-                >
-                  {page}
-                </button>
+              {getVisiblePages().map((page, index) => (
+                typeof page === 'number' ? (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    className={`px-3 py-2 rounded-lg border transition-colors ${
+                      currentPage === page
+                        ? theme === 'dark'
+                          ? 'bg-emerald-600 border-emerald-500 text-white'
+                          : 'bg-emerald-500 border-emerald-400 text-white'
+                        : theme === 'dark'
+                          ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
+                          : 'bg-white border-zinc-300 text-zinc-900 hover:bg-zinc-100'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ) : (
+                  <span
+                    key={`ellipsis-${index}`}
+                    className={`px-2 py-2 text-sm ${
+                      theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'
+                    }`}
+                  >
+                    {page}
+                  </span>
+                )
               ))}
             </div>
 

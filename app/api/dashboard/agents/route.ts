@@ -1,82 +1,74 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/utils/supabase/server';
 
-export interface FilterParams {
-  searchTerm: string;
-  searchType: 'general' | 'name' | 'description' | 'owner_wallet' | 'wallet' | 'metadata' | 'supported_trust' | 'oasf_skills' | 'technical_tools' | 'technical_prompts' | 'technical_capabilities' | 'services';
+// Interface para los parámetros de filtro
+interface FilterParams {
+  searchTerm?: string;
+  searchType?: 'general' | 'name' | 'description' | 'owner_wallet' | 'wallet' | 'metadata';
   chainId?: number | null;
-  sortBy: 'on_chain_created_at' | 'name' | 'nonce_current' | 'balance_current' | 'current_humi_score';
-  sortDirection: 'asc' | 'desc';
-  page: number;
-  limit: number;
+  sortBy?: 'on_chain_created_at' | 'name' | 'nonce_current' | 'balance_current' | 'current_humi_score';
+  sortDirection?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+  totalAgents?: number;
 }
 
 export async function GET(request: NextRequest) {
+  console.log('🔍 API Route called with URL:', request.url);
+
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    console.log('🔍 Creating Supabase client...');
+    const supabase = await createClient();
+    console.log('✅ Supabase client created successfully');
 
-    // Test basic connection first
-    const { error: testError } = await supabase
-      .schema('web_dashboard')
-      .from('agents')
-      .select('id', { count: 'exact', head: true })
-      .limit(1);
-
-    if (testError) {
-      console.error('Connection test failed:', testError);
-      return NextResponse.json(
-        { error: 'Error de conexión a la base de datos', details: testError.message },
-        { status: 500 }
-      );
-    }
-
+    // Parsear parámetros de la URL
     const { searchParams } = new URL(request.url);
-
-    // Parse query parameters
     const filters: FilterParams = {
       searchTerm: searchParams.get('searchTerm') || '',
-      searchType: (searchParams.get('searchType') as FilterParams['searchType']) || 'general',
+      searchType: searchParams.get('searchType') as FilterParams['searchType'] || 'general',
       chainId: searchParams.get('chainId') ? parseInt(searchParams.get('chainId')!) : null,
-      sortBy: (searchParams.get('sortBy') as FilterParams['sortBy']) || 'on_chain_created_at',
-      sortDirection: (searchParams.get('sortDirection') as FilterParams['sortDirection']) || 'desc',
+      sortBy: searchParams.get('sortBy') as FilterParams['sortBy'] || 'current_humi_score',
+      sortDirection: searchParams.get('sortDirection') as FilterParams['sortDirection'] || 'desc',
       page: parseInt(searchParams.get('page') || '1'),
       limit: parseInt(searchParams.get('limit') || '10'),
+      totalAgents: searchParams.get('totalAgents') ? parseInt(searchParams.get('totalAgents')!) : undefined,
     };
 
-    // Validate limit
-    if (![10, 20, 30, 50].includes(filters.limit)) {
-      filters.limit = 10;
-    }
+    // Validar parámetros
+    const page = Math.max(1, filters.page || 1);
+    const limit = Math.min(50, Math.max(1, filters.limit || 10));
 
-    // Calculate offset
-    const offset = (filters.page - 1) * filters.limit;
+    // Calcular offset para paginación
+    const offset = (page - 1) * limit;
 
-    // Build base query - only essential fields for performance
+    // Construir la consulta base - versión simplificada para testing
     let query = supabase
       .schema('web_dashboard')
       .from('agents')
       .select(`
         id,
-        chain_id,
+        chain_name,
         name,
         description,
         image_url,
         current_humi_score,
         on_chain_created_at
-      `, { count: 'exact' })
-      .gt('current_humi_score', 0); // Only agents with valid HUMI scores
+      `);
 
-    // Apply search filters
-    if (filters.searchTerm.trim()) {
+    // Aplicar filtros de calidad (igual que en la implementación actual)
+    query = query.gt('current_humi_score', 0);
+    query = query.neq('name', 'Unnamed Agent');
+
+    // Aplicar filtro de cadena si se especifica
+    if (filters.chainId !== null) {
+      query = query.eq('chain_id', filters.chainId);
+    }
+
+    // Aplicar filtros de búsqueda
+    if (filters.searchTerm && filters.searchTerm.trim()) {
       const searchTerm = filters.searchTerm.trim();
 
       switch (filters.searchType) {
-        case 'general':
-          query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-          break;
         case 'name':
           query = query.ilike('name', `%${searchTerm}%`);
           break;
@@ -92,40 +84,39 @@ export async function GET(request: NextRequest) {
         case 'metadata':
           query = query.ilike('searchable_metadata', `%${searchTerm}%`);
           break;
-        case 'supported_trust':
-          query = query.ilike('supported_trust', `%${searchTerm}%`);
-          break;
-        case 'oasf_skills':
-          query = query.ilike('oasf_skills', `%${searchTerm}%`);
-          break;
-        case 'technical_tools':
-          query = query.ilike('technical_tools', `%${searchTerm}%`);
-          break;
-        case 'technical_prompts':
-          query = query.ilike('technical_prompts', `%${searchTerm}%`);
-          break;
-        case 'technical_capabilities':
-          query = query.ilike('technical_capabilities', `%${searchTerm}%`);
-          break;
-        case 'services':
-          query = query.ilike('services', `%${searchTerm}%`);
+        case 'general':
+        default:
+          // Búsqueda general en múltiples campos
+          query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,owner_wallet.ilike.%${searchTerm}%,transactional_wallets.ilike.%${searchTerm}%,searchable_metadata.ilike.%${searchTerm}%`);
           break;
       }
     }
 
-    // Apply chain filter
-    if (filters.chainId) {
-      query = query.eq('chain_id', filters.chainId);
+    // Aplicar ordenamiento
+    const sortDirection = filters.sortDirection === 'asc';
+    switch (filters.sortBy) {
+      case 'name':
+        query = query.order('name', { ascending: sortDirection });
+        break;
+      case 'nonce_current':
+        query = query.order('nonce_current', { ascending: sortDirection });
+        break;
+      case 'balance_current':
+        query = query.order('balance_current', { ascending: sortDirection });
+        break;
+      case 'current_humi_score':
+        query = query.order('current_humi_score', { ascending: sortDirection });
+        break;
+      case 'on_chain_created_at':
+      default:
+        query = query.order('on_chain_created_at', { ascending: sortDirection });
+        break;
     }
 
-    // Apply sorting
-    const ascending = filters.sortDirection === 'asc';
-    query = query.order(filters.sortBy, { ascending });
+    // Aplicar paginación
+    query = query.range(offset, offset + limit - 1);
 
-    // Apply pagination
-    query = query.range(offset, offset + filters.limit - 1);
-
-    // Execute query
+    // Ejecutar la consulta
     const { data, error, count } = await query;
 
     if (error) {
@@ -136,51 +127,53 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get chains data for mapping (cache this in production)
-    // For now, skip chains loading to test if that's causing the timeout
-    const chainsData = null;
+    // Mapear agentes usando chain_name directamente de la tabla agents
+    const mappedAgents = (data || []).map((agent: any) => {
+      console.log('Debug agent:', { id: agent.id, chain_name: agent.chain_name, hasChainName: !!agent.chain_name });
+      return {
+        agent_id: agent.id,
+        chain: agent.chain_name,
+        on_chain_id: null, // No cargado inicialmente
+        created_at: agent.on_chain_created_at,
+        name: agent.name,
+        description: agent.description,
+        image_url: agent.image_url || '/agent_directory_default.jpg',
+        owner_wallet: agent.owner_wallet,
+        searchable_metadata: agent.searchable_metadata,
+        supported_trust: agent.supported_trust,
+        skills_filters: null, // No cargado inicialmente
+        capabilities_filters: null, // No cargado inicialmente
+        tags_filters: null, // No cargado inicialmente
+        oasf_domains_filters: null, // No cargado inicialmente
+        oasf_skills: null, // No cargado inicialmente
+        technical_tools: null, // No cargado inicialmente
+        technical_prompts: null, // No cargado inicialmente
+        technical_capabilities: null, // No cargado inicialmente
+        services: null, // No cargado inicialmente
+        has_x402: null, // No cargado inicialmente
+        transactional_wallets: agent.transactional_wallets,
+        humi_score: agent.current_humi_score,
+        nonce_current: agent.nonce_current,
+        balance_current: agent.balance_current
+      };
+    });
 
-    // Map agents with chain names
-    const mappedAgents = (data || []).map((agent: any) => ({
-      agent_id: agent.id,
-      chain: 'Unknown', // Temporarily disabled chains loading
-      on_chain_id: null, // Not loaded initially for performance
-      created_at: agent.on_chain_created_at,
-      name: agent.name,
-      description: agent.description,
-      image_url: agent.image_url || '/agent_directory_default.jpg',
-      // Additional fields will be loaded via lazy loading
-      owner_wallet: null,
-      searchable_metadata: null,
-      supported_trust: null,
-      skills_filters: null,
-      capabilities_filters: null,
-      tags_filters: null,
-      oasf_domains_filters: null,
-      oasf_skills: null,
-      technical_tools: null,
-      technical_prompts: null,
-      technical_capabilities: null,
-      services: null,
-      has_x402: null,
-      transactional_wallets: null,
-      humi_score: agent.current_humi_score,
-      nonce_current: null,
-      balance_current: null
-    }));
+    // Usar totalAgents del cliente si está disponible, sino usar count de la consulta
+    const totalCount = filters.totalAgents || count || 0;
 
     return NextResponse.json({
       data: mappedAgents,
       count: count || 0,
-      page: filters.page,
-      limit: filters.limit,
-      totalPages: Math.ceil((count || 0) / filters.limit)
+      totalCount: totalCount,
+      page: page,
+      limit: limit,
+      totalPages: Math.ceil(totalCount / limit)
     });
 
   } catch (error) {
-    console.error('API error:', error);
+    console.error('API Error:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error interno del servidor', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

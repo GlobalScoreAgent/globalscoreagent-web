@@ -267,16 +267,38 @@ function NetworkCards({ isDark, t, chainStats }: any) {
                 {/* Logo con efecto de relieve y glow */}
                 <div className="relative">
                   <div
-                    className="w-14 h-14 rounded-xl flex items-center justify-center shadow-xl"
+                    className="w-14 h-14 rounded-xl flex items-center justify-center shadow-xl relative"
                     style={{
                       background: `radial-gradient(circle, ${network.color}20 0%, transparent 70%)`,
                       boxShadow: `0 0 25px ${network.color}35, inset 0 3px 8px rgba(255,255,255,0.2)`
                     }}
                   >
+                    {/* Fallback siempre visible */}
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm absolute inset-0"
+                      style={{ backgroundColor: network.color }}
+                    >
+                      {network.name}
+                    </div>
+
+                    {/* Imagen que se superpone */}
                     <img
                       src={`/${network.logoFile}`}
                       alt={`${network.fullName} logo`}
-                      className="w-10 h-10 object-contain drop-shadow-md"
+                      className="w-10 h-10 object-contain drop-shadow-md relative z-10"
+                      onLoad={(e) => {
+                        // Si la imagen carga correctamente, ocultar el fallback
+                        const target = e.target as HTMLImageElement;
+                        const fallback = target.previousElementSibling as HTMLElement;
+                        if (fallback) {
+                          fallback.style.opacity = '0';
+                        }
+                      }}
+                      onError={(e) => {
+                        // Mantener el fallback visible si hay error
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                      }}
                     />
                   </div>
                 </div>
@@ -347,16 +369,38 @@ function NetworkCards({ isDark, t, chainStats }: any) {
                 <div className="flex flex-col items-center flex-shrink-0">
                   <div className="relative mb-1">
                     <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
+                      className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg relative"
                       style={{
                         background: `radial-gradient(circle, ${network.color}25 0%, transparent 70%)`,
                         boxShadow: `0 0 25px ${network.color}35, inset 0 3px 6px rgba(255,255,255,0.2)`
                       }}
                     >
+                      {/* Fallback siempre visible */}
+                      <div
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs absolute inset-0"
+                        style={{ backgroundColor: network.color }}
+                      >
+                        {network.name}
+                      </div>
+
+                      {/* Imagen que se superpone */}
                       <img
                         src={`/${network.logoFile}`}
                         alt={`${network.fullName} logo`}
-                        className="w-8 h-8 object-contain drop-shadow-md"
+                        className="w-8 h-8 object-contain drop-shadow-md relative z-10"
+                        onLoad={(e) => {
+                          // Si la imagen carga correctamente, ocultar el fallback
+                          const target = e.target as HTMLImageElement;
+                          const fallback = target.previousElementSibling as HTMLElement;
+                          if (fallback) {
+                            fallback.style.opacity = '0';
+                          }
+                        }}
+                        onError={(e) => {
+                          // Mantener el fallback visible si hay error
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                        }}
                       />
                     </div>
                   </div>
