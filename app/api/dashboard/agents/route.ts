@@ -50,6 +50,15 @@ function parseBooleanValue(value: string): boolean | null {
   return null;
 }
 
+/** JSONB @> payload: array of objects with `type` (matches services column shape). */
+function jsonbContainsServiceTypePayload(rawType: string): string {
+  return JSON.stringify([{ type: rawType }]);
+}
+
+function isServicesTypeFilterColumn(columnName: string): boolean {
+  return columnName === 'services';
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -145,16 +154,34 @@ export async function GET(request: NextRequest) {
       const filterValues = advancedFilters[filters.advancedFilterName];
       const columnName = filters.advancedFilterKey;
 
-      if (Array.isArray(filters.advancedFilterTagRawValues) && filters.advancedFilterTagRawValues.length > 0) {
-        // Any-match sobre jsonb arrays: obtener IDs por cada tag_raw_value con contains (cs) y luego intersectar en query principal
+      const hasTagRawValues =
+        Array.isArray(filters.advancedFilterTagRawValues) && filters.advancedFilterTagRawValues.length > 0;
+      const hasSimpleValue =
+        !!filters.advancedFilterValue && filters.advancedFilterValue !== 'all';
+
+      // Booleans: siempre eq (evita rama jsonb/cs si agent_advanced_filters envía tag_raw_values por error)
+      if (hasSimpleValue && isSimpleFilter(filterValues) && isBooleanLikeFilter(filterValues)) {
+        const parsed = parseBooleanValue(filters.advancedFilterValue);
+        if (parsed === null) {
+          query = query.eq('id', -1);
+        } else {
+          query = query.eq(columnName, parsed);
+        }
+      } else if (hasTagRawValues) {
+        // Any-match sobre jsonb: cs = @> ; services usa objetos { type } no strings en el array
         const idBuckets = await Promise.all(
-          filters.advancedFilterTagRawValues.map(async (rawValue) => {
+          filters.advancedFilterTagRawValues!.map(async (rawValue) => {
+            const containsPayload = isServicesTypeFilterColumn(columnName)
+              ? jsonbContainsServiceTypePayload(rawValue)
+              : `["${rawValue.replace(/"/g, '\\"')}"]`;
+
             const { data } = await supabase
               .schema('web_dashboard')
               .from('agents')
               .select('id')
-              .filter(columnName, 'cs', `["${rawValue.replace(/"/g, '\\"')}"]`)
+              .filter(columnName, 'cs', containsPayload)
               .limit(2000);
+
             return (data || []).map((row: any) => row.id);
           })
         );
@@ -165,17 +192,8 @@ export async function GET(request: NextRequest) {
         } else {
           query = query.eq('id', -1);
         }
-      } else if (filters.advancedFilterValue && filters.advancedFilterValue !== 'all' && isSimpleFilter(filterValues)) {
-        if (isBooleanLikeFilter(filterValues)) {
-          const parsed = parseBooleanValue(filters.advancedFilterValue);
-          if (parsed === null) {
-            query = query.eq('id', -1);
-          } else {
-            query = query.eq(columnName, parsed);
-          }
-        } else {
-          query = query.eq(columnName, filters.advancedFilterValue.trim());
-        }
+      } else if (hasSimpleValue && isSimpleFilter(filterValues)) {
+        query = query.eq(columnName, filters.advancedFilterValue.trim());
       }
     }
 
