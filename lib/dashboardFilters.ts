@@ -68,3 +68,29 @@ export function getSubCategoryOptions(
       label: item.value_label,
     }));
 }
+
+export function getTagRawValuesForSelection(
+  filterType: string,
+  selectedCategory: string,
+  selectedSubFilter: string,
+  advancedFilters: Record<string, any>
+): string[] {
+  const dbFilterType = mapFrontendFilterToDb(filterType);
+  const values = advancedFilters[dbFilterType] || [];
+
+  if (!Array.isArray(values) || !isComplexFilter(filterType, advancedFilters)) {
+    return [];
+  }
+
+  const category = values.find((cat: any) => cat.category_key === selectedCategory);
+  if (!category || !Array.isArray(category.items)) {
+    return [];
+  }
+
+  const selectedItem = category.items.find((item: any) => item.value_key === selectedSubFilter);
+  if (!selectedItem || !Array.isArray(selectedItem.tag_raw_values)) {
+    return [];
+  }
+
+  return selectedItem.tag_raw_values.filter((value: any) => typeof value === 'string');
+}

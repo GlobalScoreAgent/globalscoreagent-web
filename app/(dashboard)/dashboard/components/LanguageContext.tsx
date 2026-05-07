@@ -131,6 +131,9 @@ interface Translations {
 
   // Agentes - Tooltips
   clearFiltersTooltip: string;
+  searchLoadingAgents: string;
+  searchUpdatingResults: string;
+  searchRetry: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -252,6 +255,9 @@ const translations: Record<Language, Translations> = {
 
     // Agentes - Tooltips
     clearFiltersTooltip: 'Limpiar filtros específicos',
+    searchLoadingAgents: 'Consultando base de datos...',
+    searchUpdatingResults: 'Actualizando resultados...',
+    searchRetry: 'Reintentar',
 
   },
   en: {
@@ -372,6 +378,9 @@ const translations: Record<Language, Translations> = {
 
     // Agentes - Tooltips
     clearFiltersTooltip: 'Clear specific filters',
+    searchLoadingAgents: 'Querying database...',
+    searchUpdatingResults: 'Updating results...',
+    searchRetry: 'Retry',
   },
 };
 

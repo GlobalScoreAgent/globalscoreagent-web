@@ -11,6 +11,7 @@ import { createClient } from '@/utils/supabase/client';
 import {
   getAdvancedFilterOptions,
   getSubCategoryOptions,
+  getTagRawValuesForSelection,
   isComplexFilter,
 } from '@/lib/dashboardFilters';
 
@@ -217,6 +218,7 @@ export default function AgentsPage() {
   const [agents, setAgents] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState(totalAgents || 0);
   const [loading, setLoading] = useState(true);
+  const [isRefetching, setIsRefetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -237,7 +239,11 @@ export default function AgentsPage() {
     limit: number;
   }) => {
     try {
-      setLoading(true);
+      if (agents.length > 0) {
+        setIsRefetching(true);
+      } else {
+        setLoading(true);
+      }
       setError(null);
 
       const params = new URLSearchParams({
@@ -259,6 +265,29 @@ export default function AgentsPage() {
         params.set('humiFilter', filters.humiFilter);
       }
 
+      const selectedFilterName = selectedSpecificFilter.replace('search', '');
+      const selectedFilterKey = advancedFilters._filterKeys?.[selectedFilterName];
+      const complexFilter = isComplexFilter(selectedSpecificFilter, advancedFilters);
+      const tagRawValues = complexFilter
+        ? getTagRawValuesForSelection(
+            selectedSpecificFilter,
+            selectedCategory,
+            selectedSubFilter,
+            advancedFilters
+          )
+        : [];
+
+      if (selectedFilterName && selectedFilterKey) {
+        params.set('advancedFilterName', selectedFilterName);
+        params.set('advancedFilterKey', selectedFilterKey);
+      }
+
+      if (complexFilter && tagRawValues.length > 0) {
+        params.set('advancedFilterTagRawValues', JSON.stringify(tagRawValues));
+      } else if (!complexFilter && selectedSubFilter !== 'all') {
+        params.set('advancedFilterValue', selectedSubFilter);
+      }
+
       const url = `/api/dashboard/agents?${params}`;
       const response = await fetch(url);
       const data = await response.json();
@@ -272,9 +301,9 @@ export default function AgentsPage() {
     } catch (error) {
       console.error('Error fetching agents:', error);
       setError(error instanceof Error ? error.message : 'Error al cargar agentes');
-      setAgents([]);
     } finally {
       setLoading(false);
+      setIsRefetching(false);
     }
   };
 
@@ -387,7 +416,7 @@ export default function AgentsPage() {
         page: currentPage,
         limit: itemsPerPage,
       });
-    }, searchTerm ? 1000 : 0); // Solo debounce para búsqueda por texto
+    }, searchTerm ? 600 : 0); // Debounce para búsqueda por texto
 
     return () => clearTimeout(timeoutId);
   }, [currentPage, itemsPerPage, searchTerm, selectedOpenFilter, selectedSpecificFilter, selectedSubFilter, selectedSort, sortDirection]);
@@ -685,6 +714,11 @@ export default function AgentsPage() {
           <span className={`text-sm ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>
             {totalCount.toLocaleString()} resultados · {activeFilterCount} filtros activos
           </span>
+          {isRefetching && (
+            <span className={`text-sm ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>
+              {t.searchUpdatingResults}
+            </span>
+          )}
         </div>
 
         {showAdvancedFilters && (
@@ -845,7 +879,7 @@ export default function AgentsPage() {
       {loading && (
         <div className="text-center py-12">
           <div className={`text-lg ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>
-            Cargando agentes...
+            {t.searchLoadingAgents}
           </div>
         </div>
       )}
@@ -856,6 +890,31 @@ export default function AgentsPage() {
           <div className={`text-lg ${theme === 'dark' ? 'text-red-400' : 'text-red-600'}`}>
             {error}
           </div>
+          <button
+            onClick={() => {
+              fetchAgents({
+                searchTerm: searchTerm,
+                searchType: selectedOpenFilter.replace('search', '').toLowerCase(),
+                chainId: undefined,
+                humiFilter: undefined,
+                tagsFilter: undefined,
+                skillsFilter: undefined,
+                capabilitiesFilter: undefined,
+                oasfDomainsFilter: undefined,
+                sortBy: selectedSort,
+                sortDirection: sortDirection,
+                page: currentPage,
+                limit: itemsPerPage,
+              });
+            }}
+            className={`mt-4 px-4 py-2 rounded-lg border text-sm ${
+              theme === 'dark'
+                ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
+                : 'bg-white border-zinc-300 text-zinc-900 hover:bg-zinc-100'
+            }`}
+          >
+            {t.searchRetry}
+          </button>
         </div>
       )}
 

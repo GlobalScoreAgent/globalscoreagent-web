@@ -19,6 +19,10 @@ interface FilterParams {
   skillsFilter?: string;
   capabilitiesFilter?: string;
   oasfDomainsFilter?: string;
+  advancedFilterName?: string;
+  advancedFilterKey?: string;
+  advancedFilterValue?: string;
+  advancedFilterTagRawValues?: string[];
   sortBy?: 'on_chain_created_at' | 'name' | 'nonce_current' | 'balance_current' | 'current_humi_score';
   sortDirection?: 'asc' | 'desc';
   page?: number;
@@ -42,6 +46,12 @@ export async function GET(request: NextRequest) {
       skillsFilter: searchParams.get('skillsFilter') || undefined,
       capabilitiesFilter: searchParams.get('capabilitiesFilter') || undefined,
       oasfDomainsFilter: searchParams.get('oasfDomainsFilter') || undefined,
+      advancedFilterName: searchParams.get('advancedFilterName') || undefined,
+      advancedFilterKey: searchParams.get('advancedFilterKey') || undefined,
+      advancedFilterValue: searchParams.get('advancedFilterValue') || undefined,
+      advancedFilterTagRawValues: searchParams.get('advancedFilterTagRawValues')
+        ? JSON.parse(searchParams.get('advancedFilterTagRawValues') || '[]')
+        : undefined,
       sortBy: searchParams.get('sortBy') as FilterParams['sortBy'] || 'current_humi_score',
       sortDirection: searchParams.get('sortDirection') as FilterParams['sortDirection'] || 'desc',
       page: parseInt(searchParams.get('page') || '1'),
@@ -51,7 +61,7 @@ export async function GET(request: NextRequest) {
 
     // Validar parámetros - límite dinámico basado en selección del usuario
     const page = Math.max(1, filters.page || 1);
-    const limit = Math.max(1, filters.limit || 10); // Sin límite máximo fijo
+    const limit = Math.min(100, Math.max(1, filters.limit || 10));
 
     // Calcular offset para paginación
     const offset = (page - 1) * limit;
@@ -110,27 +120,17 @@ export async function GET(request: NextRequest) {
       query = query.eq('humi_score_filter', filters.humiFilter);
     }
 
-    // Aplicar filtros dinámicos desde la base de datos
-    Object.keys(advancedFilters).forEach(filterName => {
-      // Solo procesar filtros reales, excluir keys internas
-      if (filterName !== '_filterKeys' && !filterName.startsWith('_')) {
-        // Crear nombre del parámetro dinámicamente (ej: 'Tags' -> 'tagsFilter')
-        const paramName = filterName.toLowerCase().replace(/\s+/g, '') + 'Filter';
-        const selectedValue = (filters as Record<string, any>)[paramName];
+    // Aplicar filtros dinámicos desde la base de datos usando contrato explícito
+    if (filters.advancedFilterName && filters.advancedFilterKey) {
+      const filterValues = advancedFilters[filters.advancedFilterName];
+      const columnName = filters.advancedFilterKey;
 
-        if (selectedValue && selectedValue !== 'all') {
-          const columnName = advancedFilters._filterKeys?.[filterName];
-          if (columnName) {
-            const values = advancedFilters[filterName];
-            if (isSimpleFilter(values)) {
-              query = query.ilike(`${columnName}::text`, `%${selectedValue}%`);
-            } else {
-              query = (query as any).contains(columnName, [selectedValue]).neq(columnName, []);
-            }
-          }
-        }
+      if (Array.isArray(filters.advancedFilterTagRawValues) && filters.advancedFilterTagRawValues.length > 0) {
+        query = (query as any).overlaps(columnName, filters.advancedFilterTagRawValues);
+      } else if (filters.advancedFilterValue && filters.advancedFilterValue !== 'all' && isSimpleFilter(filterValues)) {
+        query = query.ilike(`${columnName}::text`, `%${filters.advancedFilterValue}%`);
       }
-    });
+    }
 
     // Aplicar filtros de búsqueda usando los keys del openSearchOptions
     if (filters.searchTerm && filters.searchTerm.trim()) {
@@ -147,7 +147,11 @@ export async function GET(request: NextRequest) {
           query = query.ilike('owner_wallet', `%${searchTerm}%`);
           break;
         case 'searchAgentIdentifier':
-          query = query.ilike('on_chain_id', `%${searchTerm}%`);
+          if (/^\d+$/.test(searchTerm)) {
+            query = query.eq('on_chain_id', Number(searchTerm));
+          } else {
+            query = query.ilike('on_chain_id::text', `%${searchTerm}%`);
+          }
           break;
         case 'searchGeneral':
         default:
@@ -157,14 +161,16 @@ export async function GET(request: NextRequest) {
             .schema('web_dashboard')
             .from('agents')
             .select('id')
-            .or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+            .or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+            .limit(1000);
 
           // Luego buscar en searchable_metadata (JSONB)
           const metadataQuery = supabase
             .schema('web_dashboard')
             .from('agents')
             .select('id')
-            .ilike('searchable_metadata::text', `%${searchTerm}%`);
+            .ilike('searchable_metadata::text', `%${searchTerm}%`)
+            .limit(1000);
 
           // Ejecutar ambas consultas para obtener IDs
           const [textResults, metadataResults] = await Promise.all([
