@@ -55,8 +55,26 @@ function jsonbContainsServiceTypePayload(rawType: string): string {
   return JSON.stringify([{ type: rawType }]);
 }
 
-function isServicesTypeFilterColumn(columnName: string): boolean {
-  return columnName === 'services';
+/**
+ * agent_advanced_filters.filter_key suele ser `services_filters` (como skills_filters), pero
+ * los objetos con `type` viven en la columna JSON `services`. tag_raw_values son valores de `type`.
+ */
+function shouldApplyServicesTypeContainment(filterKey: string, advancedFilterName?: string): boolean {
+  const key = filterKey.trim().toLowerCase();
+  if (key === 'services' || key === 'services_filters') return true;
+  const name = advancedFilterName?.trim().toLowerCase();
+  return name === 'services' || name === 'servicios';
+}
+
+function agentsColumnForTagRawFilter(filterKey: string, advancedFilterName?: string): string {
+  return shouldApplyServicesTypeContainment(filterKey, advancedFilterName) ? 'services' : filterKey;
+}
+
+function jsonbContainsPayloadForTagRaw(filterKey: string, advancedFilterName: string | undefined, rawValue: string): string {
+  if (shouldApplyServicesTypeContainment(filterKey, advancedFilterName)) {
+    return jsonbContainsServiceTypePayload(rawValue);
+  }
+  return `["${rawValue.replace(/"/g, '\\"')}"]`;
 }
 
 export async function GET(request: NextRequest) {
@@ -168,18 +186,22 @@ export async function GET(request: NextRequest) {
           query = query.eq(columnName, parsed);
         }
       } else if (hasTagRawValues) {
-        // Any-match sobre jsonb: cs = @> ; services usa objetos { type } no strings en el array
+        // Any-match sobre jsonb (cs = @>). Services: @> [{"type": tag}] en columna `services`, no en services_filters.
+        const jsonbColumn = agentsColumnForTagRawFilter(columnName, filters.advancedFilterName);
+
         const idBuckets = await Promise.all(
           filters.advancedFilterTagRawValues!.map(async (rawValue) => {
-            const containsPayload = isServicesTypeFilterColumn(columnName)
-              ? jsonbContainsServiceTypePayload(rawValue)
-              : `["${rawValue.replace(/"/g, '\\"')}"]`;
+            const containsPayload = jsonbContainsPayloadForTagRaw(
+              columnName,
+              filters.advancedFilterName,
+              rawValue
+            );
 
             const { data } = await supabase
               .schema('web_dashboard')
               .from('agents')
               .select('id')
-              .filter(columnName, 'cs', containsPayload)
+              .filter(jsonbColumn, 'cs', containsPayload)
               .limit(2000);
 
             return (data || []).map((row: any) => row.id);
