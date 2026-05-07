@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Search, ChevronDown, CalendarDays, Hash, Wrench, Zap, FileText, User, Bot, BarChart3 } from 'lucide-react';
@@ -134,6 +134,7 @@ function ChainBadge({ chainName }: { chainName: string }) {
 }
 
 export default function AgentsPage() {
+  const PAGE_SIZE = 10;
   const { t, theme } = useLanguage();
   const dashboardStats = useDashboardStats();
   const totalAgents = dashboardStats?.totalAgents || 0;
@@ -152,9 +153,9 @@ export default function AgentsPage() {
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [isPaginationDropdownOpen, setIsPaginationDropdownOpen] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // Timers para auto-cierre de dropdowns
   const [openDropdownTimer, setOpenDropdownTimer] = useState<NodeJS.Timeout | null>(null);
@@ -237,11 +238,12 @@ export default function AgentsPage() {
     sortDirection: 'asc' | 'desc';
     page: number;
     limit: number;
-  }) => {
+  }, options?: { append?: boolean }) => {
+    const append = options?.append || false;
     try {
-      if (agents.length > 0) {
+      if (!append && agents.length > 0) {
         setIsRefetching(true);
-      } else {
+      } else if (!append) {
         setLoading(true);
       }
       setError(null);
@@ -296,11 +298,19 @@ export default function AgentsPage() {
         throw new Error(data.error || 'Error al cargar agentes');
       }
 
-      setAgents(data.data || []);
+      const incomingAgents = data.data || [];
+      setAgents((prev) => {
+        if (!append) return incomingAgents;
+        const seen = new Set(prev.map((agent: any) => agent.agent_id));
+        const uniqueIncoming = incomingAgents.filter((agent: any) => !seen.has(agent.agent_id));
+        return [...prev, ...uniqueIncoming];
+      });
       setTotalCount(data.totalCount || 0);
+      setHasMore(incomingAgents.length === filters.limit);
     } catch (error) {
       console.error('Error fetching agents:', error);
       setError(error instanceof Error ? error.message : 'Error al cargar agentes');
+      if (append) setHasMore(false);
     } finally {
       setLoading(false);
       setIsRefetching(false);
@@ -378,7 +388,7 @@ export default function AgentsPage() {
       sortBy: selectedSort,
       sortDirection: sortDirection,
       page: 1,
-      limit: itemsPerPage,
+      limit: PAGE_SIZE,
     });
 
     loadAdvancedFilters();
@@ -413,13 +423,51 @@ export default function AgentsPage() {
           : undefined,
         sortBy: selectedSort,
         sortDirection: sortDirection,
-        page: currentPage,
-        limit: itemsPerPage,
+        page: 1,
+        limit: PAGE_SIZE,
       });
+      setCurrentPage(1);
+      setHasMore(true);
     }, searchTerm ? 600 : 0); // Debounce para búsqueda por texto
 
     return () => clearTimeout(timeoutId);
-  }, [currentPage, itemsPerPage, searchTerm, selectedOpenFilter, selectedSpecificFilter, selectedSubFilter, selectedSort, sortDirection]);
+  }, [searchTerm, selectedOpenFilter, selectedSpecificFilter, selectedSubFilter, selectedSort, sortDirection]);
+
+  useEffect(() => {
+    if (currentPage <= 1 || !hasMore) return;
+
+    fetchAgents({
+      searchTerm: searchTerm,
+      searchType: selectedOpenFilter.replace('search', '').toLowerCase(),
+      chainId: undefined,
+      humiFilter: undefined,
+      tagsFilter: undefined,
+      skillsFilter: undefined,
+      capabilitiesFilter: undefined,
+      oasfDomainsFilter: undefined,
+      sortBy: selectedSort,
+      sortDirection: sortDirection,
+      page: currentPage,
+      limit: PAGE_SIZE,
+    }, { append: true });
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (!loadMoreRef.current || loading || isRefetching || !hasMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          setCurrentPage((prev) => prev + 1);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(loadMoreRef.current);
+    return () => observer.disconnect();
+  }, [loading, isRefetching, hasMore]);
 
   // Opciones de búsqueda abierta (solo texto)
   const openSearchOptions = [
@@ -438,53 +486,7 @@ export default function AgentsPage() {
       label: filterKey
     }));
 
-  // Paginación - ahora usa server-side data
-  // Limitar totalPages a un máximo razonable para evitar UI rota
-  const maxReasonablePages = 10000;
-  const calculatedTotalPages = Math.ceil(totalCount / itemsPerPage);
-  const totalPages = Math.min(calculatedTotalPages, maxReasonablePages);
-
-  const paginatedAgents = agents; // Los agentes ya vienen paginados del servidor
-
-  // Función para generar páginas inteligentes (evita miles de botones)
-  const getVisiblePages = () => {
-    const maxVisiblePages = 10;
-    const pages = [];
-
-    if (totalPages <= maxVisiblePages) {
-      // Si hay pocas páginas, mostrar todas
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      // Lógica inteligente: primera, última, actual ± 2
-      const startPage = Math.max(1, currentPage - 2);
-      const endPage = Math.min(totalPages, currentPage + 2);
-
-      // Siempre incluir la primera página
-      if (startPage > 1) {
-        pages.push(1);
-        if (startPage > 2) pages.push('...');
-      }
-
-      // Páginas del medio
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
-
-      // Siempre incluir la última página
-      if (endPage < totalPages) {
-        if (endPage < totalPages - 1) pages.push('...');
-        pages.push(totalPages);
-      }
-    }
-
-    return pages;
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  const paginatedAgents = agents;
 
   // Obtener opciones filtradas para el sub-dropdown con búsqueda
   const getFilteredSubOptions = () => {
@@ -554,6 +556,7 @@ export default function AgentsPage() {
     setSelectedCategory('all');
     setCategorySearch('');
     setCurrentPage(1);
+    setHasMore(true);
   };
 
   const currentSearchTypeLabel =
@@ -903,9 +906,11 @@ export default function AgentsPage() {
                 oasfDomainsFilter: undefined,
                 sortBy: selectedSort,
                 sortDirection: sortDirection,
-                page: currentPage,
-                limit: itemsPerPage,
+                page: 1,
+                limit: PAGE_SIZE,
               });
+              setCurrentPage(1);
+              setHasMore(true);
             }}
             className={`mt-4 px-4 py-2 rounded-lg border text-sm ${
               theme === 'dark'
@@ -1149,119 +1154,14 @@ export default function AgentsPage() {
         </div>
       )}
 
-      {/* Selector de agentes por página y controles de paginación */}
-      <div className="flex justify-between items-center mt-8">
-        {/* Selector de agentes por página */}
-        <div className="flex items-center gap-3">
-          <span className={`text-sm font-medium ${theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'}`}>
-            {t.show}:
-          </span>
-          <div className="relative">
-            <button
-              onClick={() => setIsPaginationDropdownOpen(!isPaginationDropdownOpen)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors min-w-[80px] ${
-                theme === 'dark'
-                  ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
-                  : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
-              }`}
-            >
-              <span className="text-sm">{itemsPerPage}</span>
-              <ChevronDown size={14} className={`transition-transform ${isPaginationDropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {isPaginationDropdownOpen && (
-              <div className={`absolute top-full left-0 mt-1 w-full border rounded-lg shadow-lg z-20 ${
-                theme === 'dark'
-                  ? 'bg-zinc-800 border-zinc-700'
-                  : 'bg-white border-zinc-300'
-              }`}>
-                {[5, 10, 15, 20, 25, 30].map((num) => (
-                  <button
-                    key={num}
-                    onClick={() => {
-                      setItemsPerPage(num);
-                      setIsPaginationDropdownOpen(false);
-                      setCurrentPage(1); // Reset to first page when changing items per page
-                    }}
-                    className={`w-full text-left px-3 py-2 text-sm hover:bg-zinc-700 transition-colors ${
-                      theme === 'dark' ? 'text-zinc-200 hover:bg-zinc-700' : 'text-zinc-900 hover:bg-zinc-100'
-                    }`}
-                  >
-                    {num}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+      <div ref={loadMoreRef} className="h-10" />
+      {isRefetching && agents.length > 0 && (
+        <div className="text-center pb-8">
           <span className={`text-sm ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>
-            {t.agentsPerPage}
+            {t.searchUpdatingResults}
           </span>
         </div>
-
-        {/* Controles de paginación */}
-        {totalPages > 1 && (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className={`px-4 py-2 rounded-lg border transition-colors ${
-                currentPage === 1
-                  ? 'opacity-50 cursor-not-allowed'
-                  : theme === 'dark'
-                    ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
-                    : 'bg-white border-zinc-300 text-zinc-900 hover:bg-zinc-100'
-              }`}
-            >
-              {t.previous}
-            </button>
-
-            <div className="flex gap-1">
-              {getVisiblePages().map((page, index) => (
-                typeof page === 'number' ? (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`px-3 py-2 rounded-lg border transition-colors ${
-                      currentPage === page
-                        ? theme === 'dark'
-                          ? 'bg-emerald-600 border-emerald-500 text-white'
-                          : 'bg-emerald-500 border-emerald-400 text-white'
-                        : theme === 'dark'
-                          ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
-                          : 'bg-white border-zinc-300 text-zinc-900 hover:bg-zinc-100'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ) : (
-                  <span
-                    key={`ellipsis-${index}`}
-                    className={`px-2 py-2 text-sm ${
-                      theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'
-                    }`}
-                  >
-                    {page}
-                  </span>
-                )
-              ))}
-            </div>
-
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className={`px-4 py-2 rounded-lg border transition-colors ${
-                currentPage === totalPages
-                  ? 'opacity-50 cursor-not-allowed'
-                  : theme === 'dark'
-                    ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
-                    : 'bg-white border-zinc-300 text-zinc-900 hover:bg-zinc-100'
-              }`}
-            >
-              {t.next}
-            </button>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }

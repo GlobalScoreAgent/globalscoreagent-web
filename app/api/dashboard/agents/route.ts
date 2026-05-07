@@ -30,6 +30,26 @@ interface FilterParams {
   totalAgents?: number;
 }
 
+function escapeLike(value: string): string {
+  return value.replace(/[%_]/g, '\\$&');
+}
+
+function isBooleanLikeFilter(values: any): boolean {
+  if (!Array.isArray(values) || values.length === 0) return false;
+  return values.every((item) => {
+    if (typeof item !== 'string') return false;
+    const normalized = item.trim().toLowerCase();
+    return normalized === 'true' || normalized === 'false';
+  });
+}
+
+function parseBooleanValue(value: string): boolean | null {
+  const normalized = value.trim().toLowerCase();
+  if (normalized === 'true') return true;
+  if (normalized === 'false') return false;
+  return null;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
@@ -126,9 +146,36 @@ export async function GET(request: NextRequest) {
       const columnName = filters.advancedFilterKey;
 
       if (Array.isArray(filters.advancedFilterTagRawValues) && filters.advancedFilterTagRawValues.length > 0) {
-        query = (query as any).overlaps(columnName, filters.advancedFilterTagRawValues);
+        // Any-match sobre jsonb arrays: obtener IDs por cada tag_raw_value con contains (cs) y luego intersectar en query principal
+        const idBuckets = await Promise.all(
+          filters.advancedFilterTagRawValues.map(async (rawValue) => {
+            const { data } = await supabase
+              .schema('web_dashboard')
+              .from('agents')
+              .select('id')
+              .filter(columnName, 'cs', `["${rawValue.replace(/"/g, '\\"')}"]`)
+              .limit(2000);
+            return (data || []).map((row: any) => row.id);
+          })
+        );
+
+        const matchedIds = Array.from(new Set(idBuckets.flat()));
+        if (matchedIds.length > 0) {
+          query = query.in('id', matchedIds);
+        } else {
+          query = query.eq('id', -1);
+        }
       } else if (filters.advancedFilterValue && filters.advancedFilterValue !== 'all' && isSimpleFilter(filterValues)) {
-        query = query.ilike(`${columnName}::text`, `%${filters.advancedFilterValue}%`);
+        if (isBooleanLikeFilter(filterValues)) {
+          const parsed = parseBooleanValue(filters.advancedFilterValue);
+          if (parsed === null) {
+            query = query.eq('id', -1);
+          } else {
+            query = query.eq(columnName, parsed);
+          }
+        } else {
+          query = query.eq(columnName, filters.advancedFilterValue.trim());
+        }
       }
     }
 
@@ -138,19 +185,19 @@ export async function GET(request: NextRequest) {
 
       switch (filters.selectedOpenFilter) {
         case 'searchName':
-          query = query.ilike('name', `%${searchTerm}%`);
+          query = query.ilike('name', `%${escapeLike(searchTerm)}%`);
           break;
         case 'searchWallet':
-          query = query.ilike('wallet_chain_register', `%${searchTerm}%`);
+          query = query.ilike('wallet_chain_register', `%${escapeLike(searchTerm)}%`);
           break;
         case 'searchWalletOwner':
-          query = query.ilike('owner_wallet', `%${searchTerm}%`);
+          query = query.ilike('owner_wallet', `%${escapeLike(searchTerm)}%`);
           break;
         case 'searchAgentIdentifier':
           if (/^\d+$/.test(searchTerm)) {
-            query = query.eq('on_chain_id', Number(searchTerm));
+            query = query.eq('on_chain_id', searchTerm);
           } else {
-            query = query.ilike('on_chain_id::text', `%${searchTerm}%`);
+            query = query.ilike('on_chain_id', `%${escapeLike(searchTerm)}%`);
           }
           break;
         case 'searchGeneral':
