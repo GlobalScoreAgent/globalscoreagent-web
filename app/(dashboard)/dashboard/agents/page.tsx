@@ -3,11 +3,16 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, ChevronDown, Info, ArrowUpRight, CalendarDays, Hash, Wrench, Zap, FileText, User, Bot, BarChart3 } from 'lucide-react';
+import { Search, ChevronDown, CalendarDays, Hash, Wrench, Zap, FileText, User, Bot, BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../components/LanguageContext';
 import { useDashboardStats } from '../components/DashboardLayoutClient';
 import { createClient } from '@/utils/supabase/client';
+import {
+  getAdvancedFilterOptions,
+  getSubCategoryOptions,
+  isComplexFilter,
+} from '@/lib/dashboardFilters';
 
 // Componente Image con fallback automático
 function AgentImage({ src, alt, ...props }: { src: string; alt: string; [key: string]: any }) {
@@ -39,111 +44,6 @@ function AgentImage({ src, alt, ...props }: { src: string; alt: string; [key: st
 
 
 
-function getScoreImage(score: number): string {
-  if (score >= 60) return '/index_humi_score_dorado.png';
-  if (score >= 30) return '/index_humi_score_naranja.png';
-  return '/index_humi_score_rojo.png';
-}
-
-function isAdvancedFilter(filterKey: string): boolean {
-  return ['searchOasfDomains', 'searchTags', 'searchSkills', 'searchCapabilities', 'searchNetwork'].includes(filterKey);
-}
-
-function getSubFilterOptions(): { key: string; label: string }[] {
-  return [
-    { key: 'all', label: 'All' },
-    { key: 'beginner', label: 'Beginner' },
-    { key: 'intermediate', label: 'Intermediate' },
-    { key: 'advanced', label: 'Advanced' },
-  ];
-}
-
-function getNetworkOptions(chains: any[]): { key: string; label: string }[] {
-  const options = [{ key: 'all', label: 'Todas las redes' }];
-  chains.forEach(chain => {
-    options.push({ key: chain.id.toString(), label: chain.short_name });
-  });
-  return options;
-}
-
-function getAdvancedFilterOptions(filterType: string, advancedFilters: Record<string, any>): { key: string; label: string }[] {
-  // Mapear los tipos de filtro del frontend a los de la base de datos
-  const filterMapping: Record<string, string> = {
-    'searchOasfDomains': 'OASF Domains',
-    'searchTags': 'Tags',
-    'searchSkills': 'Skills',
-    'searchCapabilities': 'Capabilities'
-  };
-
-  const dbFilterType = filterMapping[filterType] || filterType.replace('search', '');
-  const values = advancedFilters[dbFilterType] || [];
-
-  // Si es un array simple de strings
-  if (Array.isArray(values) && values.length > 0 && typeof values[0] === 'string') {
-    const options: { key: string; label: string }[] = [];
-    values.forEach(value => {
-      options.push({ key: value, label: value });
-    });
-    return options;
-  }
-
-  // Si es un array de objetos complejos, devolver las categorías
-  if (Array.isArray(values) && values.length > 0 && typeof values[0] === 'object') {
-    const options = [];
-    values.forEach(category => {
-      if (category.category_label) {
-        options.push({ key: category.category_key, label: category.category_label });
-      }
-    });
-    return options;
-  }
-
-  return [{ key: 'all', label: 'Todos' }];
-}
-
-function isComplexFilter(filterType: string, advancedFilters: Record<string, any>): boolean {
-  const filterMapping: Record<string, string> = {
-    'searchOasfDomains': 'OASF Domains',
-    'searchTags': 'Tags',
-    'searchSkills': 'Skills',
-    'searchCapabilities': 'Capabilities'
-  };
-
-  const dbFilterType = filterMapping[filterType] || filterType.replace('search', '');
-  const values = advancedFilters[dbFilterType] || [];
-
-  return Array.isArray(values) && values.length > 0 && typeof values[0] === 'object';
-}
-
-function getSubCategoryOptions(filterType: string, selectedCategory: string, advancedFilters: Record<string, any>): { key: string; label: string }[] {
-  const filterMapping: Record<string, string> = {
-    'searchOasfDomains': 'OASF Domains',
-    'searchTags': 'Tags',
-    'searchSkills': 'Skills',
-    'searchCapabilities': 'Capabilities'
-  };
-
-  const dbFilterType = filterMapping[filterType] || filterType.replace('search', '');
-  const values = advancedFilters[dbFilterType] || [];
-
-  if (!Array.isArray(values) || !isComplexFilter(filterType, advancedFilters)) {
-    return [];
-  }
-
-  const category = values.find(cat => cat.category_key === selectedCategory);
-  if (!category || !category.items) {
-    return [];
-  }
-
-  const options: { key: string; label: string }[] = [];
-  category.items.forEach(item => {
-    if (item.value_label) {
-      options.push({ key: item.value_key, label: item.value_label });
-    }
-  });
-  return options;
-}
-
 function getSortOptions(): { key: string; label: string }[] {
   return [
     { key: 'name', label: 'sortName' },
@@ -152,155 +52,6 @@ function getSortOptions(): { key: string; label: string }[] {
   ];
 }
 
-// Función para determinar qué función RPC llamar basado en ordenamiento
-function getFilterFunction(sortBy: string, sortDirection: 'asc' | 'desc'): string {
-  const mapping: Record<string, string> = {
-    'name_asc': 'filter_agents_by_name_asc',
-    'name_desc': 'filter_agents_by_name_desc',
-    'created_at_asc': 'filter_agents_by_created_at_asc',
-    'created_at_desc': 'filter_agents_by_created_at_desc',
-    'current_humi_score_asc': 'filter_agents_by_humi_score_asc',
-    'current_humi_score_desc': 'filter_agents_by_humi_score_desc'
-  };
-  return mapping[`${sortBy}_${sortDirection}`] || 'filter_agents_by_created_at_desc';
-}
-
-// Función para obtener tag_raw_values de filtros complejos
-function getTagRawValuesForFilter(
-  filterType: string,
-  selectedCategory: string,
-  selectedSubFilter: string,
-  advancedFilters: Record<string, any>
-): string[] | null {
-  const filterMapping: Record<string, string> = {
-    'searchOasfDomains': 'OASF Domains',
-    'searchTags': 'Tags',
-    'searchSkills': 'Skills',
-    'searchCapabilities': 'Capabilities'
-  };
-
-  const dbFilterType = filterMapping[filterType] || filterType.replace('search', '');
-  const values = advancedFilters[dbFilterType] || [];
-
-  if (!Array.isArray(values) || !isComplexFilter(filterType, advancedFilters)) {
-    return null;
-  }
-
-  const category = values.find((cat: any) => cat.category_key === selectedCategory);
-  if (!category || !category.items) {
-    return null;
-  }
-
-  const item = category.items.find((item: any) => item.value_key === selectedSubFilter);
-  if (!item || !item.tag_raw_values) {
-    return null;
-  }
-
-  return item.tag_raw_values;
-}
-
-// Función para construir los parámetros dinámicos para la función RPC
-function getFilterParams(
-  selectedSpecificFilter: string,
-  selectedCategory: string,
-  selectedSubFilter: string,
-  advancedFilters: Record<string, any>,
-  searchTerm: string,
-  searchType: string,
-  sortBy: string,
-  sortDirection: 'asc' | 'desc',
-  page: number,
-  limit: number,
-  chainId?: number,
-  humiFilter?: string
-) {
-  const params: Record<string, any> = {
-    p_limit: limit,
-    p_cursor: null // Por ahora no implementamos cursor
-  };
-
-  // Determinar si es filtro simple o complejo
-  const isComplex = isComplexFilter(selectedSpecificFilter, advancedFilters);
-
-  if (isComplex) {
-    // Filtro complejo: enviar tag_raw_values al parámetro correspondiente
-    const tagRawValues = getTagRawValuesForFilter(
-      selectedSpecificFilter,
-      selectedCategory,
-      selectedSubFilter,
-      advancedFilters
-    );
-
-    if (tagRawValues) {
-      // Mapear filter_key a parámetro de función
-      const filterKey = advancedFilters._filterKeys?.[selectedSpecificFilter.replace('search', '')] || selectedSpecificFilter.replace('search', '').toLowerCase();
-      const paramMapping: Record<string, string> = {
-        'tags': 'p_tags_filter',
-        'skills': 'p_skills_filter',
-        'capabilities': 'p_capabilities_filter',
-        'oasf-domains': 'p_oasf_domains_filter',
-        'services': 'p_services_filter',
-        'technical-tools': 'p_technical_tools_filter',
-        'technical-prompts': 'p_technical_prompts_filter',
-        'technical-capabilities': 'p_technical_capabilities_filter',
-        'oasf-skills': 'p_oasf_skills_filter'
-      };
-
-      const paramName = paramMapping[filterKey];
-      if (paramName) {
-        params[paramName] = JSON.stringify(tagRawValues);
-      }
-    }
-  } else {
-    // Filtro simple: usar p_search_term y p_search_type
-    if (selectedSubFilter && selectedSubFilter !== 'all') {
-      params.p_search_term = selectedSubFilter;
-      params.p_search_type = advancedFilters._filterKeys?.[selectedSpecificFilter.replace('search', '')] || selectedSpecificFilter.replace('search', '').toLowerCase();
-    }
-  }
-
-  // Agregar parámetros comunes
-  if (chainId !== undefined) {
-    params.p_chain_id = chainId;
-  }
-
-  if (humiFilter && humiFilter !== 'all') {
-    params.p_humi_filter = humiFilter;
-  }
-
-  if (searchTerm && searchTerm.trim()) {
-    params.p_search_term = searchTerm;
-    params.p_search_type = searchType;
-  }
-
-  return params;
-}
-
-function sortAgents(agents: any[], sortBy: string, direction: 'asc' | 'desc' = 'desc') {
-  return [...agents].sort((a, b) => {
-    let comparison = 0;
-    switch (sortBy) {
-      case 'name':
-        comparison = a.name.localeCompare(b.name);
-        break;
-      case 'created_at':
-        comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-        break;
-      case 'humi_score':
-        comparison = a.humi_score - b.humi_score;
-        break;
-      case 'nonce':
-        comparison = a.nonce - b.nonce;
-        break;
-      case 'balance':
-        comparison = a.balance - b.balance;
-        break;
-      default:
-        return 0;
-    }
-    return direction === 'asc' ? comparison : -comparison;
-  });
-}
 
 // Función para normalizar nombres de cadenas
 function normalizeChainName(chainName: string): string {
@@ -462,13 +213,13 @@ export default function AgentsPage() {
   };
 
   // Estados para datos de base de datos
-  const [chains, setChains] = useState<any[]>([]);
   const [advancedFilters, setAdvancedFilters] = useState<Record<string, any>>({});
   const [agents, setAgents] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState(totalAgents || 0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   // Función para obtener agentes desde la API
   const fetchAgents = async (filters: {
@@ -485,8 +236,6 @@ export default function AgentsPage() {
     page: number;
     limit: number;
   }) => {
-    console.log('🎯 Frontend: fetchAgents called with filters:', filters);
-
     try {
       setLoading(true);
       setError(null);
@@ -511,22 +260,8 @@ export default function AgentsPage() {
       }
 
       const url = `/api/dashboard/agents?${params}`;
-      console.log('🌐 Frontend: Making request to:', url);
-
       const response = await fetch(url);
-      console.log('📡 Frontend: Response status:', response.status);
-
       const data = await response.json();
-      console.log('📦 Frontend: Response data:', {
-        count: data.count,
-        totalCount: data.totalCount,
-        agentsCount: data.data?.length,
-        firstAgent: data.data?.[0] ? {
-          id: data.data[0].agent_id,
-          name: data.data[0].name,
-          chain: data.data[0].chain
-        } : null
-      });
 
       if (!response.ok) {
         throw new Error(data.error || 'Error al cargar agentes');
@@ -535,7 +270,7 @@ export default function AgentsPage() {
       setAgents(data.data || []);
       setTotalCount(data.totalCount || 0);
     } catch (error) {
-      console.error('❌ Frontend: Error in fetchAgents:', error);
+      console.error('Error fetching agents:', error);
       setError(error instanceof Error ? error.message : 'Error al cargar agentes');
       setAgents([]);
     } finally {
@@ -545,26 +280,6 @@ export default function AgentsPage() {
 
   // Cargar datos iniciales al montar
   useEffect(() => {
-    const loadChains = async () => {
-      try {
-        const supabase = createClient();
-        const { data, error } = await supabase
-          .schema('web_dashboard')
-          .from('chains')
-          .select('id, short_name');
-
-        if (error) {
-          console.error('Error loading chains:', error);
-          setChains([]);
-        } else {
-          setChains(data || []);
-        }
-      } catch (error) {
-        console.error('Error loading chains:', error);
-        setChains([]);
-      }
-    };
-
     const loadAdvancedFilters = async () => {
       try {
         const supabase = createClient();
@@ -613,7 +328,6 @@ export default function AgentsPage() {
               filterKeys[item.filter] = item.filter_key;
             } catch (parseError) {
               console.error('Error parsing filter values for', item.filter, ':', parseError);
-              console.log('Raw value:', item.values);
               // En caso de error, intentar usar el valor como array vacío
               filters[item.filter] = [];
               filterKeys[item.filter] = item.filter_key || '';
@@ -638,7 +352,6 @@ export default function AgentsPage() {
       limit: itemsPerPage,
     });
 
-    loadChains();
     loadAdvancedFilters();
   }, []);
 
@@ -689,29 +402,18 @@ export default function AgentsPage() {
   ];
 
   // Opciones de filtros específicos (con sub-dropdown) - dinámico desde DB
-  const specificFilterOptions = [
-    ...Object.keys(advancedFilters).map(filterKey => ({
+  const specificFilterOptions = Object.keys(advancedFilters)
+    .filter(filterKey => !filterKey.startsWith('_'))
+    .map(filterKey => ({
       key: `search${filterKey}`,
       label: filterKey
-    }))
-  ];
-
-  // Los agentes ya vienen filtrados del servidor, no necesitamos filtrado local
-  const filteredAgents = agents;
-
-  // Aplicar ordenamiento
-  const sortedAgents = sortAgents(filteredAgents, selectedSort, sortDirection);
+    }));
 
   // Paginación - ahora usa server-side data
-  // Debug: verificar valores
-  console.log('Debug - totalCount:', totalCount, 'itemsPerPage:', itemsPerPage);
-
   // Limitar totalPages a un máximo razonable para evitar UI rota
   const maxReasonablePages = 10000;
   const calculatedTotalPages = Math.ceil(totalCount / itemsPerPage);
   const totalPages = Math.min(calculatedTotalPages, maxReasonablePages);
-
-  console.log('Debug - calculatedTotalPages:', calculatedTotalPages, 'limitedTotalPages:', totalPages);
 
   const paginatedAgents = agents; // Los agentes ya vienen paginados del servidor
 
@@ -812,12 +514,33 @@ export default function AgentsPage() {
     setCurrentPage(1); // Reset to first page
   };
 
-  const handleSubFilterSelect = (optionKey: string, optionLabel: string) => {
-    setSelectedSubFilter(optionKey);
-    setSubFilterSearch(optionLabel); // Mostrar el label seleccionado en el input
-    setIsSubDropdownOpen(false);
-    setCurrentPage(1); // Reset to first page
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setSelectedOpenFilter('searchGeneral');
+    setSelectedSpecificFilter(
+      specificFilterOptions[0]?.key || 'searchNetwork'
+    );
+    setSelectedSubFilter('all');
+    setSubFilterSearch('');
+    setSelectedCategory('all');
+    setCategorySearch('');
+    setCurrentPage(1);
   };
+
+  const currentSearchTypeLabel =
+    openSearchOptions.find((option) => option.key === selectedOpenFilter)?.label || t.searchGeneral;
+  const currentSpecificFilterLabel =
+    specificFilterOptions.find((option) => option.key === selectedSpecificFilter)?.label || '';
+  const selectedCategoryLabel =
+    getAdvancedFilterOptions(selectedSpecificFilter, advancedFilters).find((option) => option.key === selectedCategory)?.label || '';
+  const selectedSubCategoryLabel =
+    getSubCategoryOptions(selectedSpecificFilter, selectedCategory, advancedFilters).find((option) => option.key === selectedSubFilter)?.label || '';
+  const hasSpecificFilter = selectedSubFilter !== 'all' && (selectedSubFilter || selectedCategory !== 'all');
+  const activeFilterCount = [
+    searchTerm.trim().length > 0,
+    selectedOpenFilter !== 'searchGeneral',
+    hasSpecificFilter,
+  ].filter(Boolean).length;
 
   const toggleFlip = (agentId: string) => {
     setFlippedCards(prev => {
@@ -840,36 +563,21 @@ export default function AgentsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Contenedor unificado de búsqueda */}
-      <div className={`p-4 rounded-2xl ${
-        theme === 'dark' ? 'bg-zinc-900' : 'bg-white border border-zinc-200'
-      }`}>
+      <div className={`p-5 rounded-2xl space-y-4 ${theme === 'dark' ? 'bg-zinc-900' : 'bg-white border border-zinc-200'}`}>
         <div className="flex flex-wrap gap-3 items-center">
-          {/* Dropdown de búsqueda abierta */}
-          <div
-            className="relative"
-            onMouseEnter={() => clearDropdownTimer('open')}
-            onMouseLeave={() => startDropdownTimer('open')}
-          >
+          <div className="relative" onMouseEnter={() => clearDropdownTimer('open')} onMouseLeave={() => startDropdownTimer('open')}>
             <button
               onClick={() => setIsOpenDropdownOpen(!isOpenDropdownOpen)}
-              className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors min-w-[180px] ${
-                theme === 'dark'
-                  ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
-                  : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
+              className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors min-w-[190px] ${
+                theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700' : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
               }`}
             >
-              <span className="text-sm">
-                {openSearchOptions.find(option => option.key === selectedOpenFilter)?.label}
-              </span>
+              <span className="text-sm">{currentSearchTypeLabel}</span>
               <ChevronDown size={16} className={`transition-transform ${isOpenDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
-
             {isOpenDropdownOpen && (
               <div className={`absolute top-full left-0 mt-1 w-full border rounded-xl shadow-lg z-20 max-h-60 overflow-y-auto ${
-                theme === 'dark'
-                  ? 'bg-zinc-800 border-zinc-700'
-                  : 'bg-white border-zinc-300'
+                theme === 'dark' ? 'bg-zinc-800 border-zinc-700' : 'bg-white border-zinc-300'
               }`}>
                 {openSearchOptions.map((option) => (
                   <button
@@ -878,7 +586,7 @@ export default function AgentsPage() {
                       setSelectedOpenFilter(option.key);
                       setIsOpenDropdownOpen(false);
                     }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-zinc-700 transition-colors ${
+                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${
                       theme === 'dark' ? 'text-zinc-200 hover:bg-zinc-700' : 'text-zinc-900 hover:bg-zinc-100'
                     }`}
                   >
@@ -889,11 +597,8 @@ export default function AgentsPage() {
             )}
           </div>
 
-          {/* Campo de búsqueda */}
-          <div className="flex-1 relative min-w-[200px]">
-            <Search size={18} className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${
-              theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'
-            }`} />
+          <div className="flex-1 relative min-w-[260px]">
+            <Search size={18} className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`} />
             <input
               type="text"
               placeholder={t.searchPlaceholder}
@@ -907,237 +612,230 @@ export default function AgentsPage() {
             />
           </div>
 
-          {/* Controles de ordenamiento */}
-          <div className="flex items-center gap-2">
-            <span className={`text-sm font-medium whitespace-nowrap ${
-              theme === 'dark' ? 'text-zinc-300' : 'text-zinc-700'
-            }`}>
-              {t.sortLabel}
-            </span>
-            <div
-              className="relative"
-              onMouseEnter={() => clearDropdownTimer('sort')}
-              onMouseLeave={() => startDropdownTimer('sort')}
-            >
-              <button
-                onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-                className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors min-w-[160px] ${
-                  theme === 'dark'
-                    ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
-                    : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
-                }`}
-              >
-                <span className="text-sm">
-                  {t[getSortOptions().find(option => option.key === selectedSort)?.label as keyof typeof t]}
-                </span>
-                <ChevronDown size={16} className={`transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {isSortDropdownOpen && (
-                <div className={`absolute top-full left-0 mt-1 w-full border rounded-xl shadow-lg z-20 max-h-60 overflow-y-auto ${
-                  theme === 'dark'
-                    ? 'bg-zinc-800 border-zinc-700'
-                    : 'bg-white border-zinc-300'
-                }`}>
-                  {getSortOptions().map((option) => (
-                    <button
-                      key={option.key}
-                      onClick={() => {
-                        setSelectedSort(option.key);
-                        setIsSortDropdownOpen(false);
-                        setCurrentPage(1); // Reset to first page when sorting changes
-                      }}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-zinc-700 transition-colors ${
-                        theme === 'dark' ? 'text-zinc-200 hover:bg-zinc-700' : 'text-zinc-900 hover:bg-zinc-100'
-                      }`}
-                    >
-                      {t[option.label as keyof typeof t]}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Toggle Ascendente/Descendente */}
+          <div className="relative" onMouseEnter={() => clearDropdownTimer('sort')} onMouseLeave={() => startDropdownTimer('sort')}>
             <button
-              onClick={() => {
-                setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-                setCurrentPage(1); // Reset to first page when direction changes
-              }}
-              className={`flex items-center justify-center w-10 h-10 rounded-xl border transition-colors ${
-                sortDirection === 'asc'
-                  ? theme === 'dark'
-                    ? 'bg-emerald-600 border-emerald-500 text-white'
-                    : 'bg-emerald-500 border-emerald-400 text-white'
-                  : theme === 'dark'
-                    ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
-                    : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
-              }`}
-              title={sortDirection === 'asc' ? 'Orden ascendente' : 'Orden descendente'}
-            >
-              <span className="text-lg font-bold">
-                {sortDirection === 'asc' ? '↑' : '↓'}
-              </span>
-            </button>
-
-            {/* Botón limpiar filtros */}
-            <button
-              onClick={() => {
-                setSelectedSpecificFilter(Object.keys(advancedFilters)[0] ? `search${Object.keys(advancedFilters)[0]}` : 'searchNetwork');
-                setSelectedSubFilter('all');
-                setSubFilterSearch('');
-                setSelectedCategory('all');
-                setCategorySearch('');
-                setCurrentPage(1);
-              }}
-              className={`flex items-center justify-center px-3 py-2 rounded-xl border transition-colors ${
-                theme === 'dark'
-                  ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-red-600 hover:border-red-500 hover:text-white'
-                  : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-red-500 hover:border-red-400 hover:text-white'
-              }`}
-              title={t.clearFiltersTooltip}
-            >
-              🗑️
-            </button>
-          </div>
-
-          {/* Dropdown de filtros específicos */}
-          <div
-            className="relative"
-            onMouseEnter={() => clearDropdownTimer('specific')}
-            onMouseLeave={() => startDropdownTimer('specific')}
-          >
-            <button
-              onClick={() => setIsSpecificDropdownOpen(!isSpecificDropdownOpen)}
-              className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors min-w-[180px] ${
-                theme === 'dark'
-                  ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
-                  : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
+              onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+              className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors min-w-[190px] ${
+                theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700' : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
               }`}
             >
               <span className="text-sm">
-                {specificFilterOptions.find(option => option.key === selectedSpecificFilter)?.label}
+                {t[getSortOptions().find(option => option.key === selectedSort)?.label as keyof typeof t]} ({sortDirection === 'asc' ? '↑' : '↓'})
               </span>
-              <ChevronDown size={16} className={`transition-transform ${isSpecificDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown size={16} className={`transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
-
-            {isSpecificDropdownOpen && (
+            {isSortDropdownOpen && (
               <div className={`absolute top-full left-0 mt-1 w-full border rounded-xl shadow-lg z-20 max-h-60 overflow-y-auto ${
-                theme === 'dark'
-                  ? 'bg-zinc-800 border-zinc-700'
-                  : 'bg-white border-zinc-300'
+                theme === 'dark' ? 'bg-zinc-800 border-zinc-700' : 'bg-white border-zinc-300'
               }`}>
-                {specificFilterOptions.map((option) => (
+                {getSortOptions().map((option) => (
                   <button
                     key={option.key}
                     onClick={() => {
-                      handleSpecificFilterChange(option.key);
-                      setIsSpecificDropdownOpen(false);
+                      setSelectedSort(option.key);
+                      setIsSortDropdownOpen(false);
+                      setCurrentPage(1);
                     }}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-zinc-700 transition-colors ${
+                    className={`w-full text-left px-4 py-2 text-sm transition-colors ${
                       theme === 'dark' ? 'text-zinc-200 hover:bg-zinc-700' : 'text-zinc-900 hover:bg-zinc-100'
                     }`}
                   >
-                    {option.label}
+                    {t[option.label as keyof typeof t]}
                   </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Dropdown de categorías (siempre visible, habilitado solo para filtros complejos) */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Buscar categorías..."
-              value={categorySearch}
-              onChange={(e) => {
-                setCategorySearch(e.target.value);
-                setIsCategoryDropdownOpen(true); // Abrir dropdown al escribir
-              }}
-              onFocus={() => setIsCategoryDropdownOpen(true)}
-              onBlur={() => {
-                // Cerrar dropdown después de un pequeño delay para permitir clicks
-                setTimeout(() => setIsCategoryDropdownOpen(false), 200);
-              }}
-              disabled={false}
-              className={`px-4 py-3 rounded-xl border outline-none transition-colors min-w-[200px] ${
-                theme === 'dark'
-                  ? 'bg-zinc-800 border-zinc-700 text-zinc-200 placeholder-zinc-400 focus:border-emerald-500'
-                  : 'bg-white border-zinc-300 text-zinc-900 placeholder-zinc-500 focus:border-emerald-500'
-              }`}
-            />
+          <button
+            onClick={() => {
+              setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+              setCurrentPage(1);
+            }}
+            className={`flex items-center justify-center w-11 h-11 rounded-xl border transition-colors ${
+              theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700' : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
+            }`}
+            title={sortDirection === 'asc' ? 'Orden ascendente' : 'Orden descendente'}
+          >
+            {sortDirection === 'asc' ? '↑' : '↓'}
+          </button>
+        </div>
 
-            {isCategoryDropdownOpen && getAdvancedFilterOptions(selectedSpecificFilter, advancedFilters).length > 0 && (
-              <div className={`absolute top-full left-0 right-0 mt-1 border rounded-xl shadow-lg z-20 max-h-60 overflow-y-auto ${
-                theme === 'dark'
-                  ? 'bg-zinc-800 border-zinc-700'
-                  : 'bg-white border-zinc-300'
-              }`}>
-                {getAdvancedFilterOptions(selectedSpecificFilter, advancedFilters)
-                  .filter(option => option.label.toLowerCase().includes(categorySearch.toLowerCase()))
-                  .map((option) => (
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            className={`px-4 py-2 rounded-xl border text-sm font-medium transition-colors ${
+              theme === 'dark'
+                ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700'
+                : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
+            }`}
+          >
+            {showAdvancedFilters ? 'Ocultar filtro avanzado' : 'Add filter'}
+          </button>
+          <button
+            onClick={clearAllFilters}
+            className={`px-4 py-2 rounded-xl border text-sm font-medium transition-colors ${
+              theme === 'dark'
+                ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-red-600 hover:border-red-500 hover:text-white'
+                : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-red-500 hover:border-red-400 hover:text-white'
+            }`}
+          >
+            Clear all filters
+          </button>
+          <span className={`text-sm ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>
+            {totalCount.toLocaleString()} resultados · {activeFilterCount} filtros activos
+          </span>
+        </div>
+
+        {showAdvancedFilters && (
+          <div className={`rounded-xl border p-4 grid grid-cols-1 lg:grid-cols-3 gap-3 ${
+            theme === 'dark' ? 'bg-zinc-950 border-zinc-800' : 'bg-zinc-50 border-zinc-200'
+          }`}>
+            <div className="relative" onMouseEnter={() => clearDropdownTimer('specific')} onMouseLeave={() => startDropdownTimer('specific')}>
+              <button
+                onClick={() => setIsSpecificDropdownOpen(!isSpecificDropdownOpen)}
+                className={`flex items-center justify-between w-full gap-2 px-4 py-3 rounded-xl border transition-colors ${
+                  theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700' : 'bg-white border-zinc-300 text-zinc-900 hover:bg-zinc-100'
+                }`}
+              >
+                <span className="text-sm truncate">{currentSpecificFilterLabel || 'Filtro avanzado'}</span>
+                <ChevronDown size={16} className={`transition-transform ${isSpecificDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isSpecificDropdownOpen && (
+                <div className={`absolute top-full left-0 mt-1 w-full border rounded-xl shadow-lg z-20 max-h-60 overflow-y-auto ${
+                  theme === 'dark' ? 'bg-zinc-800 border-zinc-700' : 'bg-white border-zinc-300'
+                }`}>
+                  {specificFilterOptions.map((option) => (
                     <button
                       key={option.key}
-                      title={option.label} // Tooltip para texto completo
-                      onClick={() => handleCategorySelect(option.key, option.label)}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-zinc-700 transition-colors truncate ${
+                      onClick={() => {
+                        handleSpecificFilterChange(option.key);
+                        setIsSpecificDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-2 text-sm transition-colors ${
                         theme === 'dark' ? 'text-zinc-200 hover:bg-zinc-700' : 'text-zinc-900 hover:bg-zinc-100'
                       }`}
                     >
                       {option.label}
                     </button>
                   ))}
-              </div>
-            )}
-          </div>
+                </div>
+              )}
+            </div>
 
-          {/* Campo de búsqueda inteligente para sub-filtros (siempre visible) */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Buscar subcategorías..."
-              value={subFilterSearch}
-              onChange={(e) => {
-                setSubFilterSearch(e.target.value);
-                setIsSubDropdownOpen(true); // Abrir dropdown al escribir
-              }}
-              onFocus={() => setIsSubDropdownOpen(true)}
-              onBlur={() => {
-                // Cerrar dropdown después de un pequeño delay para permitir clicks
-                setTimeout(() => setIsSubDropdownOpen(false), 200);
-              }}
-              disabled={!isComplexFilter(selectedSpecificFilter, advancedFilters)}
-              className={`px-4 py-3 rounded-xl border outline-none transition-colors min-w-[200px] ${
-                !isComplexFilter(selectedSpecificFilter, advancedFilters)
-                  ? 'opacity-50 cursor-not-allowed'
-                  : theme === 'dark'
+            <div className="relative">
+              <input
+                type="text"
+                placeholder={isComplexFilter(selectedSpecificFilter, advancedFilters) ? 'Buscar categoría...' : 'Seleccionar valor...'}
+                value={categorySearch}
+                onChange={(e) => {
+                  setCategorySearch(e.target.value);
+                  setIsCategoryDropdownOpen(true);
+                }}
+                onFocus={() => setIsCategoryDropdownOpen(true)}
+                onBlur={() => setTimeout(() => setIsCategoryDropdownOpen(false), 200)}
+                className={`w-full px-4 py-3 rounded-xl border outline-none transition-colors ${
+                  theme === 'dark'
                     ? 'bg-zinc-800 border-zinc-700 text-zinc-200 placeholder-zinc-400 focus:border-emerald-500'
                     : 'bg-white border-zinc-300 text-zinc-900 placeholder-zinc-500 focus:border-emerald-500'
-              }`}
-            />
+                }`}
+              />
+              {isCategoryDropdownOpen && getAdvancedFilterOptions(selectedSpecificFilter, advancedFilters).length > 0 && (
+                <div className={`absolute top-full left-0 right-0 mt-1 border rounded-xl shadow-lg z-20 max-h-60 overflow-y-auto ${
+                  theme === 'dark' ? 'bg-zinc-800 border-zinc-700' : 'bg-white border-zinc-300'
+                }`}>
+                  {getAdvancedFilterOptions(selectedSpecificFilter, advancedFilters)
+                    .filter(option => option.label.toLowerCase().includes(categorySearch.toLowerCase()))
+                    .map((option) => (
+                      <button
+                        key={option.key}
+                        onClick={() => handleCategorySelect(option.key, option.label)}
+                        className={`w-full text-left px-4 py-2 text-sm truncate transition-colors ${
+                          theme === 'dark' ? 'text-zinc-200 hover:bg-zinc-700' : 'text-zinc-900 hover:bg-zinc-100'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
 
-            {isSubDropdownOpen && getFilteredSubOptions().length > 0 && (
-              <div className={`absolute top-full left-0 right-0 mt-1 border rounded-xl shadow-lg z-20 max-h-60 overflow-y-auto ${
-                theme === 'dark'
-                  ? 'bg-zinc-800 border-zinc-700'
-                  : 'bg-white border-zinc-300'
-              }`}>
-                {getFilteredSubOptions().map((option) => (
-                  <button
-                    key={option.key}
-                    title={option.label} // Tooltip para texto completo
-                    onClick={() => handleSubCategorySelect(option.key, option.label)}
-                    className={`w-full text-left px-4 py-2 text-sm hover:bg-zinc-700 transition-colors truncate ${
-                      theme === 'dark' ? 'text-zinc-200 hover:bg-zinc-700' : 'text-zinc-900 hover:bg-zinc-100'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+            {isComplexFilter(selectedSpecificFilter, advancedFilters) ? (
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar subcategoría..."
+                  value={subFilterSearch}
+                  onChange={(e) => {
+                    setSubFilterSearch(e.target.value);
+                    setIsSubDropdownOpen(true);
+                  }}
+                  onFocus={() => setIsSubDropdownOpen(true)}
+                  onBlur={() => setTimeout(() => setIsSubDropdownOpen(false), 200)}
+                  className={`w-full px-4 py-3 rounded-xl border outline-none transition-colors ${
+                    theme === 'dark'
+                      ? 'bg-zinc-800 border-zinc-700 text-zinc-200 placeholder-zinc-400 focus:border-emerald-500'
+                      : 'bg-white border-zinc-300 text-zinc-900 placeholder-zinc-500 focus:border-emerald-500'
+                  }`}
+                />
+                {isSubDropdownOpen && getFilteredSubOptions().length > 0 && (
+                  <div className={`absolute top-full left-0 right-0 mt-1 border rounded-xl shadow-lg z-20 max-h-60 overflow-y-auto ${
+                    theme === 'dark' ? 'bg-zinc-800 border-zinc-700' : 'bg-white border-zinc-300'
+                  }`}>
+                    {getFilteredSubOptions().map((option) => (
+                      <button
+                        key={option.key}
+                        onClick={() => handleSubCategorySelect(option.key, option.label)}
+                        className={`w-full text-left px-4 py-2 text-sm truncate transition-colors ${
+                          theme === 'dark' ? 'text-zinc-200 hover:bg-zinc-700' : 'text-zinc-900 hover:bg-zinc-100'
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className={`px-4 py-3 rounded-xl border text-sm ${theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-400' : 'bg-white border-zinc-300 text-zinc-600'}`}>
+                Filtro simple: selecciona un valor de la lista.
               </div>
             )}
           </div>
+        )}
+
+        <div className="flex flex-wrap gap-2">
+          {searchTerm.trim() && (
+            <button
+              onClick={() => setSearchTerm('')}
+              className={`px-3 py-1 rounded-full text-xs border ${theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200' : 'bg-zinc-100 border-zinc-300 text-zinc-800'}`}
+            >
+              Search: {currentSearchTypeLabel} = {searchTerm} ×
+            </button>
+          )}
+          {selectedOpenFilter !== 'searchGeneral' && (
+            <button
+              onClick={() => setSelectedOpenFilter('searchGeneral')}
+              className={`px-3 py-1 rounded-full text-xs border ${theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200' : 'bg-zinc-100 border-zinc-300 text-zinc-800'}`}
+            >
+              Tipo búsqueda: {currentSearchTypeLabel} ×
+            </button>
+          )}
+          {hasSpecificFilter && (
+            <button
+              onClick={() => {
+                setSelectedSubFilter('all');
+                setSubFilterSearch('');
+                setSelectedCategory('all');
+                setCategorySearch('');
+                setCurrentPage(1);
+              }}
+              className={`px-3 py-1 rounded-full text-xs border ${theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200' : 'bg-zinc-100 border-zinc-300 text-zinc-800'}`}
+            >
+              {currentSpecificFilterLabel}: {selectedCategoryLabel || '-'} {selectedSubCategoryLabel ? `> ${selectedSubCategoryLabel}` : ''} ×
+            </button>
+          )}
         </div>
       </div>
 
@@ -1231,26 +929,12 @@ export default function AgentsPage() {
 
                       {/* HUMI Score Filter Badge - Esquina superior derecha */}
                       <div className="absolute top-4 right-4 z-10">
-                        {(() => {
-                          console.log('🔍 Debug HUMI Badge para agente:', agent.name, {
-                            humi_score_filter: agent.humi_score_filter,
-                            tipo: typeof agent.humi_score_filter,
-                            esNull: agent.humi_score_filter === null,
-                            esUndefined: agent.humi_score_filter === undefined,
-                            esVacio: agent.humi_score_filter === '',
-                            color: getHumiScoreColor(agent.humi_score_filter),
-                            text: getHumiScoreText(agent.humi_score_filter, t)
-                          });
-
-                          return (
-                            <div
-                              className="px-3 py-1 rounded-lg text-sm font-medium text-white shadow-lg"
-                              style={{ backgroundColor: getHumiScoreColor(agent.humi_score_filter) }}
-                            >
-                              {getHumiScoreText(agent.humi_score_filter, t)}
-                            </div>
-                          );
-                        })()}
+                        <div
+                          className="px-3 py-1 rounded-lg text-sm font-medium text-white shadow-lg"
+                          style={{ backgroundColor: getHumiScoreColor(agent.humi_score_filter) }}
+                        >
+                          {getHumiScoreText(agent.humi_score_filter, t)}
+                        </div>
                       </div>
 
                       {/* Chain Badge - Esquina superior izquierda */}
@@ -1311,23 +995,6 @@ export default function AgentsPage() {
 
                       {/* Información detallada */}
                       <div className="space-y-2 text-xs pr-2">
-                        {/* Debug de datos */}
-                        {(() => {
-                          console.log('🔍 Debug Reverso - Datos del agente:', agent.name, {
-                            wallet_chain_register: agent.wallet_chain_register,
-                            owner_wallet: agent.owner_wallet,
-                            current_humi_score: agent.current_humi_score,
-                            nonce_current: agent.nonce_current,
-                            skills: agent.skills,
-                            capabilities: agent.capabilities,
-                            skillsType: typeof agent.skills,
-                            capabilitiesType: typeof agent.capabilities,
-                            skillsKeys: agent.skills ? Object.keys(agent.skills) : null,
-                            capabilitiesLength: agent.capabilities ? agent.capabilities.length : null
-                          });
-                          return null;
-                        })()}
-
                         {/* Descripción */}
                         <div className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
                           <FileText size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
