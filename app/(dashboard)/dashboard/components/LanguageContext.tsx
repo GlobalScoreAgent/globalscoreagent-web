@@ -89,6 +89,7 @@ interface Translations {
   searchDescription: string;
   searchWallet: string;
   searchWalletOwner: string;
+  searchAgentIdentifier: string;
   searchMetadata: string;
   searchSupportedTrust: string;
   searchSkills: string;
@@ -100,6 +101,11 @@ interface Translations {
   searchTechnicalPrompts: string;
   searchTechnicalCapabilities: string;
   searchServices: string;
+
+  // Agentes - Filtros específicos
+  selectCategory: string;
+  searchCategories: string;
+  searchSubcategories: string;
 
   // Agentes - Etiquetas de tarjetas
   humiScoreLabel: string;
@@ -204,6 +210,7 @@ const translations: Record<Language, Translations> = {
     searchDescription: 'Descripción',
     searchWallet: 'Billetera de Agente',
     searchWalletOwner: 'Billetera de Propietario',
+    searchAgentIdentifier: 'Identificador de Agente',
     searchMetadata: 'Metadatos',
     searchSupportedTrust: 'Confianza Soportada',
     searchSkills: 'Habilidades',
@@ -215,6 +222,11 @@ const translations: Record<Language, Translations> = {
     searchTechnicalPrompts: 'Indicaciones Técnicas',
     searchTechnicalCapabilities: 'Capacidades Técnicas',
     searchServices: 'Servicios',
+
+  // Agentes - Filtros específicos
+  selectCategory: 'Seleccionar categoría',
+  searchCategories: 'Buscar categorías',
+  searchSubcategories: 'Buscar subcategorías',
 
     // Agentes - Etiquetas de tarjetas
     humiScoreLabel: 'Índice HUMI - Score',
@@ -318,6 +330,7 @@ const translations: Record<Language, Translations> = {
     searchDescription: 'Description',
     searchWallet: 'Wallet',
     searchWalletOwner: 'Wallet Owner',
+    searchAgentIdentifier: 'Agent Identifier',
     searchMetadata: 'Metadata',
     searchSupportedTrust: 'Supported Trust',
     searchSkills: 'Skills',
@@ -329,6 +342,11 @@ const translations: Record<Language, Translations> = {
     searchTechnicalPrompts: 'Technical Prompts',
     searchTechnicalCapabilities: 'Technical Capabilities',
     searchServices: 'Services',
+
+  // Agentes - Filtros específicos
+  selectCategory: 'Select category',
+  searchCategories: 'Search categories',
+  searchSubcategories: 'Search subcategories',
 
     // Agentes - Etiquetas de tarjetas
     humiScoreLabel: 'HUMI Index - Score',

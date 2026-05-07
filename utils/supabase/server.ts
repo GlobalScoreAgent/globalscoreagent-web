@@ -26,6 +26,19 @@ export const createClient = async () => {
           }
         },
       },
+
     }
   );
+};
+
+// Función helper para ejecutar consultas con timeout extendido
+export const executeWithExtendedTimeout = async <T>(
+  queryFn: () => Promise<T>,
+  timeoutMs: number = 60000
+): Promise<T> => {
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error(`Query timeout after ${timeoutMs}ms`)), timeoutMs);
+  });
+
+  return Promise.race([queryFn(), timeoutPromise]);
 };
