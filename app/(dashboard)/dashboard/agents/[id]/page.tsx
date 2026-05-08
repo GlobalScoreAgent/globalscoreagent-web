@@ -3,6 +3,14 @@
 import Image from 'next/image';
 import { ArrowLeft, Copy, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 
 // ==================== MOCK DATA ====================
 const mockAgent = {
@@ -64,6 +72,7 @@ const mockAgent = {
 export default function AgentDetailPage() {
   const [activeMetadataTab, setActiveMetadataTab] = useState<keyof typeof mockAgent>('supported_trust');
   const [activeFeedbackTab, setActiveFeedbackTab] = useState<keyof typeof mockAgent>('comments_summary');
+  const [transactionalSeries, setTransactionalSeries] = useState<'nonce' | 'balance'>('nonce');
 
   const metadataOptions = [
     'supported_trust', 'skills', 'capabilities', 'tags',
@@ -108,7 +117,7 @@ export default function AgentDetailPage() {
       <div className="max-w-7xl mx-auto px-6 pt-8 space-y-10">
         {/* HEADER */}
         <div className="flex flex-col lg:flex-row gap-8">
-          <div className="relative w-80 h-80 rounded-3xl overflow-hidden border border-gray-700 flex-shrink-0 shadow-2xl">
+          <div className="relative w-80 h-80 rounded-3xl overflow-hidden border border-gray-700 flex-shrink-0 shadow-2xl mx-auto lg:mx-0">
             <Image
               src={mockAgent.image_url}
               alt={mockAgent.name}
@@ -118,24 +127,41 @@ export default function AgentDetailPage() {
             />
           </div>
 
-          <div className="flex-1 pt-4">
-            <div className="flex items-center gap-4">
-              <h1 className="text-5xl font-bold tracking-tight">{mockAgent.name}</h1>
-              <div className="px-4 py-1 bg-emerald-500/10 text-emerald-400 text-sm font-medium rounded-full border border-emerald-500/30">
-                {mockAgent.chain_name}
+          <div className="flex-1 pt-4 min-w-0">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">{mockAgent.name}</h1>
+              <div className="flex flex-wrap gap-2 shrink-0 justify-end">
+                <span className="px-4 py-1.5 bg-amber-500/10 text-amber-300 text-sm font-medium rounded-full border border-amber-500/30">
+                  Dummy
+                </span>
+                <span className="px-4 py-1.5 bg-rose-500/10 text-rose-300 text-sm font-medium rounded-full border border-rose-500/30">
+                  Duplicated
+                </span>
               </div>
             </div>
 
-            <div className="flex items-baseline gap-4 mt-4">
+            <div className="flex flex-wrap items-baseline gap-4 mt-4">
               <div className="text-7xl font-bold text-emerald-400">{mockAgent.humi_score}★</div>
               <div className="text-2xl text-gray-400">Humi Score</div>
+              <button
+                type="button"
+                className="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-2xl bg-white/5 hover:bg-white/10 border border-gray-700 transition-colors"
+              >
+                Ver Detalles
+              </button>
+            </div>
+
+            <div className="mt-3">
+              <span className="inline-flex px-4 py-1.5 bg-emerald-500/10 text-emerald-300 text-sm font-medium rounded-full border border-emerald-500/25">
+                High Performance
+              </span>
             </div>
 
             <p className="mt-6 text-xl text-gray-300 leading-relaxed max-w-3xl">
               {mockAgent.description}
             </p>
 
-            <div className="flex gap-4 mt-8">
+            <div className="flex gap-4 mt-8 flex-wrap">
               <a href="#" className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-colors">
                 🌐 Web
               </a>
@@ -144,21 +170,6 @@ export default function AgentDetailPage() {
               </a>
             </div>
           </div>
-        </div>
-
-        {/* PILLAR SCORES */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {[
-            { label: 'History', score: '23/25' },
-            { label: 'Usage', score: '21/25' },
-            { label: 'Measure', score: '24/25' },
-            { label: 'Information', score: '22/25' },
-          ].map((pillar) => (
-            <div key={pillar.label} className="bg-[#1a1a1a] p-6 rounded-3xl border border-gray-800">
-              <div className="text-gray-400 text-sm">{pillar.label}</div>
-              <div className="text-4xl font-bold mt-2 text-white">{pillar.score}</div>
-            </div>
-          ))}
         </div>
 
         {/* MAIN CONTENT GRID */}
@@ -250,6 +261,31 @@ export default function AgentDetailPage() {
           {/* TRANSACTIONAL DATA */}
           <div className="xl:col-span-7 bg-[#111111] rounded-3xl p-8 border border-gray-800">
             <h2 className="text-2xl font-semibold mb-6">Transactional Data</h2>
+
+            <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-800 pb-4">
+              <button
+                type="button"
+                onClick={() => setTransactionalSeries('nonce')}
+                className={`px-5 py-2 rounded-2xl text-sm transition-all ${
+                  transactionalSeries === 'nonce'
+                    ? 'bg-white text-black font-medium'
+                    : 'bg-gray-800 hover:bg-gray-700'
+                }`}
+              >
+                30 Days Nonce
+              </button>
+              <button
+                type="button"
+                onClick={() => setTransactionalSeries('balance')}
+                className={`px-5 py-2 rounded-2xl text-sm transition-all ${
+                  transactionalSeries === 'balance'
+                    ? 'bg-white text-black font-medium'
+                    : 'bg-gray-800 hover:bg-gray-700'
+                }`}
+              >
+                30 Days Balance
+              </button>
+            </div>
             
             <div className="grid grid-cols-2 gap-8 mb-8">
               <div>
@@ -262,13 +298,45 @@ export default function AgentDetailPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-[#1a1a1a] p-6 rounded-2xl h-80 flex items-center justify-center border border-dashed border-gray-700">
-                [Gráfico de Línea - Nonce History]
-              </div>
-              <div className="bg-[#1a1a1a] p-6 rounded-2xl h-80 flex items-center justify-center border border-dashed border-gray-700">
-                [Gráfico de Línea - Balance History]
-              </div>
+            <div className="bg-[#1a1a1a] p-4 rounded-2xl border border-gray-700 h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={
+                    transactionalSeries === 'nonce'
+                      ? mockAgent.nonce_history
+                      : mockAgent.balance_history
+                  }
+                  margin={{ top: 12, right: 12, left: 4, bottom: 8 }}
+                >
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fill: '#9ca3af', fontSize: 11 }}
+                    stroke="#374151"
+                  />
+                  <YAxis
+                    tick={{ fill: '#9ca3af', fontSize: 11 }}
+                    stroke="#374151"
+                    width={40}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#1a1a1a',
+                      border: '1px solid #374151',
+                      borderRadius: '12px',
+                    }}
+                    labelStyle={{ color: '#e5e7eb' }}
+                    itemStyle={{ color: '#34d399' }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke="#34d399"
+                    strokeWidth={2}
+                    dot={{ r: 3, fill: '#34d399' }}
+                    activeDot={{ r: 5 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
