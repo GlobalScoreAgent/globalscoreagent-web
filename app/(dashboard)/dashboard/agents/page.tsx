@@ -14,6 +14,8 @@ import {
   getTagRawValuesForSelection,
   isComplexFilter,
 } from '@/lib/dashboardFilters';
+import { normalizeChainName, getChainColor } from '@/lib/agentChains';
+import { getHumiScoreColor, getHumiScoreText } from '@/lib/agentHumiDisplay';
 
 // Componente Image con fallback automático
 function AgentImage({ src, alt, ...props }: { src: string; alt: string; [key: string]: any }) {
@@ -53,70 +55,6 @@ function getSortOptions(): { key: string; label: string }[] {
   ];
 }
 
-
-// Función para normalizar nombres de cadenas
-function normalizeChainName(chainName: string): string {
-  const normalizedName = chainName.toLowerCase().trim();
-
-  const nameMapping: Record<string, string> = {
-    'ethereum': 'Ethereum',
-    'ethereum mainnet': 'Ethereum',
-    'base': 'Base',
-    'base mainnet': 'Base',
-    'bnb': 'BNB',
-    'bnb smart chain': 'BNB',
-    'bnb chain': 'BNB',
-    'arbitrum': 'Arbitrum',
-    'arbitrum one': 'Arbitrum',
-    'arbitrum-one': 'Arbitrum',
-    'polygon': 'Polygon',
-    'polygon mainnet': 'Polygon',
-    'matic': 'Polygon',
-  };
-
-  return nameMapping[normalizedName] || chainName;
-}
-
-// Función para obtener colores específicos de cada cadena
-function getChainColor(chainName: string): string {
-  const normalizedName = chainName.toLowerCase().trim();
-
-  const colorMapping: Record<string, string> = {
-    'ethereum': '#627EEA',    // Azul característico de Ethereum
-    'base': '#0052FF',        // Azul característico de Base
-    'bnb': '#F3BA2F',         // Amarillo característico de BNB
-    'arbitrum': '#28A0F0',    // Azul característico de Arbitrum
-    'polygon': '#8247E5',     // Morado característico de Polygon
-  };
-
-  return colorMapping[normalizedName] || '#6B7280'; // Gris por defecto
-}
-
-// Función para obtener colores del HUMI score según el filtro
-function getHumiScoreColor(humiFilter: string): string {
-  const colorMapping: Record<string, string> = {
-    'Elite': '#22c55e',           // Verde para Elite
-    'High Performance': '#84cc16', // Verde lima para High Performance
-    'Stable': '#eab308',          // Amarillo para Stable
-    'Moderate Risk': '#f97316',   // Naranja para Moderate Risk
-    'Critical': '#dc2626'         // Rojo para Critical
-  };
-
-  return colorMapping[humiFilter] || '#6B7280'; // Gris por defecto
-}
-
-// Función para obtener texto internacionalizable del HUMI score
-function getHumiScoreText(humiFilter: string, t: any): string {
-  const textMapping: Record<string, string> = {
-    'Elite': t.humiElite,
-    'High Performance': t.humiHighPerformance,
-    'Stable': t.humiStable,
-    'Moderate Risk': t.humiModerateRisk,
-    'Critical': t.humiCritical
-  };
-
-  return textMapping[humiFilter] || humiFilter;
-}
 
 const AGENTS_LIST_FILTERS_KEY = 'gsa:agentsDirectoryFilters';
 const AGENTS_LIST_FILTERS_VERSION = 1;

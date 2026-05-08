@@ -8,7 +8,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 type Language = 'es' | 'en';
 type Theme = 'dark' | 'light';
 
-interface Translations {
+export interface Translations {
   // Sidebar
   home: string;
   agentsDirectory: string;
@@ -165,6 +165,61 @@ interface Translations {
   favoriteAgent: string;
   unfavoriteAgent: string;
   agentMenuAria: string;
+
+  // Agent detail page
+  agentDetailLoadError: string;
+  agentDetailLoading: string;
+  agentDetailHumiScoreLabel: string;
+  agentDetailViewDetails: string;
+  agentDetailWeb: string;
+  agentDetailEmail: string;
+  readMoreDescription: string;
+  descriptionModalTitle: string;
+  closeModal: string;
+  agentDetailOnChainData: string;
+  agentDetailChainLabel: string;
+  agentDetailWalletOnChainIdInfo: string;
+  agentDetailCreatedAt: string;
+  agentDetailOwnerChanges: string;
+  agentDetailOwnerWallet: string;
+  agentDetailOwnerSince: string;
+  agentDetailMetadataInformation: string;
+  agentDetailTransactionalData: string;
+  agentDetailFeedbackData: string;
+  transactionalTabNonce: string;
+  transactionalTabBalance: string;
+  transactionalNonceCurrentLabel: string;
+  transactionalBalanceCurrentLabel: string;
+  metadataTabSkills: string;
+  metadataTabSupportedTrust: string;
+  metadataTabCapabilities: string;
+  metadataTabTags: string;
+  metadataTabOasfSkills: string;
+  metadataTabOasfDomains: string;
+  metadataTabTechnicalTools: string;
+  metadataTabTechnicalPrompts: string;
+  metadataTabTechnicalCapabilities: string;
+  metadataTabServices: string;
+  metadataX402Enabled: string;
+  metadataX402Disabled: string;
+  feedbackTabComments: string;
+  feedbackTabAttestations: string;
+  feedbackTabExternalAudit: string;
+  feedbackTabIdentityAnalysis: string;
+  feedbackTabOnChainExecutions: string;
+  feedbackTabOnChainFeedbacks: string;
+  feedbackTabProtocolActivity: string;
+  agentDetailCopied: string;
+  agentDetailNoJsonToShow: string;
+  chartLabelToday: string;
+  chartLabel7d: string;
+  chartLabel15d: string;
+  chartLabel1m: string;
+  chartLabel2m: string;
+  chartLabel3m: string;
+  chartLabel6m: string;
+  chartLabel9m: string;
+  chartLabel12m: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -320,6 +375,60 @@ const translations: Record<Language, Translations> = {
     unfavoriteAgent: 'Quitar de favoritos',
     agentMenuAria: 'Acciones del agente',
 
+    agentDetailLoadError:
+      'No fue posible obtener los datos desde la base de datos.',
+    agentDetailLoading: 'Cargando información del agente…',
+    agentDetailHumiScoreLabel: 'HUMI Score',
+    agentDetailViewDetails: 'Ver detalles',
+    agentDetailWeb: 'Web',
+    agentDetailEmail: 'Email',
+    readMoreDescription: 'Leer más',
+    descriptionModalTitle: 'Descripción completa',
+    closeModal: 'Cerrar',
+    agentDetailOnChainData: 'Datos on-chain',
+    agentDetailChainLabel: 'Red',
+    agentDetailWalletOnChainIdInfo: 'On Chain ID (wallet registro)',
+    agentDetailCreatedAt: 'Creado en',
+    agentDetailOwnerChanges: 'Cambios de propietario',
+    agentDetailOwnerWallet: 'Wallet del propietario',
+    agentDetailOwnerSince: 'Propietario desde',
+    agentDetailMetadataInformation: 'Información de metadatos',
+    agentDetailTransactionalData: 'Datos transaccionales',
+    agentDetailFeedbackData: 'Datos de feedback',
+    transactionalTabNonce: 'Nonce',
+    transactionalTabBalance: 'Balance',
+    transactionalNonceCurrentLabel: 'Nonce actual',
+    transactionalBalanceCurrentLabel: 'Balance actual',
+    metadataTabSkills: 'Skills',
+    metadataTabSupportedTrust: 'Confianza',
+    metadataTabCapabilities: 'Capacidades',
+    metadataTabTags: 'Tags',
+    metadataTabOasfSkills: 'OASF skills',
+    metadataTabOasfDomains: 'OASF dominios',
+    metadataTabTechnicalTools: 'Herramientas',
+    metadataTabTechnicalPrompts: 'Prompts',
+    metadataTabTechnicalCapabilities: 'Cap. técnicas',
+    metadataTabServices: 'Servicios',
+    metadataX402Enabled: 'x402 activado',
+    metadataX402Disabled: 'x402 desactivado',
+    feedbackTabComments: 'Comentarios',
+    feedbackTabAttestations: 'Attestations',
+    feedbackTabExternalAudit: 'Auditoría externa',
+    feedbackTabIdentityAnalysis: 'Identidad',
+    feedbackTabOnChainExecutions: 'Ejecuciones on-chain',
+    feedbackTabOnChainFeedbacks: 'Feedback on-chain',
+    feedbackTabProtocolActivity: 'Actividad de protocolo',
+    agentDetailCopied: 'Copiado al portapapeles',
+    agentDetailNoJsonToShow: 'No hay datos para mostrar.',
+    chartLabelToday: 'Hoy',
+    chartLabel7d: '7 d',
+    chartLabel15d: '15 d',
+    chartLabel1m: '1 m',
+    chartLabel2m: '2 m',
+    chartLabel3m: '3 m',
+    chartLabel6m: '6 m',
+    chartLabel9m: '9 m',
+    chartLabel12m: '12 m',
   },
   en: {
     home: 'Home',
@@ -473,6 +582,60 @@ const translations: Record<Language, Translations> = {
     unfavoriteAgent: 'Remove from favorites',
     agentMenuAria: 'Agent actions',
 
+    agentDetailLoadError:
+      'Could not load data from the database.',
+    agentDetailLoading: 'Loading agent details…',
+    agentDetailHumiScoreLabel: 'HUMI Score',
+    agentDetailViewDetails: 'View details',
+    agentDetailWeb: 'Web',
+    agentDetailEmail: 'Email',
+    readMoreDescription: 'Read more',
+    descriptionModalTitle: 'Full description',
+    closeModal: 'Close',
+    agentDetailOnChainData: 'On-chain data',
+    agentDetailChainLabel: 'Network',
+    agentDetailWalletOnChainIdInfo: 'On-chain ID (wallet registration)',
+    agentDetailCreatedAt: 'Created at',
+    agentDetailOwnerChanges: 'Owner changes',
+    agentDetailOwnerWallet: 'Owner wallet',
+    agentDetailOwnerSince: 'Owner since',
+    agentDetailMetadataInformation: 'Metadata information',
+    agentDetailTransactionalData: 'Transactional data',
+    agentDetailFeedbackData: 'Feedback data',
+    transactionalTabNonce: 'Nonce',
+    transactionalTabBalance: 'Balance',
+    transactionalNonceCurrentLabel: 'Current nonce',
+    transactionalBalanceCurrentLabel: 'Current balance',
+    metadataTabSkills: 'Skills',
+    metadataTabSupportedTrust: 'Supported trust',
+    metadataTabCapabilities: 'Capabilities',
+    metadataTabTags: 'Tags',
+    metadataTabOasfSkills: 'OASF skills',
+    metadataTabOasfDomains: 'OASF domains',
+    metadataTabTechnicalTools: 'Technical tools',
+    metadataTabTechnicalPrompts: 'Technical prompts',
+    metadataTabTechnicalCapabilities: 'Technical capabilities',
+    metadataTabServices: 'Services',
+    metadataX402Enabled: 'x402 enabled',
+    metadataX402Disabled: 'x402 disabled',
+    feedbackTabComments: 'Comments',
+    feedbackTabAttestations: 'Attestations',
+    feedbackTabExternalAudit: 'External audit',
+    feedbackTabIdentityAnalysis: 'Identity analysis',
+    feedbackTabOnChainExecutions: 'On-chain executions',
+    feedbackTabOnChainFeedbacks: 'On-chain feedback',
+    feedbackTabProtocolActivity: 'Protocol activity',
+    agentDetailCopied: 'Copied to clipboard',
+    agentDetailNoJsonToShow: 'Nothing to display.',
+    chartLabelToday: 'Today',
+    chartLabel7d: '7d',
+    chartLabel15d: '15d',
+    chartLabel1m: '1m',
+    chartLabel2m: '2m',
+    chartLabel3m: '3m',
+    chartLabel6m: '6m',
+    chartLabel9m: '9m',
+    chartLabel12m: '12m',
   },
 };
 
