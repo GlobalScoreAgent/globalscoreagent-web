@@ -1070,12 +1070,12 @@ export default function AgentsPage() {
                       </Link>
 
                       {/* Información detallada */}
-                      <div className="space-y-2 text-xs pr-2">
+                      <div className="space-y-2 text-xs pr-2 w-full">
                         {/* Descripción */}
-                        <div className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
-                          <FileText size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
+                        <div className={`flex items-start gap-2 ${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}`}>
+                          <FileText size={14} className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} mt-0.5 shrink-0`} />
                           <span
-                            className="ml-2"
+                            className="min-w-0 break-words whitespace-normal leading-snug"
                             title={agent.description || t.noDescription}
                           >
                             {agent.description ? agent.description.substring(0, 80) + (agent.description.length > 80 ? '...' : '') : t.noDescription}
@@ -1085,8 +1085,8 @@ export default function AgentsPage() {
                         {/* Fecha de creación + on_chain_id en la misma línea */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <CalendarDays size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
-                            <span className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
+                            <CalendarDays size={14} className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} shrink-0`} />
+                            <span className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} min-w-0`}>
                               {agent.created_at ? new Date(agent.created_at).toLocaleDateString('es-ES') : t.notAvailable}
                             </span>
                           </div>
@@ -1100,18 +1100,18 @@ export default function AgentsPage() {
                         {/* Wallets */}
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
-                            <Bot size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
+                            <Bot size={14} className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} shrink-0`} />
                             <span
-                              className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} font-mono text-xs`}
+                              className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} font-mono text-xs min-w-0 break-all`}
                               title={agent.wallet_chain_register || t.notAvailable}
                             >
                               {t.agentLabel}: {agent.wallet_chain_register ? `${agent.wallet_chain_register.substring(0, 8)}...${agent.wallet_chain_register.substring(agent.wallet_chain_register.length - 6)}` : t.notAvailable}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <User size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
+                            <User size={14} className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} shrink-0`} />
                             <span
-                              className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} font-mono text-xs`}
+                              className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} font-mono text-xs min-w-0 break-all`}
                               title={agent.owner_wallet || t.notAvailable}
                             >
                               {t.ownerLabel}: {agent.owner_wallet ? `${agent.owner_wallet.substring(0, 8)}...${agent.owner_wallet.substring(agent.owner_wallet.length - 6)}` : t.notAvailable}
@@ -1122,14 +1122,14 @@ export default function AgentsPage() {
                         {/* Nonce + HUMI Score en la misma línea */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <Hash size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
-                            <span className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
+                            <Hash size={14} className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} shrink-0`} />
+                            <span className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} min-w-0`}>
                               {t.nonceValueLabel}: {agent.nonce_current ? agent.nonce_current.toLocaleString() : t.notAvailable}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <BarChart3 size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
-                            <span className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
+                            <BarChart3 size={14} className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} shrink-0`} />
+                            <span className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} min-w-0`}>
                               HUMI: {agent.current_humi_score || t.notAvailable}
                             </span>
                           </div>
