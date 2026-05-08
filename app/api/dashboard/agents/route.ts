@@ -130,6 +130,8 @@ export async function GET(request: NextRequest) {
         capabilities_filters,
         tags_filters,
         oasf_domains_filters,
+        is_dummy,
+        has_duplicate_agent,
         current_humi_score,
         balance_current
       `);
@@ -307,6 +309,8 @@ export async function GET(request: NextRequest) {
       capabilities_filters: agent.capabilities_filters,
       tags_filters: agent.tags_filters,
       oasf_domains_filters: agent.oasf_domains_filters,
+      is_dummy: agent.is_dummy,
+      has_duplicate_agent: agent.has_duplicate_agent,
       current_humi_score: agent.current_humi_score,
       humi_score_filter: agent.humi_score_filter,
       nonce_current: agent.nonce_current,

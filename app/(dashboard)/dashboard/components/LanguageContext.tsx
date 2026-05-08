@@ -156,6 +156,8 @@ interface Translations {
   nonceValueLabel: string;
   skillsLabel: string;
   capabilitiesLabel: string;
+  dummyLabel: string;
+  duplicateLabel: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -302,6 +304,8 @@ const translations: Record<Language, Translations> = {
     nonceValueLabel: 'Nonce',
     skillsLabel: 'Skills',
     capabilitiesLabel: 'Capabilities',
+    dummyLabel: 'Dummy',
+    duplicateLabel: 'Duplicado',
 
   },
   en: {
@@ -447,6 +451,8 @@ const translations: Record<Language, Translations> = {
     nonceValueLabel: 'Nonce',
     skillsLabel: 'Skills',
     capabilitiesLabel: 'Capabilities',
+    dummyLabel: 'Dummy',
+    duplicateLabel: 'Duplicated',
   },
 };
 

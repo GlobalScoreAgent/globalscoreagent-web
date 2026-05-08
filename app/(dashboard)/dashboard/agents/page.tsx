@@ -985,7 +985,7 @@ export default function AgentsPage() {
                       </div>
 
                       <div
-                        className={`mt-2 h-8 rounded-xl border px-3 flex items-center justify-center gap-2 text-xs ${
+                        className={`mt-2 min-h-8 rounded-xl border px-2 py-1 flex items-center justify-center gap-1.5 text-[11px] flex-wrap ${
                           theme === 'dark'
                             ? 'bg-zinc-900/70 border-zinc-700 text-zinc-200'
                             : 'bg-white/85 border-zinc-200 text-zinc-800'
@@ -1006,6 +1006,24 @@ export default function AgentsPage() {
                           />
                           <span className="truncate">{getHumiScoreText(agent.humi_score_filter, t)}</span>
                         </span>
+                        {agent.is_dummy === true && (
+                          <>
+                            <span className="opacity-50">·</span>
+                            <span className="inline-flex items-center gap-1.5 min-w-0">
+                              <span className="h-2 w-2 rounded-full shrink-0 bg-amber-500" />
+                              <span className="truncate">{t.dummyLabel}</span>
+                            </span>
+                          </>
+                        )}
+                        {agent.has_duplicate_agent === true && (
+                          <>
+                            <span className="opacity-50">·</span>
+                            <span className="inline-flex items-center gap-1.5 min-w-0">
+                              <span className="h-2 w-2 rounded-full shrink-0 bg-rose-500" />
+                              <span className="truncate">{t.duplicateLabel}</span>
+                            </span>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
