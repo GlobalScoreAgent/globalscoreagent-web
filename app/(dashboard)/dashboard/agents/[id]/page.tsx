@@ -1,8 +1,10 @@
 "use client";
 
 import Image from 'next/image';
-import { ArrowLeft, Copy, ExternalLink } from 'lucide-react';
-import { useState } from 'react';
+import { Copy, ExternalLink } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
+import { useAgentRecentNavigation } from '../../components/AgentRecentNavigationContext';
 import {
   LineChart,
   Line,
@@ -70,9 +72,22 @@ const mockAgent = {
 };
 
 export default function AgentDetailPage() {
+  const params = useParams();
+  const agentId =
+    typeof params?.id === "string" ? params.id : Array.isArray(params?.id) ? params.id[0] : "";
+  const { recordAgentVisit } = useAgentRecentNavigation();
+
   const [activeMetadataTab, setActiveMetadataTab] = useState<keyof typeof mockAgent>('supported_trust');
   const [activeFeedbackTab, setActiveFeedbackTab] = useState<keyof typeof mockAgent>('comments_summary');
   const [transactionalSeries, setTransactionalSeries] = useState<'nonce' | 'balance'>('nonce');
+
+  useEffect(() => {
+    if (!agentId) return;
+    recordAgentVisit(
+      agentId,
+      mockAgent.id === agentId ? mockAgent.name : `Agent ${agentId}`
+    );
+  }, [agentId, recordAgentVisit]);
 
   const metadataOptions = [
     'supported_trust', 'skills', 'capabilities', 'tags',
@@ -104,16 +119,6 @@ export default function AgentDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white pb-20">
-      {/* Back Button */}
-      <div className="max-w-7xl mx-auto px-6 pt-8">
-        <a 
-          href="/dashboard/agents" 
-          className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 transition-colors"
-        >
-          <ArrowLeft size={20} /> Volver al Directorio de Agentes
-        </a>
-      </div>
-
       <div className="max-w-7xl mx-auto px-6 pt-8 space-y-10">
         {/* HEADER */}
         <div className="flex flex-col lg:flex-row gap-8">

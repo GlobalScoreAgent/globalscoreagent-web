@@ -8,6 +8,7 @@ import { useEffect, useState, createContext, useContext } from 'react';
 import DashboardSidebar from './DashboardSidebar';
 import DashboardTopNav from './DashboardTopNav';
 import { LanguageProvider } from './LanguageContext';
+import { RecentAgentsProvider } from './AgentRecentNavigationContext';
 
 // Contexto para compartir datos estadísticos del dashboard
 interface DashboardStats {
@@ -95,22 +96,24 @@ export default function DashboardLayoutClient({
     <DashboardStatsContext.Provider value={stats}>
       <div className="flex h-screen text-white overflow-hidden dark:bg-zinc-950 bg-zinc-100">
         <LanguageProvider>
-          {/* Sidebar */}
-          <DashboardSidebar />
+          <RecentAgentsProvider>
+            {/* Sidebar */}
+            <DashboardSidebar />
 
-          {/* Área principal */}
-          <div className="flex-1 flex flex-col">
-            <DashboardTopNav
-              user={{ email: 'demo@globalscoreagent.com' }}
-              profile={{ display_name: 'Usuario Demo', avatar_url: undefined }}
-              pageTitleKey={pageTitleKey}
-            />
+            {/* Área principal */}
+            <div className="flex-1 flex flex-col">
+              <DashboardTopNav
+                user={{ email: 'demo@globalscoreagent.com' }}
+                profile={{ display_name: 'Usuario Demo', avatar_url: undefined }}
+                pageTitleKey={pageTitleKey}
+              />
 
-            {/* Contenido - aquí va la página principal */}
-            <main className="flex-1 overflow-auto p-8 dark:bg-zinc-950 bg-zinc-100">
-              {children}
-            </main>
-          </div>
+              {/* Contenido - aquí va la página principal */}
+              <main className="flex-1 overflow-auto p-8 dark:bg-zinc-950 bg-zinc-100">
+                {children}
+              </main>
+            </div>
+          </RecentAgentsProvider>
         </LanguageProvider>
       </div>
     </DashboardStatsContext.Provider>

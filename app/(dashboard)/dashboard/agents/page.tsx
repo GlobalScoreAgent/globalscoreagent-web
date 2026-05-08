@@ -118,6 +118,23 @@ function getHumiScoreText(humiFilter: string, t: any): string {
   return textMapping[humiFilter] || humiFilter;
 }
 
+const AGENTS_LIST_FILTERS_KEY = 'gsa:agentsDirectoryFilters';
+const AGENTS_LIST_FILTERS_VERSION = 1;
+
+type AgentsListFiltersSnapshot = {
+  v: number;
+  searchTerm: string;
+  selectedOpenFilter: string;
+  selectedSpecificFilter: string;
+  selectedSubFilter: string;
+  subFilterSearch: string;
+  selectedCategory: string;
+  categorySearch: string;
+  selectedSort: string;
+  sortDirection: 'asc' | 'desc';
+  showAdvancedFilters: boolean;
+};
+
 export default function AgentsPage() {
   const PAGE_SIZE = 10;
   const { t, theme } = useLanguage();
@@ -141,6 +158,10 @@ export default function AgentsPage() {
   const [hasMore, setHasMore] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const skipFilterEffectOnceRef = useRef(false);
+  const didRunInitialHydrationRef = useRef(false);
+  const [filtersConfigLoaded, setFiltersConfigLoaded] = useState(false);
+  const [listStateReady, setListStateReady] = useState(false);
 
   // Timers para auto-cierre de dropdowns
   const [openDropdownTimer, setOpenDropdownTimer] = useState<NodeJS.Timeout | null>(null);
@@ -223,7 +244,15 @@ export default function AgentsPage() {
     sortDirection: 'asc' | 'desc';
     page: number;
     limit: number;
-  }, options?: { append?: boolean }) => {
+  }, options?: {
+    append?: boolean;
+    overrideUi?: {
+      selectedOpenFilter: string;
+      selectedSpecificFilter: string;
+      selectedCategory: string;
+      selectedSubFilter: string;
+    };
+  }) => {
     const append = options?.append || false;
     try {
       if (!append && agents.length > 0) {
@@ -233,10 +262,15 @@ export default function AgentsPage() {
       }
       setError(null);
 
+      const selOpen = options?.overrideUi?.selectedOpenFilter ?? selectedOpenFilter;
+      const selSpec = options?.overrideUi?.selectedSpecificFilter ?? selectedSpecificFilter;
+      const selCat = options?.overrideUi?.selectedCategory ?? selectedCategory;
+      const selSub = options?.overrideUi?.selectedSubFilter ?? selectedSubFilter;
+
       const params = new URLSearchParams({
         searchTerm: filters.searchTerm,
         searchType: filters.searchType,
-        selectedOpenFilter: selectedOpenFilter,
+        selectedOpenFilter: selOpen,
         sortBy: filters.sortBy,
         sortDirection: filters.sortDirection,
         page: filters.page.toString(),
@@ -252,14 +286,14 @@ export default function AgentsPage() {
         params.set('humiFilter', filters.humiFilter);
       }
 
-      const selectedFilterName = selectedSpecificFilter.replace('search', '');
+      const selectedFilterName = selSpec.replace('search', '');
       const selectedFilterKey = advancedFilters._filterKeys?.[selectedFilterName];
-      const complexFilter = isComplexFilter(selectedSpecificFilter, advancedFilters);
+      const complexFilter = isComplexFilter(selSpec, advancedFilters);
       const tagRawValues = complexFilter
         ? getTagRawValuesForSelection(
-            selectedSpecificFilter,
-            selectedCategory,
-            selectedSubFilter,
+            selSpec,
+            selCat,
+            selSub,
             advancedFilters
           )
         : [];
@@ -271,8 +305,8 @@ export default function AgentsPage() {
 
       if (complexFilter && tagRawValues.length > 0) {
         params.set('advancedFilterTagRawValues', JSON.stringify(tagRawValues));
-      } else if (!complexFilter && selectedSubFilter !== 'all') {
-        params.set('advancedFilterValue', selectedSubFilter);
+      } else if (!complexFilter && selSub !== 'all') {
+        params.set('advancedFilterValue', selSub);
       }
 
       const url = `/api/dashboard/agents?${params}`;
@@ -363,21 +397,161 @@ export default function AgentsPage() {
       } catch (error) {
         console.error('Error loading advanced filters:', error);
         setAdvancedFilters({});
+      } finally {
+        setFiltersConfigLoaded(true);
       }
     };
 
-    // Cargar agentes iniciales
-    fetchAgents({
-      searchTerm: '',
-      searchType: 'general',
-      sortBy: selectedSort,
-      sortDirection: sortDirection,
-      page: 1,
-      limit: PAGE_SIZE,
-    });
-
     loadAdvancedFilters();
   }, []);
+
+  useEffect(() => {
+    if (!filtersConfigLoaded || didRunInitialHydrationRef.current) return;
+    didRunInitialHydrationRef.current = true;
+
+    const keys = Object.keys(advancedFilters).filter((k) => !k.startsWith('_'));
+    const fallbackSpecific =
+      keys.length > 0 ? `search${keys[0]}` : 'searchNetwork';
+
+    const validSpecificKeys = new Set(keys.map((k) => `search${k}`));
+    validSpecificKeys.add('searchNetwork');
+
+    let snapshot: AgentsListFiltersSnapshot | null = null;
+    try {
+      const raw = sessionStorage.getItem(AGENTS_LIST_FILTERS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<AgentsListFiltersSnapshot>;
+        if (parsed?.v === AGENTS_LIST_FILTERS_VERSION) {
+          snapshot = parsed as AgentsListFiltersSnapshot;
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+
+    const restored = snapshot
+      ? {
+          searchTerm: snapshot.searchTerm ?? '',
+          selectedOpenFilter: snapshot.selectedOpenFilter ?? 'searchGeneral',
+          selectedSpecificFilter:
+            validSpecificKeys.has(snapshot.selectedSpecificFilter ?? '')
+              ? snapshot.selectedSpecificFilter!
+              : fallbackSpecific,
+          selectedSubFilter: snapshot.selectedSubFilter ?? 'all',
+          subFilterSearch: snapshot.subFilterSearch ?? '',
+          selectedCategory: snapshot.selectedCategory ?? 'all',
+          categorySearch: snapshot.categorySearch ?? '',
+          selectedSort: snapshot.selectedSort ?? 'current_humi_score',
+          sortDirection:
+            snapshot.sortDirection === 'asc' ? 'asc' : 'desc',
+          showAdvancedFilters: Boolean(snapshot.showAdvancedFilters),
+        }
+      : null;
+
+    if (restored) {
+      skipFilterEffectOnceRef.current = true;
+      setSearchTerm(restored.searchTerm);
+      setSelectedOpenFilter(restored.selectedOpenFilter);
+      setSelectedSpecificFilter(restored.selectedSpecificFilter);
+      setSelectedSubFilter(restored.selectedSubFilter);
+      setSubFilterSearch(restored.subFilterSearch);
+      setSelectedCategory(restored.selectedCategory);
+      setCategorySearch(restored.categorySearch);
+      setSelectedSort(restored.selectedSort);
+      setSortDirection(restored.sortDirection);
+      setShowAdvancedFilters(restored.showAdvancedFilters);
+      setCurrentPage(1);
+      setHasMore(true);
+
+      void fetchAgents(
+        {
+          searchTerm: restored.searchTerm,
+          searchType: restored.selectedOpenFilter.replace('search', '').toLowerCase(),
+          tagsFilter:
+            restored.selectedSpecificFilter === 'searchTags' && restored.selectedSubFilter !== 'all'
+              ? restored.selectedSubFilter
+              : undefined,
+          skillsFilter:
+            restored.selectedSpecificFilter === 'searchSkills' &&
+            restored.selectedSubFilter !== 'all'
+              ? restored.selectedSubFilter
+              : undefined,
+          capabilitiesFilter:
+            restored.selectedSpecificFilter === 'searchCapabilities' &&
+            restored.selectedSubFilter !== 'all'
+              ? restored.selectedSubFilter
+              : undefined,
+          oasfDomainsFilter:
+            restored.selectedSpecificFilter === 'searchOasfDomains' &&
+            restored.selectedSubFilter !== 'all'
+              ? restored.selectedSubFilter
+              : undefined,
+          sortBy: restored.selectedSort,
+          sortDirection: restored.sortDirection,
+          page: 1,
+          limit: PAGE_SIZE,
+        },
+        {
+          overrideUi: {
+            selectedOpenFilter: restored.selectedOpenFilter,
+            selectedSpecificFilter: restored.selectedSpecificFilter,
+            selectedCategory: restored.selectedCategory,
+            selectedSubFilter: restored.selectedSubFilter,
+          },
+        }
+      );
+    } else {
+      void fetchAgents({
+        searchTerm: '',
+        searchType: 'general',
+        sortBy: selectedSort,
+        sortDirection: sortDirection,
+        page: 1,
+        limit: PAGE_SIZE,
+      });
+    }
+
+    setListStateReady(true);
+  }, [filtersConfigLoaded, advancedFilters]);
+
+  useEffect(() => {
+    if (!listStateReady) return;
+
+    const timeoutId = window.setTimeout(() => {
+      const snap: AgentsListFiltersSnapshot = {
+        v: AGENTS_LIST_FILTERS_VERSION,
+        searchTerm,
+        selectedOpenFilter,
+        selectedSpecificFilter,
+        selectedSubFilter,
+        subFilterSearch,
+        selectedCategory,
+        categorySearch,
+        selectedSort,
+        sortDirection,
+        showAdvancedFilters,
+      };
+      try {
+        sessionStorage.setItem(AGENTS_LIST_FILTERS_KEY, JSON.stringify(snap));
+      } catch {
+        /* ignore */
+      }
+    }, 320);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [
+    listStateReady,
+    searchTerm,
+    selectedOpenFilter,
+    selectedSpecificFilter,
+    selectedSubFilter,
+    subFilterSearch,
+    selectedCategory,
+    categorySearch,
+    selectedSort,
+    sortDirection,
+    showAdvancedFilters,
+  ]);
 
   // useEffect unificado para manejar todos los cambios (paginación, filtros, búsqueda)
   useEffect(() => {
@@ -385,6 +559,11 @@ export default function AgentsPage() {
     if (isInitialLoad) {
       setIsInitialLoad(false); // Ya no es carga inicial
       return; // No hacer llamada
+    }
+
+    if (skipFilterEffectOnceRef.current) {
+      skipFilterEffectOnceRef.current = false;
+      return;
     }
 
     const timeoutId = setTimeout(() => {

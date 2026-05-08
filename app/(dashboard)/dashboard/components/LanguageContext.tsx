@@ -158,6 +158,13 @@ interface Translations {
   capabilitiesLabel: string;
   dummyLabel: string;
   duplicateLabel: string;
+
+  // Sidebar - Recientes agentes
+  recentAgentsSubmenu: string;
+  closeSidebarAgent: string;
+  favoriteAgent: string;
+  unfavoriteAgent: string;
+  agentMenuAria: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -307,6 +314,12 @@ const translations: Record<Language, Translations> = {
     dummyLabel: 'Dummy',
     duplicateLabel: 'Duplicado',
 
+    recentAgentsSubmenu: 'Recientes',
+    closeSidebarAgent: 'Cerrar pestaña',
+    favoriteAgent: 'Agregar a favoritos',
+    unfavoriteAgent: 'Quitar de favoritos',
+    agentMenuAria: 'Acciones del agente',
+
   },
   en: {
     home: 'Home',
@@ -453,6 +466,13 @@ const translations: Record<Language, Translations> = {
     capabilitiesLabel: 'Capabilities',
     dummyLabel: 'Dummy',
     duplicateLabel: 'Duplicated',
+
+    recentAgentsSubmenu: 'Recent',
+    closeSidebarAgent: 'Close tab',
+    favoriteAgent: 'Add to favorites',
+    unfavoriteAgent: 'Remove from favorites',
+    agentMenuAria: 'Agent actions',
+
   },
 };
 

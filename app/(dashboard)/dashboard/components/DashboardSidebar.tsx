@@ -6,10 +6,17 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { LogOut, Home, Users, BarChart3, ChevronLeft, ChevronRight, Package } from 'lucide-react';
+import { LogOut, Home, Users, BarChart3, ChevronLeft, ChevronRight, Package, MoreHorizontal } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useLanguage } from './LanguageContext';
 import RoadMapCards from './RoadMapCards';
+import { useAgentRecentNavigation } from './AgentRecentNavigationContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const navItems = [
   { href: '/dashboard', labelKey: 'home' as const, icon: Home },
@@ -21,6 +28,8 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
   const supabase = createClient();
   const { t, theme } = useLanguage();
+  const { recentAgents, closeRecentAgent, addFavorite, removeFavorite, isFavorite } =
+    useAgentRecentNavigation();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -68,9 +77,117 @@ export default function DashboardSidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-6 space-y-1">
+      <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto min-h-0">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isAgentsNav = item.href === '/dashboard/agents';
+          const isActive = isAgentsNav
+            ? pathname === item.href || pathname.startsWith(`${item.href}/`)
+            : pathname === item.href;
+
+          if (isAgentsNav) {
+            return (
+              <div key={item.href} className="space-y-1">
+                <Link
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-colors ${
+                    isActive
+                      ? theme === 'dark'
+                        ? 'bg-zinc-800 text-amber-400'
+                        : 'bg-zinc-100 text-amber-600'
+                      : theme === 'dark'
+                        ? 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                        : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                  }`}
+                >
+                  <item.icon className="w-5 h-5 shrink-0" />
+                  {!isCollapsed && <span>{t[item.labelKey]}</span>}
+                </Link>
+                {!isCollapsed && recentAgents.length > 0 && (
+                  <div
+                    className={`ml-2 pl-3 border-l ${
+                      theme === 'dark' ? 'border-zinc-700' : 'border-zinc-200'
+                    } space-y-0.5 pt-1 pb-1`}
+                  >
+                    <p
+                      className={`px-2 pb-1 text-[10px] font-semibold uppercase tracking-wide ${
+                        theme === 'dark' ? 'text-zinc-500' : 'text-zinc-400'
+                      }`}
+                    >
+                      {t.recentAgentsSubmenu}
+                    </p>
+                    {recentAgents.map((agent) => {
+                      const detailPath = `/dashboard/agents/${agent.id}`;
+                      const isAgentActive = pathname === detailPath;
+                      return (
+                        <div
+                          key={agent.id}
+                          className={`group flex items-center gap-0.5 rounded-xl pl-1 pr-0.5 ${
+                            isAgentActive
+                              ? theme === 'dark'
+                                ? 'bg-zinc-800/80'
+                                : 'bg-zinc-100'
+                              : ''
+                          }`}
+                        >
+                          <Link
+                            href={detailPath}
+                            title={agent.label}
+                            className={`min-w-0 flex-1 truncate py-1.5 px-2 text-xs font-medium transition-colors ${
+                              isAgentActive
+                                ? theme === 'dark'
+                                  ? 'text-amber-400'
+                                  : 'text-amber-700'
+                                : theme === 'dark'
+                                  ? 'text-zinc-400 hover:text-zinc-100'
+                                  : 'text-zinc-600 hover:text-zinc-900'
+                            }`}
+                          >
+                            {agent.label}
+                          </Link>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                type="button"
+                                className={`shrink-0 rounded-lg p-1.5 transition-colors outline-none ${
+                                  theme === 'dark'
+                                    ? 'text-zinc-500 hover:bg-zinc-700 hover:text-zinc-200'
+                                    : 'text-zinc-400 hover:bg-zinc-200 hover:text-zinc-800'
+                                }`}
+                                aria-label={t.agentMenuAria}
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="min-w-[10rem]">
+                              <DropdownMenuItem
+                                onSelect={() => closeRecentAgent(agent.id)}
+                              >
+                                {t.closeSidebarAgent}
+                              </DropdownMenuItem>
+                              {isFavorite(agent.id) ? (
+                                <DropdownMenuItem
+                                  onSelect={() => removeFavorite(agent.id)}
+                                >
+                                  {t.unfavoriteAgent}
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem
+                                  onSelect={() => addFavorite(agent.id)}
+                                >
+                                  {t.favoriteAgent}
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
           return (
             <Link
               key={item.href}
@@ -90,8 +207,6 @@ export default function DashboardSidebar() {
             </Link>
           );
         })}
-
-
       </nav>
 
       {/* Road Map */}
