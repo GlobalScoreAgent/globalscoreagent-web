@@ -50,31 +50,10 @@ function parseBooleanValue(value: string): boolean | null {
   return null;
 }
 
-/** JSONB @> payload: array of objects with `type` (matches services column shape). */
-function jsonbContainsServiceTypePayload(rawType: string): string {
-  return JSON.stringify([{ type: rawType }]);
-}
-
-/**
- * agent_advanced_filters.filter_key suele ser `services_filters` (como skills_filters), pero
- * los objetos con `type` viven en la columna JSON `services`. tag_raw_values son valores de `type`.
- */
-function shouldApplyServicesTypeContainment(filterKey: string, advancedFilterName?: string): boolean {
-  const key = filterKey.trim().toLowerCase();
-  if (key === 'services' || key === 'services_filters') return true;
-  const name = advancedFilterName?.trim().toLowerCase();
-  return name === 'services' || name === 'servicios';
-}
-
-function agentsColumnForTagRawFilter(filterKey: string, advancedFilterName?: string): string {
-  return shouldApplyServicesTypeContainment(filterKey, advancedFilterName) ? 'services' : filterKey;
-}
-
-function jsonbContainsPayloadForTagRaw(filterKey: string, advancedFilterName: string | undefined, rawValue: string): string {
-  if (shouldApplyServicesTypeContainment(filterKey, advancedFilterName)) {
-    return jsonbContainsServiceTypePayload(rawValue);
-  }
-  return `["${rawValue.replace(/"/g, '\\"')}"]`;
+function jsonbContainsStringArrayPayload(rawValue: string): string {
+  // payload para JSONB array de strings (cs = @>)
+  // Ejemplo: columnName cs '["api"]'
+  return JSON.stringify([rawValue]);
 }
 
 export async function GET(request: NextRequest) {
@@ -186,22 +165,18 @@ export async function GET(request: NextRequest) {
           query = query.eq(columnName, parsed);
         }
       } else if (hasTagRawValues) {
-        // Any-match sobre jsonb (cs = @>). Services: @> [{"type": tag}] en columna `services`, no en services_filters.
-        const jsonbColumn = agentsColumnForTagRawFilter(columnName, filters.advancedFilterName);
-
+        // Any-match sobre jsonb (cs = @>) usando el mismo contrato que otros filtros complejos:
+        // - columnName = advancedFilterKey (p. ej. services_filters)
+        // - tag_raw_values = strings que se comparan contra el array jsonb de strings de la columna
         const idBuckets = await Promise.all(
           filters.advancedFilterTagRawValues!.map(async (rawValue) => {
-            const containsPayload = jsonbContainsPayloadForTagRaw(
-              columnName,
-              filters.advancedFilterName,
-              rawValue
-            );
+            const containsPayload = jsonbContainsStringArrayPayload(rawValue);
 
             const { data } = await supabase
               .schema('web_dashboard')
               .from('agents')
               .select('id')
-              .filter(jsonbColumn, 'cs', containsPayload)
+              .filter(columnName, 'cs', containsPayload)
               .limit(2000);
 
             return (data || []).map((row: any) => row.id);
