@@ -118,21 +118,6 @@ function getHumiScoreText(humiFilter: string, t: any): string {
   return textMapping[humiFilter] || humiFilter;
 }
 
-// Componente para mostrar badge de chain con color específico
-function ChainBadge({ chainName }: { chainName: string }) {
-  const normalizedName = normalizeChainName(chainName);
-  const backgroundColor = getChainColor(chainName);
-
-  return (
-    <div
-      className="px-3 py-1 rounded-lg text-sm font-medium text-white shadow-lg"
-      style={{ backgroundColor }}
-    >
-      {normalizedName}
-    </div>
-  );
-}
-
 export default function AgentsPage() {
   const PAGE_SIZE = 10;
   const { t, theme } = useLanguage();
@@ -475,7 +460,7 @@ export default function AgentsPage() {
     { key: 'searchName', label: t.searchName },
     { key: 'searchWallet', label: t.searchWallet },
     { key: 'searchWalletOwner', label: t.searchWalletOwner },
-    { key: 'searchAgentIdentifier', label: t.searchAgentIdentifier || 'Agent Identifier' },
+    { key: 'searchAgentIdentifier', label: t.searchAgentIdentifier },
   ];
 
   // Opciones de filtros específicos (con sub-dropdown) - dinámico desde DB
@@ -687,7 +672,7 @@ export default function AgentsPage() {
             className={`flex items-center justify-center w-11 h-11 rounded-xl border transition-colors ${
               theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700' : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
             }`}
-            title={sortDirection === 'asc' ? 'Orden ascendente' : 'Orden descendente'}
+            title={sortDirection === 'asc' ? t.sortAscending : t.sortDescending}
           >
             {sortDirection === 'asc' ? '↑' : '↓'}
           </button>
@@ -702,7 +687,7 @@ export default function AgentsPage() {
                 : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
             }`}
           >
-            {showAdvancedFilters ? 'Ocultar filtro avanzado' : 'Add filter'}
+            {showAdvancedFilters ? t.hideAdvancedFilter : t.addFilter}
           </button>
           <button
             onClick={clearAllFilters}
@@ -712,10 +697,10 @@ export default function AgentsPage() {
                 : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-red-500 hover:border-red-400 hover:text-white'
             }`}
           >
-            Clear all filters
+            {t.clearAllFilters}
           </button>
           <span className={`text-sm ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>
-            {totalCount.toLocaleString()} resultados · {activeFilterCount} filtros activos
+            {totalCount.toLocaleString()} {t.resultsLabel} · {activeFilterCount} {t.activeFiltersLabel}
           </span>
           {isRefetching && (
             <span className={`text-sm ${theme === 'dark' ? 'text-emerald-400' : 'text-emerald-600'}`}>
@@ -735,7 +720,7 @@ export default function AgentsPage() {
                   theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700' : 'bg-white border-zinc-300 text-zinc-900 hover:bg-zinc-100'
                 }`}
               >
-                <span className="text-sm truncate">{currentSpecificFilterLabel || 'Filtro avanzado'}</span>
+                <span className="text-sm truncate">{currentSpecificFilterLabel || t.advancedFilterLabel}</span>
                 <ChevronDown size={16} className={`transition-transform ${isSpecificDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isSpecificDropdownOpen && (
@@ -763,7 +748,7 @@ export default function AgentsPage() {
             <div className="relative">
               <input
                 type="text"
-                placeholder={isComplexFilter(selectedSpecificFilter, advancedFilters) ? 'Buscar categoría...' : 'Seleccionar valor...'}
+                placeholder={isComplexFilter(selectedSpecificFilter, advancedFilters) ? t.searchCategoryPlaceholder : t.selectValuePlaceholder}
                 value={categorySearch}
                 onChange={(e) => {
                   setCategorySearch(e.target.value);
@@ -802,7 +787,7 @@ export default function AgentsPage() {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Buscar subcategoría..."
+                  placeholder={t.searchSubcategoryPlaceholder}
                   value={subFilterSearch}
                   onChange={(e) => {
                     setSubFilterSearch(e.target.value);
@@ -836,7 +821,7 @@ export default function AgentsPage() {
               </div>
             ) : (
               <div className={`px-4 py-3 rounded-xl border text-sm ${theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-400' : 'bg-white border-zinc-300 text-zinc-600'}`}>
-                Filtro simple: selecciona un valor de la lista.
+                {t.simpleFilterHint}
               </div>
             )}
           </div>
@@ -848,7 +833,7 @@ export default function AgentsPage() {
               onClick={() => setSearchTerm('')}
               className={`px-3 py-1 rounded-full text-xs border ${theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200' : 'bg-zinc-100 border-zinc-300 text-zinc-800'}`}
             >
-              Search: {currentSearchTypeLabel} = {searchTerm} ×
+              {t.searchChipLabel}: {currentSearchTypeLabel} = {searchTerm} ×
             </button>
           )}
           {selectedOpenFilter !== 'searchGeneral' && (
@@ -856,7 +841,7 @@ export default function AgentsPage() {
               onClick={() => setSelectedOpenFilter('searchGeneral')}
               className={`px-3 py-1 rounded-full text-xs border ${theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200' : 'bg-zinc-100 border-zinc-300 text-zinc-800'}`}
             >
-              Tipo búsqueda: {currentSearchTypeLabel} ×
+              {t.searchTypeChipLabel}: {currentSearchTypeLabel} ×
             </button>
           )}
           {hasSpecificFilter && (
@@ -927,7 +912,7 @@ export default function AgentsPage() {
       {!loading && !error && agents.length === 0 && (
         <div className="text-center py-12">
           <div className={`text-lg ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>
-            No se encontraron agentes con los parámetros de búsqueda seleccionados
+            {t.noAgentsFound}
           </div>
         </div>
       )}
@@ -983,36 +968,45 @@ export default function AgentsPage() {
                       backgroundSize: '20px 20px'
                     }} />
 
-                    <div className="relative h-52">
+                    <div className="relative flex h-full flex-col px-4 pt-4 pb-3">
+                      <h3 className={`text-base font-semibold text-center mb-2 truncate ${
+                        theme === 'dark' ? 'text-white' : 'text-zinc-900'
+                      }`}>
+                        {agent.name}
+                      </h3>
+
+                      <div className="relative flex-1 min-h-[120px]">
                       <AgentImage
                         src={agent.image_url}
                         alt={agent.name}
                         fill
                         className="object-contain object-center"
                       />
-
-                      {/* HUMI Score Filter Badge - Esquina superior derecha */}
-                      <div className="absolute top-4 right-4 z-10">
-                        <div
-                          className="px-3 py-1 rounded-lg text-sm font-medium text-white shadow-lg"
-                          style={{ backgroundColor: getHumiScoreColor(agent.humi_score_filter) }}
-                        >
-                          {getHumiScoreText(agent.humi_score_filter, t)}
-                        </div>
                       </div>
 
-                      {/* Chain Badge - Esquina superior izquierda */}
-                      <div className="absolute top-4 left-4 z-10">
-                        <ChainBadge chainName={agent.chain} />
+                      <div
+                        className={`mt-2 h-8 rounded-xl border px-3 flex items-center justify-center gap-2 text-xs ${
+                          theme === 'dark'
+                            ? 'bg-zinc-900/70 border-zinc-700 text-zinc-200'
+                            : 'bg-white/85 border-zinc-200 text-zinc-800'
+                        }`}
+                      >
+                        <span className="inline-flex items-center gap-1.5 min-w-0">
+                          <span
+                            className="h-2 w-2 rounded-full shrink-0"
+                            style={{ backgroundColor: getChainColor(agent.chain) }}
+                          />
+                          <span className="truncate">{normalizeChainName(agent.chain)}</span>
+                        </span>
+                        <span className="opacity-50">·</span>
+                        <span className="inline-flex items-center gap-1.5 min-w-0">
+                          <span
+                            className="h-2 w-2 rounded-full shrink-0"
+                            style={{ backgroundColor: getHumiScoreColor(agent.humi_score_filter) }}
+                          />
+                          <span className="truncate">{getHumiScoreText(agent.humi_score_filter, t)}</span>
+                        </span>
                       </div>
-                    </div>
-
-                    <div className="p-6 pt-4">
-                      <h3 className={`text-xl font-semibold text-center ${
-                        theme === 'dark' ? 'text-white' : 'text-zinc-900'
-                      }`}>
-                        {agent.name}
-                      </h3>
                     </div>
                   </div>
 
@@ -1064,9 +1058,9 @@ export default function AgentsPage() {
                           <FileText size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
                           <span
                             className="ml-2"
-                            title={agent.description || 'Sin descripción'}
+                            title={agent.description || t.noDescription}
                           >
-                            {agent.description ? agent.description.substring(0, 80) + (agent.description.length > 80 ? '...' : '') : 'Sin descripción'}
+                            {agent.description ? agent.description.substring(0, 80) + (agent.description.length > 80 ? '...' : '') : t.noDescription}
                           </span>
                         </div>
 
@@ -1075,12 +1069,12 @@ export default function AgentsPage() {
                           <div className="flex items-center gap-2">
                             <CalendarDays size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
                             <span className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
-                              {agent.created_at ? new Date(agent.created_at).toLocaleDateString('es-ES') : 'N/A'}
+                              {agent.created_at ? new Date(agent.created_at).toLocaleDateString('es-ES') : t.notAvailable}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
                             <span className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} font-mono text-xs`}>
-                              ID: {agent.on_chain_id || 'N/A'}
+                              ID: {agent.on_chain_id || t.notAvailable}
                             </span>
                           </div>
                         </div>
@@ -1091,18 +1085,18 @@ export default function AgentsPage() {
                             <Bot size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
                             <span
                               className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} font-mono text-xs`}
-                              title={agent.wallet_chain_register || 'N/A'}
+                              title={agent.wallet_chain_register || t.notAvailable}
                             >
-                              Agent: {agent.wallet_chain_register ? `${agent.wallet_chain_register.substring(0, 8)}...${agent.wallet_chain_register.substring(agent.wallet_chain_register.length - 6)}` : 'N/A'}
+                              {t.agentLabel}: {agent.wallet_chain_register ? `${agent.wallet_chain_register.substring(0, 8)}...${agent.wallet_chain_register.substring(agent.wallet_chain_register.length - 6)}` : t.notAvailable}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
                             <User size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
                             <span
                               className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} font-mono text-xs`}
-                              title={agent.owner_wallet || 'N/A'}
+                              title={agent.owner_wallet || t.notAvailable}
                             >
-                              Owner: {agent.owner_wallet ? `${agent.owner_wallet.substring(0, 8)}...${agent.owner_wallet.substring(agent.owner_wallet.length - 6)}` : 'N/A'}
+                              {t.ownerLabel}: {agent.owner_wallet ? `${agent.owner_wallet.substring(0, 8)}...${agent.owner_wallet.substring(agent.owner_wallet.length - 6)}` : t.notAvailable}
                             </span>
                           </div>
                         </div>
@@ -1112,13 +1106,13 @@ export default function AgentsPage() {
                           <div className="flex items-center gap-2">
                             <Hash size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
                             <span className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
-                              Nonce: {agent.nonce_current ? agent.nonce_current.toLocaleString() : 'N/A'}
+                              {t.nonceValueLabel}: {agent.nonce_current ? agent.nonce_current.toLocaleString() : t.notAvailable}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
                             <BarChart3 size={14} className={theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} />
                             <span className={theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'}>
-                              HUMI: {agent.current_humi_score || 'N/A'}
+                              HUMI: {agent.current_humi_score || t.notAvailable}
                             </span>
                           </div>
                         </div>
@@ -1128,7 +1122,7 @@ export default function AgentsPage() {
                           <div className="flex items-start gap-2">
                             <Wrench size={14} className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} mt-0.5`} />
                             <div className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} text-xs`}>
-                              <span className="mr-1">Skills:</span>
+                              <span className="mr-1">{t.skillsLabel}:</span>
                               {agent.skills_filters.slice(0, 3).join(', ')}
                             </div>
                           </div>
@@ -1139,7 +1133,7 @@ export default function AgentsPage() {
                           <div className="flex items-start gap-2">
                             <Zap size={14} className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} mt-0.5`} />
                             <div className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} text-xs`}>
-                              <span className="mr-1">Capabilities:</span>
+                              <span className="mr-1">{t.capabilitiesLabel}:</span>
                               {agent.capabilities_filters.slice(0, 3).join(', ')}
                             </div>
                           </div>

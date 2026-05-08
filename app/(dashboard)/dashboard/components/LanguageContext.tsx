@@ -134,6 +134,28 @@ interface Translations {
   searchLoadingAgents: string;
   searchUpdatingResults: string;
   searchRetry: string;
+  hideAdvancedFilter: string;
+  addFilter: string;
+  clearAllFilters: string;
+  resultsLabel: string;
+  activeFiltersLabel: string;
+  advancedFilterLabel: string;
+  searchCategoryPlaceholder: string;
+  selectValuePlaceholder: string;
+  searchSubcategoryPlaceholder: string;
+  simpleFilterHint: string;
+  searchChipLabel: string;
+  searchTypeChipLabel: string;
+  noAgentsFound: string;
+  sortAscending: string;
+  sortDescending: string;
+  notAvailable: string;
+  noDescription: string;
+  agentLabel: string;
+  ownerLabel: string;
+  nonceValueLabel: string;
+  skillsLabel: string;
+  capabilitiesLabel: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -258,6 +280,28 @@ const translations: Record<Language, Translations> = {
     searchLoadingAgents: 'Consultando base de datos...',
     searchUpdatingResults: 'Actualizando resultados...',
     searchRetry: 'Reintentar',
+    hideAdvancedFilter: 'Ocultar filtro avanzado',
+    addFilter: 'Agregar filtro',
+    clearAllFilters: 'Limpiar todos los filtros',
+    resultsLabel: 'resultados',
+    activeFiltersLabel: 'filtros activos',
+    advancedFilterLabel: 'Filtro avanzado',
+    searchCategoryPlaceholder: 'Buscar categoría...',
+    selectValuePlaceholder: 'Seleccionar valor...',
+    searchSubcategoryPlaceholder: 'Buscar subcategoría...',
+    simpleFilterHint: 'Filtro simple: selecciona un valor de la lista.',
+    searchChipLabel: 'Búsqueda',
+    searchTypeChipLabel: 'Tipo de búsqueda',
+    noAgentsFound: 'No se encontraron agentes con los parámetros de búsqueda seleccionados',
+    sortAscending: 'Orden ascendente',
+    sortDescending: 'Orden descendente',
+    notAvailable: 'N/A',
+    noDescription: 'Sin descripción',
+    agentLabel: 'Agente',
+    ownerLabel: 'Owner',
+    nonceValueLabel: 'Nonce',
+    skillsLabel: 'Skills',
+    capabilitiesLabel: 'Capabilities',
 
   },
   en: {
@@ -381,6 +425,28 @@ const translations: Record<Language, Translations> = {
     searchLoadingAgents: 'Querying database...',
     searchUpdatingResults: 'Updating results...',
     searchRetry: 'Retry',
+    hideAdvancedFilter: 'Hide advanced filter',
+    addFilter: 'Add filter',
+    clearAllFilters: 'Clear all filters',
+    resultsLabel: 'results',
+    activeFiltersLabel: 'active filters',
+    advancedFilterLabel: 'Advanced filter',
+    searchCategoryPlaceholder: 'Search category...',
+    selectValuePlaceholder: 'Select value...',
+    searchSubcategoryPlaceholder: 'Search subcategory...',
+    simpleFilterHint: 'Simple filter: select a value from the list.',
+    searchChipLabel: 'Search',
+    searchTypeChipLabel: 'Search type',
+    noAgentsFound: 'No agents were found with the selected search parameters',
+    sortAscending: 'Ascending order',
+    sortDescending: 'Descending order',
+    notAvailable: 'N/A',
+    noDescription: 'No description',
+    agentLabel: 'Agent',
+    ownerLabel: 'Owner',
+    nonceValueLabel: 'Nonce',
+    skillsLabel: 'Skills',
+    capabilitiesLabel: 'Capabilities',
   },
 };
 
