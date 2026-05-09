@@ -74,6 +74,11 @@ export default function DashboardSidebar() {
     window.location.href = '/auth/login';
   };
 
+  /** Rail colapsado (w-16): íconos centrados, sin padding horizontal agresivo */
+  const navRowLayout = isCollapsed
+    ? 'justify-center gap-0 px-2 min-h-[2.75rem]'
+    : 'gap-3 px-4';
+
   return (
     <div className={`h-screen border-r flex flex-col transition-all duration-300 ${
       isCollapsed ? 'w-16' : 'w-64'
@@ -82,13 +87,19 @@ export default function DashboardSidebar() {
       : 'bg-white border-zinc-200 text-zinc-900'}`}
     >
       {/* Logo + Título */}
-      <div className={`px-4 py-6 border-b flex items-center gap-3 ${
-        theme === 'dark' ? 'border-zinc-800' : 'border-zinc-200'
-      }`}>
-        <img 
-          src="/logo-gsa.png" 
-          alt="Global Score Agent" 
-          className={`transition-all ${isCollapsed ? 'h-10 w-10' : 'h-12 w-auto'}`}
+      <div
+        className={`border-b flex items-center ${
+          isCollapsed ? 'justify-center px-2 py-5' : 'gap-3 px-4 py-6'
+        } ${theme === 'dark' ? 'border-zinc-800' : 'border-zinc-200'}`}
+      >
+        <img
+          src="/logo-gsa.png"
+          alt="Global Score Agent"
+          className={`transition-all object-contain object-center ${
+            isCollapsed
+              ? 'mx-auto h-10 max-h-10 w-auto max-w-[2.75rem]'
+              : 'h-12 w-auto'
+          }`}
         />
         {!isCollapsed && (
           <div className="flex flex-col leading-none">
@@ -99,7 +110,7 @@ export default function DashboardSidebar() {
       </div>
 
       {/* Botón colapsar */}
-      <div className="px-4 py-2 flex justify-end">
+      <div className={`py-2 flex ${isCollapsed ? 'justify-center px-2' : 'justify-end px-4'}`}>
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className={`p-2 rounded-xl transition-colors ${
@@ -126,7 +137,8 @@ export default function DashboardSidebar() {
               <div key={item.href} className="space-y-1">
                 <Link
                   href={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-colors ${
+                  title={isCollapsed ? t[item.labelKey] : undefined}
+                  className={`flex items-center py-3 rounded-2xl text-sm font-medium transition-colors ${navRowLayout} ${
                     isActive
                       ? theme === 'dark'
                         ? 'bg-zinc-800 text-amber-400'
@@ -136,7 +148,7 @@ export default function DashboardSidebar() {
                         : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
                   }`}
                 >
-                  <item.icon className="w-5 h-5 shrink-0" />
+                  <item.icon className="h-5 w-5 shrink-0" />
                   {!isCollapsed && <span>{t[item.labelKey]}</span>}
                 </Link>
                 {!isCollapsed && recentAgents.length > 0 && (
@@ -229,17 +241,18 @@ export default function DashboardSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-colors ${
+              title={isCollapsed ? t[item.labelKey] : undefined}
+              className={`flex items-center py-3 rounded-2xl text-sm font-medium transition-colors ${navRowLayout} ${
                 isActive
                   ? theme === 'dark'
                     ? 'bg-zinc-800 text-amber-400'
                     : 'bg-zinc-100 text-amber-600'
                   : theme === 'dark'
-                  ? 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
-                  : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                    ? 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
               }`}
             >
-              <item.icon className="w-5 h-5" />
+              <item.icon className="h-5 w-5 shrink-0" />
               {!isCollapsed && <span>{t[item.labelKey]}</span>}
             </Link>
           );
@@ -299,18 +312,22 @@ export default function DashboardSidebar() {
       </div>
 
       {/* Logout */}
-      <div className={`p-4 border-t ${
-        theme === 'dark' ? 'border-zinc-800' : 'border-zinc-200'
-      }`}>
+      <div
+        className={`border-t ${isCollapsed ? 'p-2' : 'p-4'} ${
+          theme === 'dark' ? 'border-zinc-800' : 'border-zinc-200'
+        }`}
+      >
         <button
+          type="button"
           onClick={handleLogout}
-          className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors w-full rounded-2xl ${
+          title={isCollapsed ? t.logout : undefined}
+          className={`flex w-full items-center py-3 text-sm font-medium transition-colors rounded-2xl ${navRowLayout} ${
             theme === 'dark'
               ? 'text-zinc-400 hover:text-red-400 hover:bg-zinc-800/50'
               : 'text-zinc-600 hover:text-red-500 hover:bg-zinc-100'
           }`}
         >
-          <LogOut className="w-5 h-5" />
+          <LogOut className="h-5 w-5 shrink-0" />
           {!isCollapsed && <span>{t.logout}</span>}
         </button>
       </div>
