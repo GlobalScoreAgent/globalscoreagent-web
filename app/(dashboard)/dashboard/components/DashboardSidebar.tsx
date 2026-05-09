@@ -5,8 +5,19 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
-import { LogOut, Home, Users, BarChart3, ChevronLeft, ChevronRight, Package, MoreHorizontal } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import {
+  LogOut,
+  Home,
+  Users,
+  BarChart3,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ChevronDown,
+  Package,
+  MoreHorizontal,
+} from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { useLanguage } from './LanguageContext';
 import RoadMapCards from './RoadMapCards';
@@ -17,6 +28,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+
+const ROADMAP_EXPANDED_KEY = 'gsa:roadmapExpanded';
 
 const navItems = [
   { href: '/dashboard', labelKey: 'home' as const, icon: Home },
@@ -32,6 +45,29 @@ export default function DashboardSidebar() {
     useAgentRecentNavigation();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [roadMapBodyOpen, setRoadMapBodyOpen] = useState(true);
+
+  useEffect(() => {
+    try {
+      const v = localStorage.getItem(ROADMAP_EXPANDED_KEY);
+      if (v === '0') setRoadMapBodyOpen(false);
+      if (v === '1') setRoadMapBodyOpen(true);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const toggleRoadMapBody = () => {
+    setRoadMapBodyOpen((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(ROADMAP_EXPANDED_KEY, next ? '1' : '0');
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -211,20 +247,43 @@ export default function DashboardSidebar() {
 
       {/* Road Map */}
       {!isCollapsed && (
-        <div className={`mx-3 mb-4 p-4 rounded-2xl border flex-1 flex flex-col ${
-          theme === 'dark'
-            ? 'bg-zinc-800/50 border-zinc-700/50'
-            : 'bg-zinc-50 border-zinc-200'
-        }`}>
-          <div className="flex items-center gap-2 mb-4">
-            <Package className="w-4 h-4 text-amber-500" />
-            <span className={`text-sm font-semibold ${
-              theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'
-            }`}>
-              {t.roadMap}
-            </span>
-          </div>
-          <RoadMapCards />
+        <div
+          className={`mx-3 mb-4 flex flex-1 flex-col overflow-hidden rounded-2xl border ${
+            theme === 'dark'
+              ? 'border-zinc-700/50 bg-zinc-800/50'
+              : 'border-zinc-200 bg-zinc-50'
+          }`}
+        >
+          <button
+            type="button"
+            onClick={toggleRoadMapBody}
+            className={`flex w-full items-center justify-between gap-2 p-4 text-left transition-colors ${
+              theme === 'dark' ? 'hover:bg-zinc-800/80' : 'hover:bg-zinc-100/80'
+            }`}
+            aria-expanded={roadMapBodyOpen}
+            aria-label={roadMapBodyOpen ? t.roadMapCollapseAria : t.roadMapExpandAria}
+          >
+            <div className="flex min-w-0 items-center gap-2">
+              <Package className="h-4 w-4 shrink-0 text-amber-500" />
+              <span
+                className={`truncate text-sm font-semibold ${
+                  theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'
+                }`}
+              >
+                {t.roadMap}
+              </span>
+            </div>
+            {roadMapBodyOpen ? (
+              <ChevronUp className="h-4 w-4 shrink-0 text-zinc-500" aria-hidden />
+            ) : (
+              <ChevronDown className="h-4 w-4 shrink-0 text-zinc-500" aria-hidden />
+            )}
+          </button>
+          {roadMapBodyOpen ? (
+            <div className="px-4 pb-4">
+              <RoadMapCards />
+            </div>
+          ) : null}
         </div>
       )}
 

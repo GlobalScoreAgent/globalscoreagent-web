@@ -15,6 +15,8 @@ export interface Translations {
   humiIndex: string;
   certifications: string;
   roadMap: string;
+  roadMapExpandAria: string;
+  roadMapCollapseAria: string;
   cerex: string;
   cerow: string;
   logout: string;
@@ -231,6 +233,8 @@ const translations: Record<Language, Translations> = {
     humiIndex: 'Índice HUMI',
     certifications: 'Certificaciones',
     roadMap: 'Próximas Funcionalidades',
+    roadMapExpandAria: 'Expandir próximas funcionalidades',
+    roadMapCollapseAria: 'Contraer próximas funcionalidades',
     cerex: 'CEREX',
     cerow: 'CEROW',
     logout: 'Cerrar Sesión',
@@ -440,6 +444,8 @@ const translations: Record<Language, Translations> = {
     humiIndex: 'HUMI Index',
     certifications: 'Certifications',
     roadMap: 'Road Map',
+    roadMapExpandAria: 'Expand upcoming features',
+    roadMapCollapseAria: 'Collapse upcoming features',
     cerex: 'CEREX',
     cerow: 'CEROW',
     logout: 'Log Out',

@@ -1,6 +1,6 @@
 /**
  * Construye series para gráficos de detalle desde JSON plano nonce_history/balance_history.
- * Orden conceptual: today, 7d, … 12m. Omite null; conserva 0.
+ * Orden en el eje X: de bucket más antiguo («12m») hacia «hoy» (izquierda → derecha). Omite null; conserva 0.
  */
 
 export type DeltaChartPoint = { label: string; value: number };
@@ -48,7 +48,7 @@ export function buildNonceDeltaSeries(
     }
   }
 
-  return out;
+  return out.slice().reverse();
 }
 
 export function buildBalanceDeltaSeries(
@@ -82,5 +82,5 @@ export function buildBalanceDeltaSeries(
     }
   }
 
-  return out;
+  return out.slice().reverse();
 }
