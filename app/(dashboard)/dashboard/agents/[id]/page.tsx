@@ -765,6 +765,7 @@ export default function AgentDetailPage() {
                 isDark={isDark}
                 locale={lang === 'es' ? 'es-ES' : 'en-US'}
                 emptyMessage={t.agentDetailNoJsonToShow}
+                vsPreviousLabel={t.transactionalDeltaVsPrevious}
               />
             </div>
 

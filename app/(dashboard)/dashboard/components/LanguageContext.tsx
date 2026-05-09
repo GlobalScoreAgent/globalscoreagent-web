@@ -15,6 +15,8 @@ export interface Translations {
   humiIndex: string;
   certifications: string;
   roadMap: string;
+  roadMapLine1: string;
+  roadMapLine2: string;
   roadMapExpandAria: string;
   roadMapCollapseAria: string;
   cerex: string;
@@ -224,6 +226,7 @@ export interface Translations {
   chartLabel12m: string;
   agentDetailProfilesCardTitle: string;
   governanceTypeLabel: string;
+  transactionalDeltaVsPrevious: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -233,6 +236,8 @@ const translations: Record<Language, Translations> = {
     humiIndex: 'Índice HUMI',
     certifications: 'Certificaciones',
     roadMap: 'Próximas Funcionalidades',
+    roadMapLine1: 'Próximas',
+    roadMapLine2: 'Funcionalidades',
     roadMapExpandAria: 'Expandir próximas funcionalidades',
     roadMapCollapseAria: 'Contraer próximas funcionalidades',
     cerex: 'CEREX',
@@ -437,6 +442,7 @@ const translations: Record<Language, Translations> = {
     chartLabel12m: '12 m',
     agentDetailProfilesCardTitle: 'Perfiles',
     governanceTypeLabel: 'Tipo de gobernanza:',
+    transactionalDeltaVsPrevious: 'vs anterior',
   },
   en: {
     home: 'Home',
@@ -444,6 +450,8 @@ const translations: Record<Language, Translations> = {
     humiIndex: 'HUMI Index',
     certifications: 'Certifications',
     roadMap: 'Road Map',
+    roadMapLine1: 'Upcoming',
+    roadMapLine2: 'features',
     roadMapExpandAria: 'Expand upcoming features',
     roadMapCollapseAria: 'Collapse upcoming features',
     cerex: 'CEREX',
@@ -648,6 +656,7 @@ const translations: Record<Language, Translations> = {
     chartLabel12m: '12m',
     agentDetailProfilesCardTitle: 'Profiles',
     governanceTypeLabel: 'Governance type:',
+    transactionalDeltaVsPrevious: 'vs previous',
   },
 };
 

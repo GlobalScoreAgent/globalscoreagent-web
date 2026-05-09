@@ -112,8 +112,9 @@ export default function DashboardSidebar() {
         </button>
       </div>
 
+      <div className="flex min-h-0 flex-1 flex-col">
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto min-h-0">
+      <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-6 space-y-1">
         {navItems.map((item) => {
           const isAgentsNav = item.href === '/dashboard/agents';
           const isActive = isAgentsNav
@@ -248,7 +249,7 @@ export default function DashboardSidebar() {
       {/* Road Map */}
       {!isCollapsed && (
         <div
-          className={`mx-3 mb-4 flex flex-1 flex-col overflow-hidden rounded-2xl border ${
+          className={`mx-3 mb-4 mt-auto shrink-0 overflow-hidden rounded-2xl border ${
             theme === 'dark'
               ? 'border-zinc-700/50 bg-zinc-800/50'
               : 'border-zinc-200 bg-zinc-50'
@@ -257,35 +258,45 @@ export default function DashboardSidebar() {
           <button
             type="button"
             onClick={toggleRoadMapBody}
-            className={`flex w-full items-center justify-between gap-2 p-4 text-left transition-colors ${
+            className={`flex w-full items-start justify-between gap-2 p-4 text-left transition-colors ${
               theme === 'dark' ? 'hover:bg-zinc-800/80' : 'hover:bg-zinc-100/80'
             }`}
             aria-expanded={roadMapBodyOpen}
             aria-label={roadMapBodyOpen ? t.roadMapCollapseAria : t.roadMapExpandAria}
           >
-            <div className="flex min-w-0 items-center gap-2">
-              <Package className="h-4 w-4 shrink-0 text-amber-500" />
-              <span
-                className={`truncate text-sm font-semibold ${
-                  theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'
-                }`}
-              >
-                {t.roadMap}
+            <div className="flex min-w-0 flex-1 items-start gap-2">
+              <Package className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+              <span className="flex min-w-0 flex-col leading-snug">
+                <span
+                  className={`text-sm font-semibold ${
+                    theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'
+                  }`}
+                >
+                  {t.roadMapLine1}
+                </span>
+                <span
+                  className={`text-sm font-semibold ${
+                    theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'
+                  }`}
+                >
+                  {t.roadMapLine2}
+                </span>
               </span>
             </div>
             {roadMapBodyOpen ? (
-              <ChevronUp className="h-4 w-4 shrink-0 text-zinc-500" aria-hidden />
+              <ChevronUp className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" aria-hidden />
             ) : (
-              <ChevronDown className="h-4 w-4 shrink-0 text-zinc-500" aria-hidden />
+              <ChevronDown className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" aria-hidden />
             )}
           </button>
           {roadMapBodyOpen ? (
-            <div className="px-4 pb-4">
+            <div className="max-h-52 overflow-y-auto px-4 pb-4">
               <RoadMapCards />
             </div>
           ) : null}
         </div>
       )}
+      </div>
 
       {/* Logout */}
       <div className={`p-4 border-t ${
