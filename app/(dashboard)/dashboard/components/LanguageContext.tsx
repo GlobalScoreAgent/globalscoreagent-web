@@ -220,6 +220,7 @@ export interface Translations {
   chartLabel6m: string;
   chartLabel9m: string;
   chartLabel12m: string;
+  agentDetailProfilesCardTitle: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -385,16 +386,16 @@ const translations: Record<Language, Translations> = {
     readMoreDescription: 'Leer más',
     descriptionModalTitle: 'Descripción completa',
     closeModal: 'Cerrar',
-    agentDetailOnChainData: 'Datos on-chain',
+    agentDetailOnChainData: 'On Chain',
     agentDetailChainLabel: 'Red',
     agentDetailWalletOnChainIdInfo: 'On Chain ID (wallet registro)',
     agentDetailCreatedAt: 'Creado en',
     agentDetailOwnerChanges: 'Cambios de propietario',
     agentDetailOwnerWallet: 'Wallet del propietario',
     agentDetailOwnerSince: 'Propietario desde',
-    agentDetailMetadataInformation: 'Información de metadatos',
-    agentDetailTransactionalData: 'Datos transaccionales',
-    agentDetailFeedbackData: 'Datos de feedback',
+    agentDetailMetadataInformation: 'Metadatos',
+    agentDetailTransactionalData: 'Transaccional',
+    agentDetailFeedbackData: 'Feedback',
     transactionalTabNonce: 'Nonce',
     transactionalTabBalance: 'Balance',
     transactionalNonceCurrentLabel: 'Nonce actual',
@@ -429,6 +430,7 @@ const translations: Record<Language, Translations> = {
     chartLabel6m: '6 m',
     chartLabel9m: '9 m',
     chartLabel12m: '12 m',
+    agentDetailProfilesCardTitle: 'Perfiles',
   },
   en: {
     home: 'Home',
@@ -592,16 +594,16 @@ const translations: Record<Language, Translations> = {
     readMoreDescription: 'Read more',
     descriptionModalTitle: 'Full description',
     closeModal: 'Close',
-    agentDetailOnChainData: 'On-chain data',
+    agentDetailOnChainData: 'On Chain',
     agentDetailChainLabel: 'Network',
     agentDetailWalletOnChainIdInfo: 'On-chain ID (wallet registration)',
     agentDetailCreatedAt: 'Created at',
     agentDetailOwnerChanges: 'Owner changes',
     agentDetailOwnerWallet: 'Owner wallet',
     agentDetailOwnerSince: 'Owner since',
-    agentDetailMetadataInformation: 'Metadata information',
-    agentDetailTransactionalData: 'Transactional data',
-    agentDetailFeedbackData: 'Feedback data',
+    agentDetailMetadataInformation: 'Metadata',
+    agentDetailTransactionalData: 'Transactional',
+    agentDetailFeedbackData: 'Feedback',
     transactionalTabNonce: 'Nonce',
     transactionalTabBalance: 'Balance',
     transactionalNonceCurrentLabel: 'Current nonce',
@@ -636,6 +638,7 @@ const translations: Record<Language, Translations> = {
     chartLabel6m: '6m',
     chartLabel9m: '9m',
     chartLabel12m: '12m',
+    agentDetailProfilesCardTitle: 'Profiles',
   },
 };
 

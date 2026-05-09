@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Copy, ExternalLink } from 'lucide-react';
+import { Copy, ExternalLink, Mail } from 'lucide-react';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import {
@@ -355,15 +355,32 @@ export default function AgentDetailPage() {
 
       <div className="max-w-7xl mx-auto px-6 pt-8 space-y-10">
         <div className="flex flex-col lg:flex-row gap-8">
-          <div className="relative w-80 h-80 rounded-3xl overflow-hidden border border-gray-700 flex-shrink-0 shadow-2xl mx-auto lg:mx-0 bg-zinc-900">
-            <Image
-              src={imageSrcPrimary}
-              alt={String(agent.name ?? 'Agent')}
-              fill
-              className="object-cover"
-              unoptimized
-              onError={() => setImgFailed(true)}
-            />
+          <div className="flex w-80 max-w-full flex-shrink-0 flex-col gap-4 mx-auto lg:mx-0">
+            <div className="relative h-80 w-full rounded-3xl overflow-hidden border border-gray-700 shadow-2xl bg-zinc-900">
+              <Image
+                src={imageSrcPrimary}
+                alt={String(agent.name ?? 'Agent')}
+                fill
+                className="object-cover"
+                unoptimized
+                onError={() => setImgFailed(true)}
+              />
+            </div>
+            <div className="rounded-2xl border border-gray-800 bg-[#111111] p-4">
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                {t.agentDetailProfilesCardTitle}
+              </h3>
+              <div className="flex flex-wrap gap-1.5">
+                {profileKeys.map((pk) => (
+                  <span
+                    key={pk}
+                    className="rounded-full border border-gray-600 bg-white/10 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-gray-200"
+                  >
+                    {formatProfileBadgeLabel(pk)}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
 
           <div className="flex-1 pt-4 min-w-0">
@@ -393,7 +410,22 @@ export default function AgentDetailPage() {
             </div>
 
             <div className="flex flex-wrap items-baseline gap-4 mt-4">
-              <div className="text-7xl font-bold text-emerald-400">
+              <div
+                className={`text-7xl font-bold ${
+                  agent.current_humi_score === null || agent.current_humi_score === undefined
+                    ? 'text-gray-400'
+                    : humiFilter
+                      ? ''
+                      : 'text-gray-300'
+                }`}
+                style={
+                  humiFilter &&
+                  agent.current_humi_score !== null &&
+                  agent.current_humi_score !== undefined
+                    ? { color: humiColor }
+                    : undefined
+                }
+              >
                 {agent.current_humi_score !== null && agent.current_humi_score !== undefined
                   ? `${agent.current_humi_score}★`
                   : t.notAvailable}
@@ -447,17 +479,18 @@ export default function AgentDetailPage() {
                   href={webHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-colors"
+                  className="inline-flex items-center gap-1.5 px-6 py-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-colors text-sm"
                 >
-                  <ExternalLink size={18} />
+                  <ExternalLink size={14} className="shrink-0 opacity-80" />
                   {t.agentDetailWeb}
                 </a>
               ) : null}
               {emailHref ? (
                 <a
                   href={emailHref}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-colors"
+                  className="inline-flex items-center gap-1.5 px-6 py-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-colors text-sm"
                 >
+                  <Mail size={14} className="shrink-0 opacity-80" />
                   {t.agentDetailEmail}
                 </a>
               ) : null}
@@ -467,18 +500,7 @@ export default function AgentDetailPage() {
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
           <div className="relative xl:col-span-5 bg-[#111111] rounded-3xl p-8 pb-16 border border-gray-800 overflow-hidden">
-            <div className="absolute right-6 top-6 flex max-w-[50%] flex-wrap justify-end gap-1">
-              {profileKeys.map((pk) => (
-                <span
-                  key={pk}
-                  className="rounded-full border border-gray-600 bg-white/10 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-gray-200"
-                >
-                  {formatProfileBadgeLabel(pk)}
-                </span>
-              ))}
-            </div>
-
-            <h2 className="text-2xl font-semibold mb-6 pr-24">{t.agentDetailOnChainData}</h2>
+            <h2 className="text-2xl font-semibold mb-6">{t.agentDetailOnChainData}</h2>
 
             <div className="space-y-6">
               <div className="flex items-center gap-4">
@@ -622,49 +644,31 @@ export default function AgentDetailPage() {
           <div className="xl:col-span-7 bg-[#111111] rounded-3xl p-8 border border-gray-800">
             <h2 className="text-2xl font-semibold mb-6">{t.agentDetailTransactionalData}</h2>
 
-            <div className="flex flex-wrap gap-2 mb-6 border-b border-gray-800 pb-4">
-              <button
-                type="button"
-                onClick={() => setTransactionalSeries('nonce')}
-                className={`px-5 py-2 rounded-2xl text-sm transition-all ${
-                  transactionalSeries === 'nonce'
-                    ? 'bg-white text-black font-medium'
-                    : 'bg-gray-800 hover:bg-gray-700'
-                }`}
-              >
-                {t.transactionalTabNonce}
-              </button>
-              <button
-                type="button"
-                onClick={() => setTransactionalSeries('balance')}
-                className={`px-5 py-2 rounded-2xl text-sm transition-all ${
-                  transactionalSeries === 'balance'
-                    ? 'bg-white text-black font-medium'
-                    : 'bg-gray-800 hover:bg-gray-700'
-                }`}
-              >
-                {t.transactionalTabBalance}
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-8 mb-8">
-              <div>
+            <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8">
+              <div className="min-w-0">
                 <div className="text-sm text-gray-400">{t.transactionalNonceCurrentLabel}</div>
-                <div className="text-5xl font-bold mt-2">
+                <div className="mt-2 text-5xl font-bold tabular-nums">
                   {agent.nonce_current !== null && agent.nonce_current !== undefined
                     ? String(agent.nonce_current)
                     : t.notAvailable}
                 </div>
               </div>
-              <div>
+              <div className="min-w-0">
                 <div className="text-sm text-gray-400">{t.transactionalBalanceCurrentLabel}</div>
-                <div className="text-5xl font-bold mt-2 text-emerald-400">
+                <div
+                  className="mt-2 break-all text-3xl font-bold tabular-nums text-emerald-400 sm:text-4xl"
+                  title={
+                    stripNumericBalance(agent.balance_current)
+                      ? stripNumericBalance(agent.balance_current)
+                      : undefined
+                  }
+                >
                   {stripNumericBalance(agent.balance_current) || t.notAvailable}
                 </div>
               </div>
             </div>
 
-            <div className="bg-[#1a1a1a] p-4 rounded-2xl border border-gray-700 h-80">
+            <div className="mb-6 bg-[#1a1a1a] p-4 rounded-2xl border border-gray-700 h-80">
               {transactionalChartData.length === 0 ? (
                 <div className="flex h-full items-center justify-center text-sm text-gray-500">
                   {t.agentDetailNoJsonToShow}
@@ -706,6 +710,31 @@ export default function AgentDetailPage() {
                   </LineChart>
                 </ResponsiveContainer>
               )}
+            </div>
+
+            <div className="flex flex-wrap gap-2 border-t border-gray-800 pt-4">
+              <button
+                type="button"
+                onClick={() => setTransactionalSeries('nonce')}
+                className={`px-5 py-2 rounded-2xl text-sm transition-all ${
+                  transactionalSeries === 'nonce'
+                    ? 'bg-white text-black font-medium'
+                    : 'bg-gray-800 hover:bg-gray-700'
+                }`}
+              >
+                {t.transactionalTabNonce}
+              </button>
+              <button
+                type="button"
+                onClick={() => setTransactionalSeries('balance')}
+                className={`px-5 py-2 rounded-2xl text-sm transition-all ${
+                  transactionalSeries === 'balance'
+                    ? 'bg-white text-black font-medium'
+                    : 'bg-gray-800 hover:bg-gray-700'
+                }`}
+              >
+                {t.transactionalTabBalance}
+              </button>
             </div>
           </div>
 
