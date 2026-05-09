@@ -20,6 +20,7 @@ import {
 import { getHumiScoreColor, getHumiScoreText } from '@/lib/agentHumiDisplay';
 import { normalizeChainName } from '@/lib/agentChains';
 import { publicChainLogoUrl } from '@/lib/chainPublicLogo';
+import { AgentDetailCard } from '@/components/dashboard/AgentDetailCard';
 import { useAgentRecentNavigation } from '../../components/AgentRecentNavigationContext';
 import { useLanguage } from '../../components/LanguageContext';
 import type { Translations } from '../../components/LanguageContext';
@@ -324,12 +325,9 @@ export default function AgentDetailPage() {
       ? JSON.stringify(agent[activeFeedbackSummary], null, 2)
       : null;
 
-  const cardSurface = isDark
-    ? 'rounded-3xl border border-zinc-800 bg-zinc-900/95'
-    : 'rounded-3xl border border-zinc-200 bg-white shadow-sm';
   const cardInlay = isDark
-    ? 'rounded-2xl border border-zinc-700 bg-zinc-950/90'
-    : 'rounded-2xl border border-zinc-200 bg-zinc-50';
+    ? 'rounded-2xl border border-zinc-700/55 bg-zinc-950/75 shadow-[inset_0_1px_3px_rgba(0,0,0,0.5)] backdrop-blur-[1px]'
+    : 'rounded-2xl border border-zinc-300/70 bg-white/85 shadow-[inset_0_1px_2px_rgba(0,0,0,0.06)]';
   const muted = isDark ? 'text-gray-400' : 'text-zinc-600';
   const prose = isDark ? 'text-gray-300' : 'text-zinc-800';
   const tabActive = isDark ? 'bg-white text-black font-medium' : 'bg-zinc-900 text-white font-medium';
@@ -386,10 +384,11 @@ export default function AgentDetailPage() {
       <div className="max-w-7xl mx-auto px-6 pt-8 space-y-10">
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex w-80 max-w-full flex-shrink-0 flex-col gap-4 mx-auto lg:mx-0">
-            <div
-              className={`relative h-80 w-full overflow-hidden rounded-3xl border shadow-2xl ${
-                isDark ? 'border-zinc-700 bg-zinc-900' : 'border-zinc-200 bg-zinc-200'
-              }`}
+            <AgentDetailCard
+              isDark={isDark}
+              variant="image"
+              className="w-full"
+              contentClassName="relative h-80 w-full overflow-hidden"
             >
               <Image
                 src={imageSrcPrimary}
@@ -399,12 +398,8 @@ export default function AgentDetailPage() {
                 unoptimized
                 onError={() => setImgFailed(true)}
               />
-            </div>
-            <div
-              className={`rounded-2xl border p-4 ${
-                isDark ? 'border-zinc-800 bg-zinc-900/95' : 'border-zinc-200 bg-white shadow-sm'
-              }`}
-            >
+            </AgentDetailCard>
+            <AgentDetailCard isDark={isDark} variant="profiles" className="w-full" contentClassName="p-4">
               <h3
                 className={`mb-2 text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-gray-500' : 'text-zinc-500'}`}
               >
@@ -424,7 +419,7 @@ export default function AgentDetailPage() {
                   </span>
                 ))}
               </div>
-            </div>
+            </AgentDetailCard>
           </div>
 
           <div className="flex-1 pt-4 min-w-0">
@@ -457,9 +452,9 @@ export default function AgentDetailPage() {
               </div>
             </div>
 
-            <div className="flex flex-wrap items-baseline gap-4 mt-4">
+            <div className="mt-4 flex flex-wrap items-start gap-4">
               <div
-                className={`text-7xl font-bold ${
+                className={`shrink-0 text-7xl font-bold ${
                   agent.current_humi_score === null || agent.current_humi_score === undefined
                     ? 'text-gray-400'
                     : humiFilter
@@ -478,17 +473,21 @@ export default function AgentDetailPage() {
                   ? `${agent.current_humi_score}★`
                   : t.notAvailable}
               </div>
-              <div className={`text-2xl ${muted}`}>{t.agentDetailHumiScoreLabel}</div>
-              <button
-                type="button"
-                className={`inline-flex items-center rounded-2xl border px-5 py-2.5 text-sm font-medium transition-colors ${
-                  isDark
-                    ? 'border-zinc-700 bg-white/5 hover:bg-white/10'
-                    : 'border-zinc-300 bg-white hover:bg-zinc-50'
-                }`}
-              >
-                {t.agentDetailViewDetails}
-              </button>
+              <div className="flex min-w-[10rem] flex-col gap-2 pt-1 sm:pt-2">
+                <div className={`text-xl leading-tight sm:text-2xl ${muted}`}>
+                  {t.agentDetailHumiScoreLabel}
+                </div>
+                <button
+                  type="button"
+                  className={`inline-flex w-full items-center justify-center rounded-2xl border px-5 py-2.5 text-sm font-medium transition-colors sm:w-auto sm:self-start ${
+                    isDark
+                      ? 'border-zinc-700 bg-white/5 hover:bg-white/10'
+                      : 'border-zinc-300 bg-white hover:bg-zinc-50'
+                  }`}
+                >
+                  {t.agentDetailViewDetails}
+                </button>
+              </div>
             </div>
 
             <div className="mt-3">
@@ -559,8 +558,11 @@ export default function AgentDetailPage() {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-          <div
-            className={`relative overflow-hidden p-8 pb-12 xl:col-span-5 ${cardSurface}`}
+          <AgentDetailCard
+            isDark={isDark}
+            variant="onchain"
+            className="xl:col-span-5"
+            contentClassName="relative overflow-hidden p-8 pb-12"
           >
             {agent.gobernance_type ? (
               <div className="absolute right-6 top-6 z-10 max-w-[62%] text-right">
@@ -672,9 +674,14 @@ export default function AgentDetailPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </AgentDetailCard>
 
-          <div className={`xl:col-span-7 p-8 ${cardSurface}`}>
+          <AgentDetailCard
+            isDark={isDark}
+            variant="metadata"
+            className="xl:col-span-7"
+            contentClassName="p-8"
+          >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-semibold">{t.agentDetailMetadataInformation}</h2>
               <div
@@ -724,9 +731,14 @@ export default function AgentDetailPage() {
                 {metaJson ?? t.agentDetailNoJsonToShow}
               </pre>
             </div>
-          </div>
+          </AgentDetailCard>
 
-          <div className={`xl:col-span-7 p-8 ${cardSurface}`}>
+          <AgentDetailCard
+            isDark={isDark}
+            variant="transactional"
+            className="xl:col-span-7"
+            contentClassName="p-8"
+          >
             <h2 className="text-2xl font-semibold mb-6">{t.agentDetailTransactionalData}</h2>
 
             <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8">
@@ -819,9 +831,14 @@ export default function AgentDetailPage() {
                 {t.transactionalTabBalance}
               </button>
             </div>
-          </div>
+          </AgentDetailCard>
 
-          <div className={`xl:col-span-5 p-8 ${cardSurface}`}>
+          <AgentDetailCard
+            isDark={isDark}
+            variant="feedback"
+            className="xl:col-span-5"
+            contentClassName="p-8"
+          >
             <h2 className="text-2xl font-semibold mb-6">{t.agentDetailFeedbackData}</h2>
 
             <div
@@ -857,7 +874,7 @@ export default function AgentDetailPage() {
                 {feedbackJson ?? t.agentDetailNoJsonToShow}
               </pre>
             </div>
-          </div>
+          </AgentDetailCard>
         </div>
       </div>
     </div>
