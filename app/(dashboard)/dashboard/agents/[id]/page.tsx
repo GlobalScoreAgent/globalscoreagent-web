@@ -4,14 +4,6 @@ import Image from 'next/image';
 import { Copy, ExternalLink, Mail } from 'lucide-react';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
 import type { ChartLabelResolver } from '@/lib/agentDeltaSeries';
 import {
   buildBalanceDeltaSeries,
@@ -21,6 +13,7 @@ import { getHumiScoreColor, getHumiScoreText } from '@/lib/agentHumiDisplay';
 import { normalizeChainName } from '@/lib/agentChains';
 import { publicChainLogoUrl } from '@/lib/chainPublicLogo';
 import { AgentDetailCard } from '@/components/dashboard/AgentDetailCard';
+import { AgentTransactionalChart } from '@/components/dashboard/AgentTransactionalChart';
 import { useAgentRecentNavigation } from '../../components/AgentRecentNavigationContext';
 import { useLanguage } from '../../components/LanguageContext';
 import type { Translations } from '../../components/LanguageContext';
@@ -766,49 +759,13 @@ export default function AgentDetailPage() {
             </div>
 
             <div className={`mb-6 h-80 p-4 ${cardInlay}`}>
-              {transactionalChartData.length === 0 ? (
-                <div
-                  className={`flex h-full items-center justify-center text-sm ${isDark ? 'text-gray-500' : 'text-zinc-500'}`}
-                >
-                  {t.agentDetailNoJsonToShow}
-                </div>
-              ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={transactionalChartData}
-                    margin={{ top: 12, right: 12, left: 4, bottom: 8 }}
-                  >
-                    <XAxis
-                      dataKey="label"
-                      tick={{ fill: '#9ca3af', fontSize: 11 }}
-                      stroke="#374151"
-                    />
-                    <YAxis
-                      tick={{ fill: '#9ca3af', fontSize: 11 }}
-                      stroke="#374151"
-                      width={48}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: '#1a1a1a',
-                        border: '1px solid #374151',
-                        borderRadius: '12px',
-                      }}
-                      labelStyle={{ color: '#e5e7eb' }}
-                      itemStyle={{ color: '#34d399' }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#34d399"
-                      strokeWidth={2}
-                      dot={{ r: 3, fill: '#34d399' }}
-                      activeDot={{ r: 5 }}
-                      connectNulls={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              )}
+              <AgentTransactionalChart
+                data={transactionalChartData}
+                series={transactionalSeries}
+                isDark={isDark}
+                locale={lang === 'es' ? 'es-ES' : 'en-US'}
+                emptyMessage={t.agentDetailNoJsonToShow}
+              />
             </div>
 
             <div className={`flex flex-wrap gap-2 border-t pt-4 ${isDark ? 'border-gray-800' : 'border-zinc-200'}`}>
