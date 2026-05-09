@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useMemo } from 'react';
+import { useId, useMemo, useCallback } from 'react';
 import {
   Area,
   AreaChart,
@@ -173,23 +173,87 @@ export function AgentTransactionalChart({
           ? 'border-zinc-600 bg-zinc-800/90 text-zinc-400'
           : 'border-zinc-200 bg-zinc-100 text-zinc-600';
 
+  const chartMarginTop = deltaBadge ? 52 : 16;
+
+  const renderAreaDot = useCallback(
+    (props: { cx?: number; cy?: number; index?: number; r?: number }) => {
+      const { cx, cy, index, r = 3.5 } = props;
+      if (cx === undefined || cy === undefined || index === undefined) return null;
+
+      const dotStroke = isDark ? '#18181b' : '#ffffff';
+      const isLast = index === data.length - 1;
+
+      if (!isLast || !deltaBadge) {
+        return (
+          <circle
+            cx={cx}
+            cy={cy}
+            r={r}
+            fill={lineColor}
+            stroke={dotStroke}
+            strokeWidth={1.5}
+          />
+        );
+      }
+
+      const BADGE_W = 120;
+      const BADGE_H = 52;
+      const gap = 8;
+      let bx = cx - BADGE_W / 2;
+      bx = Math.max(2, bx);
+      const by = cy - r - gap - BADGE_H;
+
+      const ariaLabel = `${vsPreviousLabel}: ${deltaBadge.deltaText}, ${deltaBadge.pctText ?? '—'}`;
+
+      return (
+        <g>
+          <foreignObject
+            x={bx}
+            y={by}
+            width={BADGE_W}
+            height={BADGE_H}
+            pointerEvents="none"
+          >
+            <div
+              title={vsPreviousLabel}
+              role="status"
+              aria-label={ariaLabel}
+              className={`box-border flex h-full w-full flex-col justify-center rounded-lg border px-2.5 py-1.5 text-[11px] leading-snug shadow-sm backdrop-blur-sm pointer-events-none ${badgeTone}`}
+            >
+              <div className="font-semibold tabular-nums">{deltaBadge.deltaText}</div>
+              <div className="mt-0.5 font-medium tabular-nums opacity-95">
+                {deltaBadge.pctText !== null ? `(${deltaBadge.pctText})` : '(—)'}
+              </div>
+            </div>
+          </foreignObject>
+          <circle
+            cx={cx}
+            cy={cy}
+            r={r}
+            fill={lineColor}
+            stroke={dotStroke}
+            strokeWidth={1.5}
+          />
+        </g>
+      );
+    },
+    [
+      data.length,
+      deltaBadge,
+      badgeTone,
+      lineColor,
+      isDark,
+      vsPreviousLabel,
+    ]
+  );
+
   return (
-    <div className="relative h-full w-full">
-      {deltaBadge ? (
-        <div
-          className={`absolute right-2 top-2 z-10 max-w-[11rem] rounded-lg border px-2.5 py-1.5 text-[11px] leading-snug shadow-sm backdrop-blur-sm ${badgeTone}`}
-          title={vsPreviousLabel}
-          role="status"
-          aria-label={`${vsPreviousLabel}: ${deltaBadge.deltaText}, ${deltaBadge.pctText ?? '—'}`}
-        >
-          <div className="font-semibold tabular-nums">{deltaBadge.deltaText}</div>
-          <div className="mt-0.5 font-medium tabular-nums opacity-95">
-            {deltaBadge.pctText !== null ? `(${deltaBadge.pctText})` : '(—)'}
-          </div>
-        </div>
-      ) : null}
+    <div className="h-full w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 16, right: 20, left: 4, bottom: 28 }}>
+        <AreaChart
+          data={data}
+          margin={{ top: chartMarginTop, right: 20, left: 4, bottom: 28 }}
+        >
           <defs>
             <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={lineColor} stopOpacity={0.45} />
@@ -249,12 +313,8 @@ export function AgentTransactionalChart({
               strokeWidth: 2,
               fill: lineColor,
             }}
-            dot={{
-              r: 3.5,
-              fill: lineColor,
-              stroke: isDark ? '#18181b' : '#ffffff',
-              strokeWidth: 1.5,
-            }}
+            /* Recharts DotType includes render props; our handler matches runtime shape */
+            dot={renderAreaDot as React.ComponentProps<typeof Area>['dot']}
             connectNulls={false}
           />
         </AreaChart>
