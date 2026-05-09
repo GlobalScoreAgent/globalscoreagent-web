@@ -30,6 +30,7 @@ export async function GET(
         current_humi_score,
         humi_score_filter,
         on_chain_id,
+        chain_id,
         chain_name,
         wallet_chain_register,
         on_chain_created_at,
@@ -84,8 +85,24 @@ export async function GET(
     }
 
     let chain_logo_file_name: string | null = null;
-    const matchName = normalizeChainShortNameForMatch(agent.chain_name);
-    if (matchName) {
+
+    const chainId = (agent as { chain_id?: number | null }).chain_id;
+    if (chainId != null && !Number.isNaN(Number(chainId))) {
+      const { data: byId } = await supabase
+        .schema('web_dashboard')
+        .from('chains')
+        .select('logo_file_name')
+        .eq('id', chainId)
+        .maybeSingle();
+      if (byId?.logo_file_name) {
+        chain_logo_file_name = byId.logo_file_name;
+      }
+    }
+
+    const matchName = !chain_logo_file_name
+      ? normalizeChainShortNameForMatch(agent.chain_name)
+      : null;
+    if (!chain_logo_file_name && matchName) {
       const tryNames = Array.from(
         new Set([matchName, String(agent.chain_name).trim()].filter(Boolean))
       );

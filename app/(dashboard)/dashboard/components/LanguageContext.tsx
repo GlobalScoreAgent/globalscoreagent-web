@@ -221,6 +221,7 @@ export interface Translations {
   chartLabel9m: string;
   chartLabel12m: string;
   agentDetailProfilesCardTitle: string;
+  governanceTypeLabel: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -431,6 +432,7 @@ const translations: Record<Language, Translations> = {
     chartLabel9m: '9 m',
     chartLabel12m: '12 m',
     agentDetailProfilesCardTitle: 'Perfiles',
+    governanceTypeLabel: 'Tipo de gobernanza:',
   },
   en: {
     home: 'Home',
@@ -639,6 +641,7 @@ const translations: Record<Language, Translations> = {
     chartLabel9m: '9m',
     chartLabel12m: '12m',
     agentDetailProfilesCardTitle: 'Profiles',
+    governanceTypeLabel: 'Governance type:',
   },
 };
 
