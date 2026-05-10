@@ -123,44 +123,40 @@ export function DashboardOverviewInsightCard({
       className="min-h-0 w-full min-w-0 flex-1"
       contentClassName="flex flex-col gap-4 p-4 pt-14 sm:p-5 sm:pt-14"
     >
-      <div className="absolute left-4 top-4 z-10">
+      <div className="absolute left-4 top-4 z-10 max-w-[calc(100%-8rem)]">
         <div
           className={`rounded-lg border px-3 py-1 text-xs font-bold tracking-wider ${
             isDark ? 'border-blue-400/20 bg-blue-400/10 text-blue-400' : 'border-blue-400/30 bg-blue-400/20 text-blue-600'
           }`}
         >
-          {t.agentNonceTitle}
+          {t.dashboardInsightNonceBadge}
         </div>
-      </div>
-      <div className="absolute right-4 top-4 z-10 flex flex-col items-end gap-1 text-right">
-        <div
-          className={`rounded-lg border px-3 py-1 text-xs font-bold tracking-wider ${
-            isDark ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-400' : 'border-emerald-400/30 bg-emerald-400/20 text-emerald-600'
-          }`}
-        >
-          {t.last30DaysTitle}
-        </div>
-        {lastPoint ? (
-          <div
-            className={`hidden max-w-[14rem] rounded-lg border px-2 py-1 text-[11px] font-semibold leading-snug sm:block ${
-              isDark ? 'border-emerald-400/15 bg-emerald-400/5 text-emerald-300' : 'border-emerald-400/25 bg-emerald-400/10 text-emerald-700'
-            }`}
-          >
-            {t.totalLabel}: {lastPoint.nonces.toLocaleString()} {t.nonceLabel}
-            {nonceSeries.length > 1 && nonceSeries[nonceSeries.length - 2].nonces > 0 ? (
-              <> ({lastPoint.change})</>
-            ) : null}
-          </div>
-        ) : null}
       </div>
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-4">
-        <div className="h-44 min-h-0 w-full shrink-0 lg:min-w-0 lg:flex-1">
+        <div className="relative h-44 min-h-0 w-full shrink-0 lg:min-w-0 lg:flex-1">
+          {lastPoint ? (
+            <div
+              className={`pointer-events-none absolute right-0 top-0 z-10 hidden max-w-[min(100%,14rem)] rounded-lg border px-2 py-1 text-right text-[11px] font-semibold leading-snug sm:pointer-events-auto sm:block ${
+                isDark ? 'border-emerald-400/15 bg-emerald-400/5 text-emerald-300' : 'border-emerald-400/25 bg-emerald-400/10 text-emerald-700'
+              }`}
+            >
+              {t.totalLabel}: {lastPoint.nonces.toLocaleString()} {t.nonceLabel}
+              {nonceSeries.length > 1 && nonceSeries[nonceSeries.length - 2].nonces > 0 ? (
+                <> ({lastPoint.change})</>
+              ) : null}
+            </div>
+          ) : null}
           {nonceSeries.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={nonceSeries}
-                margin={{ top: 8, right: 8, left: 12, bottom: 4 }}
+                margin={{
+                  top: lastPoint ? 30 : 8,
+                  right: 8,
+                  left: 12,
+                  bottom: 4,
+                }}
               >
                 <defs>
                   <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
@@ -228,34 +224,38 @@ export function DashboardOverviewInsightCard({
           )}
         </div>
 
-        <div className="flex w-full shrink-0 flex-col gap-3 border-t border-zinc-500/15 pt-3 lg:w-[220px] lg:border-l lg:border-t-0 lg:pl-4 lg:pt-0 xl:w-[240px]">
-          {humiStack.total > 0 ? (
-            <StackedDistributionBar
-              title={t.humiDistributionTitle}
-              rowKeys={humiStack.rowKeys}
-              row={humiStack.row}
-              colors={humiColor}
-              labelForKey={humiLabelForKey}
-              isDark={isDark}
-              orientation="vertical"
-            />
-          ) : (
-            <p className={`text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.humiDistributionTitle}</p>
-          )}
+        <div className="flex w-full shrink-0 flex-col gap-3 border-t border-zinc-500/15 pt-3 sm:flex-row sm:gap-2 lg:min-w-[min(100%,380px)] lg:flex-[0_1_42%] lg:border-l lg:border-t-0 lg:pl-4 lg:pt-0 xl:min-w-[400px]">
+          <div className="min-w-0 flex-1">
+            {humiStack.total > 0 ? (
+              <StackedDistributionBar
+                title={t.humiDistributionTitle}
+                rowKeys={humiStack.rowKeys}
+                row={humiStack.row}
+                colors={humiColor}
+                labelForKey={humiLabelForKey}
+                isDark={isDark}
+                orientation="vertical"
+              />
+            ) : (
+              <p className={`text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.humiDistributionTitle}</p>
+            )}
+          </div>
 
-          {metaStack.total > 0 ? (
-            <StackedDistributionBar
-              title={t.metadataRichnessTitle}
-              rowKeys={metaStack.rowKeys}
-              row={metaStack.row}
-              colors={metaColor}
-              labelForKey={metaLabelForKey}
-              isDark={isDark}
-              orientation="vertical"
-            />
-          ) : (
-            <p className={`text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.metadataRichnessTitle}</p>
-          )}
+          <div className="min-w-0 flex-1">
+            {metaStack.total > 0 ? (
+              <StackedDistributionBar
+                title={t.metadataRichnessTitle}
+                rowKeys={metaStack.rowKeys}
+                row={metaStack.row}
+                colors={metaColor}
+                labelForKey={metaLabelForKey}
+                isDark={isDark}
+                orientation="vertical"
+              />
+            ) : (
+              <p className={`text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.metadataRichnessTitle}</p>
+            )}
+          </div>
         </div>
       </div>
     </AgentDetailCard>

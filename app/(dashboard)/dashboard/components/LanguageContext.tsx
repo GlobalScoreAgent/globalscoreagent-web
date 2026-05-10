@@ -57,6 +57,8 @@ export interface Translations {
   humiIndexTitle: string;
   metadataRichnessTitle: string;
   agentNonceTitle: string;
+  /** Insight card: Agent Nonce section title including 30-day window */
+  dashboardInsightNonceBadge: string;
   last30DaysTitle: string;
   totalLabel: string;
   nonceLabel: string;
@@ -292,6 +294,7 @@ const translations: Record<Language, Translations> = {
     humiIndexTitle: 'Indice',
     metadataRichnessTitle: 'Riqueza Metadata',
     agentNonceTitle: 'Agente Nonce',
+    dashboardInsightNonceBadge: 'Agente Nonce - Últimos 30 días',
     last30DaysTitle: 'Ultimos 30 dias',
     totalLabel: 'Total',
     nonceLabel: 'nonce',
@@ -523,6 +526,7 @@ const translations: Record<Language, Translations> = {
     humiIndexTitle: 'Index',
     metadataRichnessTitle: 'Metadata Richness',
     agentNonceTitle: 'Agent Nonce',
+    dashboardInsightNonceBadge: 'Agent Nonce - Last 30 Days',
     last30DaysTitle: 'Last 30 Days',
     totalLabel: 'Total',
     nonceLabel: 'nonce',
