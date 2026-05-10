@@ -39,6 +39,8 @@ export function StackedDistributionBar({
   yDomainMax,
   showTooltip = true,
   onStackedSegmentHover,
+  sideLegend = false,
+  verticalBarSize,
   className,
 }: {
   title: string;
@@ -61,6 +63,10 @@ export function StackedDistributionBar({
   showTooltip?: boolean;
   /** Fires when pointer enters a segment; clear when pointer leaves the chart (wrapper). */
   onStackedSegmentHover?: (payload: { dataKey: string; value: number } | null) => void;
+  /** Vertical stacked column only: color swatch list beside the chart (e.g. metadata richness). */
+  sideLegend?: boolean;
+  /** Vertical orientation: fixed column width in px (thinner bar). Overrides rail barSize when set. */
+  verticalBarSize?: number;
   className?: string;
 }) {
   const axisStroke = isDark ? '#52525b' : '#d4d4d8';
@@ -74,6 +80,8 @@ export function StackedDistributionBar({
   const useCompactYTick = total >= 100_000;
   const isRail = density === 'rail';
   const barSize = isRail ? 14 : undefined;
+  /** Width of each stacked column in vertical layout (richness uses explicit px). */
+  const verticalStackBarSize = verticalBarSize ?? (isRail ? 14 : undefined);
   const yAxisW = isRail ? 30 : 44;
   const vertMargins = isRail
     ? { top: 4, right: 2, left: 0, bottom: 4 }
@@ -192,7 +200,7 @@ export function StackedDistributionBar({
               stackId="stack"
               fill={colors(k)}
               radius={[0, 0, 0, 0]}
-              barSize={barSize}
+              barSize={verticalStackBarSize}
               onMouseEnter={onStackedSegmentHover ? () => emitSegmentEnter(k) : undefined}
             />
           ))}
@@ -200,6 +208,44 @@ export function StackedDistributionBar({
       )}
     </>
   );
+
+  const chartResponsive = (
+    <ResponsiveContainer width="100%" height="100%">
+      {chartInner}
+    </ResponsiveContainer>
+  );
+
+  const chartWithPointer =
+    onStackedSegmentHover ? (
+      <div className="h-full w-full" onPointerLeave={() => onStackedSegmentHover(null)}>
+        {chartResponsive}
+      </div>
+    ) : (
+      chartResponsive
+    );
+
+  const legendMuted = isDark ? 'text-zinc-400' : 'text-zinc-600';
+
+  const sideLegendList =
+    sideLegend && orientation === 'vertical' ? (
+      <ul
+        className="max-w-[45%] w-[7.25rem] shrink-0 space-y-1.5 sm:w-32"
+        aria-label="Chart legend"
+      >
+        {rowKeys.map((k) => (
+          <li key={k} className="flex gap-1.5">
+            <span
+              className="mt-0.5 h-2 w-2 shrink-0 rounded-sm"
+              style={{ backgroundColor: colors(k) }}
+              aria-hidden
+            />
+            <span className={`break-words text-[10px] leading-tight ${legendMuted}`}>{labelForKey(k)}</span>
+          </li>
+        ))}
+      </ul>
+    ) : null;
+
+  const showVerticalSideLegend = sideLegend && orientation === 'vertical';
 
   return (
     <div className={cn('space-y-1', fillHeight && orientation === 'vertical' && 'flex min-h-0 flex-1 flex-col', className)}>
@@ -211,19 +257,14 @@ export function StackedDistributionBar({
       >
         {title}
       </p>
-      <div className={chartShell}>
-        {onStackedSegmentHover ? (
-          <div className="h-full w-full" onPointerLeave={() => onStackedSegmentHover(null)}>
-            <ResponsiveContainer width="100%" height="100%">
-              {chartInner}
-            </ResponsiveContainer>
-          </div>
-        ) : (
-          <ResponsiveContainer width="100%" height="100%">
-            {chartInner}
-          </ResponsiveContainer>
-        )}
-      </div>
+      {showVerticalSideLegend ? (
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-start sm:gap-3">
+          <div className={cn(chartShell, 'min-w-0 flex-1')}>{chartWithPointer}</div>
+          {sideLegendList}
+        </div>
+      ) : (
+        <div className={chartShell}>{chartWithPointer}</div>
+      )}
     </div>
   );
 }

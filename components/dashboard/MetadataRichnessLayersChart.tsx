@@ -147,6 +147,8 @@ export function MetadataRichnessLayersChart({
               isDark={isDark}
               orientation="vertical"
               yDomainMax={cap}
+              sideLegend
+              verticalBarSize={28}
               showTooltip={false}
               onStackedSegmentHover={
                 onSegmentHover
