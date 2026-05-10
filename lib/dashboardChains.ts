@@ -6,6 +6,7 @@ export type DashboardChainRow = {
   chain_id: string;
   name: string;
   short_name: string;
+  updated_at: string | null;
   logo_file_name: string | null;
   agent_stats_information: Record<string, unknown> | null;
   statistics_agent_last_30_days: Record<string, unknown> | null;

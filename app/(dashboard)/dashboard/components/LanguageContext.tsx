@@ -257,6 +257,7 @@ export interface Translations {
   chainChartMetadataDistributionTitle: string;
   chainDistributionRailHumi: string;
   chainDistributionRailMetadata: string;
+  chainDataUpdatedLabel: string;
   chainSeriesNewAgents: string;
   chainSeriesTotalAgents: string;
   chainSeriesActiveAgents: string;
@@ -503,6 +504,7 @@ const translations: Record<Language, Translations> = {
     chainChartMetadataDistributionTitle: 'Distribución metadata',
     chainDistributionRailHumi: 'HUMI',
     chainDistributionRailMetadata: 'Meta',
+    chainDataUpdatedLabel: 'Última actualización de datos',
     chainSeriesNewAgents: 'Nuevos',
     chainSeriesTotalAgents: 'Total agentes',
     chainSeriesActiveAgents: 'Activos',
@@ -747,6 +749,7 @@ const translations: Record<Language, Translations> = {
     chainChartMetadataDistributionTitle: 'Metadata distribution',
     chainDistributionRailHumi: 'HUMI',
     chainDistributionRailMetadata: 'Meta',
+    chainDataUpdatedLabel: 'Last data update',
     chainSeriesNewAgents: 'New',
     chainSeriesTotalAgents: 'Total agents',
     chainSeriesActiveAgents: 'Active',

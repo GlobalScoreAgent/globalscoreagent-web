@@ -31,6 +31,13 @@ type Props = {
   lang: 'es' | 'en';
 };
 
+function formatChainUpdatedAt(iso: string | null | undefined, locale: string): string {
+  if (iso == null || iso === '') return '—';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' });
+}
+
 function formatMonthLabel(ym: string, locale: string): string {
   const parts = ym.split('-');
   const y = Number(parts[0]);
@@ -197,14 +204,23 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
         <div className="flex min-w-0 flex-1 flex-col gap-4">
         <div className="flex flex-wrap items-start gap-4">
           <div
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl shadow-lg"
+            className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl shadow-lg"
             style={{
               background: `radial-gradient(circle, ${accent}22 0%, transparent 70%)`,
               boxShadow: `0 0 20px ${accent}35`,
             }}
           >
             {logoSrc ? (
-              <Image src={logoSrc} alt={chain.name} width={40} height={40} className="object-contain" unoptimized />
+              <div className="relative h-full min-h-0 w-full min-w-0 p-2">
+                <Image
+                  src={logoSrc}
+                  alt={chain.name}
+                  fill
+                  className="object-contain"
+                  sizes="56px"
+                  unoptimized
+                />
+              </div>
             ) : (
               <span className="text-lg font-bold text-zinc-400">{chain.short_name?.slice(0, 2) ?? '?'}</span>
             )}
@@ -212,6 +228,11 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
           <div className="min-w-0 flex-1">
             <h3 className={`text-lg font-semibold ${prose}`}>{chain.name}</h3>
             <p className={`text-xs ${muted}`}>{chain.chain_id}</p>
+            <p className={`mt-1 text-xs ${muted}`}>
+              <span className="opacity-90">{t.chainDataUpdatedLabel}</span>
+              <span className="mx-1 opacity-50">·</span>
+              <span className="tabular-nums">{formatChainUpdatedAt(chain.updated_at, locale)}</span>
+            </p>
           </div>
         </div>
 

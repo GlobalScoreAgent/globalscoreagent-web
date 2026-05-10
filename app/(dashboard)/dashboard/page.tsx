@@ -146,7 +146,7 @@ export default function DashboardPage() {
           .schema('web_dashboard')
           .from('chains')
           .select(
-            'chain_id,name,short_name,logo_file_name,agent_stats_information,statistics_agent_last_30_days,statistics_agent_monthly,humi_distribution,metadata_distribution,owner_stats_information,technical_data_information,warning_stats_information,on_chain_stats_information'
+            'chain_id,name,short_name,updated_at,logo_file_name,agent_stats_information,statistics_agent_last_30_days,statistics_agent_monthly,humi_distribution,metadata_distribution,owner_stats_information,technical_data_information,warning_stats_information,on_chain_stats_information'
           )
           .order('name'),
       ]);
