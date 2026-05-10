@@ -7,7 +7,9 @@ import {
   humanizeRichnessDetailKey,
   metadataLayerMaxPoints,
   type ParsedMetadataRichness,
+  type ParsedRichnessLayer,
   type RichnessLayerKey,
+  type RichnessSegmentHoverDetail,
 } from '@/lib/metadataRichness';
 
 const SEGMENT_PALETTE = [
@@ -72,10 +74,12 @@ export function MetadataRichnessLayersChart({
   parsed,
   isDark,
   t,
+  onSegmentHover,
 }: {
   parsed: ParsedMetadataRichness;
   isDark: boolean;
   t: Translations;
+  onSegmentHover?: (detail: RichnessSegmentHoverDetail | null) => void;
 }) {
   const mutedSmall = isDark ? 'text-zinc-500' : 'text-zinc-500';
   const layersBlocks = useMemo(() => {
@@ -143,6 +147,23 @@ export function MetadataRichnessLayersChart({
               isDark={isDark}
               orientation="vertical"
               yDomainMax={cap}
+              showTooltip={false}
+              onStackedSegmentHover={
+                onSegmentHover
+                  ? (p) => {
+                      if (!p) {
+                        onSegmentHover(null);
+                        return;
+                      }
+                      onSegmentHover({
+                        layerKey: layer.layerKey,
+                        layerTitle: title,
+                        segmentLabel: labelForKey(p.dataKey),
+                        value: p.value,
+                      });
+                    }
+                  : undefined
+              }
               className="[&>p:first-child]:hidden"
             />
           </div>

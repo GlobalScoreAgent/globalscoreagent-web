@@ -223,6 +223,7 @@ export interface Translations {
   agentDetailMetadataLayerIntermediate: string;
   agentDetailMetadataLayerAdvanced: string;
   agentDetailMetadataRichnessEmpty: string;
+  agentDetailMetadataRichnessHoverPlaceholder: string;
   agentDetailMetadataLayerNoBreakdown: string;
   feedbackTabComments: string;
   feedbackTabAttestations: string;
@@ -485,6 +486,8 @@ const translations: Record<Language, Translations> = {
     agentDetailMetadataLayerIntermediate: 'Capa intermedia',
     agentDetailMetadataLayerAdvanced: 'Capa avanzada',
     agentDetailMetadataRichnessEmpty: 'No hay datos de análisis de metadata disponibles.',
+    agentDetailMetadataRichnessHoverPlaceholder:
+      'Pasa el cursor por un segmento de las barras para ver el detalle y la puntuación del ítem.',
     agentDetailMetadataLayerNoBreakdown: 'Sin desglose por ítems',
     feedbackTabComments: 'Comentarios',
     feedbackTabAttestations: 'Attestations',
@@ -744,6 +747,8 @@ const translations: Record<Language, Translations> = {
     agentDetailMetadataLayerIntermediate: 'Intermediate layer',
     agentDetailMetadataLayerAdvanced: 'Advanced layer',
     agentDetailMetadataRichnessEmpty: 'No metadata richness analysis available.',
+    agentDetailMetadataRichnessHoverPlaceholder:
+      'Hover a segment in the bar charts to see the item label and its score.',
     agentDetailMetadataLayerNoBreakdown: 'No per-item breakdown',
     feedbackTabComments: 'Comments',
     feedbackTabAttestations: 'Attestations',

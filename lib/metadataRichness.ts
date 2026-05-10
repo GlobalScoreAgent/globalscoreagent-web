@@ -38,6 +38,14 @@ export function metadataRichnessTier(score: number | null | undefined): {
 
 export type RichnessLayerKey = 'basic' | 'intermediate' | 'advanced';
 
+/** Hover detail for metadata richness stacked segments (detail panel, not chart tooltip). */
+export type RichnessSegmentHoverDetail = {
+  layerKey: RichnessLayerKey;
+  layerTitle: string;
+  segmentLabel: string;
+  value: number;
+};
+
 /** Max points achievable per layer (bands 0–40, 40–70, 70–100 on the 0–100 scale). */
 export function metadataLayerMaxPoints(layerKey: RichnessLayerKey): number {
   switch (layerKey) {

@@ -37,6 +37,8 @@ export function StackedDistributionBar({
   xDomainMax,
   horizontalMarginBottom,
   yDomainMax,
+  showTooltip = true,
+  onStackedSegmentHover,
   className,
 }: {
   title: string;
@@ -55,6 +57,10 @@ export function StackedDistributionBar({
   horizontalMarginBottom?: number;
   /** When orientation is vertical (stacked columns), fix Y axis max (e.g. layer cap). */
   yDomainMax?: number;
+  /** When false, skip floating Tooltip (e.g. richness detail panel uses hover callbacks instead). */
+  showTooltip?: boolean;
+  /** Fires when pointer enters a segment; clear when pointer leaves the chart (wrapper). */
+  onStackedSegmentHover?: (payload: { dataKey: string; value: number } | null) => void;
   className?: string;
 }) {
   const axisStroke = isDark ? '#52525b' : '#d4d4d8';
@@ -115,6 +121,86 @@ export function StackedDistributionBar({
         ? 'h-32 w-full sm:h-36'
         : 'h-14 w-full';
 
+  const emitSegmentEnter = (dataKey: string) => {
+    if (!onStackedSegmentHover) return;
+    const v = Number(row[dataKey]);
+    onStackedSegmentHover({
+      dataKey,
+      value: Number.isFinite(v) ? v : 0,
+    });
+  };
+
+  const chartInner = (
+    <>
+      {orientation === 'horizontal' ? (
+        <BarChart layout="vertical" data={[row]} margin={horizontalMargins}>
+          <CartesianGrid strokeDasharray="3 3" stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} horizontal={false} />
+          <XAxis
+            type="number"
+            stroke={axisStroke}
+            tick={{ fill: tickFill, fontSize: 10 }}
+            domain={xDomainMax != null && Number.isFinite(xDomainMax) ? [0, xDomainMax] : undefined}
+          />
+          <YAxis type="category" dataKey="name" width={1} hide />
+          {showTooltip ? (
+            <Tooltip
+              allowEscapeViewBox={{ x: true, y: true }}
+              animationDuration={0}
+              wrapperStyle={{ zIndex: 50, overflow: 'visible' }}
+              content={tooltipContent as never}
+            />
+          ) : null}
+          {rowKeys.map((k) => (
+            <Bar
+              key={k}
+              dataKey={k}
+              stackId="stack"
+              fill={colors(k)}
+              radius={[0, 0, 0, 0]}
+              onMouseEnter={onStackedSegmentHover ? () => emitSegmentEnter(k) : undefined}
+            />
+          ))}
+        </BarChart>
+      ) : (
+        <BarChart layout="horizontal" data={[row]} margin={vertMargins}>
+          <CartesianGrid strokeDasharray="3 3" stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} vertical={false} />
+          <XAxis type="category" dataKey="name" hide />
+          <YAxis
+            type="number"
+            stroke={axisStroke}
+            tick={{ fill: tickFill, fontSize: isRail ? 8 : 10 }}
+            width={yAxisW}
+            domain={
+              yDomainMax != null && Number.isFinite(yDomainMax)
+                ? [0, yDomainMax]
+                : [0, 'auto']
+            }
+            tickFormatter={(v: number) => compactTick(v, useCompactYTick)}
+          />
+          {showTooltip ? (
+            <Tooltip
+              allowEscapeViewBox={{ x: true, y: true }}
+              animationDuration={0}
+              wrapperStyle={{ zIndex: 50, overflow: 'visible' }}
+              content={tooltipContent as never}
+            />
+          ) : null}
+          {rowKeys.map((k) => (
+            <Bar
+              key={k}
+              dataKey={k}
+              stackId="stack"
+              fill={colors(k)}
+              radius={[0, 0, 0, 0]}
+              barSize={barSize}
+              onMouseEnter={onStackedSegmentHover ? () => emitSegmentEnter(k) : undefined}
+            />
+          ))}
+        </BarChart>
+      )}
+    </>
+  );
+
   return (
     <div className={cn('space-y-1', fillHeight && orientation === 'vertical' && 'flex min-h-0 flex-1 flex-col', className)}>
       <p
@@ -126,62 +212,17 @@ export function StackedDistributionBar({
         {title}
       </p>
       <div className={chartShell}>
-        <ResponsiveContainer width="100%" height="100%">
-          {orientation === 'horizontal' ? (
-            <BarChart layout="vertical" data={[row]} margin={horizontalMargins}>
-              <CartesianGrid strokeDasharray="3 3" stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} horizontal={false} />
-              <XAxis
-                type="number"
-                stroke={axisStroke}
-                tick={{ fill: tickFill, fontSize: 10 }}
-                domain={xDomainMax != null && Number.isFinite(xDomainMax) ? [0, xDomainMax] : undefined}
-              />
-              <YAxis type="category" dataKey="name" width={1} hide />
-              <Tooltip
-                allowEscapeViewBox={{ x: true, y: true }}
-                animationDuration={0}
-                wrapperStyle={{ zIndex: 50, overflow: 'visible' }}
-                content={tooltipContent as never}
-              />
-              {rowKeys.map((k) => (
-                <Bar key={k} dataKey={k} stackId="stack" fill={colors(k)} radius={[0, 0, 0, 0]} />
-              ))}
-            </BarChart>
-          ) : (
-            <BarChart layout="horizontal" data={[row]} margin={vertMargins}>
-              <CartesianGrid strokeDasharray="3 3" stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} vertical={false} />
-              <XAxis type="category" dataKey="name" hide />
-              <YAxis
-                type="number"
-                stroke={axisStroke}
-                tick={{ fill: tickFill, fontSize: isRail ? 8 : 10 }}
-                width={yAxisW}
-                domain={
-                  yDomainMax != null && Number.isFinite(yDomainMax)
-                    ? [0, yDomainMax]
-                    : [0, 'auto']
-                }
-                tickFormatter={(v: number) => compactTick(v, useCompactYTick)}
-              />
-              <Tooltip
-                allowEscapeViewBox={{ x: true, y: true }}
-                animationDuration={0}
-                wrapperStyle={{ zIndex: 50, overflow: 'visible' }}
-                content={tooltipContent as never}
-              />
-              {rowKeys.map((k) => (
-                <Bar
-                  key={k}
-                  dataKey={k}
-                  stackId="stack"
-                  fill={colors(k)}
-                  radius={[0, 0, 0, 0]}
-                  barSize={barSize}
-                />
-              ))}
-            </BarChart>
-          )}
-        </ResponsiveContainer>
+        {onStackedSegmentHover ? (
+          <div className="h-full w-full" onPointerLeave={() => onStackedSegmentHover(null)}>
+            <ResponsiveContainer width="100%" height="100%">
+              {chartInner}
+            </ResponsiveContainer>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            {chartInner}
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

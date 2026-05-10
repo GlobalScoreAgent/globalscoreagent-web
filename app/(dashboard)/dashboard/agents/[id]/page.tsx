@@ -15,7 +15,11 @@ import { publicChainLogoUrl } from '@/lib/chainPublicLogo';
 import { AgentDetailCard } from '@/components/dashboard/AgentDetailCard';
 import { MetadataRichnessLayersChart } from '@/components/dashboard/MetadataRichnessLayersChart';
 import { AgentTransactionalChart } from '@/components/dashboard/AgentTransactionalChart';
-import { metadataRichnessTier, parseMetadataRichnessInformation } from '@/lib/metadataRichness';
+import {
+  metadataRichnessTier,
+  parseMetadataRichnessInformation,
+  type RichnessSegmentHoverDetail,
+} from '@/lib/metadataRichness';
 import { useAgentRecentNavigation } from '../../components/AgentRecentNavigationContext';
 import { useLanguage } from '../../components/LanguageContext';
 import type { Translations } from '../../components/LanguageContext';
@@ -120,6 +124,7 @@ export default function AgentDetailPage() {
   const [activeMetaField, setActiveMetaField] = useState<string | null>(null);
   const [activeFeedbackSummary, setActiveFeedbackSummary] = useState<string | null>(null);
   const [metadataView, setMetadataView] = useState<'analysis' | 'data'>('data');
+  const [richnessHover, setRichnessHover] = useState<RichnessSegmentHoverDetail | null>(null);
 
   const chartLabelOf: ChartLabelResolver = useCallback(
     (bucket) => {
@@ -282,6 +287,10 @@ export default function AgentDetailPage() {
     () => metadataRichnessTier(metadataRichnessDisplayScore),
     [metadataRichnessDisplayScore]
   );
+
+  useEffect(() => {
+    setRichnessHover(null);
+  }, [metadataView, routeId]);
 
   const normalizedChainDisplay = normalizeChainName(
     typeof agent?.chain_name === 'string' ? agent.chain_name : ''
@@ -783,17 +792,53 @@ export default function AgentDetailPage() {
                         </div>
                         <p className={`text-sm font-bold ${muted}`}>{t.agentDetailRichnessScoreLabel}</p>
                       </div>
-                      {richnessParsed?.calculatedAt ? (
-                        <div className={`shrink-0 text-sm ${muted} lg:text-right`}>
-                          <span>{t.agentDetailMetadataRichnessCalculatedAt}: </span>
-                          <span className="tabular-nums">{formatDate(richnessParsed.calculatedAt)}</span>
-                        </div>
-                      ) : null}
+                      <div className="flex w-full shrink-0 flex-col gap-3 lg:max-w-sm lg:items-end lg:text-right">
+                        {richnessParsed?.calculatedAt ? (
+                          <div className={`text-sm ${muted}`}>
+                            <span>{t.agentDetailMetadataRichnessCalculatedAt}: </span>
+                            <span className="tabular-nums">{formatDate(richnessParsed.calculatedAt)}</span>
+                          </div>
+                        ) : null}
+                        {richnessParsed ? (
+                          <div
+                            className={`w-full min-h-[3rem] rounded-xl border px-3 py-2.5 text-left text-sm ${
+                              isDark ? 'border-zinc-600/80 bg-zinc-950/60' : 'border-zinc-200 bg-white/90'
+                            }`}
+                          >
+                            {richnessHover ? (
+                              <div className="space-y-1">
+                                <p className={`text-[11px] font-semibold uppercase tracking-wide ${muted}`}>
+                                  {richnessHover.layerTitle}
+                                </p>
+                                <p className={prose}>
+                                  <span className="font-semibold">{richnessHover.segmentLabel}</span>
+                                  <span className={`mx-1.5 ${muted}`}>·</span>
+                                  <span className="tabular-nums font-semibold">
+                                    {richnessHover.value.toLocaleString(
+                                      lang === 'es' ? 'es-ES' : 'en-US',
+                                      { maximumFractionDigits: 2 }
+                                    )}
+                                  </span>
+                                </p>
+                              </div>
+                            ) : (
+                              <p className={`text-xs leading-snug ${muted}`}>
+                                {t.agentDetailMetadataRichnessHoverPlaceholder}
+                              </p>
+                            )}
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
 
                     {richnessParsed ? (
                       <div className={`max-h-[520px] overflow-auto p-6 pb-14 ${cardInlay}`}>
-                        <MetadataRichnessLayersChart parsed={richnessParsed} isDark={isDark} t={t} />
+                        <MetadataRichnessLayersChart
+                          parsed={richnessParsed}
+                          isDark={isDark}
+                          t={t}
+                          onSegmentHover={setRichnessHover}
+                        />
                       </div>
                     ) : null}
                   </>
