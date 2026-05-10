@@ -236,6 +236,8 @@ export interface Translations {
   agentDetailFeedbackAnalysisEmpty: string;
   /** Feedback radar: scale hint with `{max}` placeholder */
   agentDetailFeedbackRadarScale: string;
+  /** Feedback radar title: `{avg}` formatted mean, `{n}` axis count */
+  agentDetailFeedbackRadarStrengthTitle: string;
   feedbackTabComments: string;
   feedbackTabAttestations: string;
   feedbackTabExternalAudit: string;
@@ -510,6 +512,7 @@ const translations: Record<Language, Translations> = {
     feedbackAxisFreshness: 'Actualidad',
     agentDetailFeedbackAnalysisEmpty: 'No hay análisis de feedback disponible.',
     agentDetailFeedbackRadarScale: 'Escala: 0–{max}',
+    agentDetailFeedbackRadarStrengthTitle: 'Fortaleza de feedback: {avg} (promedio de {n} ejes)',
     feedbackTabComments: 'Comentarios',
     feedbackTabAttestations: 'Attestations',
     feedbackTabExternalAudit: 'Auditoría externa',
@@ -781,6 +784,7 @@ const translations: Record<Language, Translations> = {
     feedbackAxisFreshness: 'Freshness',
     agentDetailFeedbackAnalysisEmpty: 'No feedback analysis available.',
     agentDetailFeedbackRadarScale: 'Scale: 0–{max}',
+    agentDetailFeedbackRadarStrengthTitle: 'Feedback strength: {avg} (avg. {n} axes)',
     feedbackTabComments: 'Comments',
     feedbackTabAttestations: 'Attestations',
     feedbackTabExternalAudit: 'External audit',

@@ -10,7 +10,10 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts';
-import type { Translations } from '@/app/(dashboard)/dashboard/components/LanguageContext';
+import {
+  useLanguage,
+  type Translations,
+} from '@/app/(dashboard)/dashboard/components/LanguageContext';
 import type { FeedbackAxisSubjectKey, ParsedFeedbackAxis } from '@/lib/agentFeedbackAnalysis';
 
 export type AgentFeedbackRadarChartProps = {
@@ -34,20 +37,27 @@ type PolarAngleTickProps = {
   y?: number;
   payload?: { value?: unknown };
   textAnchor?: string;
+  verticalAnchor?: string;
   fill?: string;
+  isDark: boolean;
 };
 
 function FeedbackAxisNumberTick(props: PolarAngleTickProps) {
-  const { x = 0, y = 0, payload, textAnchor = 'middle', fill } = props;
+  const { x = 0, y = 0, payload, textAnchor = 'middle', verticalAnchor, isDark } = props;
   const v = payload?.value;
   const label = v !== undefined && v !== null ? String(v) : '';
+  /** Bottom vertex tick sits tight to the grid; nudge down for even spacing. */
+  const extraDy = verticalAnchor === 'end' ? 8 : 0;
+  const textFill = isDark ? '#e4e4e7' : '#3f3f46';
+
   return (
     <text
       x={x}
       y={y}
+      dy={extraDy}
       textAnchor={textAnchor as 'start' | 'middle' | 'end'}
-      fill={fill}
-      fontSize={12}
+      fill={textFill}
+      fontSize={14}
       fontWeight={600}
       className="tabular-nums"
     >
@@ -119,9 +129,17 @@ export function AgentFeedbackRadarChart({
   t,
   emptyMessage,
 }: AgentFeedbackRadarChartProps) {
+  const { lang } = useLanguage();
+  const locale = lang === 'es' ? 'es-ES' : 'en-US';
   const uid = useId().replace(/:/g, '');
   const radFillId = `${uid}-radar-fill`;
   const glowFilterId = `${uid}-radar-glow`;
+
+  const avgStrength = useMemo(() => {
+    if (!axes.length) return null;
+    const sum = axes.reduce((s, a) => s + a.value, 0);
+    return sum / axes.length;
+  }, [axes]);
 
   const data = useMemo<RadarDatum[]>(
     () =>
@@ -160,6 +178,16 @@ export function AgentFeedbackRadarChart({
     String(Math.round(domainMax))
   );
 
+  const strengthTitle =
+    avgStrength !== null
+      ? t.agentDetailFeedbackRadarStrengthTitle
+          .replace(
+            '{avg}',
+            avgStrength.toLocaleString(locale, { maximumFractionDigits: 2 })
+          )
+          .replace('{n}', String(data.length))
+      : '';
+
   return (
     <div
       className={`rounded-2xl border p-3 sm:p-4 ${
@@ -168,13 +196,23 @@ export function AgentFeedbackRadarChart({
           : 'border-zinc-200/90 bg-gradient-to-br from-emerald-50/90 via-white to-zinc-50/95'
       }`}
     >
+      {strengthTitle ? (
+        <h3
+          className={`mb-3 text-center text-sm font-semibold leading-snug sm:text-base ${
+            isDark ? 'text-zinc-100' : 'text-zinc-900'
+          }`}
+        >
+          {strengthTitle}
+        </h3>
+      ) : null}
+
       <div className="h-[360px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart
             cx="50%"
             cy="50%"
             outerRadius="86%"
-            margin={{ top: 12, right: 14, bottom: 12, left: 14 }}
+            margin={{ top: 12, right: 14, bottom: 26, left: 14 }}
             data={data}
           >
             <defs>
@@ -206,7 +244,10 @@ export function AgentFeedbackRadarChart({
               dataKey="axisTick"
               stroke={tickFill}
               tick={(tickProps) => (
-                <FeedbackAxisNumberTick {...(tickProps as PolarAngleTickProps)} />
+                <FeedbackAxisNumberTick
+                  {...(tickProps as unknown as PolarAngleTickProps)}
+                  isDark={isDark}
+                />
               )}
               tickLine={false}
             />
