@@ -96,28 +96,30 @@ export function AgentDetailCard({
   return (
     <div
       className={cn(
-        'group relative overflow-hidden rounded-3xl border backdrop-blur-sm transition-all duration-300',
+        'group relative overflow-visible rounded-3xl border backdrop-blur-sm transition-all duration-300',
         'hover:-translate-y-0.5',
         isDark ? 'border-zinc-700/45' : 'border-zinc-200/55',
         className,
       )}
       style={{ background, boxShadow }}
     >
-      <div
-        className="pointer-events-none absolute top-0 right-0 h-40 w-40 rounded-full opacity-[0.055]"
-        style={{
-          background: `radial-gradient(circle, ${accent} 0%, transparent 72%)`,
-          transform: `translate(${x}px, ${y}px)`,
-        }}
-      />
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          opacity: dotOpacity,
-          backgroundImage: `radial-gradient(circle, ${accent} 1px, transparent 1px)`,
-          backgroundSize: '20px 20px',
-        }}
-      />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl">
+        <div
+          className="absolute top-0 right-0 h-40 w-40 rounded-full opacity-[0.055]"
+          style={{
+            background: `radial-gradient(circle, ${accent} 0%, transparent 72%)`,
+            transform: `translate(${x}px, ${y}px)`,
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            opacity: dotOpacity,
+            backgroundImage: `radial-gradient(circle, ${accent} 1px, transparent 1px)`,
+            backgroundSize: '20px 20px',
+          }}
+        />
+      </div>
       <div className={cn('relative z-[1]', contentClassName)}>{children}</div>
     </div>
   );
