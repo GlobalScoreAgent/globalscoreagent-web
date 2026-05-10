@@ -232,11 +232,11 @@ export interface Translations {
   dashboardChainsEmpty: string;
   chainSectionLast30Days: string;
   chainSectionOwners: string;
+  chainSectionAgentInformation: string;
   chainStatPctActive: string;
   chainStatNewAgents30d: string;
   chainStatPctWalletActivity: string;
   chainStatPctOnchainActivity: string;
-  chainStatPctHighHumi: string;
   chainOwnerTotal: string;
   chainAvgAgentsPerOwner: string;
   chainChartMonthlyTitle: string;
@@ -465,11 +465,11 @@ const translations: Record<Language, Translations> = {
     dashboardChainsEmpty: 'No hay datos de chains disponibles.',
     chainSectionLast30Days: 'Últimos 30 días',
     chainSectionOwners: 'Owners',
+    chainSectionAgentInformation: 'Información de agentes',
     chainStatPctActive: '% activos',
     chainStatNewAgents30d: 'Nuevos agentes (30 d)',
     chainStatPctWalletActivity: '% con actividad en wallet',
     chainStatPctOnchainActivity: '% con actividad on-chain',
-    chainStatPctHighHumi: '% alto HUMI',
     chainOwnerTotal: 'Total owners',
     chainAvgAgentsPerOwner: 'Media agentes / owner',
     chainChartMonthlyTitle: 'Agentes por mes',
@@ -696,11 +696,11 @@ const translations: Record<Language, Translations> = {
     dashboardChainsEmpty: 'No chain data available.',
     chainSectionLast30Days: 'Last 30 days',
     chainSectionOwners: 'Owners',
+    chainSectionAgentInformation: 'Agent information',
     chainStatPctActive: '% active',
     chainStatNewAgents30d: 'New agents (30d)',
     chainStatPctWalletActivity: '% with wallet activity',
     chainStatPctOnchainActivity: '% with on-chain activity',
-    chainStatPctHighHumi: '% high HUMI',
     chainOwnerTotal: 'Total owners',
     chainAvgAgentsPerOwner: 'Avg agents / owner',
     chainChartMonthlyTitle: 'Agents by month',

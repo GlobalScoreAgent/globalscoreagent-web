@@ -81,6 +81,44 @@ export const METADATA_BUCKET_COLORS: Record<string, string> = {
   metadataElite: '#a855f7',
 };
 
+function hslToRgbTriplet(h360: number, s: number, l: number): [number, number, number] {
+  const h = h360 / 360;
+  let r: number;
+  let g: number;
+  let b: number;
+  if (s === 0) {
+    r = g = b = l;
+  } else {
+    const hue2rgb = (p: number, q: number, t: number) => {
+      let tt = t;
+      if (tt < 0) tt += 1;
+      if (tt > 1) tt -= 1;
+      if (tt < 1 / 6) return p + (q - p) * 6 * tt;
+      if (tt < 1 / 2) return q;
+      if (tt < 2 / 3) return p + (q - p) * (2 / 3 - tt) * 6;
+      return p;
+    };
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1 / 3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1 / 3);
+  }
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+
+/** Same perceptual hue/sat/lightness as chainAccentColor, as #RRGGBB for hex+alpha gradients. */
+export function chainAccentHex(chainId: string): string {
+  let h = 0;
+  for (let i = 0; i < chainId.length; i++) {
+    h = chainId.charCodeAt(i) + ((h << 5) - h);
+  }
+  const hue = Math.abs(h) % 360;
+  const [r, g, b] = hslToRgbTriplet(hue, 0.58, 0.52);
+  const hex = (n: number) => Math.max(0, Math.min(255, n)).toString(16).padStart(2, '0');
+  return `#${hex(r)}${hex(g)}${hex(b)}`;
+}
+
 export function chainAccentColor(chainId: string): string {
   let h = 0;
   for (let i = 0; i < chainId.length; i++) {

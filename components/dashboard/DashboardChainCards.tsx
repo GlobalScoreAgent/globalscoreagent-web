@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -15,9 +16,11 @@ import {
   YAxis,
 } from 'recharts';
 import type { Translations } from '@/app/(dashboard)/dashboard/components/LanguageContext';
+import { AgentDetailCard } from '@/components/dashboard/AgentDetailCard';
 import { publicChainLogoUrl } from '@/lib/chainPublicLogo';
 import {
   chainAccentColor,
+  chainAccentHex,
   HUMI_BUCKET_COLORS,
   HUMI_BUCKET_ORDER,
   HUMI_BUCKET_TKEY,
@@ -189,13 +192,13 @@ function MonthlyAgentsChart({
 function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDark: boolean; t: Translations; lang: 'es' | 'en' }) {
   const locale = lang === 'es' ? 'es-ES' : 'en-US';
   const accent = chainAccentColor(chain.chain_id);
+  const accentHex = chainAccentHex(chain.chain_id);
   const logoSrc = publicChainLogoUrl(chain.logo_file_name);
 
   const agentJson = chain.agent_stats_information;
   const totalAgents = numFromJson(agentJson, 'total_agents');
   const activeAgents = numFromJson(agentJson, 'active_agents');
   const withFeedback = numFromJson(agentJson, 'agents_with_feedback');
-  const pctHighHumi = numFromJson(agentJson, 'pct_high_humi');
 
   const ownerJson = chain.owner_stats_information;
   const totalOwners = numFromJson(ownerJson, 'total_owners');
@@ -231,28 +234,16 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
   const muted = isDark ? 'text-zinc-400' : 'text-zinc-600';
   const prose = isDark ? 'text-white' : 'text-zinc-900';
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25 }}
-      className={`rounded-3xl border p-5 backdrop-blur-sm transition-all hover:-translate-y-0.5 relative overflow-hidden ${
-        isDark ? 'border-zinc-700/50 bg-zinc-900/80' : 'border-zinc-200/80 bg-white/90'
-      }`}
-      style={{
-        background: isDark
-          ? `linear-gradient(135deg, ${accent}12 0%, rgba(39,39,42,0.88) 35%, rgba(24,24,27,0.96) 100%)`
-          : `linear-gradient(135deg, ${accent}14 0%, rgba(255,255,255,0.95) 40%, rgba(250,250,250,0.98) 100%)`,
-        boxShadow: isDark
-          ? `0 12px 40px rgba(0,0,0,0.55), 0 0 0 1px ${accent}28`
-          : `0 12px 40px rgba(0,0,0,0.12), 0 0 0 1px ${accent}30`,
-      }}
-    >
-      <div
-        className="pointer-events-none absolute top-0 right-0 h-32 w-32 rounded-full opacity-[0.06]"
-        style={{ background: `radial-gradient(circle, ${accent} 0%, transparent 70%)`, transform: 'translate(12px,-12px)' }}
-      />
+  const miniCardShell = isDark ? 'border-zinc-700 bg-black/20' : 'border-zinc-200 bg-zinc-50';
 
+  return (
+    <AgentDetailCard
+      isDark={isDark}
+      variant="chain"
+      accentHex={accentHex}
+      className="w-full"
+      contentClassName="p-5"
+    >
       <div className="relative flex flex-col gap-4">
         <div className="flex flex-wrap items-start gap-4">
           <div
@@ -274,48 +265,41 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:grid-cols-4">
-          <div>
-            <span className={muted}>{t.agentsLabel}</span>
-            <div className={`font-bold tabular-nums ${prose}`}>{totalAgents !== null ? totalAgents.toLocaleString(locale) : '—'}</div>
-          </div>
-          <div>
-            <span className={muted}>{t.activeLabel}</span>
-            <div className="font-bold tabular-nums text-emerald-500">{activeAgents !== null ? activeAgents.toLocaleString(locale) : '—'}</div>
-          </div>
-          <div>
-            <span className={muted}>{t.feedbacksLabel}</span>
-            <div className="font-bold tabular-nums text-blue-500">{withFeedback !== null ? withFeedback.toLocaleString(locale) : '—'}</div>
-          </div>
-          {pctHighHumi !== null ? (
-            <div>
-              <span className={muted}>{t.chainStatPctHighHumi}</span>
-              <div className={`font-bold tabular-nums ${prose}`}>
-                {(pctHighHumi * 100).toLocaleString(locale, { maximumFractionDigits: 2 })}%
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className={`rounded-2xl border px-3 py-2 ${miniCardShell}`}>
+            <p className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionAgentInformation}</p>
+            <div className="flex flex-wrap gap-6 text-sm">
+              <div>
+                <span className={muted}>{t.agentsLabel}</span>
+                <div className={`font-bold tabular-nums ${prose}`}>{totalAgents !== null ? totalAgents.toLocaleString(locale) : '—'}</div>
+              </div>
+              <div>
+                <span className={muted}>{t.activeLabel}</span>
+                <div className="font-bold tabular-nums text-emerald-500">{activeAgents !== null ? activeAgents.toLocaleString(locale) : '—'}</div>
+              </div>
+              <div>
+                <span className={muted}>{t.feedbacksLabel}</span>
+                <div className="font-bold tabular-nums text-blue-500">{withFeedback !== null ? withFeedback.toLocaleString(locale) : '—'}</div>
               </div>
             </div>
-          ) : null}
-        </div>
+          </div>
 
-        {(totalOwners !== null || avgAgentsPerOwner !== null) && (
-          <div className={`rounded-2xl border px-3 py-2 ${isDark ? 'border-zinc-700 bg-black/20' : 'border-zinc-200 bg-zinc-50'}`}>
+          <div className={`rounded-2xl border px-3 py-2 ${miniCardShell}`}>
             <p className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionOwners}</p>
             <div className="flex flex-wrap gap-6 text-sm">
-              {totalOwners !== null ? (
-                <div>
-                  <span className={muted}>{t.chainOwnerTotal}</span>
-                  <div className={`font-bold tabular-nums ${prose}`}>{totalOwners.toLocaleString(locale)}</div>
+              <div>
+                <span className={muted}>{t.chainOwnerTotal}</span>
+                <div className={`font-bold tabular-nums ${prose}`}>{totalOwners !== null ? totalOwners.toLocaleString(locale) : '—'}</div>
+              </div>
+              <div>
+                <span className={muted}>{t.chainAvgAgentsPerOwner}</span>
+                <div className={`font-bold tabular-nums ${prose}`}>
+                  {avgAgentsPerOwner !== null ? avgAgentsPerOwner.toLocaleString(locale, { maximumFractionDigits: 2 }) : '—'}
                 </div>
-              ) : null}
-              {avgAgentsPerOwner !== null ? (
-                <div>
-                  <span className={muted}>{t.chainAvgAgentsPerOwner}</span>
-                  <div className={`font-bold tabular-nums ${prose}`}>{avgAgentsPerOwner.toLocaleString(locale, { maximumFractionDigits: 2 })}</div>
-                </div>
-              ) : null}
+              </div>
             </div>
           </div>
-        )}
+        </div>
 
         {d30 && (
           <div className={`rounded-2xl border px-3 py-2 ${isDark ? 'border-zinc-700 bg-black/15' : 'border-zinc-200 bg-white/60'}`}>
@@ -396,12 +380,20 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
           />
         ) : null}
       </div>
-    </motion.div>
+    </AgentDetailCard>
   );
 }
 
 export function DashboardChainCards({ chains, isDark, t, lang }: Props) {
   const muted = isDark ? 'text-zinc-500' : 'text-zinc-600';
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  useEffect(() => {
+    setSelectedIndex((i) => {
+      if (chains.length === 0) return 0;
+      return Math.min(i, chains.length - 1);
+    });
+  }, [chains.length]);
 
   if (!chains.length) {
     return (
@@ -411,11 +403,46 @@ export function DashboardChainCards({ chains, isDark, t, lang }: Props) {
     );
   }
 
+  const active = chains[selectedIndex];
+  if (!active) {
+    return (
+      <div className={`flex min-h-[120px] items-center justify-center rounded-3xl border p-8 text-sm ${isDark ? 'border-zinc-800 bg-zinc-900/50' : 'border-zinc-200 bg-white/80'}`}>
+        <p className={muted}>{t.dashboardChainsEmpty}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-      {chains.map((chain) => (
-        <ChainCard key={chain.chain_id} chain={chain} isDark={isDark} t={t} lang={lang} />
-      ))}
+    <div className="flex w-full flex-col items-center gap-6">
+      <motion.div
+        key={active.chain_id}
+        className="w-full"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25 }}
+      >
+        <ChainCard chain={active} isDark={isDark} t={t} lang={lang} />
+      </motion.div>
+
+      <div className="flex flex-wrap justify-center gap-4">
+        {chains.map((c, index) => (
+          <button
+            key={c.chain_id}
+            type="button"
+            aria-label={c.name}
+            title={c.short_name || c.name}
+            onClick={() => setSelectedIndex(index)}
+            className={`h-4 w-4 rounded-full transition-all duration-300 ${
+              selectedIndex === index
+                ? 'scale-125 shadow-lg'
+                : `bg-zinc-600 hover:bg-zinc-500 ${isDark ? 'hover:bg-zinc-400' : 'hover:bg-zinc-500'}`
+            }`}
+            style={{
+              backgroundColor: selectedIndex === index ? chainAccentColor(c.chain_id) : undefined,
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }
