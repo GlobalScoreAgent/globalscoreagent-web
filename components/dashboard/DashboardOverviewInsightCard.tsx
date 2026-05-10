@@ -40,6 +40,13 @@ const GLOBAL_META_ORDER = [
   { dbKey: 'Elite', slug: 'elite', color: '#a855f7', labelKey: 'metadataElite' as const },
 ];
 
+function formatNonceYAxisTick(v: number, useCompact: boolean): string {
+  if (!Number.isFinite(v)) return '';
+  if (useCompact && v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
+  if (useCompact && v >= 100_000) return `${Math.round(v / 1_000)}k`;
+  return Math.round(v).toLocaleString();
+}
+
 export function DashboardOverviewInsightCard({
   isDark,
   t,
@@ -56,6 +63,10 @@ export function DashboardOverviewInsightCard({
   const tickFill = isDark ? '#a1a1aa' : '#71717a';
 
   const nonceSeries = useMemo(() => buildNonceDailySeries(agentNonce), [agentNonce]);
+
+  const nonceMax = useMemo(() => nonceSeries.reduce((m, d) => Math.max(m, d.nonces), 0), [nonceSeries]);
+
+  const compactNonceYTick = nonceMax >= 100_000;
 
   const nonceTicks = useMemo(() => {
     const idx = [0, 7, 14, 21, 29];
@@ -110,7 +121,7 @@ export function DashboardOverviewInsightCard({
       variant="transactional"
       accentHex="#38bdf8"
       className="min-h-0 w-full min-w-0 flex-1"
-      contentClassName="flex min-h-[520px] flex-col gap-4 p-4 pt-14 sm:p-5 sm:pt-14"
+      contentClassName="flex flex-col gap-4 p-4 pt-14 sm:p-5 sm:pt-14"
     >
       <div className="absolute left-4 top-4 z-10">
         <div
@@ -143,101 +154,109 @@ export function DashboardOverviewInsightCard({
         ) : null}
       </div>
 
-      <div className="h-44 w-full shrink-0">
-        {nonceSeries.length > 0 ? (
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={nonceSeries} margin={{ top: 8, right: 8, left: 0, bottom: 4 }}>
-              <defs>
-                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#3b82f6" stopOpacity={isDark ? 0.45 : 0.35} />
-                  <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke={isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'}
-                vertical={false}
-              />
-              <XAxis
-                dataKey="date"
-                type="category"
-                ticks={nonceTicks}
-                tickFormatter={(d: string) => String(new Date(d).getDate())}
-                stroke={axisStroke}
-                tick={{ fill: tickFill, fontSize: 10 }}
-                tickLine={false}
-              />
-              <YAxis
-                stroke={axisStroke}
-                tick={{ fill: tickFill, fontSize: 10 }}
-                width={40}
-                domain={[0, 'auto']}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: isDark ? '#18181b' : '#fff',
-                  border: `1px solid ${isDark ? '#3f3f46' : '#e4e4e7'}`,
-                  borderRadius: 8,
-                  fontSize: 12,
-                }}
-                labelFormatter={(label) => {
-                  try {
-                    return new Date(String(label)).toLocaleDateString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    });
-                  } catch {
-                    return String(label);
-                  }
-                }}
-                formatter={(value: unknown) => [
-                  typeof value === 'number' ? value.toLocaleString() : '—',
-                  t.nonceLabel,
-                ]}
-              />
-              <Area
-                type="monotone"
-                dataKey="nonces"
-                stroke="#3b82f6"
-                strokeWidth={2}
-                fill={`url(#${gradientId})`}
-                dot={{ r: 2, fill: '#60a5fa', strokeWidth: 0 }}
-                activeDot={{ r: 4 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className={`flex h-full items-center justify-center text-sm ${muted}`}>—</div>
-        )}
-      </div>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-4">
+        <div className="h-44 min-h-0 w-full shrink-0 lg:min-w-0 lg:flex-1">
+          {nonceSeries.length > 0 ? (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={nonceSeries}
+                margin={{ top: 8, right: 8, left: 12, bottom: 4 }}
+              >
+                <defs>
+                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#3b82f6" stopOpacity={isDark ? 0.45 : 0.35} />
+                    <stop offset="100%" stopColor="#3b82f6" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke={isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)'}
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="date"
+                  type="category"
+                  ticks={nonceTicks}
+                  tickFormatter={(d: string) => String(new Date(d).getDate())}
+                  stroke={axisStroke}
+                  tick={{ fill: tickFill, fontSize: 10 }}
+                  tickLine={false}
+                />
+                <YAxis
+                  stroke={axisStroke}
+                  tick={{ fill: tickFill, fontSize: 10 }}
+                  width={56}
+                  tickFormatter={(v: number) => formatNonceYAxisTick(v, compactNonceYTick)}
+                  domain={[0, (max: number) => Math.max(1, Math.ceil(max * 1.05))]}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: isDark ? '#18181b' : '#fff',
+                    border: `1px solid ${isDark ? '#3f3f46' : '#e4e4e7'}`,
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                  labelFormatter={(label) => {
+                    try {
+                      return new Date(String(label)).toLocaleDateString(undefined, {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                      });
+                    } catch {
+                      return String(label);
+                    }
+                  }}
+                  formatter={(value: unknown) => [
+                    typeof value === 'number' ? value.toLocaleString() : '—',
+                    t.nonceLabel,
+                  ]}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="nonces"
+                  stroke="#3b82f6"
+                  strokeWidth={2}
+                  fill={`url(#${gradientId})`}
+                  dot={{ r: 2, fill: '#60a5fa', strokeWidth: 0 }}
+                  activeDot={{ r: 4 }}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className={`flex h-full items-center justify-center text-sm ${muted}`}>—</div>
+          )}
+        </div>
 
-      <div className="flex min-h-0 flex-col gap-3 border-t border-zinc-500/15 pt-3">
-        {humiStack.total > 0 ? (
-          <StackedDistributionBar
-            title={t.humiDistributionTitle}
-            rowKeys={humiStack.rowKeys}
-            row={humiStack.row}
-            colors={humiColor}
-            labelForKey={humiLabelForKey}
-            isDark={isDark}
-          />
-        ) : (
-          <p className={`text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.humiDistributionTitle}</p>
-        )}
+        <div className="flex w-full shrink-0 flex-col gap-3 border-t border-zinc-500/15 pt-3 lg:w-[220px] lg:border-l lg:border-t-0 lg:pl-4 lg:pt-0 xl:w-[240px]">
+          {humiStack.total > 0 ? (
+            <StackedDistributionBar
+              title={t.humiDistributionTitle}
+              rowKeys={humiStack.rowKeys}
+              row={humiStack.row}
+              colors={humiColor}
+              labelForKey={humiLabelForKey}
+              isDark={isDark}
+              orientation="vertical"
+            />
+          ) : (
+            <p className={`text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.humiDistributionTitle}</p>
+          )}
 
-        {metaStack.total > 0 ? (
-          <StackedDistributionBar
-            title={t.metadataRichnessTitle}
-            rowKeys={metaStack.rowKeys}
-            row={metaStack.row}
-            colors={metaColor}
-            labelForKey={metaLabelForKey}
-            isDark={isDark}
-          />
-        ) : (
-          <p className={`text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.metadataRichnessTitle}</p>
-        )}
+          {metaStack.total > 0 ? (
+            <StackedDistributionBar
+              title={t.metadataRichnessTitle}
+              rowKeys={metaStack.rowKeys}
+              row={metaStack.row}
+              colors={metaColor}
+              labelForKey={metaLabelForKey}
+              isDark={isDark}
+              orientation="vertical"
+            />
+          ) : (
+            <p className={`text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.metadataRichnessTitle}</p>
+          )}
+        </div>
       </div>
     </AgentDetailCard>
   );
