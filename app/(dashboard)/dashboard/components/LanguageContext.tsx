@@ -255,6 +255,8 @@ export interface Translations {
   chainChartMonthlyTitle: string;
   chainChartHumiDistributionTitle: string;
   chainChartMetadataDistributionTitle: string;
+  chainDistributionRailHumi: string;
+  chainDistributionRailMetadata: string;
   chainSeriesNewAgents: string;
   chainSeriesTotalAgents: string;
   chainSeriesActiveAgents: string;
@@ -499,6 +501,8 @@ const translations: Record<Language, Translations> = {
     chainChartMonthlyTitle: 'Agentes por mes',
     chainChartHumiDistributionTitle: 'Distribución HUMI',
     chainChartMetadataDistributionTitle: 'Distribución metadata',
+    chainDistributionRailHumi: 'HUMI',
+    chainDistributionRailMetadata: 'Meta',
     chainSeriesNewAgents: 'Nuevos',
     chainSeriesTotalAgents: 'Total agentes',
     chainSeriesActiveAgents: 'Activos',
@@ -741,6 +745,8 @@ const translations: Record<Language, Translations> = {
     chainChartMonthlyTitle: 'Agents by month',
     chainChartHumiDistributionTitle: 'HUMI distribution',
     chainChartMetadataDistributionTitle: 'Metadata distribution',
+    chainDistributionRailHumi: 'HUMI',
+    chainDistributionRailMetadata: 'Meta',
     chainSeriesNewAgents: 'New',
     chainSeriesTotalAgents: 'Total agents',
     chainSeriesActiveAgents: 'Active',

@@ -8,6 +8,7 @@ import type { Translations } from '@/app/(dashboard)/dashboard/components/Langua
 import { AgentDetailCard } from '@/components/dashboard/AgentDetailCard';
 import { StackedDistributionBar } from '@/components/dashboard/StackedDistributionBar';
 import { publicChainLogoUrl } from '@/lib/chainPublicLogo';
+import { cn } from '@/lib/utils';
 import {
   chainAccentColor,
   chainAccentHex,
@@ -182,6 +183,8 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
 
   const miniCardShell = isDark ? 'border-zinc-700 bg-black/20' : 'border-zinc-200 bg-zinc-50';
 
+  const showDistributionRail = humiBarKeys.length > 0 || metaBarKeys.length > 0;
+
   return (
     <AgentDetailCard
       isDark={isDark}
@@ -190,7 +193,8 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
       className="w-full"
       contentClassName="p-5"
     >
-      <div className="relative flex flex-col gap-4">
+      <div className={cn('relative flex flex-col gap-4', showDistributionRail && 'lg:flex-row lg:items-stretch lg:gap-5')}>
+        <div className="flex min-w-0 flex-1 flex-col gap-4">
         <div className="flex flex-wrap items-start gap-4">
           <div
             className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl shadow-lg"
@@ -322,38 +326,59 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
         ) : null}
 
         <MonthlyAgentsChart rows={chain.statistics_agent_monthly} isDark={isDark} locale={locale} t={t} />
+        </div>
 
-        {humiBarKeys.length > 0 ? (
-          <StackedDistributionBar
-            title={t.chainChartHumiDistributionTitle}
-            rowKeys={humiBarKeys}
-            row={humiRow}
-            colors={(k) => HUMI_BUCKET_COLORS[k] ?? '#71717a'}
-            labelForKey={(k) => {
-              const tk = HUMI_BUCKET_TKEY[k];
-              return tk ? t[tk] : k;
-            }}
-            isDark={isDark}
-          />
-        ) : null}
-
-        {metaBarKeys.length > 0 ? (
-          <StackedDistributionBar
-            title={t.chainChartMetadataDistributionTitle}
-            rowKeys={metaBarKeys}
-            row={metaRow}
-            colors={(slug) => {
-              const dbKey = metaKeysSorted.find((dk) => dk.replace(/\s+/g, '_').replace(/[()]/g, '') === slug);
-              const tkey = dbKey ? METADATA_DB_KEY_TO_TKEY[dbKey] : undefined;
-              return tkey ? METADATA_BUCKET_COLORS[tkey] ?? '#71717a' : '#71717a';
-            }}
-            labelForKey={(slug) => {
-              const dbKey = metaKeysSorted.find((dk) => dk.replace(/\s+/g, '_').replace(/[()]/g, '') === slug);
-              const tkey = dbKey ? METADATA_DB_KEY_TO_TKEY[dbKey] : undefined;
-              return tkey ? t[tkey] : slug;
-            }}
-            isDark={isDark}
-          />
+        {showDistributionRail ? (
+          <div
+            className={cn(
+              'flex min-h-[220px] w-full shrink-0 gap-2 sm:min-h-[260px]',
+              'lg:min-h-0 lg:w-[7rem] lg:self-stretch xl:w-[7.5rem]',
+            )}
+          >
+            {humiBarKeys.length > 0 ? (
+              <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+                <StackedDistributionBar
+                  title={t.chainDistributionRailHumi}
+                  rowKeys={humiBarKeys}
+                  row={humiRow}
+                  colors={(k) => HUMI_BUCKET_COLORS[k] ?? '#71717a'}
+                  labelForKey={(k) => {
+                    const tk = HUMI_BUCKET_TKEY[k];
+                    return tk ? t[tk] : k;
+                  }}
+                  isDark={isDark}
+                  orientation="vertical"
+                  density="rail"
+                  fillHeight
+                  className="min-h-0 flex-1"
+                />
+              </div>
+            ) : null}
+            {metaBarKeys.length > 0 ? (
+              <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+                <StackedDistributionBar
+                  title={t.chainDistributionRailMetadata}
+                  rowKeys={metaBarKeys}
+                  row={metaRow}
+                  colors={(slug) => {
+                    const dbKey = metaKeysSorted.find((dk) => dk.replace(/\s+/g, '_').replace(/[()]/g, '') === slug);
+                    const tkey = dbKey ? METADATA_DB_KEY_TO_TKEY[dbKey] : undefined;
+                    return tkey ? METADATA_BUCKET_COLORS[tkey] ?? '#71717a' : '#71717a';
+                  }}
+                  labelForKey={(slug) => {
+                    const dbKey = metaKeysSorted.find((dk) => dk.replace(/\s+/g, '_').replace(/[()]/g, '') === slug);
+                    const tkey = dbKey ? METADATA_DB_KEY_TO_TKEY[dbKey] : undefined;
+                    return tkey ? t[tkey] : slug;
+                  }}
+                  isDark={isDark}
+                  orientation="vertical"
+                  density="rail"
+                  fillHeight
+                  className="min-h-0 flex-1"
+                />
+              </div>
+            ) : null}
+          </div>
         ) : null}
       </div>
     </AgentDetailCard>

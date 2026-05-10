@@ -11,8 +11,11 @@ import {
 } from 'recharts';
 import { cn } from '@/lib/utils';
 
-/** horizontal = wide stacked bar (chains); vertical = stacked columns (overview insight card). */
+/** horizontal = wide stacked bar; vertical = stacked columns. */
 export type StackedBarOrientation = 'horizontal' | 'vertical';
+
+/** default = overview card columns; rail = thin columns for chain card sidebar */
+export type StackedBarDensity = 'default' | 'rail';
 
 function compactTick(v: number, useCompact: boolean): string {
   if (!Number.isFinite(v)) return '';
@@ -29,6 +32,8 @@ export function StackedDistributionBar({
   labelForKey,
   isDark,
   orientation = 'horizontal',
+  density = 'default',
+  fillHeight = false,
   className,
 }: {
   title: string;
@@ -38,6 +43,9 @@ export function StackedDistributionBar({
   labelForKey: (k: string) => string;
   isDark: boolean;
   orientation?: StackedBarOrientation;
+  density?: StackedBarDensity;
+  /** When vertical, grow to fill parent flex height (chain rail). */
+  fillHeight?: boolean;
   className?: string;
 }) {
   const axisStroke = isDark ? '#52525b' : '#d4d4d8';
@@ -49,6 +57,12 @@ export function StackedDistributionBar({
   if (total <= 0) return null;
 
   const useCompactYTick = total >= 100_000;
+  const isRail = density === 'rail';
+  const barSize = isRail ? 14 : undefined;
+  const yAxisW = isRail ? 30 : 44;
+  const vertMargins = isRail
+    ? { top: 4, right: 2, left: 0, bottom: 4 }
+    : { top: 6, right: 12, left: 4, bottom: 4 };
 
   type TooltipPayloadItem = { dataKey?: string | number; value?: number };
 
@@ -71,12 +85,24 @@ export function StackedDistributionBar({
     );
   };
 
+  const chartShell =
+    orientation === 'vertical'
+      ? fillHeight
+        ? 'min-h-0 flex-1 w-full'
+        : 'h-40 w-full'
+      : 'h-14 w-full';
+
   return (
-    <div className={cn('space-y-1', className)}>
-      <p className={`text-[11px] font-semibold uppercase tracking-wide ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>
+    <div className={cn('space-y-1', fillHeight && orientation === 'vertical' && 'flex min-h-0 flex-1 flex-col', className)}>
+      <p
+        className={cn(
+          'shrink-0 font-semibold uppercase tracking-wide text-zinc-500',
+          isRail ? 'text-[9px] leading-tight text-center' : 'text-[11px]',
+        )}
+      >
         {title}
       </p>
-      <div className={orientation === 'vertical' ? 'h-40 w-full' : 'h-14 w-full'}>
+      <div className={chartShell}>
         <ResponsiveContainer width="100%" height="100%">
           {orientation === 'horizontal' ? (
             <BarChart layout="vertical" data={[row]} margin={{ top: 2, right: 64, left: 4, bottom: 2 }}>
@@ -94,14 +120,14 @@ export function StackedDistributionBar({
               ))}
             </BarChart>
           ) : (
-            <BarChart layout="horizontal" data={[row]} margin={{ top: 6, right: 12, left: 4, bottom: 4 }}>
+            <BarChart layout="horizontal" data={[row]} margin={vertMargins}>
               <CartesianGrid strokeDasharray="3 3" stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} vertical={false} />
               <XAxis type="category" dataKey="name" hide />
               <YAxis
                 type="number"
                 stroke={axisStroke}
-                tick={{ fill: tickFill, fontSize: 10 }}
-                width={44}
+                tick={{ fill: tickFill, fontSize: isRail ? 8 : 10 }}
+                width={yAxisW}
                 domain={[0, 'auto']}
                 tickFormatter={(v: number) => compactTick(v, useCompactYTick)}
               />
@@ -112,7 +138,14 @@ export function StackedDistributionBar({
                 content={tooltipContent as never}
               />
               {rowKeys.map((k) => (
-                <Bar key={k} dataKey={k} stackId="stack" fill={colors(k)} radius={[0, 0, 0, 0]} />
+                <Bar
+                  key={k}
+                  dataKey={k}
+                  stackId="stack"
+                  fill={colors(k)}
+                  radius={[0, 0, 0, 0]}
+                  barSize={barSize}
+                />
               ))}
             </BarChart>
           )}
