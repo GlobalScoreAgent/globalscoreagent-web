@@ -67,7 +67,9 @@ export async function GET(
         has_on_chain_feedbacks,
         on_chain_feedback_summary,
         has_protocol_activity,
-        protocol_activity_summary
+        protocol_activity_summary,
+        metadata_richness_score,
+        metadata_richness_information
       `)
       .eq('id', numericId)
       .maybeSingle();

@@ -13,7 +13,9 @@ import { getHumiScoreColor, getHumiScoreText } from '@/lib/agentHumiDisplay';
 import { normalizeChainName } from '@/lib/agentChains';
 import { publicChainLogoUrl } from '@/lib/chainPublicLogo';
 import { AgentDetailCard } from '@/components/dashboard/AgentDetailCard';
+import { MetadataRichnessLayersChart } from '@/components/dashboard/MetadataRichnessLayersChart';
 import { AgentTransactionalChart } from '@/components/dashboard/AgentTransactionalChart';
+import { metadataRichnessTier, parseMetadataRichnessInformation } from '@/lib/metadataRichness';
 import { useAgentRecentNavigation } from '../../components/AgentRecentNavigationContext';
 import { useLanguage } from '../../components/LanguageContext';
 import type { Translations } from '../../components/LanguageContext';
@@ -117,6 +119,7 @@ export default function AgentDetailPage() {
 
   const [activeMetaField, setActiveMetaField] = useState<string | null>(null);
   const [activeFeedbackSummary, setActiveFeedbackSummary] = useState<string | null>(null);
+  const [metadataView, setMetadataView] = useState<'analysis' | 'data'>('data');
 
   const chartLabelOf: ChartLabelResolver = useCallback(
     (bucket) => {
@@ -259,6 +262,26 @@ export default function AgentDetailPage() {
 
   const transactionalChartData =
     transactionalSeries === 'nonce' ? nonceChartData : balanceChartData;
+
+  const richnessParsed = useMemo(
+    () => parseMetadataRichnessInformation(agent?.metadata_richness_information),
+    [agent?.metadata_richness_information]
+  );
+
+  const metadataRichnessDisplayScore = useMemo(() => {
+    if (!agent) return null;
+    const v = agent.metadata_richness_score;
+    if (v !== null && v !== undefined && String(v).trim() !== '') {
+      const n = Number(v);
+      if (Number.isFinite(n)) return n;
+    }
+    return richnessParsed?.totalScore ?? null;
+  }, [agent, richnessParsed]);
+
+  const richnessTier = useMemo(
+    () => metadataRichnessTier(metadataRichnessDisplayScore),
+    [metadataRichnessDisplayScore]
+  );
 
   const normalizedChainDisplay = normalizeChainName(
     typeof agent?.chain_name === 'string' ? agent.chain_name : ''
@@ -695,35 +718,120 @@ export default function AgentDetailPage() {
             <div
               className={`mb-6 flex flex-wrap gap-2 border-b pb-4 ${isDark ? 'border-gray-800' : 'border-zinc-200'}`}
             >
-              {METADATA_ROWS.map((row) => {
-                const empty = jsonFieldEmpty(agent[row.field]);
-                return (
-                  <button
-                    key={row.field}
-                    type="button"
-                    disabled={empty}
-                    onClick={() => !empty && setActiveMetaField(row.field)}
-                    className={`rounded-2xl px-5 py-2 text-sm transition-all ${
-                      empty
-                        ? tabDisabled
-                        : activeMetaField === row.field
-                          ? tabActive
-                          : tabIdle
-                    }`}
-                  >
-                    {t[row.labelKey]}
-                  </button>
-                );
-              })}
+              <button
+                type="button"
+                onClick={() => setMetadataView('analysis')}
+                className={`rounded-2xl px-5 py-2 text-sm transition-all ${
+                  metadataView === 'analysis' ? tabActive : tabIdle
+                }`}
+              >
+                {t.agentDetailMetadataViewAnalysis}
+              </button>
+              <button
+                type="button"
+                onClick={() => setMetadataView('data')}
+                className={`rounded-2xl px-5 py-2 text-sm transition-all ${
+                  metadataView === 'data' ? tabActive : tabIdle
+                }`}
+              >
+                {t.agentDetailMetadataViewData}
+              </button>
             </div>
 
-            <div className={`max-h-[520px] overflow-auto p-6 ${cardInlay}`}>
-              <pre
-                className={`whitespace-pre-wrap font-mono text-sm ${isDark ? 'text-gray-300' : 'text-zinc-800'}`}
-              >
-                {metaJson ?? t.agentDetailNoJsonToShow}
-              </pre>
-            </div>
+            {metadataView === 'analysis' ? (
+              <div className="space-y-8">
+                {metadataRichnessDisplayScore === null && richnessParsed === null ? (
+                  <p className={`text-sm ${muted}`}>{t.agentDetailMetadataRichnessEmpty}</p>
+                ) : (
+                  <>
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                      <div>
+                        <p className={`text-sm ${muted}`}>{t.agentDetailMetadataRichnessScoreLabel}</p>
+                        <div className="mt-3 flex flex-wrap items-center gap-4">
+                          {metadataRichnessDisplayScore !== null ? (
+                            <>
+                              <span
+                                className="text-5xl font-bold tabular-nums"
+                                style={{
+                                  color:
+                                    richnessTier?.colorHex ?? (isDark ? '#fafafa' : '#18181b'),
+                                }}
+                              >
+                                {metadataRichnessDisplayScore.toLocaleString(
+                                  lang === 'es' ? 'es-ES' : 'en-US',
+                                  { maximumFractionDigits: 2 }
+                                )}
+                              </span>
+                              {richnessTier ? (
+                                <span
+                                  className="rounded-full px-4 py-2 text-sm font-semibold"
+                                  style={{
+                                    backgroundColor: `${richnessTier.colorHex}22`,
+                                    color: richnessTier.colorHex,
+                                    border: `1px solid ${richnessTier.colorHex}66`,
+                                  }}
+                                >
+                                  {t[richnessTier.labelKey]}
+                                </span>
+                              ) : null}
+                            </>
+                          ) : (
+                            <span className={`text-sm ${muted}`}>{t.notAvailable}</span>
+                          )}
+                        </div>
+                      </div>
+                      {richnessParsed?.calculatedAt ? (
+                        <div className={`text-sm ${muted}`}>
+                          <span>{t.agentDetailMetadataRichnessCalculatedAt}: </span>
+                          <span className="tabular-nums">{formatDate(richnessParsed.calculatedAt)}</span>
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {richnessParsed ? (
+                      <div className={`max-h-[520px] overflow-auto p-6 ${cardInlay}`}>
+                        <MetadataRichnessLayersChart parsed={richnessParsed} isDark={isDark} t={t} />
+                      </div>
+                    ) : null}
+                  </>
+                )}
+              </div>
+            ) : (
+              <>
+                <div
+                  className={`mb-6 flex flex-wrap gap-2 border-b pb-4 ${isDark ? 'border-gray-800' : 'border-zinc-200'}`}
+                >
+                  {METADATA_ROWS.map((row) => {
+                    const empty = jsonFieldEmpty(agent[row.field]);
+                    return (
+                      <button
+                        key={row.field}
+                        type="button"
+                        disabled={empty}
+                        onClick={() => !empty && setActiveMetaField(row.field)}
+                        className={`rounded-2xl px-5 py-2 text-sm transition-all ${
+                          empty
+                            ? tabDisabled
+                            : activeMetaField === row.field
+                              ? tabActive
+                              : tabIdle
+                        }`}
+                      >
+                        {t[row.labelKey]}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className={`max-h-[520px] overflow-auto p-6 ${cardInlay}`}>
+                  <pre
+                    className={`whitespace-pre-wrap font-mono text-sm ${isDark ? 'text-gray-300' : 'text-zinc-800'}`}
+                  >
+                    {metaJson ?? t.agentDetailNoJsonToShow}
+                  </pre>
+                </div>
+              </>
+            )}
           </AgentDetailCard>
 
           <AgentDetailCard

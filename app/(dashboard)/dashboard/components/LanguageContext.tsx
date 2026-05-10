@@ -210,6 +210,16 @@ export interface Translations {
   metadataTabServices: string;
   metadataX402Enabled: string;
   metadataX402Disabled: string;
+  agentDetailMetadataViewAnalysis: string;
+  agentDetailMetadataViewData: string;
+  agentDetailMetadataRichnessScoreLabel: string;
+  agentDetailMetadataRichnessTotalLabel: string;
+  agentDetailMetadataRichnessCalculatedAt: string;
+  agentDetailMetadataLayerBasic: string;
+  agentDetailMetadataLayerIntermediate: string;
+  agentDetailMetadataLayerAdvanced: string;
+  agentDetailMetadataRichnessEmpty: string;
+  agentDetailMetadataLayerNoBreakdown: string;
   feedbackTabComments: string;
   feedbackTabAttestations: string;
   feedbackTabExternalAudit: string;
@@ -458,6 +468,16 @@ const translations: Record<Language, Translations> = {
     metadataTabServices: 'Servicios',
     metadataX402Enabled: 'x402 activado',
     metadataX402Disabled: 'x402 desactivado',
+    agentDetailMetadataViewAnalysis: 'Análisis',
+    agentDetailMetadataViewData: 'Datos',
+    agentDetailMetadataRichnessScoreLabel: 'Score de riqueza de metadata',
+    agentDetailMetadataRichnessTotalLabel: 'Total',
+    agentDetailMetadataRichnessCalculatedAt: 'Calculado',
+    agentDetailMetadataLayerBasic: 'Capa básica',
+    agentDetailMetadataLayerIntermediate: 'Capa intermedia',
+    agentDetailMetadataLayerAdvanced: 'Capa avanzada',
+    agentDetailMetadataRichnessEmpty: 'No hay datos de análisis de metadata disponibles.',
+    agentDetailMetadataLayerNoBreakdown: 'Sin desglose por ítems',
     feedbackTabComments: 'Comentarios',
     feedbackTabAttestations: 'Attestations',
     feedbackTabExternalAudit: 'Auditoría externa',
@@ -703,6 +723,16 @@ const translations: Record<Language, Translations> = {
     metadataTabServices: 'Services',
     metadataX402Enabled: 'x402 enabled',
     metadataX402Disabled: 'x402 disabled',
+    agentDetailMetadataViewAnalysis: 'Analysis',
+    agentDetailMetadataViewData: 'Data',
+    agentDetailMetadataRichnessScoreLabel: 'Metadata richness score',
+    agentDetailMetadataRichnessTotalLabel: 'Total',
+    agentDetailMetadataRichnessCalculatedAt: 'Calculated',
+    agentDetailMetadataLayerBasic: 'Basic layer',
+    agentDetailMetadataLayerIntermediate: 'Intermediate layer',
+    agentDetailMetadataLayerAdvanced: 'Advanced layer',
+    agentDetailMetadataRichnessEmpty: 'No metadata richness analysis available.',
+    agentDetailMetadataLayerNoBreakdown: 'No per-item breakdown',
     feedbackTabComments: 'Comments',
     feedbackTabAttestations: 'Attestations',
     feedbackTabExternalAudit: 'External audit',
