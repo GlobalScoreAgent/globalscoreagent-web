@@ -20,18 +20,26 @@ export type AgentFeedbackRadarChartProps = {
   emptyMessage: string;
 };
 
-const FIRST_LINE_BREAK_AT = 22;
+/** Labels with more characters than this use two lines to free space for a larger plot. */
+const MAX_SINGLE_LINE_CHARS = 17;
+/** When splitting, prefer breaking after the last space before this index (inclusive of short first words). */
+const FIRST_LINE_CHAR_BUDGET = 18;
+const MIN_WORD_BREAK_INDEX = 6;
+const SECOND_LINE_MAX_BEFORE_ELLIPSIS = 24;
 
 /** Split category labels into two lines near word boundaries for perimeter ticks. */
 function splitLongAngleLabel(text: string): string[] {
   const t = text.trim();
-  if (t.length <= FIRST_LINE_BREAK_AT) return [t];
-  const spaceBreak = t.lastIndexOf(' ', FIRST_LINE_BREAK_AT);
-  const cut = spaceBreak > 10 ? spaceBreak : FIRST_LINE_BREAK_AT;
+  if (t.length <= MAX_SINGLE_LINE_CHARS) return [t];
+
+  const spaceBreak = t.lastIndexOf(' ', FIRST_LINE_CHAR_BUDGET);
+  const cut = spaceBreak > MIN_WORD_BREAK_INDEX ? spaceBreak : Math.min(FIRST_LINE_CHAR_BUDGET, t.length);
   const line1 = t.slice(0, cut).trim();
-  const line2 = (spaceBreak > 10 ? t.slice(spaceBreak + 1) : t.slice(cut)).trim();
+  const line2 = (spaceBreak > MIN_WORD_BREAK_INDEX ? t.slice(spaceBreak + 1) : t.slice(cut)).trim();
   if (!line2) return [t];
-  if (line2.length > 28) return [line1, `${line2.slice(0, 26)}…`];
+  if (line2.length > SECOND_LINE_MAX_BEFORE_ELLIPSIS) {
+    return [line1, `${line2.slice(0, SECOND_LINE_MAX_BEFORE_ELLIPSIS - 1)}…`];
+  }
   return [line1, line2];
 }
 
@@ -206,13 +214,13 @@ export function AgentFeedbackRadarChart({
           : 'border-zinc-200/90 bg-gradient-to-br from-emerald-50/90 via-white to-zinc-50/95'
       }`}
     >
-      <div className="h-[380px] w-full">
+      <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart
             cx="50%"
             cy="50%"
-            outerRadius="58%"
-            margin={{ top: 28, right: 48, bottom: 36, left: 48 }}
+            outerRadius="70%"
+            margin={{ top: 22, right: 32, bottom: 30, left: 32 }}
             data={data}
           >
             <defs>
