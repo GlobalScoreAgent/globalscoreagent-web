@@ -36,6 +36,7 @@ export function StackedDistributionBar({
   fillHeight = false,
   xDomainMax,
   horizontalMarginBottom,
+  yDomainMax,
   className,
 }: {
   title: string;
@@ -52,6 +53,8 @@ export function StackedDistributionBar({
   xDomainMax?: number;
   /** Extra bottom margin for horizontal bar chart (tooltip / ticks). */
   horizontalMarginBottom?: number;
+  /** When orientation is vertical (stacked columns), fix Y axis max (e.g. layer cap). */
+  yDomainMax?: number;
   className?: string;
 }) {
   const axisStroke = isDark ? '#52525b' : '#d4d4d8';
@@ -153,13 +156,17 @@ export function StackedDistributionBar({
                 stroke={axisStroke}
                 tick={{ fill: tickFill, fontSize: isRail ? 8 : 10 }}
                 width={yAxisW}
-                domain={[0, 'auto']}
+                domain={
+                  yDomainMax != null && Number.isFinite(yDomainMax)
+                    ? [0, yDomainMax]
+                    : [0, 'auto']
+                }
                 tickFormatter={(v: number) => compactTick(v, useCompactYTick)}
               />
               <Tooltip
                 allowEscapeViewBox={{ x: true, y: true }}
                 animationDuration={0}
-                wrapperStyle={{ zIndex: 50 }}
+                wrapperStyle={{ zIndex: 50, overflow: 'visible' }}
                 content={tooltipContent as never}
               />
               {rowKeys.map((k) => (

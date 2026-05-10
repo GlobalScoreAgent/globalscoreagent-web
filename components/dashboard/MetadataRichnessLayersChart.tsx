@@ -86,7 +86,7 @@ export function MetadataRichnessLayersChart({
   }, [parsed.layers]);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start lg:gap-4">
       {layersBlocks.map(({ layer, built }) => {
         const title = t[layerTitleKey(layer.layerKey)];
         const cap = metadataLayerMaxPoints(layer.layerKey);
@@ -104,7 +104,7 @@ export function MetadataRichnessLayersChart({
 
         if (!built) {
           return (
-            <div key={layer.layerKey}>
+            <div key={layer.layerKey} className="min-w-0">
               {scoreLine}
               <p className={`text-xs ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>{t.agentDetailMetadataLayerNoBreakdown}</p>
             </div>
@@ -114,7 +114,7 @@ export function MetadataRichnessLayersChart({
         const totalSeg = built.rowKeys.reduce((s, k) => s + (Number(built.row[k]) || 0), 0);
         if (totalSeg <= 0) {
           return (
-            <div key={layer.layerKey}>
+            <div key={layer.layerKey} className="min-w-0">
               {scoreLine}
               <p className={`text-xs ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>{t.agentDetailMetadataLayerNoBreakdown}</p>
             </div>
@@ -132,7 +132,7 @@ export function MetadataRichnessLayersChart({
         };
 
         return (
-          <div key={layer.layerKey}>
+          <div key={layer.layerKey} className="min-w-0">
             {scoreLine}
             <StackedDistributionBar
               title=""
@@ -141,9 +141,8 @@ export function MetadataRichnessLayersChart({
               colors={colors}
               labelForKey={labelForKey}
               isDark={isDark}
-              orientation="horizontal"
-              xDomainMax={cap}
-              horizontalMarginBottom={28}
+              orientation="vertical"
+              yDomainMax={cap}
               className="[&>p:first-child]:hidden"
             />
           </div>
