@@ -227,6 +227,24 @@ export interface Translations {
   agentDetailProfilesCardTitle: string;
   governanceTypeLabel: string;
   transactionalDeltaVsPrevious: string;
+
+  // Dashboard — chains (dynamic cards)
+  dashboardChainsEmpty: string;
+  chainSectionLast30Days: string;
+  chainSectionOwners: string;
+  chainStatPctActive: string;
+  chainStatNewAgents30d: string;
+  chainStatPctWalletActivity: string;
+  chainStatPctOnchainActivity: string;
+  chainStatPctHighHumi: string;
+  chainOwnerTotal: string;
+  chainAvgAgentsPerOwner: string;
+  chainChartMonthlyTitle: string;
+  chainChartHumiDistributionTitle: string;
+  chainChartMetadataDistributionTitle: string;
+  chainSeriesNewAgents: string;
+  chainSeriesTotalAgents: string;
+  chainSeriesActiveAgents: string;
 }
 
 const translations: Record<Language, Translations> = {
@@ -443,6 +461,23 @@ const translations: Record<Language, Translations> = {
     agentDetailProfilesCardTitle: 'Perfiles',
     governanceTypeLabel: 'Tipo de gobernanza:',
     transactionalDeltaVsPrevious: 'vs anterior',
+
+    dashboardChainsEmpty: 'No hay datos de chains disponibles.',
+    chainSectionLast30Days: 'Últimos 30 días',
+    chainSectionOwners: 'Owners',
+    chainStatPctActive: '% activos',
+    chainStatNewAgents30d: 'Nuevos agentes (30 d)',
+    chainStatPctWalletActivity: '% con actividad en wallet',
+    chainStatPctOnchainActivity: '% con actividad on-chain',
+    chainStatPctHighHumi: '% alto HUMI',
+    chainOwnerTotal: 'Total owners',
+    chainAvgAgentsPerOwner: 'Media agentes / owner',
+    chainChartMonthlyTitle: 'Agentes por mes',
+    chainChartHumiDistributionTitle: 'Distribución HUMI',
+    chainChartMetadataDistributionTitle: 'Distribución metadata',
+    chainSeriesNewAgents: 'Nuevos',
+    chainSeriesTotalAgents: 'Total agentes',
+    chainSeriesActiveAgents: 'Activos',
   },
   en: {
     home: 'Home',
@@ -657,6 +692,23 @@ const translations: Record<Language, Translations> = {
     agentDetailProfilesCardTitle: 'Profiles',
     governanceTypeLabel: 'Governance type:',
     transactionalDeltaVsPrevious: 'vs previous',
+
+    dashboardChainsEmpty: 'No chain data available.',
+    chainSectionLast30Days: 'Last 30 days',
+    chainSectionOwners: 'Owners',
+    chainStatPctActive: '% active',
+    chainStatNewAgents30d: 'New agents (30d)',
+    chainStatPctWalletActivity: '% with wallet activity',
+    chainStatPctOnchainActivity: '% with on-chain activity',
+    chainStatPctHighHumi: '% high HUMI',
+    chainOwnerTotal: 'Total owners',
+    chainAvgAgentsPerOwner: 'Avg agents / owner',
+    chainChartMonthlyTitle: 'Agents by month',
+    chainChartHumiDistributionTitle: 'HUMI distribution',
+    chainChartMetadataDistributionTitle: 'Metadata distribution',
+    chainSeriesNewAgents: 'New',
+    chainSeriesTotalAgents: 'Total agents',
+    chainSeriesActiveAgents: 'Active',
   },
 };
 

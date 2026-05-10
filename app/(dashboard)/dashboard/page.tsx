@@ -5,6 +5,8 @@
 
 import { useLanguage } from './components/LanguageContext';
 import AnimatedCounter from './components/AnimatedCounter';
+import { DashboardChainCards } from '@/components/dashboard/DashboardChainCards';
+import type { DashboardChainRow } from '@/lib/dashboardChains';
 import { createClient } from '@/utils/supabase/client';
 import { useState, useEffect, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
@@ -120,305 +122,40 @@ function StatsNavigator({ currentStats, isDark, t }: any) {
   );
 }
 
-// Componente de Network Cards - TARJETAS CUADRADAS MÁS PEQUEÑAS
-function NetworkCards({ isDark, t, chainStats }: any) {
-  const baseNetworks = [
-    {
-      name: 'BNB',
-      fullName: 'BNB Chain',
-      logoFile: 'BNB_logo.png',
-      color: '#F3BA2F',
-      stats: {
-        totalAgents: 1350,
-        totalOwners: 890,
-        activeAgents: 756,
-        withFeedbacks: 423
-      }
-    },
-    {
-      name: 'Base',
-      fullName: 'Base',
-      logoFile: 'Base_logo.png',
-      color: '#0052FF',
-      stats: {
-        totalAgents: 980,
-        totalOwners: 654,
-        activeAgents: 587,
-        withFeedbacks: 312
-      }
-    },
-    {
-      name: 'ETH',
-      fullName: 'Ethereum',
-      logoFile: 'ETH_logo.png',
-      color: '#627EEA',
-      stats: {
-        totalAgents: 2150,
-        totalOwners: 1420,
-        activeAgents: 1289,
-        withFeedbacks: 756
-      }
-    },
-    {
-      name: 'ARB',
-      fullName: 'Arbitrum One',
-      logoFile: 'Arbitrum_logo.png',
-      color: '#28A0F0',
-      stats: {
-        totalAgents: 320,
-        totalOwners: 198,
-        activeAgents: 145,
-        withFeedbacks: 89
-      }
-    },
-    {
-      name: 'POL',
-      fullName: 'Polygon',
-      logoFile: 'Polygon_logo.png',
-      color: '#8247E5',
-      stats: {
-        totalAgents: 445,
-        totalOwners: 267,
-        activeAgents: 201,
-        withFeedbacks: 134
-      }
-    }
-  ];
-
-  // Función para actualizar estadísticas de redes con datos reales
-  const updateNetworksWithRealData = (networks: any[], chainStats: any[]) => {
-    if (!chainStats || !Array.isArray(chainStats)) return networks;
-
-    // Mapeo de chain_id a nombre de red en el componente
-    const chainMapping: { [key: number]: string } = {
-      56: 'BNB',      // BNB Chain
-      8453: 'Base',   // Base Mainnet
-      1: 'ETH',       // Ethereum Mainnet
-      42161: 'ARB',   // Arbitrum-One
-      137: 'POL'      // Polygon Mainnet
-    };
-
-    return networks.map(network => {
-      const chainData = chainStats.find(chain =>
-        chainMapping[chain.chain_id] === network.name
-      );
-
-      if (chainData) {
-        return {
-          ...network,
-          stats: {
-            totalAgents: chainData.agent_total || 0,
-            totalOwners: chainData.owner_total || 0,
-            activeAgents: chainData.agent_active || 0,
-            withFeedbacks: chainData.agent_with_feedback || 0
-          }
-        };
-      }
-
-      return network; // Mantener datos por defecto si no hay datos
-    });
-  };
-
-  const networks = updateNetworksWithRealData(baseNetworks, chainStats);
-
-  const mainNetworks = networks.slice(0, 3);
-  const sideNetworks = networks.slice(3);
-
-  return (
-    <div className="w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Columna izquierda - 3 tarjetas horizontales (compactas) */}
-        <div className="lg:col-span-8 flex flex-col gap-4">
-          {mainNetworks.map((network, index) => (
-            <motion.div
-              key={network.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-              className={`rounded-2xl p-5 transition-all hover:scale-[1.02] hover:-translate-y-1 relative overflow-hidden backdrop-blur-sm ${
-                isDark ? 'bg-zinc-900/80 border border-zinc-700/50' : 'bg-white/80 border border-zinc-200/50'
-              }`}
-              style={{
-                background: isDark
-                  ? `linear-gradient(135deg, ${network.color}15 0%, rgba(39,39,42,0.85) 30%, rgba(39,39,42,0.95) 70%, ${network.color}10 100%)`
-                  : `linear-gradient(135deg, ${network.color}20 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.95) 70%, ${network.color}15 100%)`,
-                boxShadow: isDark
-                  ? `0 12px 40px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px ${network.color}30, inset 0 1px 0 rgba(255,255,255,0.1)`
-                  : `0 12px 40px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.1), 0 0 0 1px ${network.color}35, inset 0 1px 0 rgba(255,255,255,0.6)`
-              }}
-            >
-              {/* Elementos decorativos sutiles */}
-              <div
-                className="absolute top-0 right-0 w-32 h-32 opacity-5 rounded-full"
-                style={{
-                  background: `radial-gradient(circle, ${network.color} 0%, transparent 70%)`,
-                  transform: 'translate(16px, -16px)'
-                }}
-              />
-
-              {/* Líneas decorativas */}
-              <div className="absolute top-4 left-4 right-4 h-px opacity-10" style={{
-                background: `linear-gradient(90deg, transparent 0%, ${network.color}30 20%, ${network.color}50 50%, ${network.color}30 80%, transparent 100%)`
-              }} />
-              <div className="absolute bottom-4 left-4 right-4 h-px opacity-5" style={{
-                background: `linear-gradient(90deg, transparent 0%, ${network.color}20 30%, ${network.color}10 70%, transparent 100%)`
-              }} />
-              <div className="flex items-center gap-5">
-                {/* Logo con efecto de relieve y glow */}
-                <div className="relative">
-                  <div
-                    className="w-14 h-14 rounded-xl flex items-center justify-center shadow-xl"
-                    style={{
-                      background: `radial-gradient(circle, ${network.color}20 0%, transparent 70%)`,
-                      boxShadow: `0 0 25px ${network.color}35, inset 0 3px 8px rgba(255,255,255,0.2)`
-                    }}
-                  >
-                    <img
-                      src={`/${network.logoFile}`}
-                      alt={`${network.fullName} logo`}
-                      className="w-10 h-10 object-contain drop-shadow-md"
-                    />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-zinc-900'}`}>
-                    {network.fullName}
-                  </h3>
-                  <div className="flex gap-3 text-[11px]">
-                    <div className="flex items-center gap-2">
-                      <span className={isDark ? 'text-zinc-400' : 'text-zinc-500'}>{t.agentsLabel}:</span>
-                      <span className={`font-bold ${isDark ? 'text-white' : 'text-zinc-900'}`} suppressHydrationWarning>{network.stats.totalAgents.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={isDark ? 'text-zinc-400' : 'text-zinc-500'}>{t.ownersLabel}:</span>
-                      <span className={`font-bold ${isDark ? 'text-white' : 'text-zinc-900'}`} suppressHydrationWarning>{network.stats.totalOwners.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={isDark ? 'text-zinc-400' : 'text-zinc-500'}>{t.activeLabel}:</span>
-                      <span className="font-bold text-green-500" suppressHydrationWarning>{network.stats.activeAgents.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={isDark ? 'text-zinc-400' : 'text-zinc-500'}>{t.feedbacksLabel}:</span>
-                      <span className="font-bold text-blue-500" suppressHydrationWarning>{network.stats.withFeedbacks.toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Columna derecha - 2 tarjetas verticales con altura igual a las horizontales */}
-        <div className="lg:col-span-4 flex flex-col gap-4 h-full">
-          {sideNetworks.map((network, index) => (
-            <motion.div
-              key={network.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: (index + 3) * 0.1 }}
-              className={`rounded-3xl p-4 transition-all hover:scale-[1.02] hover:-translate-y-1 flex-1 relative overflow-hidden backdrop-blur-sm ${
-                isDark ? 'bg-zinc-900/80 border border-zinc-700/50' : 'bg-white/80 border border-zinc-200/50'
-              }`}
-              style={{
-                background: isDark
-                  ? `linear-gradient(135deg, ${network.color}15 0%, rgba(39,39,42,0.85) 30%, rgba(39,39,42,0.95) 70%, ${network.color}10 100%)`
-                  : `linear-gradient(135deg, ${network.color}20 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.95) 70%, ${network.color}15 100%)`,
-                boxShadow: isDark
-                  ? `0 12px 40px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.4), 0 0 0 1px ${network.color}30, inset 0 1px 0 rgba(255,255,255,0.1)`
-                  : `0 12px 40px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.1), 0 0 0 1px ${network.color}35, inset 0 1px 0 rgba(255,255,255,0.6)`
-              }}
-            >
-              {/* Elemento decorativo sutil */}
-              <div
-                className="absolute top-0 right-0 w-24 h-24 opacity-5 rounded-full"
-                style={{
-                  background: `radial-gradient(circle, ${network.color} 0%, transparent 70%)`,
-                  transform: 'translate(12px, -12px)'
-                }}
-              />
-
-              {/* Línea divisoria sutil */}
-              <div
-                className="absolute top-16 left-4 right-4 h-px opacity-20"
-                style={{ background: `linear-gradient(90deg, transparent 0%, ${network.color}40 50%, transparent 100%)` }}
-              />
-              <div className="flex items-center gap-3 h-full">
-                {/* Logo y título a la izquierda */}
-                <div className="flex flex-col items-center flex-shrink-0">
-                  <div className="relative mb-1">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg relative"
-                      style={{
-                        background: `radial-gradient(circle, ${network.color}25 0%, transparent 70%)`,
-                        boxShadow: `0 0 25px ${network.color}35, inset 0 3px 6px rgba(255,255,255,0.2)`
-                      }}
-                    >
-                      <img
-                        src={`/${network.logoFile}`}
-                        alt={`${network.fullName} logo`}
-                        className="w-8 h-8 object-contain drop-shadow-md"
-                      />
-                    </div>
-                  </div>
-                  <h3 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-zinc-900'}`}>
-                    {network.fullName}
-                  </h3>
-                </div>
-
-                {/* Estadísticas en dos columnas a la derecha */}
-                <div className="flex-1 grid grid-cols-2 gap-2 text-xs">
-                  <div className="space-y-2">
-                    <div className="flex flex-col items-center text-center">
-                      <span className={isDark ? 'text-zinc-400' : 'text-zinc-500'}>{t.agentsLabel}</span>
-                      <span className={`font-bold ${isDark ? 'text-white' : 'text-zinc-900'}`}>{network.stats.totalAgents}</span>
-                    </div>
-                    <div className="flex flex-col items-center text-center">
-                      <span className={isDark ? 'text-zinc-400' : 'text-zinc-500'}>{t.ownersLabel}</span>
-                      <span className={`font-bold ${isDark ? 'text-white' : 'text-zinc-900'}`}>{network.stats.totalOwners}</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex flex-col items-center text-center">
-                      <span className={isDark ? 'text-zinc-400' : 'text-zinc-500'}>{t.activeLabel}</span>
-                      <span className="font-bold text-green-500">{network.stats.activeAgents}</span>
-                    </div>
-                    <div className="flex flex-col items-center text-center">
-                      <span className={isDark ? 'text-zinc-400' : 'text-zinc-500'}>{t.feedbacksLabel}</span>
-                      <span className="font-bold text-blue-500">{network.stats.withFeedbacks}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function DashboardPage() {
-  const { t, theme } = useLanguage();
+  const { t, theme, lang } = useLanguage();
   const isDark = theme === 'dark';
 
   const [stats, setStats] = useState<any>(null);
+  const [dashboardChains, setDashboardChains] = useState<DashboardChainRow[]>([]);
 
   useEffect(() => {
     const supabase = createClient();
 
-    const fetchStats = async () => {
-      const { data } = await supabase
-        .schema('web_dashboard')
-        .from('main_stadistics')
-        .select('*')
-        .order('calculated_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+    const load = async () => {
+      const [statsRes, chainsRes] = await Promise.all([
+        supabase
+          .schema('web_dashboard')
+          .from('main_stadistics')
+          .select('*')
+          .order('calculated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .schema('web_dashboard')
+          .from('chains')
+          .select(
+            'chain_id,name,short_name,logo_file_name,agent_stats_information,statistics_agent_last_30_days,statistics_agent_monthly,humi_distribution,metadata_distribution,owner_stats_information'
+          )
+          .order('name'),
+      ]);
 
-      if (data) setStats(data);
+      if (statsRes.data) setStats(statsRes.data);
+      if (chainsRes.data) setDashboardChains(chainsRes.data as DashboardChainRow[]);
     };
 
-    fetchStats();
+    void load();
   }, []);
 
   const defaultStats = {
@@ -473,39 +210,6 @@ export default function DashboardPage() {
     return transformed;
   };
 
-  // Función para actualizar estadísticas de redes con datos reales
-  const updateNetworksWithRealData = (networks: any[], chainStats: any[]) => {
-    if (!chainStats || !Array.isArray(chainStats)) return networks;
-
-    // Mapeo de chain_id a nombre de red en el componente
-    const chainMapping: { [key: number]: string } = {
-      56: 'BNB',      // BNB Chain
-      8453: 'Base',   // Base Mainnet
-      1: 'ETH',       // Ethereum Mainnet
-      42161: 'ARB',   // Arbitrum-One
-      137: 'POL'      // Polygon Mainnet
-    };
-
-    return networks.map(network => {
-      const chainData = chainStats.find(chain =>
-        chainMapping[chain.chain_id] === network.name
-      );
-
-      if (chainData) {
-        return {
-          ...network,
-          stats: {
-            totalAgents: chainData.agent_total || 0,
-            totalOwners: chainData.owner_total || 0,
-            activeAgents: chainData.agent_active || 0,
-            withFeedbacks: chainData.agent_with_feedback || 0
-          }
-        };
-      }
-
-      return network; // Mantener datos por defecto si no hay datos
-    });
-  };
 
   // Merge stats from database with default stats, ensuring all fields are present
   const currentStats = {
@@ -1023,17 +727,16 @@ export default function DashboardPage() {
   return (
     <div className={`min-h-full ${isDark ? 'bg-zinc-950' : 'bg-zinc-100'}`}>
       <div className="max-w-screen-2xl mx-auto">
-        {/* Estadísticas Principales + Network Cards - GRID 12 COLUMNAS + items-stretch */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-stretch">
-          {/* Carta principal de estadísticas */}
+        {/* Estadísticas principales */}
+        <div className="mb-16 grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-stretch">
           <div className="lg:col-span-5">
             <StatsNavigator currentStats={currentStats} isDark={isDark} t={t} />
           </div>
+        </div>
 
-          {/* Network Cards - Cinco cadenas */}
-          <div className="lg:col-span-7">
-            <NetworkCards isDark={isDark} t={t} chainStats={stats?.chain_stats} />
-          </div>
+        {/* Chains dinámicas (web_dashboard.chains) */}
+        <div className="mb-16">
+          <DashboardChainCards chains={dashboardChains} isDark={isDark} t={t} lang={lang} />
         </div>
 
          {/* HUMI Distribution + Agent Metadata Distribution + Nonce Trend */}
