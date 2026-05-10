@@ -14,12 +14,14 @@ import { normalizeChainName } from '@/lib/agentChains';
 import { publicChainLogoUrl } from '@/lib/chainPublicLogo';
 import { AgentDetailCard } from '@/components/dashboard/AgentDetailCard';
 import { MetadataRichnessLayersChart } from '@/components/dashboard/MetadataRichnessLayersChart';
+import { AgentFeedbackRadarChart } from '@/components/dashboard/AgentFeedbackRadarChart';
 import { AgentTransactionalChart } from '@/components/dashboard/AgentTransactionalChart';
 import {
   metadataRichnessTier,
   parseMetadataRichnessInformation,
   type RichnessSegmentHoverDetail,
 } from '@/lib/metadataRichness';
+import { parseAgentFeedbackAnalysis } from '@/lib/agentFeedbackAnalysis';
 import { useAgentRecentNavigation } from '../../components/AgentRecentNavigationContext';
 import { useLanguage } from '../../components/LanguageContext';
 import type { Translations } from '../../components/LanguageContext';
@@ -123,7 +125,8 @@ export default function AgentDetailPage() {
 
   const [activeMetaField, setActiveMetaField] = useState<string | null>(null);
   const [activeFeedbackSummary, setActiveFeedbackSummary] = useState<string | null>(null);
-  const [metadataView, setMetadataView] = useState<'analysis' | 'data'>('data');
+  const [metadataView, setMetadataView] = useState<'analysis' | 'data'>('analysis');
+  const [feedbackView, setFeedbackView] = useState<'analysis' | 'data'>('analysis');
   const [richnessHover, setRichnessHover] = useState<RichnessSegmentHoverDetail | null>(null);
 
   const chartLabelOf: ChartLabelResolver = useCallback(
@@ -286,6 +289,11 @@ export default function AgentDetailPage() {
   const richnessTier = useMemo(
     () => metadataRichnessTier(metadataRichnessDisplayScore),
     [metadataRichnessDisplayScore]
+  );
+
+  const feedbackParsed = useMemo(
+    () => parseAgentFeedbackAnalysis(agent?.agent_feedback_analysis),
+    [agent?.agent_feedback_analysis]
   );
 
   useEffect(() => {
@@ -958,36 +966,72 @@ export default function AgentDetailPage() {
             <div
               className={`mb-6 flex flex-wrap gap-2 border-b pb-4 ${isDark ? 'border-gray-800' : 'border-zinc-200'}`}
             >
-              {FEEDBACK_ROWS.map((row) => {
-                const enabled =
-                  agent[row.hasField] === true && !jsonFieldEmpty(agent[row.summaryField]);
-                return (
-                  <button
-                    key={row.summaryField}
-                    type="button"
-                    disabled={!enabled}
-                    onClick={() => enabled && setActiveFeedbackSummary(row.summaryField)}
-                    className={`rounded-2xl px-5 py-2 text-sm transition-all ${
-                      !enabled
-                        ? tabDisabled
-                        : activeFeedbackSummary === row.summaryField
-                          ? tabActive
-                          : tabIdle
-                    }`}
-                  >
-                    {t[row.labelKey]}
-                  </button>
-                );
-              })}
+              <button
+                type="button"
+                onClick={() => setFeedbackView('analysis')}
+                className={`rounded-2xl px-5 py-2 text-sm transition-all ${
+                  feedbackView === 'analysis' ? tabActive : tabIdle
+                }`}
+              >
+                {t.agentDetailMetadataViewAnalysis}
+              </button>
+              <button
+                type="button"
+                onClick={() => setFeedbackView('data')}
+                className={`rounded-2xl px-5 py-2 text-sm transition-all ${
+                  feedbackView === 'data' ? tabActive : tabIdle
+                }`}
+              >
+                {t.agentDetailMetadataViewData}
+              </button>
             </div>
 
-            <div className={`max-h-[520px] overflow-auto p-6 ${cardInlay}`}>
-              <pre
-                className={`whitespace-pre-wrap font-mono text-sm ${isDark ? 'text-gray-300' : 'text-zinc-800'}`}
-              >
-                {feedbackJson ?? t.agentDetailNoJsonToShow}
-              </pre>
-            </div>
+            {feedbackView === 'analysis' ? (
+              <div className={`p-4 ${cardInlay}`}>
+                <AgentFeedbackRadarChart
+                  axes={feedbackParsed?.axes ?? []}
+                  isDark={isDark}
+                  t={t}
+                  emptyMessage={t.agentDetailFeedbackAnalysisEmpty}
+                />
+              </div>
+            ) : (
+              <>
+                <div
+                  className={`mb-6 flex flex-wrap gap-2 border-b pb-4 ${isDark ? 'border-gray-800' : 'border-zinc-200'}`}
+                >
+                  {FEEDBACK_ROWS.map((row) => {
+                    const enabled =
+                      agent[row.hasField] === true && !jsonFieldEmpty(agent[row.summaryField]);
+                    return (
+                      <button
+                        key={row.summaryField}
+                        type="button"
+                        disabled={!enabled}
+                        onClick={() => enabled && setActiveFeedbackSummary(row.summaryField)}
+                        className={`rounded-2xl px-5 py-2 text-sm transition-all ${
+                          !enabled
+                            ? tabDisabled
+                            : activeFeedbackSummary === row.summaryField
+                              ? tabActive
+                              : tabIdle
+                        }`}
+                      >
+                        {t[row.labelKey]}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className={`max-h-[520px] overflow-auto p-6 ${cardInlay}`}>
+                  <pre
+                    className={`whitespace-pre-wrap font-mono text-sm ${isDark ? 'text-gray-300' : 'text-zinc-800'}`}
+                  >
+                    {feedbackJson ?? t.agentDetailNoJsonToShow}
+                  </pre>
+                </div>
+              </>
+            )}
           </AgentDetailCard>
         </div>
       </div>

@@ -69,7 +69,8 @@ export async function GET(
         has_protocol_activity,
         protocol_activity_summary,
         metadata_richness_score,
-        metadata_richness_information
+        metadata_richness_information,
+        agent_feedback_analysis
       `)
       .eq('id', numericId)
       .maybeSingle();

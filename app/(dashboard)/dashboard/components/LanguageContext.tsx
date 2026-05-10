@@ -225,6 +225,15 @@ export interface Translations {
   agentDetailMetadataRichnessEmpty: string;
   agentDetailMetadataRichnessHoverPlaceholder: string;
   agentDetailMetadataLayerNoBreakdown: string;
+  feedbackAxisCommentQuality: string;
+  feedbackAxisAttestationQuality: string;
+  feedbackAxisFeedbackVolume: string;
+  feedbackAxisProtocolActivity: string;
+  feedbackAxisExecutionSuccess: string;
+  feedbackAxisAttestationValidity: string;
+  feedbackAxisPaidProtocolActivity: string;
+  feedbackAxisFreshness: string;
+  agentDetailFeedbackAnalysisEmpty: string;
   feedbackTabComments: string;
   feedbackTabAttestations: string;
   feedbackTabExternalAudit: string;
@@ -489,6 +498,15 @@ const translations: Record<Language, Translations> = {
     agentDetailMetadataRichnessHoverPlaceholder:
       'Pasa el cursor por un segmento de las barras para ver el detalle y la puntuación del ítem.',
     agentDetailMetadataLayerNoBreakdown: 'Sin desglose por ítems',
+    feedbackAxisCommentQuality: 'Calidad de comentarios',
+    feedbackAxisAttestationQuality: 'Calidad de attestation',
+    feedbackAxisFeedbackVolume: 'Volumen de feedback',
+    feedbackAxisProtocolActivity: 'Actividad de protocolo',
+    feedbackAxisExecutionSuccess: 'Éxito de ejecución',
+    feedbackAxisAttestationValidity: 'Validez de attestation',
+    feedbackAxisPaidProtocolActivity: 'Actividad de protocolo pagada',
+    feedbackAxisFreshness: 'Actualidad',
+    agentDetailFeedbackAnalysisEmpty: 'No hay análisis de feedback disponible.',
     feedbackTabComments: 'Comentarios',
     feedbackTabAttestations: 'Attestations',
     feedbackTabExternalAudit: 'Auditoría externa',
@@ -750,6 +768,15 @@ const translations: Record<Language, Translations> = {
     agentDetailMetadataRichnessHoverPlaceholder:
       'Hover a segment in the bar charts to see the item label and its score.',
     agentDetailMetadataLayerNoBreakdown: 'No per-item breakdown',
+    feedbackAxisCommentQuality: 'Comment quality',
+    feedbackAxisAttestationQuality: 'Attestation quality',
+    feedbackAxisFeedbackVolume: 'Feedback volume',
+    feedbackAxisProtocolActivity: 'Protocol activity',
+    feedbackAxisExecutionSuccess: 'Execution success',
+    feedbackAxisAttestationValidity: 'Attestation validity',
+    feedbackAxisPaidProtocolActivity: 'Paid protocol activity',
+    feedbackAxisFreshness: 'Freshness',
+    agentDetailFeedbackAnalysisEmpty: 'No feedback analysis available.',
     feedbackTabComments: 'Comments',
     feedbackTabAttestations: 'Attestations',
     feedbackTabExternalAudit: 'External audit',
