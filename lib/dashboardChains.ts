@@ -13,6 +13,9 @@ export type DashboardChainRow = {
   humi_distribution: Record<string, unknown> | null;
   metadata_distribution: Record<string, unknown> | null;
   owner_stats_information: Record<string, unknown> | null;
+  technical_data_information: Record<string, unknown> | null;
+  warning_stats_information: Record<string, unknown> | null;
+  on_chain_stats_information: Record<string, unknown> | null;
 };
 
 export type MonthlyStatRow = {

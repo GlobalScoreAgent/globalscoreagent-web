@@ -129,30 +129,36 @@ export function DashboardOverviewInsightCard({
             isDark ? 'border-blue-400/20 bg-blue-400/10 text-blue-400' : 'border-blue-400/30 bg-blue-400/20 text-blue-600'
           }`}
         >
-          {t.dashboardInsightNonceBadge}
+          {t.dashboardInsightEcosystemBadge}
         </div>
       </div>
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:gap-4">
-        <div className="relative h-44 min-h-0 w-full shrink-0 lg:min-w-0 lg:flex-1">
-          {lastPoint ? (
-            <div
-              className={`pointer-events-none absolute right-0 top-0 z-10 hidden max-w-[min(100%,14rem)] rounded-lg border px-2 py-1 text-right text-[11px] font-semibold leading-snug sm:pointer-events-auto sm:block ${
-                isDark ? 'border-emerald-400/15 bg-emerald-400/5 text-emerald-300' : 'border-emerald-400/25 bg-emerald-400/10 text-emerald-700'
-              }`}
-            >
-              {t.totalLabel}: {lastPoint.nonces.toLocaleString()} {t.nonceLabel}
-              {nonceSeries.length > 1 && nonceSeries[nonceSeries.length - 2].nonces > 0 ? (
-                <> ({lastPoint.change})</>
-              ) : null}
-            </div>
-          ) : null}
+        <div className="flex min-h-0 w-full shrink-0 flex-col gap-1.5 lg:min-w-0 lg:flex-1">
+          <div className="flex flex-wrap items-start justify-between gap-2 gap-y-1">
+            <p className={`min-w-0 flex-1 text-sm font-semibold leading-tight ${isDark ? 'text-zinc-200' : 'text-zinc-800'}`}>
+              {t.dashboardInsightNonceBadge}
+            </p>
+            {lastPoint ? (
+              <div
+                className={`max-w-[min(100%,14rem)] shrink-0 rounded-lg border px-2 py-1 text-right text-[11px] font-semibold leading-snug ${
+                  isDark ? 'border-emerald-400/15 bg-emerald-400/5 text-emerald-300' : 'border-emerald-400/25 bg-emerald-400/10 text-emerald-700'
+                }`}
+              >
+                {t.totalLabel}: {lastPoint.nonces.toLocaleString()} {t.nonceLabel}
+                {nonceSeries.length > 1 && nonceSeries[nonceSeries.length - 2].nonces > 0 ? (
+                  <> ({lastPoint.change})</>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+          <div className="relative h-44 w-full min-h-0 shrink-0">
           {nonceSeries.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
                 data={nonceSeries}
                 margin={{
-                  top: lastPoint ? 30 : 8,
+                  top: 8,
                   right: 8,
                   left: 12,
                   bottom: 4,
@@ -222,6 +228,7 @@ export function DashboardOverviewInsightCard({
           ) : (
             <div className={`flex h-full items-center justify-center text-sm ${muted}`}>—</div>
           )}
+          </div>
         </div>
 
         <div className="flex w-full shrink-0 flex-col gap-3 border-t border-zinc-500/15 pt-3 sm:flex-row sm:gap-2 lg:min-w-[min(100%,380px)] lg:flex-[0_1_42%] lg:border-l lg:border-t-0 lg:pl-4 lg:pt-0 xl:min-w-[400px]">

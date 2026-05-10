@@ -59,6 +59,8 @@ export interface Translations {
   agentNonceTitle: string;
   /** Insight card: Agent Nonce section title including 30-day window */
   dashboardInsightNonceBadge: string;
+  /** Insight card top badge: ecosystem overview */
+  dashboardInsightEcosystemBadge: string;
   last30DaysTitle: string;
   totalLabel: string;
   nonceLabel: string;
@@ -235,6 +237,15 @@ export interface Translations {
   chainSectionLast30Days: string;
   chainSectionOwners: string;
   chainSectionAgentInformation: string;
+  chainSectionTechnicalMaturity: string;
+  chainPctX402: string;
+  chainPctMcpA2a: string;
+  chainSectionWarnings: string;
+  chainPctSpam: string;
+  chainPctDuplicates: string;
+  chainOnChainExecutions30d: string;
+  chainOnChainPayments30d: string;
+  chainOnChainProtocolActivity30d: string;
   chainStatPctActive: string;
   chainStatNewAgents30d: string;
   chainStatPctWalletActivity: string;
@@ -295,6 +306,7 @@ const translations: Record<Language, Translations> = {
     metadataRichnessTitle: 'Riqueza Metadata',
     agentNonceTitle: 'Agente Nonce',
     dashboardInsightNonceBadge: 'Agente Nonce - Últimos 30 días',
+    dashboardInsightEcosystemBadge: 'ERC-8004 Ecosistema / Estadísticas generales',
     last30DaysTitle: 'Ultimos 30 dias',
     totalLabel: 'Total',
     nonceLabel: 'nonce',
@@ -469,6 +481,15 @@ const translations: Record<Language, Translations> = {
     chainSectionLast30Days: 'Últimos 30 días',
     chainSectionOwners: 'Owners',
     chainSectionAgentInformation: 'Información de agentes',
+    chainSectionTechnicalMaturity: 'Madurez técnica',
+    chainPctX402: '% x402',
+    chainPctMcpA2a: '% MCP / A2A',
+    chainSectionWarnings: 'Advertencias',
+    chainPctSpam: '% spam',
+    chainPctDuplicates: '% duplicados',
+    chainOnChainExecutions30d: 'Ejecuciones (30 d)',
+    chainOnChainPayments30d: 'Con pagos (30 d)',
+    chainOnChainProtocolActivity30d: 'Actividad protocolo (30 d)',
     chainStatPctActive: '% activos',
     chainStatNewAgents30d: 'Nuevos agentes (30 d)',
     chainStatPctWalletActivity: '% con actividad en wallet',
@@ -527,6 +548,7 @@ const translations: Record<Language, Translations> = {
     metadataRichnessTitle: 'Metadata Richness',
     agentNonceTitle: 'Agent Nonce',
     dashboardInsightNonceBadge: 'Agent Nonce - Last 30 Days',
+    dashboardInsightEcosystemBadge: 'ERC-8004 Ecosystem / General Statistics',
     last30DaysTitle: 'Last 30 Days',
     totalLabel: 'Total',
     nonceLabel: 'nonce',
@@ -701,6 +723,15 @@ const translations: Record<Language, Translations> = {
     chainSectionLast30Days: 'Last 30 days',
     chainSectionOwners: 'Owners',
     chainSectionAgentInformation: 'Agent information',
+    chainSectionTechnicalMaturity: 'Technical maturity',
+    chainPctX402: '% x402',
+    chainPctMcpA2a: '% MCP / A2A',
+    chainSectionWarnings: 'Warnings',
+    chainPctSpam: '% spam',
+    chainPctDuplicates: '% duplicates',
+    chainOnChainExecutions30d: 'Executions (30d)',
+    chainOnChainPayments30d: 'With payments (30d)',
+    chainOnChainProtocolActivity30d: 'Protocol activity (30d)',
     chainStatPctActive: '% active',
     chainStatNewAgents30d: 'New agents (30d)',
     chainStatPctWalletActivity: '% with wallet activity',

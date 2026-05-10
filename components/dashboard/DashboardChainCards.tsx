@@ -130,6 +130,34 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
   const pctWallet = numFromJson(d30, 'pct_with_wallet_activity');
   const pctOnchain = numFromJson(d30, 'pct_with_onchain_activity');
 
+  const techJson = chain.technical_data_information;
+  const pctX402 = numFromJson(techJson, 'pct_x402');
+  const pctMcpA2a = numFromJson(techJson, 'pct_mcp_a2a');
+
+  const warnJson = chain.warning_stats_information;
+  const pctSpam = numFromJson(warnJson, 'pct_with_spam');
+  const pctDup = numFromJson(warnJson, 'pct_duplicates');
+
+  const onChainJson = chain.on_chain_stats_information;
+  const onChainExec = numFromJson(onChainJson, 'total_executions_30d');
+  const onChainPay = numFromJson(onChainJson, 'total_with_payments_30d');
+  const onChainProto = numFromJson(onChainJson, 'total_protocol_activity_30d');
+
+  const hasLast30Legacy =
+    pctActive !== null ||
+    d30Total !== null ||
+    d30Active !== null ||
+    newAgents30d !== null ||
+    pctWallet !== null ||
+    pctOnchain !== null;
+  const hasLast30OnChain = onChainExec !== null || onChainPay !== null || onChainProto !== null;
+  const showLast30Section = hasLast30Legacy || hasLast30OnChain;
+
+  const fmtPct = (n: number | null) =>
+    n === null || !Number.isFinite(n) ? '—' : `${n.toLocaleString(locale, { maximumFractionDigits: 2 })}%`;
+  const fmtCount = (n: number | null) =>
+    n === null || !Number.isFinite(n) ? '—' : Number(n).toLocaleString(locale, { maximumFractionDigits: 0 });
+
   const humiDist = recordToNumberMap(chain.humi_distribution);
   const humiRow: Record<string, number | string> = { name: chain.short_name || chain.name };
   HUMI_BUCKET_ORDER.forEach((k) => {
@@ -183,7 +211,7 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <div className={`rounded-2xl border px-3 py-2 ${miniCardShell}`}>
             <p className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionAgentInformation}</p>
             <div className="flex flex-wrap gap-6 text-sm">
@@ -217,51 +245,81 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
               </div>
             </div>
           </div>
-        </div>
 
-        {d30 && (
-          <div className={`rounded-2xl border px-3 py-2 ${isDark ? 'border-zinc-700 bg-black/15' : 'border-zinc-200 bg-white/60'}`}>
-            <p className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionLast30Days}</p>
-            <div className="grid grid-cols-2 gap-2 text-[11px] sm:grid-cols-3">
-              {pctActive !== null ? (
-                <div>
-                  <span className={muted}>{t.chainStatPctActive}</span>
-                  <div className={`font-semibold tabular-nums ${prose}`}>{pctActive.toLocaleString(locale, { maximumFractionDigits: 2 })}%</div>
-                </div>
-              ) : null}
-              {d30Total !== null ? (
-                <div>
-                  <span className={muted}>{t.agentsLabel}</span>
-                  <div className={`font-semibold tabular-nums ${prose}`}>{d30Total.toLocaleString(locale)}</div>
-                </div>
-              ) : null}
-              {d30Active !== null ? (
-                <div>
-                  <span className={muted}>{t.activeLabel}</span>
-                  <div className="font-semibold tabular-nums text-emerald-500">{d30Active.toLocaleString(locale)}</div>
-                </div>
-              ) : null}
-              {newAgents30d !== null ? (
-                <div>
-                  <span className={muted}>{t.chainStatNewAgents30d}</span>
-                  <div className={`font-semibold tabular-nums ${prose}`}>{newAgents30d.toLocaleString(locale)}</div>
-                </div>
-              ) : null}
-              {pctWallet !== null ? (
-                <div>
-                  <span className={muted}>{t.chainStatPctWalletActivity}</span>
-                  <div className={`font-semibold tabular-nums ${prose}`}>{pctWallet.toLocaleString(locale, { maximumFractionDigits: 2 })}%</div>
-                </div>
-              ) : null}
-              {pctOnchain !== null ? (
-                <div>
-                  <span className={muted}>{t.chainStatPctOnchainActivity}</span>
-                  <div className={`font-semibold tabular-nums ${prose}`}>{pctOnchain.toLocaleString(locale, { maximumFractionDigits: 2 })}%</div>
-                </div>
-              ) : null}
+          <div className={`rounded-2xl border px-3 py-2 ${miniCardShell}`}>
+            <p className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionTechnicalMaturity}</p>
+            <div className="flex flex-wrap gap-6 text-sm">
+              <div>
+                <span className={muted}>{t.chainPctX402}</span>
+                <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctX402)}</div>
+              </div>
+              <div>
+                <span className={muted}>{t.chainPctMcpA2a}</span>
+                <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctMcpA2a)}</div>
+              </div>
             </div>
           </div>
-        )}
+
+          <div className={`rounded-2xl border px-3 py-2 ${miniCardShell}`}>
+            <p className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionWarnings}</p>
+            <div className="flex flex-wrap gap-6 text-sm">
+              <div>
+                <span className={muted}>{t.chainPctSpam}</span>
+                <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctSpam)}</div>
+              </div>
+              <div>
+                <span className={muted}>{t.chainPctDuplicates}</span>
+                <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctDup)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {showLast30Section ? (
+          <div className={`rounded-2xl border px-3 py-2 ${isDark ? 'border-zinc-700 bg-black/15' : 'border-zinc-200 bg-white/60'}`}>
+            <p className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionLast30Days}</p>
+            <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3 lg:grid-cols-3">
+              <div>
+                <span className={muted}>{t.chainStatPctActive}</span>
+                <div className={`font-semibold tabular-nums ${prose}`}>{fmtPct(pctActive)}</div>
+              </div>
+              <div>
+                <span className={muted}>{t.agentsLabel}</span>
+                <div className={`font-semibold tabular-nums ${prose}`}>
+                  {d30Total !== null ? d30Total.toLocaleString(locale) : '—'}
+                </div>
+              </div>
+              <div>
+                <span className={muted}>{t.activeLabel}</span>
+                <div className="font-semibold tabular-nums text-emerald-500">{d30Active !== null ? d30Active.toLocaleString(locale) : '—'}</div>
+              </div>
+              <div>
+                <span className={muted}>{t.chainStatNewAgents30d}</span>
+                <div className={`font-semibold tabular-nums ${prose}`}>{newAgents30d !== null ? newAgents30d.toLocaleString(locale) : '—'}</div>
+              </div>
+              <div>
+                <span className={muted}>{t.chainStatPctWalletActivity}</span>
+                <div className={`font-semibold tabular-nums ${prose}`}>{fmtPct(pctWallet)}</div>
+              </div>
+              <div>
+                <span className={muted}>{t.chainStatPctOnchainActivity}</span>
+                <div className={`font-semibold tabular-nums ${prose}`}>{fmtPct(pctOnchain)}</div>
+              </div>
+              <div>
+                <span className={muted}>{t.chainOnChainExecutions30d}</span>
+                <div className={`font-semibold tabular-nums ${prose}`}>{fmtCount(onChainExec)}</div>
+              </div>
+              <div>
+                <span className={muted}>{t.chainOnChainPayments30d}</span>
+                <div className={`font-semibold tabular-nums ${prose}`}>{fmtCount(onChainPay)}</div>
+              </div>
+              <div>
+                <span className={muted}>{t.chainOnChainProtocolActivity30d}</span>
+                <div className={`font-semibold tabular-nums ${prose}`}>{fmtCount(onChainProto)}</div>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         <MonthlyAgentsChart rows={chain.statistics_agent_monthly} isDark={isDark} locale={locale} t={t} />
 
