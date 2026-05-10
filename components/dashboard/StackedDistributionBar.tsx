@@ -98,12 +98,19 @@ export function StackedDistributionBar({
     );
   };
 
+  /** Wide horizontal stacked bar: default h-14; extra bottom margin / fixed X domain need more SVG height or the plot collapses. */
+  const horizontalChartTall =
+    orientation === 'horizontal' &&
+    (xDomainMax != null || (horizontalMarginBottom ?? 0) > 8);
+
   const chartShell =
     orientation === 'vertical'
       ? fillHeight
         ? 'min-h-0 flex-1 w-full'
         : 'h-40 w-full'
-      : 'h-14 w-full';
+      : horizontalChartTall
+        ? 'h-32 w-full sm:h-36'
+        : 'h-14 w-full';
 
   return (
     <div className={cn('space-y-1', fillHeight && orientation === 'vertical' && 'flex min-h-0 flex-1 flex-col', className)}>
