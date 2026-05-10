@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from 'recharts';
 import type { Translations } from '@/app/(dashboard)/dashboard/components/LanguageContext';
-import type { ParsedFeedbackAxis } from '@/lib/agentFeedbackAnalysis';
+import type { FeedbackAxisSubjectKey, ParsedFeedbackAxis } from '@/lib/agentFeedbackAnalysis';
 
 export type AgentFeedbackRadarChartProps = {
   axes: ParsedFeedbackAxis[];
@@ -20,96 +20,45 @@ export type AgentFeedbackRadarChartProps = {
   emptyMessage: string;
 };
 
-/** Labels with more characters than this use two lines to free space for a larger plot. */
-const MAX_SINGLE_LINE_CHARS = 17;
-/** When splitting, prefer breaking after the last space before this index (inclusive of short first words). */
-const FIRST_LINE_CHAR_BUDGET = 18;
-const MIN_WORD_BREAK_INDEX = 6;
-const SECOND_LINE_MAX_BEFORE_ELLIPSIS = 24;
-
-/** Split category labels into two lines near word boundaries for perimeter ticks. */
-function splitLongAngleLabel(text: string): string[] {
-  const t = text.trim();
-  if (t.length <= MAX_SINGLE_LINE_CHARS) return [t];
-
-  const spaceBreak = t.lastIndexOf(' ', FIRST_LINE_CHAR_BUDGET);
-  const cut = spaceBreak > MIN_WORD_BREAK_INDEX ? spaceBreak : Math.min(FIRST_LINE_CHAR_BUDGET, t.length);
-  const line1 = t.slice(0, cut).trim();
-  const line2 = (spaceBreak > MIN_WORD_BREAK_INDEX ? t.slice(spaceBreak + 1) : t.slice(cut)).trim();
-  if (!line2) return [t];
-  if (line2.length > SECOND_LINE_MAX_BEFORE_ELLIPSIS) {
-    return [line1, `${line2.slice(0, SECOND_LINE_MAX_BEFORE_ELLIPSIS - 1)}…`];
-  }
-  return [line1, line2];
-}
-
-type PolarAngleTickRenderProps = {
-  x?: number;
-  y?: number;
-  payload?: { value?: unknown; coordinate?: number; index?: number };
-  textAnchor?: string;
-  verticalAnchor?: string;
-  fill?: string;
-  index?: number;
+export type RadarDatum = {
+  axisTick: string;
+  axisIndex: number;
+  subjectKey: FeedbackAxisSubjectKey;
+  subject: string;
+  value: number;
+  fullMark: number;
 };
 
-function FeedbackPolarAngleTick(props: PolarAngleTickRenderProps) {
-  const { x = 0, y = 0, payload, textAnchor = 'middle', verticalAnchor = 'middle', fill } = props;
-  const raw = payload?.value;
-  const text = typeof raw === 'string' ? raw : String(raw ?? '');
-  const lines = splitLongAngleLabel(text);
+type PolarAngleTickProps = {
+  x?: number;
+  y?: number;
+  payload?: { value?: unknown };
+  textAnchor?: string;
+  fill?: string;
+};
 
-  if (lines.length === 1) {
-    return (
-      <text
-        x={x}
-        y={y}
-        textAnchor={textAnchor as 'start' | 'middle' | 'end'}
-        fill={fill}
-        fontSize={10}
-        className="recharts-polar-angle-axis-tick-value"
-      >
-        {lines[0]}
-      </text>
-    );
-  }
-
-  const [a, b] = lines;
-  let startDy: string;
-  let secondDy: string;
-  if (verticalAnchor === 'start') {
-    startDy = '0em';
-    secondDy = '1.15em';
-  } else if (verticalAnchor === 'end') {
-    startDy = '-1.15em';
-    secondDy = '1.15em';
-  } else {
-    startDy = '-0.55em';
-    secondDy = '1.1em';
-  }
-
+function FeedbackAxisNumberTick(props: PolarAngleTickProps) {
+  const { x = 0, y = 0, payload, textAnchor = 'middle', fill } = props;
+  const v = payload?.value;
+  const label = v !== undefined && v !== null ? String(v) : '';
   return (
     <text
       x={x}
       y={y}
       textAnchor={textAnchor as 'start' | 'middle' | 'end'}
       fill={fill}
-      fontSize={10}
-      className="recharts-polar-angle-axis-tick-value"
+      fontSize={12}
+      fontWeight={600}
+      className="tabular-nums"
     >
-      <tspan x={x} dy={startDy}>
-        {a}
-      </tspan>
-      <tspan x={x} dy={secondDy}>
-        {b}
-      </tspan>
+      {label}
     </text>
   );
 }
 
 type RadarTooltipRows = Array<{
   value?: number;
-  payload?: { subject?: string; value?: number; fullMark?: number };
+  payload?: RadarDatum;
 }>;
 
 function FeedbackRadarTooltip({
@@ -122,13 +71,11 @@ function FeedbackRadarTooltip({
   isDark: boolean;
 }) {
   if (!active || !payload?.length) return null;
-  const row = payload[0]?.payload as {
-    subject?: string;
-    value?: number;
-    fullMark?: number;
-  };
+  const row = payload[0]?.payload;
   const subject = typeof row?.subject === 'string' ? row.subject : '';
-  const max = typeof row?.fullMark === 'number' && Number.isFinite(row.fullMark) ? row.fullMark : 100;
+  const axisIndex = typeof row?.axisIndex === 'number' ? row.axisIndex : null;
+  const max =
+    typeof row?.fullMark === 'number' && Number.isFinite(row.fullMark) ? row.fullMark : 100;
   const raw = payload[0]?.value;
   const v =
     typeof raw === 'number'
@@ -140,6 +87,9 @@ function FeedbackRadarTooltip({
     ? v.toLocaleString(undefined, { maximumFractionDigits: 2 })
     : '—';
 
+  const title =
+    axisIndex !== null && subject ? `(${axisIndex}) ${subject}` : subject || '';
+
   return (
     <div
       className={`rounded-xl border px-3 py-2 text-sm shadow-lg backdrop-blur-sm ${
@@ -148,9 +98,9 @@ function FeedbackRadarTooltip({
           : 'border-zinc-200/90 bg-white/95 text-zinc-900 shadow-zinc-900/10'
       }`}
     >
-      {subject ? (
-        <div className={`mb-1 max-w-[220px] text-xs font-medium leading-snug ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
-          {subject}
+      {title ? (
+        <div className={`mb-1 max-w-[240px] text-xs font-medium leading-snug ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
+          {title}
         </div>
       ) : null}
       <div className="font-semibold tabular-nums">
@@ -173,9 +123,12 @@ export function AgentFeedbackRadarChart({
   const radFillId = `${uid}-radar-fill`;
   const glowFilterId = `${uid}-radar-glow`;
 
-  const data = useMemo(
+  const data = useMemo<RadarDatum[]>(
     () =>
-      axes.map((a) => ({
+      axes.map((a, i) => ({
+        axisTick: String(i + 1),
+        axisIndex: i + 1,
+        subjectKey: a.subjectKey,
         subject: t[a.subjectKey],
         value: a.value,
         fullMark: a.fullMark,
@@ -187,6 +140,7 @@ export function AgentFeedbackRadarChart({
   const fillSoft = isDark ? '#6ee7b7' : '#10b981';
   const gridStroke = isDark ? 'rgba(255,255,255,0.09)' : 'rgba(0,0,0,0.07)';
   const tickFill = isDark ? '#a1a1aa' : '#52525b';
+  const legendAccent = isDark ? 'text-emerald-400' : 'text-emerald-600';
 
   if (!data.length) {
     return (
@@ -214,13 +168,13 @@ export function AgentFeedbackRadarChart({
           : 'border-zinc-200/90 bg-gradient-to-br from-emerald-50/90 via-white to-zinc-50/95'
       }`}
     >
-      <div className="h-[400px] w-full">
+      <div className="h-[360px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart
             cx="50%"
             cy="50%"
-            outerRadius="70%"
-            margin={{ top: 22, right: 32, bottom: 30, left: 32 }}
+            outerRadius="86%"
+            margin={{ top: 12, right: 14, bottom: 12, left: 14 }}
             data={data}
           >
             <defs>
@@ -249,10 +203,10 @@ export function AgentFeedbackRadarChart({
             />
 
             <PolarAngleAxis
-              dataKey="subject"
+              dataKey="axisTick"
               stroke={tickFill}
               tick={(tickProps) => (
-                <FeedbackPolarAngleTick {...(tickProps as PolarAngleTickRenderProps)} />
+                <FeedbackAxisNumberTick {...(tickProps as PolarAngleTickProps)} />
               )}
               tickLine={false}
             />
@@ -292,10 +246,35 @@ export function AgentFeedbackRadarChart({
       </div>
 
       <p
-        className={`mt-3 text-center text-xs tabular-nums ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}
+        className={`mt-2 text-center text-xs tabular-nums ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}
       >
         {scaleCaption}
       </p>
+
+      <div
+        className={`mt-4 grid grid-cols-1 gap-x-8 gap-y-2.5 text-xs sm:grid-cols-2 ${
+          isDark ? 'text-zinc-300' : 'text-zinc-700'
+        }`}
+      >
+        {data.map((row) => {
+          const vText = row.value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+          const maxText = row.fullMark.toLocaleString(undefined, { maximumFractionDigits: 0 });
+          return (
+            <div key={row.subjectKey} className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <span className={`shrink-0 font-semibold tabular-nums ${legendAccent}`}>{row.axisIndex}.</span>
+              <span className="min-w-0 flex-1 leading-snug">{row.subject}</span>
+              <span
+                className={`shrink-0 tabular-nums ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}
+                title={`${vText} / ${maxText}`}
+              >
+                {vText}
+                <span className="mx-0.5 opacity-70">/</span>
+                {maxText}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

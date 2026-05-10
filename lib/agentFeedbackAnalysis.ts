@@ -28,6 +28,33 @@ export type ParsedAgentFeedbackAnalysis = {
   axes: ParsedFeedbackAxis[];
 };
 
+/**
+ * Vertex order for radar / legends: stable across agents regardless of API array order.
+ * Matches documented API axis sequence (Comment Quality → … → Freshness).
+ */
+export const FEEDBACK_AXIS_CANONICAL_ORDER: readonly FeedbackAxisSubjectKey[] = [
+  'feedbackAxisCommentQuality',
+  'feedbackAxisAttestationQuality',
+  'feedbackAxisFeedbackVolume',
+  'feedbackAxisProtocolActivity',
+  'feedbackAxisExecutionSuccess',
+  'feedbackAxisAttestationValidity',
+  'feedbackAxisPaidProtocolActivity',
+  'feedbackAxisFreshness',
+] as const;
+
+function canonicalAxisOrderIndex(key: FeedbackAxisSubjectKey): number {
+  const i = FEEDBACK_AXIS_CANONICAL_ORDER.indexOf(key);
+  return i === -1 ? 999 : i;
+}
+
+/** Sort parsed axes by canonical dimension order (for numbered radar vertices). */
+export function sortParsedFeedbackAxes(axes: ParsedFeedbackAxis[]): ParsedFeedbackAxis[] {
+  return [...axes].sort(
+    (a, b) => canonicalAxisOrderIndex(a.subjectKey) - canonicalAxisOrderIndex(b.subjectKey)
+  );
+}
+
 /** API `subject` → translation key (stable contract). */
 const SUBJECT_TO_KEY: Record<string, FeedbackAxisSubjectKey> = {
   'Comment Quality': 'feedbackAxisCommentQuality',
@@ -80,5 +107,5 @@ export function parseAgentFeedbackAnalysis(raw: unknown): ParsedAgentFeedbackAna
   }
 
   if (axes.length === 0) return null;
-  return { axes };
+  return { axes: sortParsedFeedbackAxes(axes) };
 }
