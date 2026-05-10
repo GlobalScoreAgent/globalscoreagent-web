@@ -404,16 +404,19 @@ export default function AgentDetailPage() {
               isDark={isDark}
               variant="image"
               className="w-full"
-              contentClassName="relative h-80 w-full overflow-hidden"
+              contentClassName="relative h-80 w-full overflow-hidden rounded-3xl"
             >
-              <Image
-                src={imageSrcPrimary}
-                alt={String(agent.name ?? 'Agent')}
-                fill
-                className="object-cover"
-                unoptimized
-                onError={() => setImgFailed(true)}
-              />
+              <div className="relative h-full w-full p-3">
+                <Image
+                  src={imageSrcPrimary}
+                  alt={String(agent.name ?? 'Agent')}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 1024px) 100vw, 320px"
+                  unoptimized
+                  onError={() => setImgFailed(true)}
+                />
+              </div>
             </AgentDetailCard>
             <AgentDetailCard isDark={isDark} variant="profiles" className="w-full" contentClassName="p-4">
               <h3
@@ -744,10 +747,9 @@ export default function AgentDetailPage() {
                   <p className={`text-sm ${muted}`}>{t.agentDetailMetadataRichnessEmpty}</p>
                 ) : (
                   <>
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                      <div>
-                        <p className={`text-sm ${muted}`}>{t.agentDetailMetadataRichnessScoreLabel}</p>
-                        <div className="mt-3 flex flex-wrap items-center gap-4">
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                      <div className="flex flex-col gap-3">
+                        <div className="flex flex-wrap items-center gap-4">
                           {metadataRichnessDisplayScore !== null ? (
                             <>
                               <span
@@ -779,9 +781,10 @@ export default function AgentDetailPage() {
                             <span className={`text-sm ${muted}`}>{t.notAvailable}</span>
                           )}
                         </div>
+                        <p className={`text-sm font-bold ${muted}`}>{t.agentDetailRichnessScoreLabel}</p>
                       </div>
                       {richnessParsed?.calculatedAt ? (
-                        <div className={`text-sm ${muted}`}>
+                        <div className={`shrink-0 text-sm ${muted} lg:text-right`}>
                           <span>{t.agentDetailMetadataRichnessCalculatedAt}: </span>
                           <span className="tabular-nums">{formatDate(richnessParsed.calculatedAt)}</span>
                         </div>
@@ -789,7 +792,7 @@ export default function AgentDetailPage() {
                     </div>
 
                     {richnessParsed ? (
-                      <div className={`max-h-[520px] overflow-auto p-6 ${cardInlay}`}>
+                      <div className={`max-h-[520px] overflow-auto p-6 pb-14 ${cardInlay}`}>
                         <MetadataRichnessLayersChart parsed={richnessParsed} isDark={isDark} t={t} />
                       </div>
                     ) : null}

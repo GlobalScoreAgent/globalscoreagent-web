@@ -38,6 +38,20 @@ export function metadataRichnessTier(score: number | null | undefined): {
 
 export type RichnessLayerKey = 'basic' | 'intermediate' | 'advanced';
 
+/** Max points achievable per layer (bands 0–40, 40–70, 70–100 on the 0–100 scale). */
+export function metadataLayerMaxPoints(layerKey: RichnessLayerKey): number {
+  switch (layerKey) {
+    case 'basic':
+      return 40;
+    case 'intermediate':
+      return 30;
+    case 'advanced':
+      return 30;
+    default:
+      return 40;
+  }
+}
+
 export type RichnessDetailEntry = {
   slug: string;
   rawKey: string;

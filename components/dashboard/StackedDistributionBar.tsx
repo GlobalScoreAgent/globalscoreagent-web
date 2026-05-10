@@ -34,6 +34,8 @@ export function StackedDistributionBar({
   orientation = 'horizontal',
   density = 'default',
   fillHeight = false,
+  xDomainMax,
+  horizontalMarginBottom,
   className,
 }: {
   title: string;
@@ -46,6 +48,10 @@ export function StackedDistributionBar({
   density?: StackedBarDensity;
   /** When vertical, grow to fill parent flex height (chain rail). */
   fillHeight?: boolean;
+  /** When orientation is horizontal (wide stacked bar), fix X axis max (e.g. layer cap). */
+  xDomainMax?: number;
+  /** Extra bottom margin for horizontal bar chart (tooltip / ticks). */
+  horizontalMarginBottom?: number;
   className?: string;
 }) {
   const axisStroke = isDark ? '#52525b' : '#d4d4d8';
@@ -63,6 +69,13 @@ export function StackedDistributionBar({
   const vertMargins = isRail
     ? { top: 4, right: 2, left: 0, bottom: 4 }
     : { top: 6, right: 12, left: 4, bottom: 4 };
+
+  const horizontalMargins = {
+    top: 2,
+    right: 64,
+    left: 4,
+    bottom: horizontalMarginBottom ?? 2,
+  };
 
   type TooltipPayloadItem = { dataKey?: string | number; value?: number };
 
@@ -105,14 +118,19 @@ export function StackedDistributionBar({
       <div className={chartShell}>
         <ResponsiveContainer width="100%" height="100%">
           {orientation === 'horizontal' ? (
-            <BarChart layout="vertical" data={[row]} margin={{ top: 2, right: 64, left: 4, bottom: 2 }}>
+            <BarChart layout="vertical" data={[row]} margin={horizontalMargins}>
               <CartesianGrid strokeDasharray="3 3" stroke={isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} horizontal={false} />
-              <XAxis type="number" stroke={axisStroke} tick={{ fill: tickFill, fontSize: 10 }} />
+              <XAxis
+                type="number"
+                stroke={axisStroke}
+                tick={{ fill: tickFill, fontSize: 10 }}
+                domain={xDomainMax != null && Number.isFinite(xDomainMax) ? [0, xDomainMax] : undefined}
+              />
               <YAxis type="category" dataKey="name" width={1} hide />
               <Tooltip
                 allowEscapeViewBox={{ x: true, y: true }}
                 animationDuration={0}
-                wrapperStyle={{ zIndex: 50 }}
+                wrapperStyle={{ zIndex: 50, overflow: 'visible' }}
                 content={tooltipContent as never}
               />
               {rowKeys.map((k) => (

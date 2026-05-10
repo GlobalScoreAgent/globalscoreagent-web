@@ -213,8 +213,12 @@ export interface Translations {
   agentDetailMetadataViewAnalysis: string;
   agentDetailMetadataViewData: string;
   agentDetailMetadataRichnessScoreLabel: string;
+  agentDetailRichnessScoreLabel: string;
   agentDetailMetadataRichnessTotalLabel: string;
   agentDetailMetadataRichnessCalculatedAt: string;
+  agentDetailMetadataLayerRangeBasic: string;
+  agentDetailMetadataLayerRangeIntermediate: string;
+  agentDetailMetadataLayerRangeAdvanced: string;
   agentDetailMetadataLayerBasic: string;
   agentDetailMetadataLayerIntermediate: string;
   agentDetailMetadataLayerAdvanced: string;
@@ -471,8 +475,12 @@ const translations: Record<Language, Translations> = {
     agentDetailMetadataViewAnalysis: 'Análisis',
     agentDetailMetadataViewData: 'Datos',
     agentDetailMetadataRichnessScoreLabel: 'Score de riqueza de metadata',
+    agentDetailRichnessScoreLabel: 'Richness Score',
     agentDetailMetadataRichnessTotalLabel: 'Total',
-    agentDetailMetadataRichnessCalculatedAt: 'Calculado',
+    agentDetailMetadataRichnessCalculatedAt: 'Última actualización de metadata',
+    agentDetailMetadataLayerRangeBasic: '0–40',
+    agentDetailMetadataLayerRangeIntermediate: '40–70',
+    agentDetailMetadataLayerRangeAdvanced: '70–100',
     agentDetailMetadataLayerBasic: 'Capa básica',
     agentDetailMetadataLayerIntermediate: 'Capa intermedia',
     agentDetailMetadataLayerAdvanced: 'Capa avanzada',
@@ -726,8 +734,12 @@ const translations: Record<Language, Translations> = {
     agentDetailMetadataViewAnalysis: 'Analysis',
     agentDetailMetadataViewData: 'Data',
     agentDetailMetadataRichnessScoreLabel: 'Metadata richness score',
+    agentDetailRichnessScoreLabel: 'Richness Score',
     agentDetailMetadataRichnessTotalLabel: 'Total',
-    agentDetailMetadataRichnessCalculatedAt: 'Calculated',
+    agentDetailMetadataRichnessCalculatedAt: 'Metadata Last Update',
+    agentDetailMetadataLayerRangeBasic: '0–40',
+    agentDetailMetadataLayerRangeIntermediate: '40–70',
+    agentDetailMetadataLayerRangeAdvanced: '70–100',
     agentDetailMetadataLayerBasic: 'Basic layer',
     agentDetailMetadataLayerIntermediate: 'Intermediate layer',
     agentDetailMetadataLayerAdvanced: 'Advanced layer',

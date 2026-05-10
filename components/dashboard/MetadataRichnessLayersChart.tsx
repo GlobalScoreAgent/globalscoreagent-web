@@ -5,8 +5,8 @@ import { StackedDistributionBar } from '@/components/dashboard/StackedDistributi
 import type { Translations } from '@/app/(dashboard)/dashboard/components/LanguageContext';
 import {
   humanizeRichnessDetailKey,
+  metadataLayerMaxPoints,
   type ParsedMetadataRichness,
-  type ParsedRichnessLayer,
   type RichnessLayerKey,
 } from '@/lib/metadataRichness';
 
@@ -37,6 +37,19 @@ function layerTitleKey(layerKey: RichnessLayerKey): keyof Translations {
   }
 }
 
+function layerRangeLabelKey(layerKey: RichnessLayerKey): keyof Translations {
+  switch (layerKey) {
+    case 'basic':
+      return 'agentDetailMetadataLayerRangeBasic';
+    case 'intermediate':
+      return 'agentDetailMetadataLayerRangeIntermediate';
+    case 'advanced':
+      return 'agentDetailMetadataLayerRangeAdvanced';
+    default:
+      return 'agentDetailMetadataLayerRangeBasic';
+  }
+}
+
 function buildLayerBar(layer: ParsedRichnessLayer): {
   rowKeys: string[];
   row: Record<string, number | string>;
@@ -64,6 +77,7 @@ export function MetadataRichnessLayersChart({
   isDark: boolean;
   t: Translations;
 }) {
+  const mutedSmall = isDark ? 'text-zinc-500' : 'text-zinc-500';
   const layersBlocks = useMemo(() => {
     return parsed.layers.map((layer) => {
       const built = buildLayerBar(layer);
@@ -75,11 +89,15 @@ export function MetadataRichnessLayersChart({
     <div className="flex flex-col gap-8">
       {layersBlocks.map(({ layer, built }) => {
         const title = t[layerTitleKey(layer.layerKey)];
+        const cap = metadataLayerMaxPoints(layer.layerKey);
         const scoreLine = (
-          <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-            <p className={`text-sm font-semibold ${isDark ? 'text-zinc-200' : 'text-zinc-800'}`}>{title}</p>
-            <span className={`tabular-nums text-sm ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}>
-              {layer.layerScore.toLocaleString()}
+          <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0 space-y-0.5">
+              <p className={`text-sm font-semibold ${isDark ? 'text-zinc-200' : 'text-zinc-800'}`}>{title}</p>
+              <p className={`text-[11px] tabular-nums ${mutedSmall}`}>{t[layerRangeLabelKey(layer.layerKey)]}</p>
+            </div>
+            <span className={`shrink-0 tabular-nums text-sm font-medium ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
+              {layer.layerScore.toLocaleString()} / {cap}
             </span>
           </div>
         );
@@ -124,6 +142,8 @@ export function MetadataRichnessLayersChart({
               labelForKey={labelForKey}
               isDark={isDark}
               orientation="horizontal"
+              xDomainMax={cap}
+              horizontalMarginBottom={28}
               className="[&>p:first-child]:hidden"
             />
           </div>
