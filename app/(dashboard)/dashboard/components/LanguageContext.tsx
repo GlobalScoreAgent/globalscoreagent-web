@@ -234,6 +234,8 @@ export interface Translations {
   feedbackAxisPaidProtocolActivity: string;
   feedbackAxisFreshness: string;
   agentDetailFeedbackAnalysisEmpty: string;
+  /** Feedback radar: scale hint with `{max}` placeholder */
+  agentDetailFeedbackRadarScale: string;
   feedbackTabComments: string;
   feedbackTabAttestations: string;
   feedbackTabExternalAudit: string;
@@ -507,6 +509,7 @@ const translations: Record<Language, Translations> = {
     feedbackAxisPaidProtocolActivity: 'Actividad de protocolo pagada',
     feedbackAxisFreshness: 'Actualidad',
     agentDetailFeedbackAnalysisEmpty: 'No hay análisis de feedback disponible.',
+    agentDetailFeedbackRadarScale: 'Escala: 0–{max}',
     feedbackTabComments: 'Comentarios',
     feedbackTabAttestations: 'Attestations',
     feedbackTabExternalAudit: 'Auditoría externa',
@@ -777,6 +780,7 @@ const translations: Record<Language, Translations> = {
     feedbackAxisPaidProtocolActivity: 'Paid protocol activity',
     feedbackAxisFreshness: 'Freshness',
     agentDetailFeedbackAnalysisEmpty: 'No feedback analysis available.',
+    agentDetailFeedbackRadarScale: 'Scale: 0–{max}',
     feedbackTabComments: 'Comments',
     feedbackTabAttestations: 'Attestations',
     feedbackTabExternalAudit: 'External audit',
