@@ -237,32 +237,32 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          <div className={`rounded-2xl border px-3 py-2 ${miniCardShell}`}>
-            <p className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionAgentInformation}</p>
-            <div className="flex flex-wrap gap-6 text-sm">
-              <div>
+          <div className={`rounded-2xl border px-3 py-2 text-center ${miniCardShell}`}>
+            <p className={`mb-2 text-center text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionAgentInformation}</p>
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
+              <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.agentsLabel}</span>
                 <div className={`font-bold tabular-nums ${prose}`}>{totalAgents !== null ? totalAgents.toLocaleString(locale) : '—'}</div>
               </div>
-              <div>
+              <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.activeLabel}</span>
                 <div className="font-bold tabular-nums text-emerald-500">{activeAgents !== null ? activeAgents.toLocaleString(locale) : '—'}</div>
               </div>
-              <div>
+              <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.feedbacksLabel}</span>
                 <div className="font-bold tabular-nums text-blue-500">{withFeedback !== null ? withFeedback.toLocaleString(locale) : '—'}</div>
               </div>
             </div>
           </div>
 
-          <div className={`rounded-2xl border px-3 py-2 ${miniCardShell}`}>
-            <p className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionOwners}</p>
-            <div className="flex flex-wrap gap-6 text-sm">
-              <div>
+          <div className={`rounded-2xl border px-3 py-2 text-center ${miniCardShell}`}>
+            <p className={`mb-2 text-center text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionOwners}</p>
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
+              <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.chainOwnerTotal}</span>
                 <div className={`font-bold tabular-nums ${prose}`}>{totalOwners !== null ? totalOwners.toLocaleString(locale) : '—'}</div>
               </div>
-              <div>
+              <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.chainAvgAgentsPerOwner}</span>
                 <div className={`font-bold tabular-nums ${prose}`}>
                   {avgAgentsPerOwner !== null ? avgAgentsPerOwner.toLocaleString(locale, { maximumFractionDigits: 2 }) : '—'}
@@ -271,28 +271,28 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
             </div>
           </div>
 
-          <div className={`rounded-2xl border px-3 py-2 ${miniCardShell}`}>
-            <p className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionTechnicalMaturity}</p>
-            <div className="flex flex-wrap gap-6 text-sm">
-              <div>
+          <div className={`rounded-2xl border px-3 py-2 text-center ${miniCardShell}`}>
+            <p className={`mb-2 text-center text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionTechnicalMaturity}</p>
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
+              <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.chainPctX402}</span>
                 <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctX402)}</div>
               </div>
-              <div>
+              <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.chainPctMcpA2a}</span>
                 <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctMcpA2a)}</div>
               </div>
             </div>
           </div>
 
-          <div className={`rounded-2xl border px-3 py-2 ${miniCardShell}`}>
-            <p className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionWarnings}</p>
-            <div className="flex flex-wrap gap-6 text-sm">
-              <div>
+          <div className={`rounded-2xl border px-3 py-2 text-center ${miniCardShell}`}>
+            <p className={`mb-2 text-center text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionWarnings}</p>
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
+              <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.chainPctSpam}</span>
                 <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctSpam)}</div>
               </div>
-              <div>
+              <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.chainPctDuplicates}</span>
                 <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctDup)}</div>
               </div>
