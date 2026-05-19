@@ -1,0 +1,28 @@
+---
+description: Web oficial v2 — landing, HUMI, APIs públicas (rama web-page-v2)
+globs: app/page.tsx,app/about/**,app/humi/**,app/certificaciones/**,app/legal/**,app/waitlist/**,app/api/erc8004/**,app/api/humi/**,app/api/waitlist/**,app/api/test-db/**,components/Header.tsx,app/components/**,app/contexts/**
+alwaysApply: false
+---
+
+# Marketing — web-page-v2
+
+## Alcance
+
+Solo páginas públicas y APIs de lectura/waitlist. Dashboard vive en otra rama.
+
+## Convenciones
+
+- Extraer secciones a `components/marketing/` (evitar páginas de 400+ líneas).
+- Preferir Server Components; `'use client'` solo para charts, i18n toggle, formularios.
+- i18n: `LanguageContext` existente; no romper ES/EN.
+- Colores marca: `gold` / `zinc-950` en Tailwind; rediseño Intuition-style usa fondo oscuro + acento gold (no copiar azul Intuition).
+- Supabase en API routes: `schema('web_page')`; URL desde `process.env.NEXT_PUBLIC_SUPABASE_URL`, clave servidor en `SUPABASE_SERVICE_ROLE_KEY`.
+- No hardcodear URLs de Supabase en nuevas rutas.
+
+## Diseño (referencia Intuition Portal)
+
+Glass cards, hero oscuro, métricas en vivo, grid de productos, CTAs pill. Ver plan en conversación / diseño tokens en `tailwind.config.js` cuando existan.
+
+## Prohibido sin acuerdo
+
+Editar `app/(dashboard)/**`, `components/dashboard/**`, `lib/*` usado solo por dashboard.
