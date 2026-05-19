@@ -1,0 +1,26 @@
+---
+description: Dashboard ERC-8004 / HUMI (rama dashboard-final)
+globs: app/(dashboard)/**,components/dashboard/**,components/ui/**,app/api/dashboard/**,lib/**
+alwaysApply: false
+---
+
+# Dashboard — dashboard-final
+
+## Alcance
+
+Rutas bajo `/dashboard`, componentes `components/dashboard`, APIs `app/api/dashboard`, utilidades `lib/`.
+
+## Convenciones
+
+- Cliente Supabase: `@/utils/supabase/server` (server) y `client.ts` (browser).
+- Mantener `HeaderWrapper` ocultando el Header marketing en `/dashboard`.
+- Animaciones: `framer-motion` ya en el proyecto; no añadir deps pesadas sin necesidad.
+- Filtros y tipos: reutilizar `lib/dashboardFilters.ts` y patrones existentes en `agents/route.ts`.
+
+## Compartido
+
+Si necesitas cambiar `package.json`, `utils/supabase/*` o `app/layout.tsx`, documenta el impacto en marketing (`web-page-v2`).
+
+## Prohibido sin acuerdo
+
+Refactor masivo de `app/page.tsx`, landing, o APIs públicas `erc8004` / `humi` / `waitlist`.

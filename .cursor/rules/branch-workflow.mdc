@@ -1,0 +1,23 @@
+---
+description: Ramas web-page-v2 vs dashboard-final y archivos compartidos
+alwaysApply: true
+---
+
+# Ramas y archivos compartidos
+
+Lee `docs/BRANCHING.md` antes de cambios que crucen marketing y dashboard.
+
+## Rama activa
+
+- **Marketing / web oficial:** trabajar en `web-page-v2`. No modificar `app/(dashboard)/**` ni `components/dashboard/**`.
+- **Dashboard:** trabajar en `dashboard-final`. No modificar landing (`app/page.tsx`, `app/humi/`, etc.) salvo que el usuario lo pida.
+
+## Compartido — pedir confirmación si el cambio es grande
+
+`package.json`, `utils/supabase/*`, `app/layout.tsx`, `app/globals.css`, `next.config.js`, `tailwind.config.js`, `.env.example`
+
+Reglas: cambios aditivos; no eliminar código ajeno; tras tocar shared, indicar que la otra rama debe mergear `main`.
+
+## Estilo de código
+
+Mantener formato de comentarios, espaciado y estilo existente. TypeScript strict. Next.js 14 App Router — ver guías en `node_modules/next/dist/docs/` si hay dudas de API.
