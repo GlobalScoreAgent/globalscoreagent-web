@@ -1,0 +1,35 @@
+# Global Score Agent
+
+> Reputation and trust infrastructure for the ERC-8004 agent ecosystem.
+
+## Products
+
+- HUMI Index: 0–100 reputation score for autonomous agents (ERC-8004).
+- WAMI Index: 0–100 reputation score for owner wallets linked to agents.
+
+## Canonical URLs
+
+- Portal (ERC-8004 ecosystem stats): https://globalscoreagent.com/
+- HUMI Index: https://globalscoreagent.com/humi
+- WAMI Index: https://globalscoreagent.com/wami
+- Waitlist: https://globalscoreagent.com/waitlist
+- Legal: https://globalscoreagent.com/legal
+
+## Language
+
+- Default: Spanish (es)
+- English UI: append `?lang=en` to any URL above
+
+## Contact
+
+- Email: hello@globalscoreagent.com
+- X: https://x.com/ibzjairvalenz
+- Farcaster: https://farcaster.xyz/globalscoreagent
+
+## API and dashboard
+
+Full wallet/agent lookup dashboard and public API are coming soon. Join the waitlist at https://globalscoreagent.com/waitlist
+
+## Sitemap
+
+https://globalscoreagent.com/sitemap.xml

@@ -1,8 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,   // ← Esto ignora temporalmente el error de tipos
+  async redirects() {
+    return [
+      {
+        source: '/certificaciones',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/about',
+        destination: '/#mission',
+        permanent: false,
+      },
+    ];
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

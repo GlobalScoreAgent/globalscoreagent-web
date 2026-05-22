@@ -1,6 +1,6 @@
 ---
 description: Web oficial v2 — landing, HUMI, APIs públicas (rama web-page-v2)
-globs: app/page.tsx,app/about/**,app/humi/**,app/certificaciones/**,app/legal/**,app/waitlist/**,app/api/erc8004/**,app/api/humi/**,app/api/waitlist/**,app/api/test-db/**,components/Header.tsx,app/components/**,app/contexts/**
+globs: app/page.tsx,app/humi/**,app/wami/**,app/legal/**,app/waitlist/**,app/api/erc8004/**,app/api/humi/**,app/api/waitlist/**,app/api/web-page/**,components/marketing/**,app/components/**,app/contexts/**
 alwaysApply: false
 ---
 

@@ -1,40 +1,46 @@
-// app/api/erc8004/stats/route.ts
-import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { apiJsonResponse } from '@/lib/api/route-config';
 
-const supabaseUrl = 'https://mezqyworblseixaypftg.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-const supabase = createClient(supabaseUrl, supabaseKey!, {
-  auth: { persistSession: false }
-});
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
+    return apiJsonResponse(
+      { success: false, error: 'Supabase no configurado' },
+      { status: 503 }
+    );
+  }
+
   try {
     const { data, error } = await supabase
       .schema('web_page')
       .from('erc_8004_agent_statistics')
-      .select('statistics_date, agent_count')   // ← Sin alias aquí
+      .select('statistics_date, agent_count')
       .order('statistics_date', { ascending: true });
 
     if (error) throw error;
 
-    // Renombramos los campos aquí en JavaScript (más seguro)
-    const formattedData = data?.map(row => ({
-      date: row.statistics_date,
-      count: row.agent_count
-    })) || [];
+    const formattedData =
+      data?.map((row) => ({
+        date: row.statistics_date,
+        count: row.agent_count,
+      })) || [];
 
-    return NextResponse.json({
+    return apiJsonResponse({
       success: true,
-      data: formattedData
+      data: formattedData,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error fetching ERC-8004 stats:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Error al cargar estadísticas de agentes',
-      details: error.message 
-    }, { status: 500 });
+    return apiJsonResponse(
+      {
+        success: false,
+        error: 'Error al cargar estadísticas de agentes',
+        details: message,
+      },
+      { status: 500 }
+    );
   }
 }
