@@ -16,10 +16,10 @@ Este repositorio aloja **dos productos** en un solo monorepo Next.js. Trabajamos
 
 ### Solo marketing (`web-page-v2`)
 
-- `app/page.tsx`, `app/about/`, `app/humi/`, `app/certificaciones/`, `app/legal/`, `app/waitlist/`
-- `app/api/erc8004/`, `app/api/humi/`, `app/api/waitlist/`, `app/api/test-db/`
-- `components/Header.tsx`, `app/components/HeaderWrapper.tsx`, `app/contexts/LanguageContext.tsx`
-- Futuro: `app/(marketing)/`, `components/marketing/`
+- `app/page.tsx`, `app/humi/`, `app/wami/`, `app/legal/`, `app/waitlist/`
+- `app/api/erc8004/`, `app/api/humi/`, `app/api/waitlist/`, `app/api/web-page/`
+- `app/components/HeaderWrapper.tsx`, `app/contexts/LanguageContext.tsx`, `components/marketing/`
+- Redirects legacy en `next.config.js`: `/about` → `/#mission`, `/certificaciones` → `/`
 
 ### Solo dashboard (`dashboard-final`)
 
