@@ -21,6 +21,14 @@ export const waitlistCopy = {
   },
   success: {
     title: { es: '¡Gracias!', en: 'Thank you!' } satisfies Bilingual,
+    message: {
+      es: 'Te mantendremos informado.',
+      en: 'We will keep you updated.',
+    } satisfies Bilingual,
+    alreadyRegistered: {
+      es: 'Este email ya estaba registrado.',
+      en: 'This email was already registered.',
+    } satisfies Bilingual,
     backHome: { es: 'Volver al inicio', en: 'Back to home' } satisfies Bilingual,
   },
   footerNote: {
@@ -30,5 +38,10 @@ export const waitlistCopy = {
   errors: {
     connection: { es: 'Error de conexión', en: 'Connection error' } satisfies Bilingual,
     generic: { es: 'Algo salió mal', en: 'Something went wrong' } satisfies Bilingual,
+    invalidEmail: { es: 'Email inválido', en: 'Invalid email' } satisfies Bilingual,
+    submitFailed: {
+      es: 'Error al registrar. Inténtalo de nuevo.',
+      en: 'Could not register. Please try again.',
+    } satisfies Bilingual,
   },
 } as const;

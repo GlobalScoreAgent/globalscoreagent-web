@@ -6,15 +6,33 @@ import { pick } from '@/content/marketing/i18n';
 import { fetchApiNoStore } from '@/lib/api/client-fetch';
 import { useState } from 'react';
 
+type SuccessKind = 'registered' | 'alreadyRegistered';
+
+function mapWaitlistApiError(
+  code: string | undefined,
+  language: 'es' | 'en'
+): string {
+  switch (code) {
+    case 'invalid_email':
+      return pick(language, waitlistCopy.errors.invalidEmail);
+    case 'server_error':
+      return pick(language, waitlistCopy.errors.submitFailed);
+    default:
+      return pick(language, waitlistCopy.errors.generic);
+  }
+}
+
 export default function WaitlistPageClient() {
   const { language } = useLanguage();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [message, setMessage] = useState('');
+  const [successKind, setSuccessKind] = useState<SuccessKind | null>(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
+    setErrorMessage('');
 
     try {
       const res = await fetchApiNoStore('/api/waitlist', {
@@ -27,17 +45,22 @@ export default function WaitlistPageClient() {
 
       if (data.success) {
         setStatus('success');
-        setMessage(data.message);
+        setSuccessKind(data.alreadyRegistered ? 'alreadyRegistered' : 'registered');
         setEmail('');
       } else {
         setStatus('error');
-        setMessage(data.error || pick(language, waitlistCopy.errors.generic));
+        setErrorMessage(mapWaitlistApiError(data.error, language));
       }
     } catch {
       setStatus('error');
-      setMessage(pick(language, waitlistCopy.errors.connection));
+      setErrorMessage(pick(language, waitlistCopy.errors.connection));
     }
   };
+
+  const successBodyCopy =
+    successKind === 'alreadyRegistered'
+      ? waitlistCopy.success.alreadyRegistered
+      : waitlistCopy.success.message;
 
   return (
     <div className="min-h-[60vh] bg-zinc-950 py-12 text-white">
@@ -52,7 +75,7 @@ export default function WaitlistPageClient() {
         </div>
 
         <div className="rounded-3xl border border-gold/30 bg-zinc-900/70 p-10 backdrop-blur-xl">
-          {status === 'success' ? (
+          {status === 'success' && successKind ? (
             <div className="py-12 text-center">
               <div className="mb-6 text-6xl" aria-hidden>
                 ✅
@@ -60,7 +83,7 @@ export default function WaitlistPageClient() {
               <h2 className="mb-3 text-3xl font-semibold text-amber-300">
                 {pick(language, waitlistCopy.success.title)}
               </h2>
-              <p className="mb-8 text-lg text-zinc-300">{message}</p>
+              <p className="mb-8 text-lg text-zinc-300">{pick(language, successBodyCopy)}</p>
               <a
                 href="/"
                 className="inline-block rounded-2xl bg-gold px-10 py-4 text-lg font-semibold text-black transition-all hover:bg-amber-400 active:scale-95"
@@ -83,9 +106,9 @@ export default function WaitlistPageClient() {
                   placeholder={pick(language, waitlistCopy.form.emailPlaceholder)}
                 />
               </div>
-              {status === 'error' && message && (
+              {status === 'error' && errorMessage && (
                 <p className="text-sm text-red-400" role="alert">
-                  {message}
+                  {errorMessage}
                 </p>
               )}
               <button
