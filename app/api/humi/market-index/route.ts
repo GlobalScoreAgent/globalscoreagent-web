@@ -1,15 +1,17 @@
-// app/api/humi/market-index/route.ts
-import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { apiJsonResponse } from '@/lib/api/route-config';
 
-const supabaseUrl = 'https://mezqyworblseixaypftg.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-const supabase = createClient(supabaseUrl, supabaseKey!, {
-  auth: { persistSession: false }
-});
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
+    return apiJsonResponse(
+      { success: false, error: 'Supabase no configurado' },
+      { status: 503 }
+    );
+  }
+
   try {
     const { data, error } = await supabase
       .schema('web_page')
@@ -33,32 +35,36 @@ export async function GET() {
 
     if (error) throw error;
 
-    // Renombramos las columnas aquí en JavaScript (más seguro)
-    const formattedData = data?.map(row => ({
-      date: row.register_date,
-      average: row.best_agent_avg_score,
-      "1-star-count": row.agent_1_star_count,
-      "1-star-avg": row.agent_1_star_avg_score,
-      "2-star-count": row.agent_2_star_count,
-      "2-star-avg": row.agent_2_star_avg_score,
-      "3-star-count": row.agent_3_star_count,
-      "3-star-avg": row.agent_3_star_avg_score,
-      "4-star-count": row.agent_4_star_count,
-      "4-star-avg": row.agent_4_star_avg_score,
-      "5-star-count": row.agent_5_star_count,
-      "5-star-avg": row.agent_5_star_avg_score,
-    })) || [];
+    const formattedData =
+      data?.map((row) => ({
+        date: row.register_date,
+        average: row.best_agent_avg_score,
+        '1-star-count': row.agent_1_star_count,
+        '1-star-avg': row.agent_1_star_avg_score,
+        '2-star-count': row.agent_2_star_count,
+        '2-star-avg': row.agent_2_star_avg_score,
+        '3-star-count': row.agent_3_star_count,
+        '3-star-avg': row.agent_3_star_avg_score,
+        '4-star-count': row.agent_4_star_count,
+        '4-star-avg': row.agent_4_star_avg_score,
+        '5-star-count': row.agent_5_star_count,
+        '5-star-avg': row.agent_5_star_avg_score,
+      })) || [];
 
-    return NextResponse.json({
+    return apiJsonResponse({
       success: true,
-      data: formattedData
+      data: formattedData,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error fetching market index:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Error al cargar datos del índice HUMI',
-      details: error.message 
-    }, { status: 500 });
+    return apiJsonResponse(
+      {
+        success: false,
+        error: 'Error al cargar datos del índice HUMI',
+        details: message,
+      },
+      { status: 500 }
+    );
   }
 }

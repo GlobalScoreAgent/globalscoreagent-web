@@ -1,22 +1,26 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,   // ← Esto ignora temporalmente el error de tipos
+  async redirects() {
+    return [
+      {
+        source: '/certificaciones',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/about',
+        destination: '/#mission',
+        permanent: false,
+      },
+    ];
   },
   experimental: {
     serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
-  // Aumentar timeout para API routes y permitir consultas pesadas
-  api: {
-    responseLimit: false,
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
-  // Timeout más largo para requests (30 segundos)
+  // Dashboard API routes: allow heavier agent queries
   serverRuntimeConfig: {
     timeout: 30000,
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

@@ -9,7 +9,13 @@
 }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  video {
+    display: none;
+  }
 }
 
 /* Animated modern background */
@@ -39,4 +45,20 @@ body {
   0% { opacity: 0.08; }
   50% { opacity: 0.18; }
   100% { opacity: 0.08; }
+}
+
+/* Marketing portal section backgrounds */
+.marketing-section-glow {
+  background: radial-gradient(
+    ellipse 80% 50% at 50% 0%,
+    rgba(212, 175, 55, 0.08) 0%,
+    transparent 70%
+  );
+}
+
+.marketing-grid-bg {
+  background-image:
+    linear-gradient(rgba(212, 175, 55, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 175, 55, 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
 }

@@ -1,14 +1,17 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { apiJsonResponse } from '@/lib/api/route-config';
 
-const supabaseUrl = 'https://mezqyworblseixaypftg.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-const supabase = createClient(supabaseUrl, supabaseKey!, {
-  auth: { persistSession: false }
-});
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
+    return apiJsonResponse(
+      { success: false, error: 'Supabase no configurado' },
+      { status: 503 }
+    );
+  }
+
   try {
     const { data, error } = await supabase
       .schema('web_page')
@@ -25,13 +28,17 @@ export async function GET() {
 
     if (error) throw error;
 
-    return NextResponse.json({ success: true, data: data || [] });
-  } catch (error: any) {
+    return apiJsonResponse({ success: true, data: data || [] });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error fetching chains stats:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Error al cargar distribución de cadenas',
-      details: error.message 
-    }, { status: 500 });
+    return apiJsonResponse(
+      {
+        success: false,
+        error: 'Error al cargar distribución de cadenas',
+        details: message,
+      },
+      { status: 500 }
+    );
   }
 }

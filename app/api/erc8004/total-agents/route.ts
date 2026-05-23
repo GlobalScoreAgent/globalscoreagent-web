@@ -1,14 +1,17 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { apiJsonResponse } from '@/lib/api/route-config';
 
-const supabaseUrl = 'https://mezqyworblseixaypftg.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-const supabase = createClient(supabaseUrl, supabaseKey!, {
-  auth: { persistSession: false }
-});
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const supabase = getSupabaseAdmin();
+  if (!supabase) {
+    return apiJsonResponse(
+      { success: false, error: 'Supabase no configurado' },
+      { status: 503 }
+    );
+  }
+
   try {
     const { data, error } = await supabase
       .schema('web_page')
@@ -19,13 +22,17 @@ export async function GET() {
 
     const total = data?.reduce((sum, row) => sum + (row.agent_total_count || 0), 0) || 0;
 
-    return NextResponse.json({ success: true, total });
-  } catch (error: any) {
+    return apiJsonResponse({ success: true, total });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error fetching total agents:', error);
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Error al cargar total de agentes',
-      details: error.message 
-    }, { status: 500 });
+    return apiJsonResponse(
+      {
+        success: false,
+        error: 'Error al cargar total de agentes',
+        details: message,
+      },
+      { status: 500 }
+    );
   }
 }
