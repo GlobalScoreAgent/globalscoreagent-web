@@ -6,7 +6,8 @@
 import { useLanguage } from './components/LanguageContext';
 import AnimatedCounter from './components/AnimatedCounter';
 import { DashboardChainCards } from '@/components/dashboard/DashboardChainCards';
-import { DashboardOverviewInsightCard } from '@/components/dashboard/DashboardOverviewInsightCard';
+import { DashboardGlobalDistributionCard } from '@/components/dashboard/DashboardGlobalDistributionCard';
+import { DashboardNonceInsightCard } from '@/components/dashboard/DashboardNonceInsightCard';
 import type { DashboardChainRow } from '@/lib/dashboardChains';
 import { createClient } from '@/utils/supabase/client';
 import { useState, useEffect } from 'react';
@@ -146,7 +147,7 @@ export default function DashboardPage() {
           .schema('web_dashboard')
           .from('chains')
           .select(
-            'chain_id,name,short_name,updated_at,logo_file_name,agent_stats_information,statistics_agent_last_30_days,statistics_agent_monthly,humi_distribution,metadata_distribution,owner_stats_information,technical_data_information,warning_stats_information,on_chain_stats_information'
+            'chain_id,name,short_name,updated_at,logo_file_name,agent_stats_information,statistics_agent_last_30_days,statistics_agent_monthly,humi_distribution,wami_distribution,metadata_distribution,best_10_agents_humi,owner_stats_information,technical_data_information,warning_stats_information,on_chain_stats_information'
           )
           .order('name'),
       ]);
@@ -169,6 +170,13 @@ export default function DashboardPage() {
       "30-60": 270,
       "60-80": 405,
       "80-100": 495,
+    },
+    wami_index_distribution: {
+      "0-10": 0,
+      "10-30": 0,
+      "30-60": 0,
+      "60-80": 0,
+      "80-100": 0,
     },
     agent_metadata_distribution: {
       "Mala": { count: 45, percentage: 3 },
@@ -219,6 +227,10 @@ export default function DashboardPage() {
       ...defaultStats.humi_index_distribution,
       ...(stats?.humi_index_distribution || {})
     },
+    wami_index_distribution: {
+      ...defaultStats.wami_index_distribution,
+      ...(stats?.wami_index_distribution || {}),
+    },
     agent_metadata_distribution: transformMetadataData(stats?.agent_metadata_richness)
   };
 
@@ -230,15 +242,22 @@ export default function DashboardPage() {
           <div className="flex min-h-0 min-w-0 lg:col-span-5">
             <StatsNavigator currentStats={currentStats} isDark={isDark} t={t} />
           </div>
-          <div className="flex min-h-0 min-w-0 lg:col-span-7">
-            <DashboardOverviewInsightCard
+          <div className="flex min-h-0 min-w-0 flex-col gap-4 lg:col-span-7 lg:flex-row lg:items-stretch">
+            <DashboardNonceInsightCard
+              isDark={isDark}
+              t={t}
+              agentNonce={stats?.agent_nonce}
+              className="min-h-0 flex-1"
+            />
+            <DashboardGlobalDistributionCard
               isDark={isDark}
               t={t}
               currentStats={{
                 humi_index_distribution: currentStats.humi_index_distribution,
+                wami_index_distribution: currentStats.wami_index_distribution,
                 agent_metadata_distribution: currentStats.agent_metadata_distribution,
               }}
-              agentNonce={stats?.agent_nonce}
+              className="min-h-0 flex-1"
             />
           </div>
         </div>

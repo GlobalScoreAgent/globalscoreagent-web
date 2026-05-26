@@ -1,0 +1,38 @@
+'use client';
+
+import type { Translations } from '@/app/(dashboard)/dashboard/components/LanguageContext';
+import {
+  DistributionCarouselPanel,
+  type DistributionCarouselSlide,
+} from '@/components/dashboard/DistributionCarouselPanel';
+import { cn } from '@/lib/utils';
+
+export type ChainDistributionSlide = DistributionCarouselSlide & {
+  id: 'humi' | 'meta' | 'wami';
+};
+
+type Props = {
+  slides: ChainDistributionSlide[];
+  chainKey: string;
+  isDark: boolean;
+  t: Translations;
+  className?: string;
+};
+
+export function ChainDistributionPanel({ slides, chainKey, isDark, t, className }: Props) {
+  return (
+    <DistributionCarouselPanel
+      slides={slides}
+      resetKey={chainKey}
+      panelTitle={t.chainSectionDistribution}
+      prevLabel={t.chainDistributionPrev}
+      nextLabel={t.chainDistributionNext}
+      isDark={isDark}
+      legendPlacement="bottom"
+      className={cn(
+        'lg:min-h-0 lg:w-[13rem] lg:self-stretch xl:w-[14rem]',
+        className,
+      )}
+    />
+  );
+}

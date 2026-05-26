@@ -12,7 +12,9 @@ export type DashboardChainRow = {
   statistics_agent_last_30_days: Record<string, unknown> | null;
   statistics_agent_monthly: MonthlyStatRow[] | null;
   humi_distribution: Record<string, unknown> | null;
+  wami_distribution: Record<string, unknown> | null;
   metadata_distribution: Record<string, unknown> | null;
+  best_10_agents_humi: unknown;
   owner_stats_information: Record<string, unknown> | null;
   technical_data_information: Record<string, unknown> | null;
   warning_stats_information: Record<string, unknown> | null;
@@ -185,4 +187,128 @@ export function recordToNumberMap(raw: unknown): Record<string, number> {
     if (Number.isFinite(n)) out[k] = n;
   }
   return out;
+}
+
+export type Best10AgentHumiRow = {
+  name: string;
+  humi_score: number;
+  agent_id?: number;
+};
+
+/** Parse and sort top agents by HUMI score (desc), max 10. */
+export function parseBest10AgentsHumi(raw: unknown): Best10AgentHumiRow[] {
+  if (!Array.isArray(raw)) return [];
+  const rows: Best10AgentHumiRow[] = [];
+  for (const item of raw) {
+    if (!item || typeof item !== 'object') continue;
+    const name =
+      typeof (item as { name?: unknown }).name === 'string'
+        ? String((item as { name: string }).name).trim()
+        : '';
+    if (!name) continue;
+    const scoreRaw = (item as { humi_score?: unknown }).humi_score;
+    const n = typeof scoreRaw === 'number' ? scoreRaw : Number(scoreRaw);
+    if (!Number.isFinite(n)) continue;
+    const agentIdRaw = (item as { agent_id?: unknown }).agent_id;
+    const agentId =
+      typeof agentIdRaw === 'number' ? agentIdRaw : Number(agentIdRaw);
+    const row: Best10AgentHumiRow = { name, humi_score: n };
+    if (Number.isFinite(agentId) && agentId > 0) {
+      row.agent_id = agentId;
+    }
+    rows.push(row);
+  }
+  return rows.sort((a, b) => b.humi_score - a.humi_score).slice(0, 10);
+}
+
+/** Fixed display order for chain warning_stats_information JSON keys. */
+export const WARNING_STAT_KEYS = [
+  'dummy_metadata',
+  'lower_realness',
+  'lower_metadata_richness',
+  'duplication_metadata',
+  'multi_agent_wallet',
+  'transactional_wallet_same_as_owner',
+  'owner_inactive_agents',
+  'high_ownership_churn',
+  'attestations_spam',
+  'high_revocations',
+  'external_audit_warning',
+] as const;
+
+export type WarningStatKey = (typeof WARNING_STAT_KEYS)[number];
+
+export type WarningTranslationKey =
+  | 'chainWarningDummyMetadata'
+  | 'chainWarningLowerRealness'
+  | 'chainWarningLowerMetadataRichness'
+  | 'chainWarningDuplicationMetadata'
+  | 'chainWarningMultiAgentWallet'
+  | 'chainWarningTransactionalWalletSameAsOwner'
+  | 'chainWarningOwnerInactiveAgents'
+  | 'chainWarningHighOwnershipChurn'
+  | 'chainWarningAttestationsSpam'
+  | 'chainWarningHighRevocations'
+  | 'chainWarningExternalAuditWarning';
+
+export type WarningHelpTranslationKey =
+  | 'chainWarningDummyMetadataHelp'
+  | 'chainWarningLowerRealnessHelp'
+  | 'chainWarningLowerMetadataRichnessHelp'
+  | 'chainWarningDuplicationMetadataHelp'
+  | 'chainWarningMultiAgentWalletHelp'
+  | 'chainWarningTransactionalWalletSameAsOwnerHelp'
+  | 'chainWarningOwnerInactiveAgentsHelp'
+  | 'chainWarningHighOwnershipChurnHelp'
+  | 'chainWarningAttestationsSpamHelp'
+  | 'chainWarningHighRevocationsHelp'
+  | 'chainWarningExternalAuditWarningHelp';
+
+export const WARNING_STAT_TKEY: Record<WarningStatKey, WarningTranslationKey> = {
+  dummy_metadata: 'chainWarningDummyMetadata',
+  lower_realness: 'chainWarningLowerRealness',
+  lower_metadata_richness: 'chainWarningLowerMetadataRichness',
+  duplication_metadata: 'chainWarningDuplicationMetadata',
+  multi_agent_wallet: 'chainWarningMultiAgentWallet',
+  transactional_wallet_same_as_owner: 'chainWarningTransactionalWalletSameAsOwner',
+  owner_inactive_agents: 'chainWarningOwnerInactiveAgents',
+  high_ownership_churn: 'chainWarningHighOwnershipChurn',
+  attestations_spam: 'chainWarningAttestationsSpam',
+  high_revocations: 'chainWarningHighRevocations',
+  external_audit_warning: 'chainWarningExternalAuditWarning',
+};
+
+export const WARNING_STAT_HELP_TKEY: Record<WarningStatKey, WarningHelpTranslationKey> = {
+  dummy_metadata: 'chainWarningDummyMetadataHelp',
+  lower_realness: 'chainWarningLowerRealnessHelp',
+  lower_metadata_richness: 'chainWarningLowerMetadataRichnessHelp',
+  duplication_metadata: 'chainWarningDuplicationMetadataHelp',
+  multi_agent_wallet: 'chainWarningMultiAgentWalletHelp',
+  transactional_wallet_same_as_owner: 'chainWarningTransactionalWalletSameAsOwnerHelp',
+  owner_inactive_agents: 'chainWarningOwnerInactiveAgentsHelp',
+  high_ownership_churn: 'chainWarningHighOwnershipChurnHelp',
+  attestations_spam: 'chainWarningAttestationsSpamHelp',
+  high_revocations: 'chainWarningHighRevocationsHelp',
+  external_audit_warning: 'chainWarningExternalAuditWarningHelp',
+};
+
+export function parseWarningStats(raw: unknown): { key: WarningStatKey; value: number }[] {
+  if (!raw || typeof raw !== 'object') return [];
+  const obj = raw as Record<string, unknown>;
+  const out: { key: WarningStatKey; value: number }[] = [];
+  for (const key of WARNING_STAT_KEYS) {
+    const v = obj[key];
+    const n = typeof v === 'number' ? v : Number(v);
+    if (Number.isFinite(n)) out.push({ key, value: n });
+  }
+  return out;
+}
+
+/** Map numeric HUMI score to filter tier for badge color (approximate bands). */
+export function humiFilterFromNumericScore(score: number): string {
+  if (score >= 90) return 'Elite';
+  if (score >= 80) return 'High Performance';
+  if (score >= 60) return 'Stable';
+  if (score >= 30) return 'Moderate Risk';
+  return 'Critical';
 }

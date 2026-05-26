@@ -9,6 +9,7 @@ import DashboardSidebar from './DashboardSidebar';
 import DashboardTopNav from './DashboardTopNav';
 import { LanguageProvider } from './LanguageContext';
 import { RecentAgentsProvider } from './AgentRecentNavigationContext';
+import { DashboardTitleOverrideProvider } from './DashboardTitleOverrideContext';
 
 // Contexto para compartir datos estadísticos del dashboard
 interface DashboardStats {
@@ -28,8 +29,12 @@ export const useDashboardStats = () => {
 };
 
 function getPageTitleKey(pathname: string): string {
-  if (pathname.startsWith('/dashboard/agents')) {
+  if (pathname === '/dashboard/agents' || pathname === '/dashboard/agents/') {
     return 'agentsDirectory';
+  }
+
+  if (pathname.startsWith('/dashboard/agents/')) {
+    return 'agentOverviewTitle';
   }
   return 'dashboardOverviewTitle';
 }
@@ -102,16 +107,18 @@ export default function DashboardLayoutClient({
 
             {/* Área principal */}
             <div className="flex-1 flex flex-col">
-              <DashboardTopNav
-                user={{ email: 'demo@globalscoreagent.com' }}
-                profile={{ display_name: 'Usuario Demo', avatar_url: undefined }}
-                pageTitleKey={pageTitleKey}
-              />
+              <DashboardTitleOverrideProvider>
+                <DashboardTopNav
+                  user={{ email: 'demo@globalscoreagent.com' }}
+                  profile={{ display_name: 'Usuario Demo', avatar_url: undefined }}
+                  pageTitleKey={pageTitleKey}
+                />
 
-              {/* Contenido - aquí va la página principal */}
-              <main className="flex-1 overflow-auto p-8 dark:bg-zinc-950 bg-zinc-100">
-                {children}
-              </main>
+                {/* Contenido - aquí va la página principal */}
+                <main className="flex-1 overflow-auto p-8 dark:bg-zinc-950 bg-zinc-100">
+                  {children}
+                </main>
+              </DashboardTitleOverrideProvider>
             </div>
           </RecentAgentsProvider>
         </LanguageProvider>

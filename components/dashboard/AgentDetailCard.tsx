@@ -21,6 +21,7 @@ type AgentDetailCardProps = {
   accentHex?: string;
   className?: string;
   contentClassName?: string;
+  style?: React.CSSProperties;
   children: React.ReactNode;
 };
 
@@ -81,6 +82,7 @@ export function AgentDetailCard({
   accentHex,
   className,
   contentClassName,
+  style,
   children,
 }: AgentDetailCardProps) {
   const accent = accentHex ?? DEFAULT_ACCENT;
@@ -101,7 +103,7 @@ export function AgentDetailCard({
         isDark ? 'border-zinc-700/45' : 'border-zinc-200/55',
         className,
       )}
-      style={{ background, boxShadow }}
+      style={{ background, boxShadow, ...style }}
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl">
         <div

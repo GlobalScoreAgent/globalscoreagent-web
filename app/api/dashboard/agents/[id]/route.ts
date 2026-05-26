@@ -29,6 +29,8 @@ export async function GET(
         is_dummy,
         current_humi_score,
         humi_score_filter,
+        current_wami_score,
+        wami_score_filter,
         on_chain_id,
         chain_id,
         chain_name,
@@ -37,6 +39,7 @@ export async function GET(
         owner_wallet,
         owner_since_at,
         owner_changes,
+        owner_wallet_details,
         gobernance_type,
         profiles,
         has_x402,
@@ -52,6 +55,8 @@ export async function GET(
         services,
         nonce_current,
         balance_current,
+        wallet_wami_score_details,
+        wallet_category,
         nonce_history,
         balance_history,
         has_comments,
@@ -70,7 +75,8 @@ export async function GET(
         protocol_activity_summary,
         metadata_richness_score,
         metadata_richness_information,
-        agent_feedback_analysis
+        agent_feedback_analysis,
+        agent_warnings
       `)
       .eq('id', numericId)
       .maybeSingle();

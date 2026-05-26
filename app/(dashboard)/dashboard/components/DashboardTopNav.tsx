@@ -7,6 +7,7 @@ import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from './LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
+import { useDashboardTitleOverride } from './DashboardTitleOverrideContext';
 
 interface Props {
   user: any;
@@ -18,6 +19,7 @@ export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) 
   const router = useRouter();
   const supabase = createClient();
   const { t, theme, toggleTheme } = useLanguage();
+  const { titleOverride } = useDashboardTitleOverride();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -35,7 +37,12 @@ export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) 
       
       {/* Título dinámico bilingüe */}
       <div className="font-semibold text-2xl tracking-tight">
-        {t.platformTitle} - {pageTitleKey ? t[pageTitleKey as keyof typeof t] : t.dashboardTitle}
+        {t.platformTitle} -{' '}
+        {titleOverride
+          ? titleOverride
+          : pageTitleKey
+            ? t[pageTitleKey as keyof typeof t]
+            : t.dashboardTitle}
       </div>
 
       <div className="flex items-center gap-6">

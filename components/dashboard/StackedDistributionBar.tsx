@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   Bar,
@@ -16,6 +16,9 @@ export type StackedBarOrientation = 'horizontal' | 'vertical';
 
 /** default = overview card columns; rail = thin columns for chain card sidebar */
 export type StackedBarDensity = 'default' | 'rail';
+
+/** default = Recharts default; rail-inward = shift tooltip left (chain rail, avoids horizontal overflow). */
+export type StackedBarTooltipPlacement = 'default' | 'rail-inward';
 
 function compactTick(v: number, useCompact: boolean): string {
   if (!Number.isFinite(v)) return '';
@@ -38,9 +41,13 @@ export function StackedDistributionBar({
   horizontalMarginBottom,
   yDomainMax,
   showTooltip = true,
+  tooltipPlacement = 'default',
   onStackedSegmentHover,
   sideLegend = false,
+  sideLegendWithValues = false,
+  bottomLegend = false,
   verticalBarSize,
+  hideTitle = false,
   className,
 }: {
   title: string;
@@ -61,12 +68,20 @@ export function StackedDistributionBar({
   yDomainMax?: number;
   /** When false, skip floating Tooltip (e.g. richness detail panel uses hover callbacks instead). */
   showTooltip?: boolean;
+  /** Rail sidebar: place tooltip inward (left) so it does not widen the card. */
+  tooltipPlacement?: StackedBarTooltipPlacement;
   /** Fires when pointer enters a segment; clear when pointer leaves the chart (wrapper). */
   onStackedSegmentHover?: (payload: { dataKey: string; value: number } | null) => void;
   /** Vertical stacked column only: color swatch list beside the chart (e.g. metadata richness). */
   sideLegend?: boolean;
+  /** With sideLegend: show count beside each label. */
+  sideLegendWithValues?: boolean;
+  /** Vertical stacked column only: label + value list below the chart. */
+  bottomLegend?: boolean;
   /** Vertical orientation: fixed column width in px (thinner bar). Overrides rail barSize when set. */
   verticalBarSize?: number;
+  /** When true, omit the title row (parent renders metric label). */
+  hideTitle?: boolean;
   className?: string;
 }) {
   const axisStroke = isDark ? '#52525b' : '#d4d4d8';
@@ -96,14 +111,25 @@ export function StackedDistributionBar({
 
   type TooltipPayloadItem = { dataKey?: string | number; value?: number };
 
+  const useRailInwardTooltip =
+    tooltipPlacement === 'rail-inward' && orientation === 'vertical' && isRail;
+
+  const railTooltipPosition = useRailInwardTooltip
+    ? (props: { coordinate?: { x?: number; y?: number } }) => {
+        const x = props.coordinate?.x ?? 0;
+        const y = props.coordinate?.y ?? 0;
+        return { x: Math.max(4, x - 168), y: Math.max(4, y - 8) };
+      }
+    : undefined;
+
   const tooltipContent = (props: { payload?: readonly TooltipPayloadItem[] }) => {
     const { payload } = props;
     if (!payload?.length) return null;
     return (
       <div
-        className={`max-w-[min(100vw-2rem,22rem)] rounded-lg border px-2 py-1.5 text-xs shadow-md ${
-          isDark ? 'border-zinc-600 bg-zinc-900 text-zinc-100' : 'border-zinc-200 bg-white text-zinc-900'
-        }`}
+        className={`rounded-lg border px-2 py-1.5 text-xs shadow-md ${
+          useRailInwardTooltip ? 'max-w-[10rem]' : 'max-w-[min(100vw-2rem,22rem)]'
+        } ${isDark ? 'border-zinc-600 bg-zinc-900 text-zinc-100' : 'border-zinc-200 bg-white text-zinc-900'}`}
       >
         {payload.map((p) => (
           <div key={String(p.dataKey)} className="tabular-nums break-words">
@@ -154,6 +180,7 @@ export function StackedDistributionBar({
             <Tooltip
               allowEscapeViewBox={{ x: true, y: true }}
               animationDuration={0}
+              position={railTooltipPosition}
               wrapperStyle={{ zIndex: 50, overflow: 'visible' }}
               content={tooltipContent as never}
             />
@@ -189,6 +216,7 @@ export function StackedDistributionBar({
             <Tooltip
               allowEscapeViewBox={{ x: true, y: true }}
               animationDuration={0}
+              position={railTooltipPosition}
               wrapperStyle={{ zIndex: 50, overflow: 'visible' }}
               content={tooltipContent as never}
             />
@@ -225,45 +253,104 @@ export function StackedDistributionBar({
     );
 
   const legendMuted = isDark ? 'text-zinc-400' : 'text-zinc-600';
+  const legendValue = isDark ? 'text-zinc-200' : 'text-zinc-800';
+
+  const legendSwatch = (k: string) => (
+    <span
+      className="mt-0.5 h-2 w-2 shrink-0 rounded-sm"
+      style={{ backgroundColor: colors(k) }}
+      aria-hidden
+    />
+  );
 
   const sideLegendList =
     sideLegend && orientation === 'vertical' ? (
       <ul
-        className="max-w-[45%] w-[7.25rem] shrink-0 space-y-1.5 sm:w-32"
+        className={cn(
+          'w-[7.5rem] shrink-0 space-y-1.5 sm:w-32',
+          sideLegendWithValues ? 'max-h-full overflow-y-auto overscroll-contain' : 'max-w-[45%]',
+        )}
         aria-label="Chart legend"
       >
-        {rowKeys.map((k) => (
-          <li key={k} className="flex gap-1.5">
-            <span
-              className="mt-0.5 h-2 w-2 shrink-0 rounded-sm"
-              style={{ backgroundColor: colors(k) }}
-              aria-hidden
-            />
-            <span className={`break-words text-[10px] leading-tight ${legendMuted}`}>{labelForKey(k)}</span>
-          </li>
-        ))}
+        {rowKeys.map((k) => {
+          if (sideLegendWithValues) {
+            const v = Number(row[k]);
+            const valueText = Number.isFinite(v) ? v.toLocaleString() : '—';
+            return (
+              <li key={k} className="flex min-w-0 flex-col gap-0.5">
+                <span className="flex min-w-0 items-start gap-1.5">
+                  {legendSwatch(k)}
+                  <span className={`truncate text-[10px] leading-tight ${legendMuted}`}>{labelForKey(k)}</span>
+                </span>
+                <span className={`pl-3.5 text-[10px] font-semibold tabular-nums ${legendValue}`}>{valueText}</span>
+              </li>
+            );
+          }
+          return (
+            <li key={k} className="flex gap-1.5">
+              {legendSwatch(k)}
+              <span className={`break-words text-[10px] leading-tight ${legendMuted}`}>{labelForKey(k)}</span>
+            </li>
+          );
+        })}
+      </ul>
+    ) : null;
+
+  const bottomLegendList =
+    bottomLegend && orientation === 'vertical' ? (
+      <ul
+        className="mt-1.5 max-h-[6.5rem] shrink-0 space-y-1 overflow-y-auto overscroll-contain"
+        aria-label="Chart legend"
+      >
+        {rowKeys.map((k) => {
+          const v = Number(row[k]);
+          const valueText = Number.isFinite(v) ? v.toLocaleString() : '—';
+          return (
+            <li key={k} className="flex min-w-0 items-start justify-between gap-2">
+              <span className="flex min-w-0 flex-1 items-start gap-1.5">
+                {legendSwatch(k)}
+                <span className={`truncate text-[10px] leading-tight ${legendMuted}`}>{labelForKey(k)}</span>
+              </span>
+              <span className={`shrink-0 text-[10px] font-semibold tabular-nums ${legendValue}`}>{valueText}</span>
+            </li>
+          );
+        })}
       </ul>
     ) : null;
 
   const showVerticalSideLegend = sideLegend && orientation === 'vertical';
+  const showVerticalBottomLegend = bottomLegend && orientation === 'vertical';
+
+  const chartBlock = (
+    <div className={cn(chartShell, showVerticalBottomLegend && fillHeight && 'min-h-0 flex-1', !showVerticalSideLegend && useRailInwardTooltip && 'overflow-visible')}>
+      {chartWithPointer}
+    </div>
+  );
 
   return (
     <div className={cn('space-y-1', fillHeight && orientation === 'vertical' && 'flex min-h-0 flex-1 flex-col', className)}>
-      <p
-        className={cn(
-          'shrink-0 font-semibold uppercase tracking-wide text-zinc-500',
-          isRail ? 'text-[9px] leading-tight text-center' : 'text-[11px]',
-        )}
-      >
-        {title}
-      </p>
+      {!hideTitle ? (
+        <p
+          className={cn(
+            'shrink-0 font-semibold uppercase tracking-wide text-zinc-500',
+            isRail ? 'text-[9px] leading-tight text-center' : 'text-[11px]',
+          )}
+        >
+          {title}
+        </p>
+      ) : null}
       {showVerticalSideLegend ? (
-        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-start sm:gap-3">
-          <div className={cn(chartShell, 'min-w-0 flex-1')}>{chartWithPointer}</div>
+        <div className={cn('flex w-full gap-3 sm:flex-row sm:items-stretch sm:gap-3', fillHeight && 'min-h-0 flex-1')}>
+          <div className={cn(chartShell, 'min-w-0 flex-1', fillHeight && 'min-h-0')}>{chartWithPointer}</div>
           {sideLegendList}
         </div>
+      ) : showVerticalBottomLegend ? (
+        <>
+          {chartBlock}
+          {bottomLegendList}
+        </>
       ) : (
-        <div className={chartShell}>{chartWithPointer}</div>
+        chartBlock
       )}
     </div>
   );

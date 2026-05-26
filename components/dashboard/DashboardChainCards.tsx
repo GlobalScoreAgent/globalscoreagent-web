@@ -2,11 +2,13 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { Translations } from '@/app/(dashboard)/dashboard/components/LanguageContext';
 import { AgentDetailCard } from '@/components/dashboard/AgentDetailCard';
-import { StackedDistributionBar } from '@/components/dashboard/StackedDistributionBar';
+import { ChainDistributionPanel, type ChainDistributionSlide } from '@/components/dashboard/ChainDistributionPanel';
+import { DashboardInfoTooltip } from '@/components/dashboard/DashboardInfoTooltip';
+import { ChainTopAgentsList } from '@/components/dashboard/ChainTopAgentsList';
 import { publicChainLogoUrl } from '@/lib/chainPublicLogo';
 import { cn } from '@/lib/utils';
 import {
@@ -18,9 +20,13 @@ import {
   METADATA_BUCKET_COLORS,
   METADATA_DB_KEY_TO_TKEY,
   numFromJson,
+  parseBest10AgentsHumi,
   parseMonthlyRows,
+  parseWarningStats,
   recordToNumberMap,
   sortedMetadataKeys,
+  WARNING_STAT_HELP_TKEY,
+  WARNING_STAT_TKEY,
   type DashboardChainRow,
 } from '@/lib/dashboardChains';
 
@@ -142,9 +148,40 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
   const pctX402 = numFromJson(techJson, 'pct_x402');
   const pctMcpA2a = numFromJson(techJson, 'pct_mcp_a2a');
 
-  const warnJson = chain.warning_stats_information;
-  const pctSpam = numFromJson(warnJson, 'pct_with_spam');
-  const pctDup = numFromJson(warnJson, 'pct_duplicates');
+  const warningStats = parseWarningStats(chain.warning_stats_information);
+  const topAgents = parseBest10AgentsHumi(chain.best_10_agents_humi);
+
+  const warningsRef = useRef<HTMLDivElement>(null);
+  const [syncedRowHeight, setSyncedRowHeight] = useState<number | undefined>();
+
+  useLayoutEffect(() => {
+    const el = warningsRef.current;
+    if (!el) return;
+
+    const mq = window.matchMedia('(min-width: 1024px)');
+
+    const measure = () => {
+      if (!mq.matches) {
+        setSyncedRowHeight(undefined);
+        return;
+      }
+      setSyncedRowHeight(el.offsetHeight);
+    };
+
+    measure();
+
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    mq.addEventListener('change', measure);
+
+    return () => {
+      ro.disconnect();
+      mq.removeEventListener('change', measure);
+    };
+  }, [warningStats, lang]);
+
+  const syncedCardStyle = syncedRowHeight != null ? { height: syncedRowHeight } : undefined;
+  const metricMiniShell = isDark ? 'border-zinc-700 bg-black/15' : 'border-zinc-200 bg-white/60';
 
   const onChainJson = chain.on_chain_stats_information;
   const onChainExec = numFromJson(onChainJson, 'total_executions_30d');
@@ -173,6 +210,13 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
   });
   const humiBarKeys = HUMI_BUCKET_ORDER.filter((k) => k in humiDist);
 
+  const wamiDist = recordToNumberMap(chain.wami_distribution);
+  const wamiRow: Record<string, number | string> = { name: chain.short_name || chain.name };
+  HUMI_BUCKET_ORDER.forEach((k) => {
+    if (k in wamiDist) wamiRow[k] = wamiDist[k];
+  });
+  const wamiBarKeys = HUMI_BUCKET_ORDER.filter((k) => k in wamiDist);
+
   const metaDist = recordToNumberMap(chain.metadata_distribution);
   const metaKeysSorted = sortedMetadataKeys(Object.keys(metaDist));
   const metaRow: Record<string, number | string> = { name: chain.short_name || chain.name };
@@ -190,7 +234,56 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
 
   const miniCardShell = isDark ? 'border-zinc-700 bg-black/20' : 'border-zinc-200 bg-zinc-50';
 
-  const showDistributionRail = humiBarKeys.length > 0 || metaBarKeys.length > 0;
+  const showDistributionRail = humiBarKeys.length > 0 || metaBarKeys.length > 0 || wamiBarKeys.length > 0;
+
+  const distributionSlides = useMemo((): ChainDistributionSlide[] => {
+    const slides: ChainDistributionSlide[] = [];
+    if (humiBarKeys.length > 0) {
+      slides.push({
+        id: 'humi',
+        metricLabel: t.chainDistributionRailHumi,
+        rowKeys: humiBarKeys,
+        row: humiRow,
+        colors: (k) => HUMI_BUCKET_COLORS[k] ?? '#71717a',
+        labelForKey: (k) => {
+          const tk = HUMI_BUCKET_TKEY[k];
+          return tk ? t[tk] : k;
+        },
+      });
+    }
+    if (metaBarKeys.length > 0) {
+      slides.push({
+        id: 'meta',
+        metricLabel: t.chainDistributionRailMetadata,
+        rowKeys: metaBarKeys,
+        row: metaRow,
+        colors: (slug) => {
+          const dbKey = metaKeysSorted.find((dk) => dk.replace(/\s+/g, '_').replace(/[()]/g, '') === slug);
+          const tkey = dbKey ? METADATA_DB_KEY_TO_TKEY[dbKey] : undefined;
+          return tkey ? METADATA_BUCKET_COLORS[tkey] ?? '#71717a' : '#71717a';
+        },
+        labelForKey: (slug) => {
+          const dbKey = metaKeysSorted.find((dk) => dk.replace(/\s+/g, '_').replace(/[()]/g, '') === slug);
+          const tkey = dbKey ? METADATA_DB_KEY_TO_TKEY[dbKey] : undefined;
+          return tkey ? t[tkey] : slug;
+        },
+      });
+    }
+    if (wamiBarKeys.length > 0) {
+      slides.push({
+        id: 'wami',
+        metricLabel: t.chainDistributionRailWami,
+        rowKeys: wamiBarKeys,
+        row: wamiRow,
+        colors: (k) => HUMI_BUCKET_COLORS[k] ?? '#71717a',
+        labelForKey: (k) => {
+          const tk = HUMI_BUCKET_TKEY[k];
+          return tk ? t[tk] : k;
+        },
+      });
+    }
+    return slides;
+  }, [humiBarKeys, metaBarKeys, wamiBarKeys, humiRow, metaRow, wamiRow, metaKeysSorted, t]);
 
   return (
     <AgentDetailCard
@@ -236,10 +329,10 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           <div className={`rounded-2xl border px-3 py-2 text-center ${miniCardShell}`}>
             <p className={`mb-2 text-center text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionAgentInformation}</p>
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
+            <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm sm:gap-x-10">
               <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.agentsLabel}</span>
                 <div className={`font-bold tabular-nums ${prose}`}>{totalAgents !== null ? totalAgents.toLocaleString(locale) : '—'}</div>
@@ -257,7 +350,7 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
 
           <div className={`rounded-2xl border px-3 py-2 text-center ${miniCardShell}`}>
             <p className={`mb-2 text-center text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionOwners}</p>
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
+            <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm sm:gap-x-10">
               <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.chainOwnerTotal}</span>
                 <div className={`font-bold tabular-nums ${prose}`}>{totalOwners !== null ? totalOwners.toLocaleString(locale) : '—'}</div>
@@ -273,7 +366,7 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
 
           <div className={`rounded-2xl border px-3 py-2 text-center ${miniCardShell}`}>
             <p className={`mb-2 text-center text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionTechnicalMaturity}</p>
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
+            <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm sm:gap-x-10">
               <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.chainPctX402}</span>
                 <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctX402)}</div>
@@ -285,121 +378,111 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
             </div>
           </div>
 
-          <div className={`rounded-2xl border px-3 py-2 text-center ${miniCardShell}`}>
-            <p className={`mb-2 text-center text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionWarnings}</p>
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm">
-              <div className="flex min-w-0 flex-col items-center text-center">
-                <span className={muted}>{t.chainPctSpam}</span>
-                <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctSpam)}</div>
-              </div>
-              <div className="flex min-w-0 flex-col items-center text-center">
-                <span className={muted}>{t.chainPctDuplicates}</span>
-                <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctDup)}</div>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {showLast30Section ? (
-          <div className={`rounded-2xl border px-3 py-2 ${isDark ? 'border-zinc-700 bg-black/15' : 'border-zinc-200 bg-white/60'}`}>
-            <p className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>{t.chainSectionLast30Days}</p>
-            <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-3 lg:grid-cols-3">
-              <div>
-                <span className={muted}>{t.chainStatPctActive}</span>
-                <div className={`font-semibold tabular-nums ${prose}`}>{fmtPct(pctActive)}</div>
-              </div>
-              <div>
-                <span className={muted}>{t.agentsLabel}</span>
-                <div className={`font-semibold tabular-nums ${prose}`}>
-                  {d30Total !== null ? d30Total.toLocaleString(locale) : '—'}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:items-start">
+          <ChainTopAgentsList
+            agents={topAgents}
+            isDark={isDark}
+            t={t}
+            locale={locale}
+            className="min-h-0"
+            style={syncedCardStyle}
+          />
+
+          <div
+            className={cn('flex min-h-0 flex-col rounded-2xl border px-3 py-2', metricMiniShell)}
+            style={syncedCardStyle}
+          >
+            <p className={`mb-1.5 shrink-0 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>
+              {t.chainSectionLast30Days}
+            </p>
+            {showLast30Section ? (
+              <div className="grid min-h-0 flex-1 grid-cols-1 gap-x-2 text-xs sm:grid-cols-3 sm:grid-rows-3">
+                <div className="flex flex-col justify-center">
+                  <span className={muted}>{t.chainStatPctActive}</span>
+                  <div className={`font-semibold tabular-nums ${prose}`}>{fmtPct(pctActive)}</div>
+                </div>
+                <div className="flex flex-col justify-center">
+                  <span className={muted}>{t.agentsLabel}</span>
+                  <div className={`font-semibold tabular-nums ${prose}`}>
+                    {d30Total !== null ? d30Total.toLocaleString(locale) : '—'}
+                  </div>
+                </div>
+                <div className="flex flex-col justify-center">
+                  <span className={muted}>{t.activeLabel}</span>
+                  <div className="font-semibold tabular-nums text-emerald-500">
+                    {d30Active !== null ? d30Active.toLocaleString(locale) : '—'}
+                  </div>
+                </div>
+                <div className="flex flex-col justify-center">
+                  <span className={muted}>{t.chainStatNewAgents30d}</span>
+                  <div className={`font-semibold tabular-nums ${prose}`}>
+                    {newAgents30d !== null ? newAgents30d.toLocaleString(locale) : '—'}
+                  </div>
+                </div>
+                <div className="flex flex-col justify-center">
+                  <span className={muted}>{t.chainStatPctWalletActivity}</span>
+                  <div className={`font-semibold tabular-nums ${prose}`}>{fmtPct(pctWallet)}</div>
+                </div>
+                <div className="flex flex-col justify-center">
+                  <span className={muted}>{t.chainStatPctOnchainActivity}</span>
+                  <div className={`font-semibold tabular-nums ${prose}`}>{fmtPct(pctOnchain)}</div>
+                </div>
+                <div className="flex flex-col justify-center">
+                  <span className={muted}>{t.chainOnChainExecutions30d}</span>
+                  <div className={`font-semibold tabular-nums ${prose}`}>{fmtCount(onChainExec)}</div>
+                </div>
+                <div className="flex flex-col justify-center">
+                  <span className={muted}>{t.chainOnChainPayments30d}</span>
+                  <div className={`font-semibold tabular-nums ${prose}`}>{fmtCount(onChainPay)}</div>
+                </div>
+                <div className="flex flex-col justify-center">
+                  <span className={muted}>{t.chainOnChainProtocolActivity30d}</span>
+                  <div className={`font-semibold tabular-nums ${prose}`}>{fmtCount(onChainProto)}</div>
                 </div>
               </div>
-              <div>
-                <span className={muted}>{t.activeLabel}</span>
-                <div className="font-semibold tabular-nums text-emerald-500">{d30Active !== null ? d30Active.toLocaleString(locale) : '—'}</div>
-              </div>
-              <div>
-                <span className={muted}>{t.chainStatNewAgents30d}</span>
-                <div className={`font-semibold tabular-nums ${prose}`}>{newAgents30d !== null ? newAgents30d.toLocaleString(locale) : '—'}</div>
-              </div>
-              <div>
-                <span className={muted}>{t.chainStatPctWalletActivity}</span>
-                <div className={`font-semibold tabular-nums ${prose}`}>{fmtPct(pctWallet)}</div>
-              </div>
-              <div>
-                <span className={muted}>{t.chainStatPctOnchainActivity}</span>
-                <div className={`font-semibold tabular-nums ${prose}`}>{fmtPct(pctOnchain)}</div>
-              </div>
-              <div>
-                <span className={muted}>{t.chainOnChainExecutions30d}</span>
-                <div className={`font-semibold tabular-nums ${prose}`}>{fmtCount(onChainExec)}</div>
-              </div>
-              <div>
-                <span className={muted}>{t.chainOnChainPayments30d}</span>
-                <div className={`font-semibold tabular-nums ${prose}`}>{fmtCount(onChainPay)}</div>
-              </div>
-              <div>
-                <span className={muted}>{t.chainOnChainProtocolActivity30d}</span>
-                <div className={`font-semibold tabular-nums ${prose}`}>{fmtCount(onChainProto)}</div>
-              </div>
-            </div>
+            ) : (
+              <p className={`text-xs ${muted}`}>{t.dashboardChainsEmpty}</p>
+            )}
           </div>
-        ) : null}
+
+          <div ref={warningsRef} className={cn('rounded-2xl border px-3 py-2', metricMiniShell)}>
+            <p className={`mb-1.5 text-[11px] font-semibold uppercase tracking-wide ${muted}`}>
+              {t.chainSectionWarnings}
+            </p>
+            {warningStats.length > 0 ? (
+              <div className="grid grid-cols-1 gap-x-2 gap-y-2.5 text-xs sm:grid-cols-3 sm:gap-y-3">
+                {warningStats.map(({ key, value }) => (
+                  <div key={key}>
+                    <div className="flex items-start gap-0.5">
+                      <span className={muted}>{t[WARNING_STAT_TKEY[key]]}</span>
+                      <DashboardInfoTooltip
+                        content={t[WARNING_STAT_HELP_TKEY[key]]}
+                        ariaLabel={t.chainWarningInfoAriaLabel}
+                        isDark={isDark}
+                      />
+                    </div>
+                    <div className={`font-semibold tabular-nums ${prose}`}>{fmtPct(value)}</div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className={`text-xs ${muted}`}>{t.dashboardChainsEmpty}</p>
+            )}
+          </div>
+        </div>
 
         <MonthlyAgentsChart rows={chain.statistics_agent_monthly} isDark={isDark} locale={locale} t={t} />
         </div>
 
         {showDistributionRail ? (
-          <div
-            className={cn(
-              'flex min-h-[220px] w-full shrink-0 gap-2 sm:min-h-[260px]',
-              'lg:min-h-0 lg:w-[7rem] lg:self-stretch xl:w-[7.5rem]',
-            )}
-          >
-            {humiBarKeys.length > 0 ? (
-              <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-                <StackedDistributionBar
-                  title={t.chainDistributionRailHumi}
-                  rowKeys={humiBarKeys}
-                  row={humiRow}
-                  colors={(k) => HUMI_BUCKET_COLORS[k] ?? '#71717a'}
-                  labelForKey={(k) => {
-                    const tk = HUMI_BUCKET_TKEY[k];
-                    return tk ? t[tk] : k;
-                  }}
-                  isDark={isDark}
-                  orientation="vertical"
-                  density="rail"
-                  fillHeight
-                  className="min-h-0 flex-1"
-                />
-              </div>
-            ) : null}
-            {metaBarKeys.length > 0 ? (
-              <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-                <StackedDistributionBar
-                  title={t.chainDistributionRailMetadata}
-                  rowKeys={metaBarKeys}
-                  row={metaRow}
-                  colors={(slug) => {
-                    const dbKey = metaKeysSorted.find((dk) => dk.replace(/\s+/g, '_').replace(/[()]/g, '') === slug);
-                    const tkey = dbKey ? METADATA_DB_KEY_TO_TKEY[dbKey] : undefined;
-                    return tkey ? METADATA_BUCKET_COLORS[tkey] ?? '#71717a' : '#71717a';
-                  }}
-                  labelForKey={(slug) => {
-                    const dbKey = metaKeysSorted.find((dk) => dk.replace(/\s+/g, '_').replace(/[()]/g, '') === slug);
-                    const tkey = dbKey ? METADATA_DB_KEY_TO_TKEY[dbKey] : undefined;
-                    return tkey ? t[tkey] : slug;
-                  }}
-                  isDark={isDark}
-                  orientation="vertical"
-                  density="rail"
-                  fillHeight
-                  className="min-h-0 flex-1"
-                />
-              </div>
-            ) : null}
-          </div>
+          <ChainDistributionPanel
+            slides={distributionSlides}
+            chainKey={chain.chain_id}
+            isDark={isDark}
+            t={t}
+          />
         ) : null}
       </div>
     </AgentDetailCard>
@@ -436,7 +519,7 @@ export function DashboardChainCards({ chains, isDark, t, lang }: Props) {
 
   return (
     <div className="flex w-full flex-col items-center gap-6">
-      <motion.div
+      <div
         key={active.chain_id}
         className="w-full"
         initial={{ opacity: 0, y: 16 }}
@@ -444,7 +527,7 @@ export function DashboardChainCards({ chains, isDark, t, lang }: Props) {
         transition={{ duration: 0.25 }}
       >
         <ChainCard chain={active} isDark={isDark} t={t} lang={lang} />
-      </motion.div>
+      </div>
 
       <div className="flex flex-wrap justify-center gap-4">
         {chains.map((c, index) => (

@@ -1,16 +1,27 @@
 'use client';
 
-import { useMemo } from 'react';
-import { StackedDistributionBar } from '@/components/dashboard/StackedDistributionBar';
+import { useEffect, useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  MetadataRichnessTreemap,
+  METADATA_REMAINING_RAW_KEY,
+  METADATA_REMAINING_SLUG,
+  type MetadataTreemapDatum,
+} from '@/components/dashboard/MetadataRichnessTreemap';
+import {
+  MetadataRichnessItemLegend,
+  type MetadataRichnessLegendItem,
+} from '@/components/dashboard/MetadataRichnessItemLegend';
 import type { Translations } from '@/app/(dashboard)/dashboard/components/LanguageContext';
+import type { RichnessExplanationLang } from '@/lib/metadataRichnessExplanations';
 import {
   humanizeRichnessDetailKey,
   metadataLayerMaxPoints,
   type ParsedMetadataRichness,
   type ParsedRichnessLayer,
   type RichnessLayerKey,
-  type RichnessSegmentHoverDetail,
 } from '@/lib/metadataRichness';
+import { cn } from '@/lib/utils';
 
 const SEGMENT_PALETTE = [
   '#6366f1',
@@ -25,6 +36,8 @@ const SEGMENT_PALETTE = [
   '#3b82f6',
   '#f43f5e',
 ];
+
+const REMAINING_FILL = { dark: '#52525b', light: '#d4d4d8' };
 
 function layerTitleKey(layerKey: RichnessLayerKey): keyof Translations {
   switch (layerKey) {
@@ -52,125 +65,228 @@ function layerRangeLabelKey(layerKey: RichnessLayerKey): keyof Translations {
   }
 }
 
-function buildLayerBar(layer: ParsedRichnessLayer): {
-  rowKeys: string[];
-  row: Record<string, number | string>;
-  slugToRaw: Map<string, string>;
+function buildLayerTreemap(
+  layer: ParsedRichnessLayer,
+  cap: number,
+  isDark: boolean,
+  remainingLabel: string,
+): {
+  treemapData: MetadataTreemapDatum[];
+  legendItems: MetadataRichnessLegendItem[];
 } | null {
   const sorted = [...layer.detailEntries].sort((a, b) => b.value - a.value);
   if (sorted.length === 0) return null;
-  const row: Record<string, number | string> = { name: layer.layerKey };
-  const rowKeys: string[] = [];
-  const slugToRaw = new Map<string, string>();
-  for (const e of sorted) {
-    row[e.slug] = e.value;
-    rowKeys.push(e.slug);
-    slugToRaw.set(e.slug, e.rawKey);
+
+  const remaining = Math.max(0, cap - layer.layerScore);
+  let colorIndex = 0;
+
+  const legendItems: MetadataRichnessLegendItem[] = sorted.map((entry) => {
+    const color =
+      entry.value > 0
+        ? SEGMENT_PALETTE[colorIndex++ % SEGMENT_PALETTE.length]
+        : isDark
+          ? '#3f3f46'
+          : '#e4e4e7';
+    return {
+      slug: entry.slug,
+      rawKey: entry.rawKey,
+      label: humanizeRichnessDetailKey(entry.rawKey),
+      value: entry.value,
+      color,
+    };
+  });
+
+  const treemapData: MetadataTreemapDatum[] = sorted
+    .filter((entry) => entry.value > 0)
+    .map((entry) => {
+      const legend = legendItems.find((l) => l.slug === entry.slug)!;
+      return {
+        name: legend.label,
+        value: entry.value,
+        fill: legend.color,
+        slug: entry.slug,
+        rawKey: entry.rawKey,
+        isRemaining: false,
+      };
+    });
+
+  if (remaining > 0) {
+    const remainingColor = isDark ? REMAINING_FILL.dark : REMAINING_FILL.light;
+    treemapData.push({
+      name: remainingLabel,
+      value: remaining,
+      fill: remainingColor,
+      slug: METADATA_REMAINING_SLUG,
+      rawKey: METADATA_REMAINING_RAW_KEY,
+      isRemaining: true,
+    });
+    legendItems.push({
+      slug: METADATA_REMAINING_SLUG,
+      rawKey: METADATA_REMAINING_RAW_KEY,
+      label: remainingLabel,
+      value: remaining,
+      color: remainingColor,
+      isRemaining: true,
+    });
   }
-  return { rowKeys, row, slugToRaw };
+
+  const treemapTotal = treemapData.reduce((s, n) => s + n.value, 0);
+  if (treemapTotal <= 0) return null;
+
+  return { treemapData, legendItems };
 }
 
 export function MetadataRichnessLayersChart({
   parsed,
   isDark,
   t,
-  onSegmentHover,
+  lang,
+  resetKey,
 }: {
   parsed: ParsedMetadataRichness;
   isDark: boolean;
   t: Translations;
-  onSegmentHover?: (detail: RichnessSegmentHoverDetail | null) => void;
+  lang: RichnessExplanationLang;
+  resetKey?: string;
 }) {
+  const [activeIndex, setActiveIndex] = useState(0);
   const mutedSmall = isDark ? 'text-zinc-500' : 'text-zinc-500';
-  const layersBlocks = useMemo(() => {
-    return parsed.layers.map((layer) => {
-      const built = buildLayerBar(layer);
-      return { layer, built };
-    });
-  }, [parsed.layers]);
+  const remainingLabel = t.agentDetailMetadataLayerRemaining;
+
+  const slides = useMemo(
+    () =>
+      parsed.layers.map((layer) => {
+        const cap = metadataLayerMaxPoints(layer.layerKey);
+        const built = buildLayerTreemap(layer, cap, isDark, remainingLabel);
+        return { layer, cap, built };
+      }),
+    [parsed.layers, isDark, remainingLabel],
+  );
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [resetKey, slides.length]);
+
+  const safeIndex = slides.length > 0 ? activeIndex % slides.length : 0;
+  const activeSlide = slides[safeIndex];
+  const canNavigate = slides.length > 1;
+
+  const goPrev = () => {
+    if (!canNavigate) return;
+    setActiveIndex((i) => (i - 1 + slides.length) % slides.length);
+  };
+
+  const goNext = () => {
+    if (!canNavigate) return;
+    setActiveIndex((i) => (i + 1) % slides.length);
+  };
+
+  const navBtnClass = cn(
+    'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border transition-colors',
+    isDark
+      ? 'border-zinc-600 text-zinc-300 hover:bg-zinc-800 disabled:opacity-40'
+      : 'border-zinc-300 text-zinc-600 hover:bg-zinc-100 disabled:opacity-40',
+  );
+
+  if (!activeSlide) return null;
+
+  const { layer, built } = activeSlide;
+  const title = t[layerTitleKey(layer.layerKey)];
+  const cap = metadataLayerMaxPoints(layer.layerKey);
+
+  const scoreLine = (
+    <div className="mb-3 flex shrink-0 flex-wrap items-start justify-between gap-3">
+      <div className="min-w-0 space-y-0.5">
+        <p className={`text-sm font-semibold ${isDark ? 'text-zinc-200' : 'text-zinc-800'}`}>
+          {title}
+        </p>
+        <p className={`text-[11px] tabular-nums ${mutedSmall}`}>
+          {t[layerRangeLabelKey(layer.layerKey)]}
+        </p>
+      </div>
+      <span
+        className={`shrink-0 tabular-nums text-sm font-medium ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}
+      >
+        {layer.layerScore.toLocaleString()} / {cap}
+      </span>
+    </div>
+  );
+
+  let chartBody;
+
+  if (!built) {
+    chartBody = (
+      <p className={`text-xs ${mutedSmall}`}>{t.agentDetailMetadataLayerNoBreakdown}</p>
+    );
+  } else {
+    chartBody = (
+      <div className="grid min-h-0 flex-1 grid-rows-[1fr_auto] gap-2">
+        <MetadataRichnessTreemap data={built.treemapData} isDark={isDark} />
+        <MetadataRichnessItemLegend
+          items={built.legendItems}
+          isDark={isDark}
+          lang={lang}
+          t={t}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start lg:gap-4">
-      {layersBlocks.map(({ layer, built }) => {
-        const title = t[layerTitleKey(layer.layerKey)];
-        const cap = metadataLayerMaxPoints(layer.layerKey);
-        const scoreLine = (
-          <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
-            <div className="min-w-0 space-y-0.5">
-              <p className={`text-sm font-semibold ${isDark ? 'text-zinc-200' : 'text-zinc-800'}`}>{title}</p>
-              <p className={`text-[11px] tabular-nums ${mutedSmall}`}>{t[layerRangeLabelKey(layer.layerKey)]}</p>
-            </div>
-            <span className={`shrink-0 tabular-nums text-sm font-medium ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
-              {layer.layerScore.toLocaleString()} / {cap}
-            </span>
-          </div>
-        );
+    <div className="flex h-full min-h-0 flex-1 flex-col">
+      {scoreLine}
 
-        if (!built) {
-          return (
-            <div key={layer.layerKey} className="min-w-0">
-              {scoreLine}
-              <p className={`text-xs ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>{t.agentDetailMetadataLayerNoBreakdown}</p>
-            </div>
-          );
-        }
+      <div className="mb-2 flex shrink-0 items-center justify-between gap-1">
+        <button
+          type="button"
+          className={navBtnClass}
+          onClick={goPrev}
+          disabled={!canNavigate}
+          aria-label={t.agentDetailMetadataLayerPrev}
+        >
+          <ChevronLeft className="h-4 w-4" aria-hidden />
+        </button>
+        <span
+          className={`min-w-0 flex-1 truncate text-center text-[11px] font-semibold tabular-nums ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}
+        >
+          {safeIndex + 1} / {slides.length}
+        </span>
+        <button
+          type="button"
+          className={navBtnClass}
+          onClick={goNext}
+          disabled={!canNavigate}
+          aria-label={t.agentDetailMetadataLayerNext}
+        >
+          <ChevronRight className="h-4 w-4" aria-hidden />
+        </button>
+      </div>
 
-        const totalSeg = built.rowKeys.reduce((s, k) => s + (Number(built.row[k]) || 0), 0);
-        if (totalSeg <= 0) {
-          return (
-            <div key={layer.layerKey} className="min-w-0">
-              {scoreLine}
-              <p className={`text-xs ${isDark ? 'text-zinc-500' : 'text-zinc-500'}`}>{t.agentDetailMetadataLayerNoBreakdown}</p>
-            </div>
-          );
-        }
+      <div className="flex min-h-0 flex-1 flex-col">{chartBody}</div>
 
-        const labelForKey = (slug: string) => {
-          const raw = built.slugToRaw.get(slug);
-          return raw ? humanizeRichnessDetailKey(raw) : slug;
-        };
-
-        const colors = (slug: string) => {
-          const i = built.rowKeys.indexOf(slug);
-          return SEGMENT_PALETTE[(i >= 0 ? i : 0) % SEGMENT_PALETTE.length];
-        };
-
-        return (
-          <div key={layer.layerKey} className="min-w-0">
-            {scoreLine}
-            <StackedDistributionBar
-              title=""
-              rowKeys={built.rowKeys}
-              row={built.row}
-              colors={colors}
-              labelForKey={labelForKey}
-              isDark={isDark}
-              orientation="vertical"
-              yDomainMax={cap}
-              sideLegend
-              verticalBarSize={28}
-              showTooltip={false}
-              onStackedSegmentHover={
-                onSegmentHover
-                  ? (p) => {
-                      if (!p) {
-                        onSegmentHover(null);
-                        return;
-                      }
-                      onSegmentHover({
-                        layerKey: layer.layerKey,
-                        layerTitle: title,
-                        segmentLabel: labelForKey(p.dataKey),
-                        value: p.value,
-                      });
-                    }
-                  : undefined
-              }
-              className="[&>p:first-child]:hidden"
+      {canNavigate ? (
+        <div className="mt-3 flex shrink-0 justify-center gap-1.5">
+          {slides.map((slide, i) => (
+            <button
+              key={slide.layer.layerKey}
+              type="button"
+              aria-label={`${t[layerTitleKey(slide.layer.layerKey)]} (${i + 1}/${slides.length})`}
+              aria-current={i === safeIndex ? 'true' : undefined}
+              onClick={() => setActiveIndex(i)}
+              className={cn(
+                'h-2 w-2 rounded-full transition-colors',
+                i === safeIndex
+                  ? isDark
+                    ? 'bg-sky-400'
+                    : 'bg-sky-600'
+                  : isDark
+                    ? 'bg-zinc-600 hover:bg-zinc-500'
+                    : 'bg-zinc-300 hover:bg-zinc-400',
+              )}
             />
-          </div>
-        );
-      })}
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

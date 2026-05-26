@@ -15,6 +15,7 @@ import {
   isComplexFilter,
 } from '@/lib/dashboardFilters';
 import { normalizeChainName, getChainColor } from '@/lib/agentChains';
+import { AgentDirectoryHumiRibbon } from '@/components/dashboard/AgentDirectoryHumiRibbon';
 import { getHumiScoreColor, getHumiScoreText } from '@/lib/agentHumiDisplay';
 
 // Componente Image con fallback automático
@@ -1069,7 +1070,16 @@ export default function AgentsPage() {
                   style={{ transformStyle: "preserve-3d" }}
                 >
                   {/* Cara Frontal */}
-                  <div className="absolute inset-0 w-full h-full backface-hidden z-20">
+                  <div className="absolute inset-0 z-20 h-full w-full overflow-hidden rounded-3xl backface-hidden">
+                    <AgentDirectoryHumiRibbon
+                      categoryLabel={
+                        agent.humi_score_filter
+                          ? getHumiScoreText(agent.humi_score_filter, t)
+                          : ''
+                      }
+                      accentColor={getHumiScoreColor(agent.humi_score_filter ?? '')}
+                      isDark={theme === 'dark'}
+                    />
                     {/* Elemento decorativo sutil */}
                     <div
                       className="absolute top-0 right-0 w-40 h-40 opacity-5 rounded-full"
@@ -1116,12 +1126,21 @@ export default function AgentsPage() {
                           <span className="truncate">{normalizeChainName(agent.chain)}</span>
                         </span>
                         <span className="opacity-50">·</span>
-                        <span className="inline-flex items-center gap-1.5 min-w-0">
-                          <span
-                            className="h-2 w-2 rounded-full shrink-0"
-                            style={{ backgroundColor: getHumiScoreColor(agent.humi_score_filter) }}
-                          />
-                          <span className="truncate">{getHumiScoreText(agent.humi_score_filter, t)}</span>
+                        <span
+                          className="inline-flex min-w-0 items-center gap-1 font-semibold tabular-nums truncate"
+                          style={{ color: getHumiScoreColor(agent.humi_score_filter ?? '') }}
+                        >
+                          <span className="text-[10px] font-medium opacity-80 shrink-0">
+                            {t.humiScoreShort}:
+                          </span>
+                          <span className="truncate">
+                            {agent.current_humi_score != null &&
+                            Number.isFinite(Number(agent.current_humi_score))
+                              ? Number(agent.current_humi_score).toLocaleString(undefined, {
+                                  maximumFractionDigits: 2,
+                                })
+                              : t.notAvailable}
+                          </span>
                         </span>
                         {agent.is_dummy === true && (
                           <>
