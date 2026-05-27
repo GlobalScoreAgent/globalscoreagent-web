@@ -18,6 +18,7 @@ import {
   Package,
   MoreHorizontal,
 } from 'lucide-react';
+import { buildAuthLoginUrl } from '@/lib/auth/redirect';
 import { createClient } from '@/utils/supabase/client';
 import { useLanguage } from './LanguageContext';
 import RoadMapCards from './RoadMapCards';
@@ -71,7 +72,7 @@ export default function DashboardSidebar() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    window.location.href = '/auth/login';
+    window.location.href = buildAuthLoginUrl('/dashboard');
   };
 
   /** Rail colapsado (w-16): íconos centrados, sin padding horizontal agresivo */

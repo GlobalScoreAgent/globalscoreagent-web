@@ -15,8 +15,8 @@ export const marketingCopy = {
     collapseSidebar: { es: 'Contraer menú', en: 'Collapse menu' } satisfies Bilingual,
   },
   topBar: {
-    waitlist: { es: 'Únete a la lista de espera', en: 'Join the waitlist' } satisfies Bilingual,
-    waitlistShort: { es: 'Únete', en: 'Join' } satisfies Bilingual,
+    accessDashboard: { es: 'Acceder al Dashboard', en: 'Access Dashboard' } satisfies Bilingual,
+    accessDashboardShort: { es: 'Dashboard', en: 'Dashboard' } satisfies Bilingual,
   },
   hero: {
     eyebrow: {

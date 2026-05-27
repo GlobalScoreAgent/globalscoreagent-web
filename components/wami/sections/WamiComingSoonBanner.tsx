@@ -12,13 +12,6 @@ export default function WamiComingSoonBanner() {
     <section className="border-t border-gold/10 bg-black py-16">
       <div className="mx-auto max-w-5xl px-6">
         <div className="rounded-3xl border border-gold/30 bg-gradient-to-r from-zinc-900 to-black p-10 text-center md:p-14">
-          <div className="mb-6 inline-flex items-center gap-3 rounded-3xl bg-amber-400/10 px-6 py-2 text-sm font-medium text-amber-300">
-            <span className="relative flex h-3 w-3">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
-              <span className="relative inline-flex h-3 w-3 rounded-full bg-amber-400" />
-            </span>
-            {pick(language, comingSoon.badge)}
-          </div>
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-white md:text-4xl">
             {pick(language, comingSoon.title)}
           </h2>

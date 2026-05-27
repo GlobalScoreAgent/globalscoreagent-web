@@ -9,7 +9,6 @@ import { DashboardChainCards } from '@/components/dashboard/DashboardChainCards'
 import { DashboardGlobalDistributionCard } from '@/components/dashboard/DashboardGlobalDistributionCard';
 import { DashboardNonceInsightCard } from '@/components/dashboard/DashboardNonceInsightCard';
 import type { DashboardChainRow } from '@/lib/dashboardChains';
-import { createClient } from '@/utils/supabase/client';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
@@ -132,28 +131,17 @@ export default function DashboardPage() {
   const [dashboardChains, setDashboardChains] = useState<DashboardChainRow[]>([]);
 
   useEffect(() => {
-    const supabase = createClient();
-
     const load = async () => {
-      const [statsRes, chainsRes] = await Promise.all([
-        supabase
-          .schema('web_dashboard')
-          .from('main_stadistics')
-          .select('*')
-          .order('calculated_at', { ascending: false })
-          .limit(1)
-          .maybeSingle(),
-        supabase
-          .schema('web_dashboard')
-          .from('chains')
-          .select(
-            'chain_id,name,short_name,updated_at,logo_file_name,agent_stats_information,statistics_agent_last_30_days,statistics_agent_monthly,humi_distribution,wami_distribution,metadata_distribution,best_10_agents_humi,owner_stats_information,technical_data_information,warning_stats_information,on_chain_stats_information'
-          )
-          .order('name'),
-      ]);
+      const res = await fetch('/api/dashboard/overview', { credentials: 'include' });
+      const body = await res.json();
 
-      if (statsRes.data) setStats(statsRes.data);
-      if (chainsRes.data) setDashboardChains(chainsRes.data as DashboardChainRow[]);
+      if (!res.ok || !body?.success) {
+        console.error('Error loading dashboard overview:', body?.details ?? body);
+        return;
+      }
+
+      if (body.stats) setStats(body.stats);
+      if (body.chains) setDashboardChains(body.chains as DashboardChainRow[]);
     };
 
     void load();

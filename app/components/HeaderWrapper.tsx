@@ -10,8 +10,9 @@ export default function HeaderWrapper({
 }) {
   const pathname = usePathname();
   const isDashboard = pathname?.startsWith('/dashboard');
+  const isAuth = pathname?.startsWith('/auth');
 
-  if (isDashboard) {
+  if (isDashboard || isAuth) {
     return <>{children}</>;
   }
 

@@ -436,7 +436,6 @@ export const humiCopy = {
     ] as HumiPillar[],
   },
   comingSoon: {
-    badge: { es: 'Próximamente', en: 'Coming soon' } satisfies Bilingual,
     title: {
       es: 'Dashboard + API completa',
       en: 'Full Dashboard + API',
@@ -461,6 +460,6 @@ export const humiCopy = {
       es: 'Únete a la lista de espera para acceso anticipado al dashboard y la API.',
       en: 'Join the waitlist for early access to the dashboard and API.',
     } satisfies Bilingual,
-    button: { es: 'Únete a la Lista de Espera', en: 'Join the Waitlist' } satisfies Bilingual,
+    button: { es: 'Acceder al Dashboard', en: 'Access Dashboard' } satisfies Bilingual,
   },
 } as const;

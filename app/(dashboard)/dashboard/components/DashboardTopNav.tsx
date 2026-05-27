@@ -3,6 +3,7 @@
 'use client';
 
 import { User, Sun, Moon } from 'lucide-react';
+import { buildAuthLoginUrl } from '@/lib/auth/redirect';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from './LanguageContext';
@@ -23,7 +24,7 @@ export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) 
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push('/auth/login');
+    router.push(buildAuthLoginUrl('/dashboard'));
   };
 
   const displayName = profile?.display_name || user.email?.split('@')[0] || 'Usuario';

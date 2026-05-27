@@ -5,6 +5,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, createContext, useContext } from 'react';
+import type { DashboardSessionUser } from '../layout';
 import DashboardSidebar from './DashboardSidebar';
 import DashboardTopNav from './DashboardTopNav';
 import { LanguageProvider } from './LanguageContext';
@@ -41,8 +42,10 @@ function getPageTitleKey(pathname: string): string {
 
 export default function DashboardLayoutClient({
   children,
+  user,
 }: {
   children: React.ReactNode;
+  user: DashboardSessionUser;
 }) {
   const pathname = usePathname();
   const pageTitleKey = getPageTitleKey(pathname);
@@ -109,8 +112,8 @@ export default function DashboardLayoutClient({
             <div className="flex-1 flex flex-col">
               <DashboardTitleOverrideProvider>
                 <DashboardTopNav
-                  user={{ email: 'demo@globalscoreagent.com' }}
-                  profile={{ display_name: 'Usuario Demo', avatar_url: undefined }}
+                  user={{ email: user.email }}
+                  profile={{ display_name: user.display_name, avatar_url: user.avatar_url }}
                   pageTitleKey={pageTitleKey}
                 />
 
