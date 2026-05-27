@@ -216,6 +216,17 @@ export interface Translations {
   agentHumiPillarBlockIntermediate: string;
   agentHumiPillarBlockAdvanced: string;
   agentHumiPillarSummaryNoData: string;
+  agentHumiBlockDetailsTitle: string;
+  agentHumiBlockDetailsSelectPillar: string;
+  agentHumiBlockDetailsSelectBlock: string;
+  agentHumiBlockDetailsNoItems: string;
+  agentHumiBlockDetailsColItem: string;
+  agentHumiBlockDetailsColBusiness: string;
+  agentHumiBlockDetailsColReason: string;
+  agentHumiBlockDetailsColScore: string;
+  agentHumiBlockDetailsGenericDescription: string;
+  agentHumiBlockDetailsReasonEmpty: string;
+  agentHumiBlockDetailsTotalLabel: string;
   agentDetailWeb: string;
   agentDetailEmail: string;
   readMoreDescription: string;
@@ -673,6 +684,19 @@ const translations: Record<Language, Translations> = {
     agentHumiPillarBlockIntermediate: 'Intermedio',
     agentHumiPillarBlockAdvanced: 'Avanzado',
     agentHumiPillarSummaryNoData: 'No hay datos de desglose para este pilar.',
+    agentHumiBlockDetailsTitle: 'Detalles del bloque',
+    agentHumiBlockDetailsSelectPillar:
+      'Selecciona un pilar en el gráfico de scores para ver el detalle por bloque.',
+    agentHumiBlockDetailsSelectBlock:
+      'Selecciona un bloque en el desglose por bloques para ver sus ítems.',
+    agentHumiBlockDetailsNoItems: 'No hay ítems de detalle para este bloque.',
+    agentHumiBlockDetailsColItem: 'Ítem',
+    agentHumiBlockDetailsColBusiness: 'Descripción de negocio',
+    agentHumiBlockDetailsColReason: 'Razón del score',
+    agentHumiBlockDetailsColScore: 'Score',
+    agentHumiBlockDetailsGenericDescription: 'Sin descripción específica disponible.',
+    agentHumiBlockDetailsReasonEmpty: 'Sin detalle de razón disponible.',
+    agentHumiBlockDetailsTotalLabel: 'Total del bloque',
     agentDetailWeb: 'Web',
     agentDetailEmail: 'Email',
     readMoreDescription: 'Leer más',
@@ -1155,6 +1179,19 @@ const translations: Record<Language, Translations> = {
     agentHumiPillarBlockIntermediate: 'Intermediate',
     agentHumiPillarBlockAdvanced: 'Advanced',
     agentHumiPillarSummaryNoData: 'No breakdown data for this pillar.',
+    agentHumiBlockDetailsTitle: 'Block details',
+    agentHumiBlockDetailsSelectPillar:
+      'Select a pillar in the pillar scores chart to view block-level details.',
+    agentHumiBlockDetailsSelectBlock:
+      'Select a block in the block breakdown chart to view its items.',
+    agentHumiBlockDetailsNoItems: 'No detail items for this block.',
+    agentHumiBlockDetailsColItem: 'Item',
+    agentHumiBlockDetailsColBusiness: 'Business description',
+    agentHumiBlockDetailsColReason: 'Score reason',
+    agentHumiBlockDetailsColScore: 'Score',
+    agentHumiBlockDetailsGenericDescription: 'No specific description available.',
+    agentHumiBlockDetailsReasonEmpty: 'No reason detail available.',
+    agentHumiBlockDetailsTotalLabel: 'Block total',
     agentDetailWeb: 'Web',
     agentDetailEmail: 'Email',
     readMoreDescription: 'Read more',

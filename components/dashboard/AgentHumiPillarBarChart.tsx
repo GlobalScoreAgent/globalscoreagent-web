@@ -12,14 +12,15 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { barGradientStart } from '@/lib/chartBarGradient';
 import type { HumiPillarChartPoint, HumiPillarId } from '@/lib/indexHumiPillars';
+import { getPillarScoreBandColor } from '@/lib/indexHumiScoreColors';
 import { hasAnyPillarScore } from '@/lib/indexHumiPillars';
 
 export type AgentHumiPillarBarChartProps = {
   points: HumiPillarChartPoint[];
   selectedPillarId: HumiPillarId | null;
   onPillarSelect: (id: HumiPillarId) => void;
-  accentColor: string;
   isDark: boolean;
   locale: string;
   emptyMessage: string;
@@ -32,6 +33,7 @@ type ChartRow = {
   label: string;
   value: number;
   displayValue: number | null;
+  barColor: string;
   index: number;
 };
 
@@ -44,37 +46,6 @@ function formatScore(v: number | null, locale: string): string {
 
 function pillarTrackFill(isDark: boolean): string {
   return isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-}
-
-function parseHexColor(hex: string): { r: number; g: number; b: number } | null {
-  const raw = hex.trim().replace('#', '');
-  if (raw.length === 3) {
-    const r = parseInt(raw[0] + raw[0], 16);
-    const g = parseInt(raw[1] + raw[1], 16);
-    const b = parseInt(raw[2] + raw[2], 16);
-    return Number.isFinite(r) && Number.isFinite(g) && Number.isFinite(b) ? { r, g, b } : null;
-  }
-  if (raw.length === 6) {
-    const r = parseInt(raw.slice(0, 2), 16);
-    const g = parseInt(raw.slice(2, 4), 16);
-    const b = parseInt(raw.slice(4, 6), 16);
-    return Number.isFinite(r) && Number.isFinite(g) && Number.isFinite(b) ? { r, g, b } : null;
-  }
-  return null;
-}
-
-function mixHexWithWhite(hex: string, whiteMix: number): string {
-  const rgb = parseHexColor(hex);
-  if (!rgb) return hex;
-  const t = Math.min(1, Math.max(0, whiteMix));
-  const r = Math.round(rgb.r + (255 - rgb.r) * t);
-  const g = Math.round(rgb.g + (255 - rgb.g) * t);
-  const b = Math.round(rgb.b + (255 - rgb.b) * t);
-  return `rgb(${r}, ${g}, ${b})`;
-}
-
-function pillarGradientStart(accentColor: string, index: number): string {
-  return mixHexWithWhite(accentColor, 0.42 - index * 0.04);
 }
 
 function ChartTooltip({
@@ -122,7 +93,6 @@ export function AgentHumiPillarBarChart({
   points,
   selectedPillarId,
   onPillarSelect,
-  accentColor,
   isDark,
   locale,
   emptyMessage,
@@ -153,6 +123,7 @@ export function AgentHumiPillarBarChart({
         label: p.label,
         value: p.value ?? 0,
         displayValue: p.value,
+        barColor: getPillarScoreBandColor(p.value),
         index,
       })),
     [points],
@@ -188,22 +159,31 @@ export function AgentHumiPillarBarChart({
               >
                 <stop
                   offset="0%"
-                  stopColor={pillarGradientStart(accentColor, row.index)}
+                  stopColor={barGradientStart(row.barColor, 0.42 - row.index * 0.04)}
                   stopOpacity={0.55}
                 />
-                <stop offset="55%" stopColor={accentColor} stopOpacity={0.88} />
-                <stop offset="100%" stopColor={accentColor} stopOpacity={1} />
+                <stop offset="55%" stopColor={row.barColor} stopOpacity={0.88} />
+                <stop offset="100%" stopColor={row.barColor} stopOpacity={1} />
               </linearGradient>
             ))}
-            <filter id={`${baseId}-shadow`} x="-8%" y="-20%" width="116%" height="140%">
-              <feDropShadow
-                dx={0}
-                dy={1}
-                stdDeviation={2}
-                floodColor={accentColor}
-                floodOpacity={isDark ? 0.35 : 0.22}
-              />
-            </filter>
+            {chartData.map((row) => (
+              <filter
+                key={`shadow-${row.index}`}
+                id={`${baseId}-shadow-${row.index}`}
+                x="-8%"
+                y="-20%"
+                width="116%"
+                height="140%"
+              >
+                <feDropShadow
+                  dx={0}
+                  dy={1}
+                  stdDeviation={2}
+                  floodColor={row.barColor}
+                  floodOpacity={isDark ? 0.35 : 0.22}
+                />
+              </filter>
+            ))}
           </defs>
           <CartesianGrid
             strokeDasharray="3 3"
@@ -251,18 +231,10 @@ export function AgentHumiPillarBarChart({
             radius={BAR_RADIUS}
             maxBarSize={16}
             background={{ fill: trackFill, radius: BAR_RADIUS }}
-            filter={`url(#${baseId}-shadow)`}
             isAnimationActive={!reduceMotion}
             animationDuration={reduceMotion ? 0 : 600}
             animationEasing="ease-out"
             style={{ cursor: 'pointer' }}
-            activeBar={{
-              fill: accentColor,
-              fillOpacity: 1,
-              stroke: isDark ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.9)',
-              strokeWidth: 1,
-              radius: BAR_RADIUS,
-            }}
             onClick={(barData) => {
               const row = (barData as { payload?: ChartRow })?.payload;
               if (row?.pillarId) onPillarSelect(row.pillarId);
@@ -279,6 +251,7 @@ export function AgentHumiPillarBarChart({
                   fillOpacity={dimmed ? 0.4 : 1}
                   stroke={isSelected ? (isDark ? '#fafafa' : '#18181b') : 'transparent'}
                   strokeWidth={isSelected ? 2 : 0}
+                  filter={`url(#${baseId}-shadow-${row.index})`}
                 />
               );
             })}

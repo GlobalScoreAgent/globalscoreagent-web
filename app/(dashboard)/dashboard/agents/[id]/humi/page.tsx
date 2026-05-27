@@ -1,25 +1,38 @@
-// app/(dashboard)/dashboard/humi/page.tsx
 'use client';
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { AgentDetailCard } from '@/components/dashboard/AgentDetailCard';
 import { AgentDetailIndexScoreCard } from '@/components/dashboard/AgentDetailIndexScoreCard';
 import { AgentHumiPillarScoresCard } from '@/components/dashboard/AgentHumiPillarScoresCard';
+import {
+  AgentHumiBlockDetailsCard,
+  buildBlockDetailsRows,
+} from '@/components/dashboard/AgentHumiBlockDetailsCard';
 import { AgentHumiPillarSummaryCard } from '@/components/dashboard/AgentHumiPillarSummaryCard';
 import { AgentHumiPillarTrendCard } from '@/components/dashboard/AgentHumiPillarTrendCard';
 import { AgentHumiTrendCard } from '@/components/dashboard/AgentHumiTrendCard';
 import { useDashboardTitleOverride } from '@/app/(dashboard)/dashboard/components/DashboardTitleOverrideContext';
 import { useLanguage } from '@/app/(dashboard)/dashboard/components/LanguageContext';
 import { getHumiScoreColor, getHumiScoreText } from '@/lib/agentHumiDisplay';
+import {
+  getBlockPercentBandColor,
+  getPillarScoreBandColor,
+  HUMI_BAND_NEUTRAL,
+} from '@/lib/indexHumiScoreColors';
 import { formatDashboardDateUtc } from '@/lib/formatDashboardDate';
 import { parseIndexHumiRow, resolveHumiCategory, type IndexHumiCardData } from '@/lib/indexHumi';
 import {
   buildPillarSummaryChartPoints,
+  getPillarSummaryBlockMax,
+  getPillarSummaryBlockScore,
+  getPillarSummaryItemsByBlock,
   getPillarSummaryRaw,
+  hasPillarSummaryItemsForBlock,
   isPillarSummaryMissing,
   parsePillarSummary,
+  resolveDefaultPillarSummaryBlockId,
 } from '@/lib/indexHumiPillarSummary';
 import type { PillarSummaryBlockId } from '@/lib/indexHumiPillarSummary';
 import {
@@ -33,10 +46,15 @@ import { cn } from '@/lib/utils';
 
 type AgentDetailRow = Record<string, unknown>;
 
-export default function HumiIndexPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const agentId = searchParams?.get('agentId') ?? '';
+function firstParamId(v: unknown): string {
+  if (typeof v === 'string') return v;
+  if (Array.isArray(v)) return typeof v[0] === 'string' ? v[0] : '';
+  return '';
+}
+
+export default function AgentHumiDetailPage() {
+  const params = useParams();
+  const agentId = firstParamId(params?.id);
   const { t, theme, lang } = useLanguage();
   const { setTitleOverride } = useDashboardTitleOverride();
   const isDark = theme === 'dark';
@@ -45,7 +63,21 @@ export default function HumiIndexPage() {
   const [agent, setAgent] = useState<AgentDetailRow | null>(null);
   const [indexHumi, setIndexHumi] = useState<IndexHumiCardData | null>(null);
   const [selectedPillar, setSelectedPillar] = useState<HumiPillarId | null>(null);
+  const [selectedBlock, setSelectedBlock] = useState<PillarSummaryBlockId | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const handlePillarSelect = useCallback(
+    (pillarId: HumiPillarId) => {
+      setSelectedPillar(pillarId);
+      const raw = getPillarSummaryRaw(indexHumi, pillarId);
+      setSelectedBlock(resolveDefaultPillarSummaryBlockId(raw));
+    },
+    [indexHumi],
+  );
+
+  const handleBlockSelect = useCallback((blockId: PillarSummaryBlockId) => {
+    setSelectedBlock(blockId);
+  }, []);
 
   const formatDate = useCallback(
     (dateString: string | null | undefined) =>
@@ -54,15 +86,11 @@ export default function HumiIndexPage() {
   );
 
   useEffect(() => {
-    if (!agentId) return;
-    router.replace(`/dashboard/agents/${encodeURIComponent(agentId)}/humi`);
-  }, [agentId, router]);
-
-  useEffect(() => {
     if (!agentId) {
       setAgent(null);
       setIndexHumi(null);
       setSelectedPillar(null);
+      setSelectedBlock(null);
       setError(null);
       setTitleOverride(null);
       return;
@@ -74,6 +102,7 @@ export default function HumiIndexPage() {
     setAgent(null);
     setIndexHumi(null);
     setSelectedPillar(null);
+    setSelectedBlock(null);
 
     (async () => {
       try {
@@ -209,12 +238,8 @@ export default function HumiIndexPage() {
     return {
       selectedPillarId: selectedPillar,
       pillarLabel: pillarLabels[selectedPillar],
-      dailySeries: dailyRawMissing
-        ? []
-        : parseHumiLast30Days(raw.last30Days, locale, 'pillar_score'),
-      monthlySeries: monthlyRawMissing
-        ? []
-        : parseHumiMonthlyTracking(raw.tracking, locale, 'avg_score'),
+      dailySeries: dailyRawMissing ? [] : parseHumiLast30Days(raw.last30Days, locale, 'pillar_score'),
+      monthlySeries: monthlyRawMissing ? [] : parseHumiMonthlyTracking(raw.tracking, locale, 'avg_score'),
       dailyRawMissing,
       monthlyRawMissing,
     };
@@ -249,6 +274,61 @@ export default function HumiIndexPage() {
       summaryMissing: summaryMissing || summaryParseFailed,
     };
   }, [selectedPillar, indexHumi, pillarLabels, blockLabels]);
+
+  const pillarSummaryRaw = useMemo(() => {
+    if (!selectedPillar) return null;
+    return getPillarSummaryRaw(indexHumi, selectedPillar);
+  }, [selectedPillar, indexHumi]);
+
+  useEffect(() => {
+    if (!selectedPillar) return;
+    const raw = getPillarSummaryRaw(indexHumi, selectedPillar);
+    if (selectedBlock && hasPillarSummaryItemsForBlock(raw, selectedBlock)) return;
+    setSelectedBlock(resolveDefaultPillarSummaryBlockId(raw));
+  }, [selectedPillar, selectedBlock, indexHumi]);
+
+  const blockLabelsById = useMemo(
+    (): Record<PillarSummaryBlockId, string> => ({
+      basic: t.agentHumiPillarBlockBasic,
+      intermediate: t.agentHumiPillarBlockIntermediate,
+      advanced: t.agentHumiPillarBlockAdvanced,
+    }),
+    [t.agentHumiPillarBlockBasic, t.agentHumiPillarBlockIntermediate, t.agentHumiPillarBlockAdvanced],
+  );
+
+  const blockDetailRows = useMemo(() => {
+    if (!selectedPillar || !selectedBlock || !pillarSummaryRaw) return [];
+    const items = getPillarSummaryItemsByBlock(pillarSummaryRaw, selectedBlock);
+    return buildBlockDetailsRows(items, selectedPillar, selectedBlock, lang, t);
+  }, [selectedPillar, selectedBlock, pillarSummaryRaw, lang, t]);
+
+  const blockTotalScore = useMemo(() => {
+    if (!selectedBlock || !pillarSummaryRaw) return null;
+    return getPillarSummaryBlockScore(pillarSummaryRaw, selectedBlock);
+  }, [selectedBlock, pillarSummaryRaw]);
+
+  const blockMaxScore = useMemo(() => {
+    if (!selectedBlock) return null;
+    return getPillarSummaryBlockMax(selectedBlock);
+  }, [selectedBlock]);
+
+  const selectedPillarScore = useMemo(() => {
+    if (!selectedPillar) return null;
+    const point = pillarPoints.find((p) => p.id === selectedPillar);
+    return point?.value ?? null;
+  }, [selectedPillar, pillarPoints]);
+
+  const selectedPillarColor = useMemo(
+    () => getPillarScoreBandColor(selectedPillarScore),
+    [selectedPillarScore],
+  );
+
+  const selectedBlockColor = useMemo(() => {
+    if (blockTotalScore === null || blockMaxScore === null) return HUMI_BAND_NEUTRAL;
+    return getBlockPercentBandColor(blockTotalScore, blockMaxScore);
+  }, [blockTotalScore, blockMaxScore]);
+
+  const blockScoreColor = selectedBlockColor;
 
   const muted = isDark ? 'text-zinc-400' : 'text-zinc-600';
 
@@ -310,21 +390,14 @@ export default function HumiIndexPage() {
               {String(agent.on_chain_id)}
             </span>
           ) : null}
-          <h1 className="break-words text-4xl font-bold tracking-tight sm:text-5xl">
-            {title || agentId}
-          </h1>
+          <h1 className="break-words text-4xl font-bold tracking-tight sm:text-5xl">{title || agentId}</h1>
           <p className={cn('text-sm', muted)}>
             {t.agentHumiCalculatedAt}{' '}
-            <span className="tabular-nums">
-              {formatDate(indexHumi?.current_humi_score_calculated_at)}
-            </span>
+            <span className="tabular-nums">{formatDate(indexHumi?.current_humi_score_calculated_at)}</span>
           </p>
         </div>
 
-        <Link
-          href={`/dashboard/agents/${encodeURIComponent(agentId)}`}
-          className={cn(backLinkClass, 'self-start')}
-        >
+        <Link href={`/dashboard/agents/${encodeURIComponent(agentId)}`} className={cn(backLinkClass, 'self-start')}>
           {t.agentHumiBackToOverview}
         </Link>
       </div>
@@ -356,15 +429,14 @@ export default function HumiIndexPage() {
           <AgentDetailCard
             isDark={isDark}
             variant="metadata"
-            accentHex={humiColor}
+            accentHex={HUMI_BAND_NEUTRAL}
             className="w-full"
             contentClassName="p-6"
           >
             <AgentHumiPillarScoresCard
               points={pillarPoints}
               selectedPillarId={selectedPillar}
-              onPillarSelect={setSelectedPillar}
-              accentColor={humiColor}
+              onPillarSelect={handlePillarSelect}
               isDark={isDark}
               locale={locale}
               t={t}
@@ -374,16 +446,17 @@ export default function HumiIndexPage() {
           <AgentDetailCard
             isDark={isDark}
             variant="metadata"
-            accentHex={humiColor}
+            accentHex={selectedBlockColor}
             className="w-full"
             contentClassName="p-6"
           >
             <AgentHumiPillarSummaryCard
               selectedPillarId={pillarSummaryData.selectedPillarId}
+              selectedBlockId={selectedBlock}
+              onBlockSelect={handleBlockSelect}
               pillarLabel={pillarSummaryData.pillarLabel}
               summaryPoints={pillarSummaryData.summaryPoints}
               summaryMissing={pillarSummaryData.summaryMissing}
-              accentColor={humiColor}
               isDark={isDark}
               locale={locale}
               t={t}
@@ -412,7 +485,7 @@ export default function HumiIndexPage() {
           <AgentDetailCard
             isDark={isDark}
             variant="transactional"
-            accentHex={humiColor}
+            accentHex={selectedPillarColor}
             className="flex w-full min-w-0 flex-col lg:min-h-0 lg:flex-1"
             contentClassName="flex min-h-0 flex-1 flex-col p-8"
           >
@@ -423,7 +496,7 @@ export default function HumiIndexPage() {
               monthlySeries={pillarTrendData.monthlySeries}
               dailyRawMissing={pillarTrendData.dailyRawMissing}
               monthlyRawMissing={pillarTrendData.monthlyRawMissing}
-              accentColor={humiColor}
+              accentColor={selectedPillarColor}
               isDark={isDark}
               locale={locale}
               t={t}
@@ -431,6 +504,30 @@ export default function HumiIndexPage() {
           </AgentDetailCard>
         </div>
       </div>
+
+      <AgentDetailCard
+        isDark={isDark}
+        variant="metadata"
+        accentHex={blockScoreColor}
+        className="w-full"
+        contentClassName="p-6"
+      >
+        <AgentHumiBlockDetailsCard
+          selectedPillarId={selectedPillar}
+          selectedBlockId={selectedBlock}
+          pillarLabel={selectedPillar ? pillarLabels[selectedPillar] : null}
+          blockLabel={selectedBlock ? blockLabelsById[selectedBlock] : null}
+          rows={blockDetailRows}
+          blockTotalScore={blockTotalScore}
+          blockMaxScore={blockMaxScore}
+          blockScoreColor={blockScoreColor}
+          isDark={isDark}
+          locale={locale}
+          lang={lang}
+          t={t}
+        />
+      </AgentDetailCard>
     </div>
   );
 }
+

@@ -4,16 +4,17 @@ import type { Translations } from '@/app/(dashboard)/dashboard/components/Langua
 import { AgentHumiPillarSummaryBarChart } from '@/components/dashboard/AgentHumiPillarSummaryBarChart';
 import { dashboardCardInlayClass } from '@/lib/dashboardCardInlay';
 import type { HumiPillarId } from '@/lib/indexHumiPillars';
-import type { PillarSummaryChartPoint } from '@/lib/indexHumiPillarSummary';
+import type { PillarSummaryBlockId, PillarSummaryChartPoint } from '@/lib/indexHumiPillarSummary';
 import { hasPillarSummaryChartData } from '@/lib/indexHumiPillarSummary';
 import { cn } from '@/lib/utils';
 
 type Props = {
   selectedPillarId: HumiPillarId | null;
+  selectedBlockId?: PillarSummaryBlockId | null;
+  onBlockSelect?: (id: PillarSummaryBlockId) => void;
   pillarLabel: string | null;
   summaryPoints: PillarSummaryChartPoint[];
   summaryMissing: boolean;
-  accentColor: string;
   isDark: boolean;
   locale: string;
   t: Translations;
@@ -21,10 +22,11 @@ type Props = {
 
 export function AgentHumiPillarSummaryCard({
   selectedPillarId,
+  selectedBlockId = null,
+  onBlockSelect,
   pillarLabel,
   summaryPoints,
   summaryMissing,
-  accentColor,
   isDark,
   locale,
   t,
@@ -56,7 +58,8 @@ export function AgentHumiPillarSummaryCard({
         ) : hasChart ? (
           <AgentHumiPillarSummaryBarChart
             points={summaryPoints}
-            accentColor={accentColor}
+            selectedBlockId={selectedBlockId}
+            onBlockSelect={onBlockSelect}
             isDark={isDark}
             locale={locale}
           />

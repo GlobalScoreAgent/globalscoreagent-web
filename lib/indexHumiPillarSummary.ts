@@ -16,6 +16,16 @@ export type PillarSummaryChartPoint = {
   max: number;
 };
 
+export type PillarSummaryItemReason = Record<string, unknown>;
+
+export type PillarSummaryItem = {
+  name: string;
+  points: number;
+  reason: PillarSummaryItemReason | null;
+};
+
+export type PillarSummaryItemsByBlock = Record<PillarSummaryBlockId, PillarSummaryItem[]>;
+
 const BLOCK_MAX: Record<PillarSummaryBlockId, number> = {
   basic: 10,
   intermediate: 9,
@@ -99,4 +109,87 @@ export function buildPillarSummaryChartPoints(
 
 export function hasPillarSummaryChartData(points: PillarSummaryChartPoint[]): boolean {
   return points.length > 0;
+}
+
+function parseReasonObject(value: unknown): PillarSummaryItemReason | null {
+  if (value === null || value === undefined) return null;
+  if (typeof value !== 'object' || Array.isArray(value)) return null;
+  return value as PillarSummaryItemReason;
+}
+
+function parseSummaryItem(raw: unknown): PillarSummaryItem | null {
+  if (raw === null || raw === undefined || typeof raw !== 'object') return null;
+  const o = raw as Record<string, unknown>;
+  const name = typeof o.name === 'string' ? o.name.trim() : String(o.name ?? '').trim();
+  if (!name) return null;
+  const points = finiteScore(o.points) ?? 0;
+  return {
+    name,
+    points,
+    reason: parseReasonObject(o.reason),
+  };
+}
+
+function parseSummaryItemsArray(raw: unknown): PillarSummaryItem[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map(parseSummaryItem).filter((item): item is PillarSummaryItem => item !== null);
+}
+
+export function parsePillarSummaryItems(raw: unknown): PillarSummaryItemsByBlock | null {
+  if (raw === null || raw === undefined || typeof raw !== 'object') return null;
+  const o = raw as Record<string, unknown>;
+  return {
+    basic: parseSummaryItemsArray(o.block_basic_items),
+    intermediate: parseSummaryItemsArray(o.block_intermediate_items),
+    advanced: parseSummaryItemsArray(o.block_advanced_items),
+  };
+}
+
+export function getPillarSummaryItemsByBlock(
+  raw: unknown,
+  blockId: PillarSummaryBlockId,
+): PillarSummaryItem[] {
+  const parsed = parsePillarSummaryItems(raw);
+  if (!parsed) return [];
+  return parsed[blockId] ?? [];
+}
+
+export function resolveDefaultPillarSummaryBlockId(raw: unknown): PillarSummaryBlockId | null {
+  const parsed = parsePillarSummaryItems(raw);
+  if (!parsed) return null;
+  if (parsed.basic.length > 0) return 'basic';
+  if (parsed.intermediate.length > 0) return 'intermediate';
+  if (parsed.advanced.length > 0) return 'advanced';
+  return null;
+}
+
+export function hasPillarSummaryItemsForBlock(
+  raw: unknown,
+  blockId: PillarSummaryBlockId,
+): boolean {
+  return getPillarSummaryItemsByBlock(raw, blockId).length > 0;
+}
+
+const BLOCK_SCORE_FIELD: Record<PillarSummaryBlockId, keyof PillarSummaryBlocks> = {
+  basic: 'block_basic_score',
+  intermediate: 'block_intermediate_score',
+  advanced: 'block_advanced_score',
+};
+
+/** Max score per block (basic 10, intermediate 9, advanced 6). */
+export function getPillarSummaryBlockMax(blockId: PillarSummaryBlockId): number {
+  return BLOCK_MAX[blockId];
+}
+
+/** Official block total from `block_*_score` (same source as breakdown chart). */
+export function getPillarSummaryBlockScore(
+  raw: unknown,
+  blockId: PillarSummaryBlockId,
+): number | null {
+  if (raw === null || raw === undefined || typeof raw !== 'object') return null;
+  const o = raw as Record<string, unknown>;
+  const field = BLOCK_SCORE_FIELD[blockId];
+  const n = finiteScore(o[field]);
+  if (n === null) return null;
+  return clampBlockScore(o[field], BLOCK_MAX[blockId]);
 }

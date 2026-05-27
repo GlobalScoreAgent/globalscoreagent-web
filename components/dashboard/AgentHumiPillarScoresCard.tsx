@@ -10,7 +10,6 @@ type Props = {
   points: HumiPillarChartPoint[];
   selectedPillarId: HumiPillarId | null;
   onPillarSelect: (id: HumiPillarId) => void;
-  accentColor: string;
   isDark: boolean;
   locale: string;
   t: Translations;
@@ -20,7 +19,6 @@ export function AgentHumiPillarScoresCard({
   points,
   selectedPillarId,
   onPillarSelect,
-  accentColor,
   isDark,
   locale,
   t,
@@ -35,7 +33,6 @@ export function AgentHumiPillarScoresCard({
           points={points}
           selectedPillarId={selectedPillarId}
           onPillarSelect={onPillarSelect}
-          accentColor={accentColor}
           isDark={isDark}
           locale={locale}
           emptyMessage={t.agentHumiPillarsEmpty}

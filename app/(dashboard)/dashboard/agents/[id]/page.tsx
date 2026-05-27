@@ -569,7 +569,7 @@ export default function AgentDetailPage() {
                     filterTier={humiFilter}
                     filterLabel={humiText}
                     accentColor={humiColor}
-                    detailsHref={`/dashboard/humi?agentId=${encodeURIComponent(routeId)}`}
+                    detailsHref={`/dashboard/agents/${encodeURIComponent(routeId)}/humi`}
                     plusAriaLabel={t.agentDetailIndexPlusAriaLabelHumi}
                     infoAriaLabel={t.agentDetailIndexInfoAriaLabel}
                     notAvailableLabel={t.notAvailable}
