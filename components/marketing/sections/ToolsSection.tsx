@@ -28,7 +28,7 @@ export default function ToolsSection() {
               {pick(language, tools.dashboard.description)}
             </p>
             <Link
-              href="/waitlist"
+              href="/dashboard"
               className="inline-block rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 px-5 py-2 text-sm font-semibold text-black"
             >
               {pick(language, tools.dashboard.cta)}

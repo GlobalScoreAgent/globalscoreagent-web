@@ -139,7 +139,7 @@ export const marketingCopy = {
         es: 'Explora agentes, consulta scores HUMI y WAMI, aplica filtros avanzados y analiza datos en tiempo real.',
         en: 'Explore agents, view HUMI and WAMI scores, apply advanced filters, and analyze data in real time.',
       } satisfies Bilingual,
-      cta: { es: 'Lista de espera', en: 'Join waitlist' } satisfies Bilingual,
+      cta: { es: 'Abrir dashboard', en: 'Open dashboard' } satisfies Bilingual,
     },
     api: {
       title: { es: 'Public API', en: 'Public API' } satisfies Bilingual,
