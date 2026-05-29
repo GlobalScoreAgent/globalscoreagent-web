@@ -1,7 +1,7 @@
 # Index HUMI – Agent Human-like Intelligence Index
 
 **Version 1.0**  
-**Date:** May 19, 2026  
+**Date:** May 19, 2026 (Updated with Score Categories)  
 **Designed for:** GlobalScoreAgent Ecosystem (ERC-8004)
 
 ---
@@ -19,6 +19,22 @@ It is the core reputation layer for every Agent registered in the ERC-8004 netwo
 
 ---
 
+## HUMI Score Levels: What Each Category Means
+
+To make the HUMI score immediately actionable for users, developers, and platforms, every Agent is automatically classified into one of five clear business categories:
+
+| HUMI Score Range | Category              | Business Meaning |
+|------------------|-----------------------|------------------|
+| **0 – 10**       | **Critical**          | High-risk or severely deficient agent. Strong indicators of low quality, duplication, spam, or lack of legitimacy. These agents are heavily penalized and rarely recommended. |
+| **11 – 30**      | **Moderate Risk**     | Below-average agent with noticeable weaknesses. May have incomplete metadata, limited activity, or stability issues. Suitable only for very low-stakes use cases. |
+| **31 – 60**      | **Stable**            | Average, functional agent. Meets basic requirements but lacks excellence. Acceptable for general use, but not ideal for high-trust or mission-critical scenarios. |
+| **61 – 80**      | **High Performance**  | Strong, reliable agent. Demonstrates good professionalism, activity, and legitimacy. Recommended for most production and business use cases. |
+| **81 – 100**     | **Elite**             | Top-tier, exceptional agent. Outstanding across all pillars: rich metadata, strong history, high activity, and excellent realness. These agents represent the highest level of quality and trustworthiness in the ecosystem. |
+
+These categories are automatically calculated using the following logic and stored as `humi_score_filter` for easy filtering, sorting, and risk assessment across the dashboard and API.
+
+---
+
 ## How Index HUMI Applies to the ERC-8004 Ecosystem
 
 In the ERC-8004 ecosystem, Agents are autonomous entities that interact with users, protocols, and each other. Their credibility is critical for adoption, governance, staking, and marketplace listings.
@@ -28,7 +44,6 @@ Index HUMI acts as the **primary trust layer for Agents**, evaluating not just t
 HUMI applies to **all Agents** — new or ancient, high-activity or low-activity — ensuring every registered Agent receives a fair, up-to-date reputation score.
 
 It enables:
-
 - Automatic ranking and filtering of Agents in dashboards and marketplaces.
 - Real-time risk assessment before any interaction (executions, attestations, payments, etc.).
 - Seamless integration with Index WAMI to create a complete reputation system (Agent + Owner wallet).
@@ -121,7 +136,6 @@ Each pillar is worth exactly **25 points**. Below are the specific aspects analy
 
 ### 1. Pillar History (25 points)
 Evaluates the Agent’s ownership stability and historical reputation.
-
 - Strength and activity of the owner wallet: **10 points**
 - Stability of ownership over time (few or no changes): **5 points**
 - Longevity and antiquity of the owner wallet: **5 points**
@@ -129,7 +143,6 @@ Evaluates the Agent’s ownership stability and historical reputation.
 
 ### 2. Pillar Information (25 points)
 Measures the richness, professionalism, and completeness of the Agent’s public identity and technical metadata.
-
 - Quality of name, description, and image: **7.5 points**
 - Diversity and depth of information sources (Chain + URI + external): **7.5 points**
 - Availability of contact methods and programmatic endpoints: **5 points**
@@ -137,7 +150,6 @@ Measures the richness, professionalism, and completeness of the Agent’s public
 
 ### 3. Pillar Measure (25 points)
 Assesses external validation, metadata richness, and specialized analysis of the Agent.
-
 - Metadata richness and completeness: **8 points**
 - Existence of external audits and protocol activity: **7 points**
 - Identity analysis and specialized evaluations: **5 points**
@@ -145,7 +157,6 @@ Assesses external validation, metadata richness, and specialized analysis of the
 
 ### 4. Pillar Usage (25 points)
 Analyzes the Agent’s real on-chain activity and engagement level.
-
 - Natural and consistent recent activity (wallet + on-chain): **10 points**
 - Volume and quality of attestations, comments, and executions: **6 points**
 - Advanced activity patterns with payments and protocol usage: **5 points**
