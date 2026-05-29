@@ -1,7 +1,7 @@
 # Index HUMI – Agent Human-like Intelligence Index
 
 **Version 1.0**  
-**Date:** May 19, 2026 (Updated with Score Categories)  
+**Date:** May 19, 2026 (Updated with Maturity Levels)  
 **Designed for:** GlobalScoreAgent Ecosystem (ERC-8004)
 
 ---
@@ -19,19 +19,21 @@ It is the core reputation layer for every Agent registered in the ERC-8004 netwo
 
 ---
 
-## HUMI Score Levels: What Each Category Means
+## HUMI Maturity Levels (Business Interpretation)
 
-To make the HUMI score immediately actionable for users, developers, and platforms, every Agent is automatically classified into one of five clear business categories:
+The HUMI score (0–100) is translated into **5 clear maturity/confidence levels**. These levels are used in the dashboard for:
+- Filters and advanced search
+- Badges and colors on Agent cards
+- Ranking and recommendations
+- Risk alerts when combined with WAMI
 
-| HUMI Score Range | Category              | Business Meaning |
-|------------------|-----------------------|------------------|
-| **0 – 10**       | **Critical**          | High-risk or severely deficient agent. Strong indicators of low quality, duplication, spam, or lack of legitimacy. These agents are heavily penalized and rarely recommended. |
-| **11 – 30**      | **Moderate Risk**     | Below-average agent with noticeable weaknesses. May have incomplete metadata, limited activity, or stability issues. Suitable only for very low-stakes use cases. |
-| **31 – 60**      | **Stable**            | Average, functional agent. Meets basic requirements but lacks excellence. Acceptable for general use, but not ideal for high-trust or mission-critical scenarios. |
-| **61 – 80**      | **High Performance**  | Strong, reliable agent. Demonstrates good professionalism, activity, and legitimacy. Recommended for most production and business use cases. |
-| **81 – 100**     | **Elite**             | Top-tier, exceptional agent. Outstanding across all pillars: rich metadata, strong history, high activity, and excellent realness. These agents represent the highest level of quality and trustworthiness in the ecosystem. |
-
-These categories are automatically calculated using the following logic and stored as `humi_score_filter` for easy filtering, sorting, and risk assessment across the dashboard and API.
+| Level          | HUMI Range | UI Color       | Badge / Label   | Description for Users (Dashboard)                                      | Business Trust Level          | Approx. Risk   |
+|----------------|------------|----------------|-----------------|------------------------------------------------------------------------|-------------------------------|----------------|
+| **Unstable**   | 0 – 49     | 🔴 Red         | Unstable        | High-risk or very low maturity Agent. Extreme caution required.        | Very low – Not recommended for production | High           |
+| **Developing** | 50 – 64    | 🟠 Orange      | Developing      | Basic Agent. Has minimal presence but still immature.                  | Moderate – Monitor closely    | Medium-High    |
+| **Stable**     | 65 – 79    | 🟢 Light Green | Stable          | Reliable Agent with solid intermediate maturity. Recommended for general use. | Good – Acceptable confidence level | Low            |
+| **Very Stable**| 80 – 89    | 🟢 Green       | Very Stable     | Mature, consistent, and high-quality Agent. High reliability.          | High – Suitable for critical integrations | Very Low       |
+| **Elite**      | 90 – 100   | 🟢 Dark Green  | Elite           | Reference Agent in the ecosystem. Maximum quality and maturity.        | Very High / Premium – Maximum trust | Minimal        |
 
 ---
 
