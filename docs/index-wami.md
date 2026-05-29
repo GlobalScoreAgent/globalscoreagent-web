@@ -1,7 +1,7 @@
 # Index WAMI – Wallet Advanced Metrics Index
 
 **Version 1.0**  
-**Date:** May 19, 2026  
+**Date:** May 19, 2026 (Updated with Maturity Levels)  
 **Designed for:** GlobalScoreAgent Ecosystem (ERC-8004)
 
 ---
@@ -19,12 +19,35 @@ It is especially valuable for wallets that own or register Agents in the ERC-800
 
 ---
 
+## WAMI Maturity Levels (Business Interpretation)
+
+The WAMI score (0–100) is translated into **5 clear maturity/confidence levels**. These levels are used in the dashboard for:
+- Filters and advanced search
+- Badges and colors on wallet cards / Agent owner views
+- Risk alerts when combined with HUMI
+- Ranking and recommendations
+
+| Level          | WAMI Range | UI Color       | Badge / Label   | Description for Users (Dashboard)                                      | Business Trust Level          | Approx. Risk   |
+|----------------|------------|----------------|-----------------|------------------------------------------------------------------------|-------------------------------|----------------|
+| **Unstable**   | 0 – 49     | 🔴 Red         | Unstable        | High-risk wallet with suspicious origins, low activity or poor quality. Extreme caution required. | Very low – Not recommended | High           |
+| **Developing** | 50 – 64    | 🟠 Orange      | Developing      | Basic wallet. Has minimal presence but still immature.                 | Moderate – Monitor closely    | Medium-High    |
+| **Stable**     | 65 – 79    | 🟢 Light Green | Stable          | Reliable wallet with solid quality and maturity. Recommended for general use. | Good – Acceptable confidence level | Low            |
+| **Very Stable**| 80 – 89    | 🟢 Green       | Very Stable     | Mature, consistent, and high-quality wallet. High reliability.         | High – Suitable for critical use | Very Low       |
+| **Elite**      | 90 – 100   | 🟢 Dark Green  | Elite           | Exceptional wallet in the ecosystem. Maximum quality and maturity.     | Very High / Premium – Maximum trust | Minimal        |
+
+**Business Notes:**
+- The threshold for “**Stable**” has been raised to **65+** (previously too permissive). This prevents wallets with structural weaknesses (suspicious origins, low diversification, wash-trading signals, etc.) from being perceived as reliable.
+- Any WAMI **< 65** should always show a visual warning when combined with HUMI.
+- The levels respect the progressive v2.0 philosophy: new wallets can quickly reach “Developing”, but reaching “Stable” requires real on-chain maturity across all four pillars.
+- **Aligned with HUMI** – same ranges, same colors, and same badges for perfect consistency across Agents and Wallets.
+
+---
+
 ## How Index WAMI Applies to the ERC-8004 Ecosystem
 
 In the ERC-8004 ecosystem, every Agent is controlled or registered by a wallet. The quality of that wallet directly impacts the credibility of the Agent itself.
 
 Index WAMI acts as a **trust layer for wallets**, just like the Index Humi acts as a trust layer for Agents. It enables:
-
 - Automatic evaluation of Agent owners before they interact with protocols, governance, or marketplaces.
 - Real-time risk assessment for any wallet interacting with Agents (staking, payments, attestations, etc.).
 - Seamless integration with the existing Index Humi to create a complete reputation system (Agent + Owner wallet).
@@ -65,11 +88,11 @@ This combination creates the most robust reputation system in the ERC-8004 ecosy
 
 | Index / Oracle                  | Provider          | Focus                          | Score Range | Data Used                     | Key Advantage of WAMI                                      |
 |---------------------------------|-------------------|--------------------------------|-------------|-------------------------------|------------------------------------------------------------|
-| **Nansen Wallet Score**         | Nansen            | Wallet behavior & labels       | 0–100       | Off-chain + on-chain analytics| WAMI is fully on-chain and native to ERC-8004 Agents     |
-| **Arkham Intelligence**         | Arkham            | Entity labeling & fund flows   | Risk-based  | On-chain + entity database    | WAMI provides a single, simple 0-100 score with pillars   |
+| **Nansen Wallet Score**         | Nansen            | Wallet behavior & labels       | 0–100       | Off-chain + on-chain analytics| WAMI is fully on-chain and native to ERC-8004 Agents      |
+| **Arkham Intelligence**         | Arkham            | Entity labeling & fund flows   | Risk-based  | On-chain + entity database    | WAMI provides a single, simple 0-100 score with pillars    |
 | **Chainalysis / TRM Labs**      | Chainalysis/TRM   | Risk & compliance scoring      | Risk tiers  | On-chain + off-chain intel    | WAMI is public, transparent, and Agent-specific           |
 | **Dune / Community Dashboards** | Open-source       | Custom wallet metrics          | Varies      | On-chain queries              | WAMI is standardized, real-time, and integrated with GSA  |
-| **EigenLayer / Other DeFi Rep.**| Various DeFi      | Staking & restaking reputation | Varies      | Protocol-specific activity    | WAMI works across all chains and is Agent-owner focused   |
+| **EigenLayer / Other DeFi Rep.**| Various DeFi      | Staking & restaking reputation | Varies      | Protocol-specific activity    | WAMI works across all chains and is Agent-owner focused    |
 
 **Why WAMI stands out:**
 - It is purpose-built for the **ERC-8004 Agent ecosystem** (most external tools are general-purpose).
@@ -93,7 +116,6 @@ This focused approach ensures that only wallets with meaningful on-chain history
 
 ### How often is each module refreshed?
 The system uses smart **“does need”** logic to trigger updates only when necessary:
-
 - **Origins & Legitimacy (Fund Origins):** Refreshed **once** when the wallet first qualifies as valid (this is a heavier, one-time foundational analysis).
 - **Recent Flows, Portfolio Quality, and Multi-Chain Presence:** Refreshed **every 15 days** for actively valid/growing wallets (or immediately if the data has never been calculated before).
 
@@ -114,7 +136,6 @@ Each pillar is worth exactly **25 points**. Below are the specific aspects analy
 
 ### 1. Origins & Legitimacy (25 points)
 Evaluates how clean and natural the wallet’s funding history is.
-
 - Quality and legitimacy of the very first funds received: **8 points**
 - Low risk of mixing services or suspicious fund sources: **7 points**
 - Absence of heavy reliance on centralized exchange (CEX) inflows: **5 points**
@@ -122,7 +143,6 @@ Evaluates how clean and natural the wallet’s funding history is.
 
 ### 2. Portfolio Quality (25 points)
 Measures the health, liquidity, and sophistication of the assets held by the wallet.
-
 - Total portfolio value and overall asset health: **7 points**
 - High proportion of liquid (easily tradable) assets: **6 points**
 - Strong diversification across different token types and categories: **6 points**
@@ -130,7 +150,6 @@ Measures the health, liquidity, and sophistication of the assets held by the wal
 
 ### 3. Activity & Behavior (25 points)
 Analyzes whether the wallet’s recent activity looks natural and sustainable.
-
 - Natural volume and balance of inflows vs outflows: **7 points**
 - Low signs of wash-trading or artificial transaction cycles: **6 points**
 - High number of unique, genuine counterparties: **6 points**
@@ -138,7 +157,6 @@ Analyzes whether the wallet’s recent activity looks natural and sustainable.
 
 ### 4. Multi-Chain Presence & Maturity (25 points)
 Assesses the wallet’s longevity, geographic spread, and consistency across blockchains.
-
 - Long history of consistent activity (age and span): **8 points**
 - Active presence across multiple blockchain networks: **7 points**
 - Balanced and coherent activity patterns across chains: **5 points**
