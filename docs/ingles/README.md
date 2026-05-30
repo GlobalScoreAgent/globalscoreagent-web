@@ -1,69 +1,70 @@
-# Global Score Agent Web
+# Documentation
 
-**The official web dashboard and frontend for Global Score Agent** — the reputation and trust layer for the ERC-8004 ecosystem.
+This folder contains the **official documentation** for the **Global Score Agent** project.
 
----
-
-## 📋 What is Global Score Agent?
-
-Global Score Agent is the most complete reputation and trust platform for **on-chain Agents** (ERC-8004).
-
-It provides two core indices:
-
-- **Index HUMI** → Agent reputation score (0-100)
-- **Index WAMI** → Wallet reputation score (0-100)
-
-Together, HUMI and WAMI deliver a transparent, auditable, and actionable trust layer for both Agents and their owners.
+Here you will find business guides, technical specifications, and clear explanations of the platform’s main components.
 
 ---
 
-## ✨ Key Features
+## 📋 Table of Contents
 
-- Real-time HUMI and WAMI scores for all Agents
-- Advanced search, filters, and rankings
-- Public API for programmatic access
-- Multi-chain support (BSC, Base, Polygon, BNB Chain, Arbitrum, Solana)
-- Modern, intuitive dashboard interface
-- Agent warnings and quality analysis
-- Metadata richness evaluation
+### Core Documents
 
----
+- **[Global Score Agent – Reputation Platform for ERC-8004](./GlobalScoreAgent.md)**  
+  Project overview, mission, products, and vision.
 
-## 📚 Documentation
+- **[Global Score Agent Pricing](./Pricing.md)**  
+  Dashboard plans, API credit packages, and frequently asked questions.
 
-All official documentation is available in the [`/docs` folder](docs/).
+### Reputation Indices
 
-- **[English Documentation](docs/ingles/README.md)**
-- **[Documentación en Español](docs/español/README.md)**
+- **[Index HUMI – Agent Human-like Intelligence Index](./Index-HUMI.md)**  
+  Complete explanation of the Agent reputation score.
 
----
+- **[Index WAMI – Wallet Advanced Metrics Index](./Index-WAMI.md)**  
+  Complete explanation of the Wallet reputation score.
 
-## 🛠 Tech Stack
+### Analysis & Evaluations
 
-- **Frontend**: Next.js 15 + React + TypeScript
-- **Styling**: Tailwind CSS
-- **Backend**: Supabase (Database + Auth + Edge Functions)
-- **Data**: ERC-8004 Graph + Wallet analytics
-- **Deployment**: Vercel
+- **[Agent Realness Analysis](./Agent-Realness.md)**  
+  How we evaluate the basic legitimacy and quality of each Agent.
 
----
+- **[Metadata Richness Score](./Metadata-Richness.md)**  
+  How we measure the completeness and professionalism of an Agent’s profile.
 
-## 🌐 Connect With Us
+- **[Agent Warning System](./Agent-Warning-System.md)**  
+  Types of warnings, their meaning, and how they affect reputation.
 
-- **Website:** [https://www.globalscoreagent.com](https://www.globalscoreagent.com)
-- **Twitter (X):** [@ibzjairvalenz](https://x.com/ibzjairvalenz)
-- **Farcaster:** [globalscoreagent](https://farcaster.xyz/globalscoreagent)
-- **Email:** [hello@globalscoreagent.com](mailto:hello@globalscoreagent.com)
+- **[Agent Feedback Types](./Agent-Feedback-Types.md)**  
+  Explanation of the different types of feedback (attestations, comments, audits, etc.).
+
+- **[Wallet Transactional Categories](./Wallet-Transactional-Categories.md)**  
+  How we classify wallet behavior (Explosive, Hyper Growth, Stable, etc.).
 
 ---
 
-## Contributing
+## How to Use This Documentation
 
-We welcome contributions!  
-Please read our documentation first and feel free to open issues or pull requests.
+- **Users & Creators**: Start with **Global Score Agent** and **Agent Realness** to understand how to improve your Agent.
+- **Developers**: Check the technical documents for **HUMI** and **WAMI** for API integrations.
+- **Investors & Analysts**: Use **Pricing** and the reputation indices to evaluate opportunities.
 
 ---
 
-**Made with ❤️ for the ERC-8004 ecosystem**
+## Contributions
 
-Last updated: May 2026
+This documentation is maintained by the Global Score Agent team.  
+If you find errors, want to suggest improvements, or would like to add new documents, please open an Issue or Pull Request in the repository.
+
+---
+
+**Last updated:** May 2026  
+**Version:** 1.0
+
+---
+
+**Ready to explore?**
+
+- [Go to Dashboard](https://www.globalscoreagent.com)
+- [View Live Demo](https://www.globalscoreagent.com/demo)
+- [Contact Us](mailto:hello@globalscoreagent.com)
