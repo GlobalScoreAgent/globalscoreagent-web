@@ -31,21 +31,10 @@ Together, HUMI and WAMI deliver a transparent, auditable, and actionable trust l
 
 ## 📚 Documentation
 
-All official documentation is available in the [`/docs` folder](docs/):
+All official documentation is available in the [`/docs` folder](docs/).
 
-### English
-- [Global Score Agent Overview](docs/GlobalScoreAgent.md)
-- [Index HUMI – Overview & Maturity Levels](docs/Index-HUMI.md)
-- [Index WAMI – Overview & Maturity Levels](docs/Index-WAMI.md)
-- [Agent Realness Analysis](docs/Agent-Realness.md)
-- [Metadata Richness Score](docs/Metadata-Richness.md)
-- [Agent Warning System](docs/Agent-Warning-System.md)
-- [Agent Feedback Types](docs/Agent-Feedback-Types.md)
-- [Wallet Transactional Categories](docs/Wallet-Transactional-Categories.md)
-- [Pricing](docs/Pricing.md)
-
-### Español
-- [Documentación completa en español](docs/español/README.md)
+- **[English Documentation](docs/ingles/README.md)**
+- **[Documentación en Español](docs/español/README.md)**
 
 ---
 
@@ -71,7 +60,7 @@ All official documentation is available in the [`/docs` folder](docs/):
 ## Contributing
 
 We welcome contributions!  
-Please read our [documentation](docs/) first and feel free to open issues or pull requests.
+Please read our documentation first and feel free to open issues or pull requests.
 
 ---
 
