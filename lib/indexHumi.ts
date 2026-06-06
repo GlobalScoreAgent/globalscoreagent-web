@@ -1,7 +1,8 @@
-import { humiFilterFromNumericScore } from '@/lib/dashboardChains';
+import { maturityKeyFromNumericScore } from '@/lib/agentHumiDisplay';
 
 export type IndexHumiCardData = {
   humi_score: number | null;
+  madurity_level: string | null;
   humi_score_category: string | null;
   current_humi_score_calculated_at: string | null;
   humi_score_last_30_days: unknown;
@@ -36,25 +37,22 @@ function clampPillarScore(value: unknown): number | null {
   return Math.min(25, Math.max(0, n));
 }
 
+function parseOptionalString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
 export function parseIndexHumiRow(raw: unknown): IndexHumiCardData | null {
   if (!raw || typeof raw !== 'object') return null;
   const o = raw as Record<string, unknown>;
 
   const humi_score = finiteNumber(o.humi_score);
-  const categoryRaw = o.humi_score_category;
-  const humi_score_category =
-    typeof categoryRaw === 'string' && categoryRaw.trim().length > 0
-      ? categoryRaw.trim()
-      : null;
-
-  const calculatedRaw = o.current_humi_score_calculated_at;
-  const current_humi_score_calculated_at =
-    typeof calculatedRaw === 'string' && calculatedRaw.trim().length > 0
-      ? calculatedRaw.trim()
-      : null;
+  const madurity_level = parseOptionalString(o.madurity_level);
+  const humi_score_category = parseOptionalString(o.humi_score_category);
+  const current_humi_score_calculated_at = parseOptionalString(o.current_humi_score_calculated_at);
 
   return {
     humi_score,
+    madurity_level,
     humi_score_category,
     current_humi_score_calculated_at,
     humi_score_last_30_days: o.humi_score_last_30_days ?? null,
@@ -78,15 +76,20 @@ export function parseIndexHumiRow(raw: unknown): IndexHumiCardData | null {
   };
 }
 
+/** Resolve display category: madurity_level → legacy category → score bands. */
 export function resolveHumiCategory(
-  category: string | null | undefined,
+  madurityLevel: string | null | undefined,
+  legacyCategory: string | null | undefined,
   score: number | null | undefined,
 ): string {
-  if (typeof category === 'string' && category.trim().length > 0) {
-    return category.trim();
-  }
+  const maturity = parseOptionalString(madurityLevel ?? undefined);
+  if (maturity) return maturity;
+
+  const category = parseOptionalString(legacyCategory ?? undefined);
+  if (category) return category;
+
   if (score !== null && score !== undefined && Number.isFinite(score)) {
-    return humiFilterFromNumericScore(score);
+    return maturityKeyFromNumericScore(score);
   }
   return '';
 }

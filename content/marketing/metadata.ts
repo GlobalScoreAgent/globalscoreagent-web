@@ -4,6 +4,8 @@ import { humiCopy } from '@/content/humi/copy';
 import { wamiCopy } from '@/content/wami/copy';
 import { legalCopy } from '@/content/legal/copy';
 import { waitlistCopy } from '@/content/waitlist/copy';
+import { pricingCopy } from '@/content/pricing/copy';
+import { docsHubSeo, getDocManifestEntry } from '@/content/docs/manifest';
 import { SITE_URL } from '@/lib/seo/site';
 
 export { SITE_URL };
@@ -60,6 +62,18 @@ export const routeMetadata = {
     title: waitlistCopy.seo.title,
     description: waitlistCopy.seo.description,
     canonical: `${SITE_URL}/waitlist`,
+    ogPath: '/opengraph-image',
+  },
+  pricing: {
+    title: pricingCopy.seo.title,
+    description: pricingCopy.seo.description,
+    canonical: `${SITE_URL}/pricing`,
+    ogPath: '/opengraph-image',
+  },
+  docs: {
+    title: docsHubSeo.title,
+    description: docsHubSeo.description,
+    canonical: `${SITE_URL}/docs/global-score-agent`,
     ogPath: '/opengraph-image',
   },
 } as const satisfies Record<string, RouteMetaEntry>;
@@ -134,6 +148,41 @@ export function buildHomeMetadata(lang: SeoLang = 'es'): Metadata {
       url: canonical,
       siteName: 'Global Score Agent',
       type: 'website',
+      locale: ogLocale,
+      alternateLocale: ogAlternate,
+      images: buildOgImages('/opengraph-image', titleText),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: titleText,
+      description: descriptionText,
+      images: ['/opengraph-image'],
+    },
+    alternates: buildLanguageAlternates(canonical),
+  };
+}
+
+export function buildDocMetadata(slug: string, lang: SeoLang = 'es'): Metadata {
+  const entry = getDocManifestEntry(slug);
+  if (!entry) {
+    throw new Error(`Unknown documentation slug: ${slug}`);
+  }
+
+  const canonical = `${SITE_URL}/docs/${slug}`;
+  const titleText = `${pickBilingual(entry.title, lang)} | Global Score Agent`;
+  const descriptionText = pickBilingual(entry.description, lang);
+  const ogLocale = lang === 'en' ? 'en_US' : 'es_ES';
+  const ogAlternate = lang === 'en' ? ['es_ES'] : ['en_US'];
+
+  return {
+    title: titleText,
+    description: descriptionText,
+    openGraph: {
+      title: titleText,
+      description: descriptionText,
+      url: lang === 'en' ? `${canonical}?lang=en` : canonical,
+      siteName: 'Global Score Agent',
+      type: 'article',
       locale: ogLocale,
       alternateLocale: ogAlternate,
       images: buildOgImages('/opengraph-image', titleText),

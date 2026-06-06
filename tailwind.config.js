@@ -6,6 +6,7 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
     "./content/**/*.{js,ts}",
+    "./lib/**/*.{js,ts}",
   ],
 
   theme: {
@@ -17,5 +18,5 @@ module.exports = {
     },
   },
 
-  plugins: [],
+  plugins: [require('@tailwindcss/typography')],
 }

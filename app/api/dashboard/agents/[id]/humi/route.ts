@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { requireDashboardUser } from '@/lib/auth/require-dashboard-user';
 
 export async function GET(
   _request: NextRequest,
   context: { params: { id: string } },
 ) {
   try {
+    const auth = await requireDashboardUser();
+    if (!auth.ok) return auth.response;
+
     const idParam = context.params.id;
     const numericId = parseInt(idParam, 10);
     if (!idParam || Number.isNaN(numericId)) {
       return NextResponse.json({ error: 'Invalid agent id' }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    const supabase = auth.supabase;
 
     const { data, error } = await supabase
       .schema('web_dashboard')
@@ -20,6 +23,7 @@ export async function GET(
       .select(
         `
         humi_score,
+        madurity_level,
         humi_score_category,
         current_humi_score_calculated_at,
         humi_score_last_30_days,

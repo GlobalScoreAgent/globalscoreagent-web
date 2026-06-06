@@ -1,0 +1,28 @@
+---
+description: Reglas generales del proyecto — leer docs/AGENT-RULES.md al iniciar
+alwaysApply: true
+---
+
+# Reglas generales del agente
+
+Al **iniciar una tarea** (o si falta contexto), lee primero:
+
+1. [`docs/AGENT-RULES.md`](docs/AGENT-RULES.md) — ramas, BD, migraciones MV, HUMI/WAMI, convenciones, qué no hacer
+2. Si es **dashboard**: [`docs/dashboard-context-summary.md`](docs/dashboard-context-summary.md)
+3. Si cruzas marketing + dashboard: [`docs/BRANCHING.md`](docs/BRANCHING.md)
+
+## Antes de tocar BD o APIs
+
+- Confirmar **rama**: `web-page-v2` (marketing) o `dashboard-final` (dashboard)
+- Fuente práctica de tablas/vistas: `app/api/**` (`.from('...')`)
+- Definiciones SQL: `docs/sql/`; índices puntuales: `db/`
+- La BD en Supabase puede diferir del SQL del repo (p. ej. `chains_stadistics`)
+
+## Recordatorios clave
+
+- Diff mínimo; no refactorizar código ajeno
+- No commits ni push salvo petición explícita del usuario
+- Dashboard: auth vía `requireDashboardUser()`; datos sensibles por API server
+- HUMI madurez: `humi_madurity_level`; Not Calculated → `.is('humi_madurity_level', null)`
+- Migraciones hechas: `global_stadistics`, `chains_stadistics`, `global_score_agent_summary`
+- Pendiente conocido: `agents/[id]/route.ts` aún usa `chains` (legacy)

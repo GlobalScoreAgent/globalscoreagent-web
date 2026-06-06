@@ -19,7 +19,9 @@ import {
   MoreHorizontal,
 } from 'lucide-react';
 import { buildAuthLoginUrl } from '@/lib/auth/redirect';
+import { clearLoginProcess } from '@/lib/gsa/login-process-storage';
 import { createClient } from '@/utils/supabase/client';
+import { useDashboardLogin } from './DashboardLoginContext';
 import { useLanguage } from './LanguageContext';
 import RoadMapCards from './RoadMapCards';
 import { useAgentRecentNavigation } from './AgentRecentNavigationContext';
@@ -42,8 +44,11 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
   const supabase = createClient();
   const { t, theme } = useLanguage();
-  const { recentAgents, closeRecentAgent, addFavorite, removeFavorite, isFavorite } =
+  const { recentAgents, favoriteAgents, closeRecentAgent, addFavorite, removeFavorite, isFavorite } =
     useAgentRecentNavigation();
+  const { subscription } = useDashboardLogin();
+  const navDisabled = subscription === 'Disable';
+  const recentAgentsFiltered = recentAgents.filter((agent) => !isFavorite(agent.id));
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [roadMapBodyOpen, setRoadMapBodyOpen] = useState(true);
@@ -71,9 +76,20 @@ export default function DashboardSidebar() {
   };
 
   const handleLogout = async () => {
+    try {
+      sessionStorage.removeItem('gsa:agentsRecent');
+      sessionStorage.removeItem('gsa:agentFavorites');
+    } catch {
+      /* ignore */
+    }
+    clearLoginProcess();
     await supabase.auth.signOut();
     window.location.href = buildAuthLoginUrl('/dashboard');
   };
+
+  const navDisabledClass = navDisabled
+    ? 'pointer-events-none opacity-50 cursor-not-allowed'
+    : '';
 
   /** Rail colapsado (w-16): íconos centrados, sin padding horizontal agresivo */
   const navRowLayout = isCollapsed
@@ -138,8 +154,9 @@ export default function DashboardSidebar() {
               <div key={item.href} className="space-y-1">
                 <Link
                   href={item.href}
+                  aria-disabled={navDisabled}
                   title={isCollapsed ? t[item.labelKey] : undefined}
-                  className={`flex items-center py-3 rounded-2xl text-sm font-medium transition-colors ${navRowLayout} ${
+                  className={`flex items-center py-3 rounded-2xl text-sm font-medium transition-colors ${navRowLayout} ${navDisabledClass} ${
                     isActive
                       ? theme === 'dark'
                         ? 'bg-zinc-800 text-amber-400'
@@ -152,20 +169,94 @@ export default function DashboardSidebar() {
                   <item.icon className="h-5 w-5 shrink-0" />
                   {!isCollapsed && <span>{t[item.labelKey]}</span>}
                 </Link>
-                {!isCollapsed && recentAgents.length > 0 && (
+                {!isCollapsed && (recentAgentsFiltered.length > 0 || favoriteAgents.length > 0) && (
                   <div
                     className={`ml-2 pl-3 border-l ${
                       theme === 'dark' ? 'border-zinc-700' : 'border-zinc-200'
                     } space-y-0.5 pt-1 pb-1`}
                   >
-                    <p
-                      className={`px-2 pb-1 text-[10px] font-semibold uppercase tracking-wide ${
-                        theme === 'dark' ? 'text-zinc-500' : 'text-zinc-400'
-                      }`}
-                    >
-                      {t.recentAgentsSubmenu}
-                    </p>
-                    {recentAgents.map((agent) => {
+                    {favoriteAgents.length > 0 && (
+                      <>
+                        <p
+                          className={`px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wide ${
+                            theme === 'dark' ? 'text-zinc-500' : 'text-zinc-400'
+                          }`}
+                        >
+                          {t.favoriteAgentsSubmenu}
+                        </p>
+                        {favoriteAgents.map((agent) => {
+                          const detailPath = `/dashboard/agents/${agent.id}`;
+                          const isAgentActive = pathname === detailPath;
+                          return (
+                            <div
+                              key={`favorite-${agent.id}`}
+                              className={`group flex items-center gap-0.5 rounded-xl pl-1 pr-0.5 ${
+                                isAgentActive
+                                  ? theme === 'dark'
+                                    ? 'bg-zinc-800/80'
+                                    : 'bg-zinc-100'
+                                  : ''
+                              }`}
+                            >
+                              <Link
+                                href={detailPath}
+                                aria-disabled={navDisabled}
+                                title={agent.label}
+                                className={`min-w-0 flex-1 truncate py-1.5 px-2 text-xs font-medium transition-colors ${navDisabledClass} ${
+                                  isAgentActive
+                                    ? theme === 'dark'
+                                      ? 'text-amber-400'
+                                      : 'text-amber-700'
+                                    : theme === 'dark'
+                                      ? 'text-zinc-300 hover:text-zinc-100'
+                                      : 'text-zinc-700 hover:text-zinc-900'
+                                }`}
+                              >
+                                {agent.label}
+                              </Link>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button
+                                    type="button"
+                                    className={`shrink-0 rounded-lg p-1.5 transition-colors outline-none ${
+                                      theme === 'dark'
+                                        ? 'text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100'
+                                        : 'text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900'
+                                    }`}
+                                    aria-label={t.agentMenuAria}
+                                  >
+                                    <MoreHorizontal className="h-4 w-4" />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                  align="end"
+                                  className={`min-w-[10rem] ${
+                                    theme === 'dark'
+                                      ? 'bg-zinc-900 border-zinc-700 text-zinc-100'
+                                      : 'bg-white border-zinc-200 text-zinc-900'
+                                  }`}
+                                >
+                                  <DropdownMenuItem onSelect={() => void removeFavorite(agent.id)}>
+                                    {t.unfavoriteAgent}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          );
+                        })}
+                      </>
+                    )}
+
+                    {recentAgentsFiltered.length > 0 && (
+                      <p
+                        className={`px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wide ${
+                          theme === 'dark' ? 'text-zinc-500' : 'text-zinc-400'
+                        }`}
+                      >
+                        {t.recentAgentsSubmenu}
+                      </p>
+                    )}
+                    {recentAgentsFiltered.map((agent) => {
                       const detailPath = `/dashboard/agents/${agent.id}`;
                       const isAgentActive = pathname === detailPath;
                       return (
@@ -181,8 +272,9 @@ export default function DashboardSidebar() {
                         >
                           <Link
                             href={detailPath}
+                            aria-disabled={navDisabled}
                             title={agent.label}
-                            className={`min-w-0 flex-1 truncate py-1.5 px-2 text-xs font-medium transition-colors ${
+                            className={`min-w-0 flex-1 truncate py-1.5 px-2 text-xs font-medium transition-colors ${navDisabledClass} ${
                               isAgentActive
                                 ? theme === 'dark'
                                   ? 'text-amber-400'
@@ -208,7 +300,14 @@ export default function DashboardSidebar() {
                                 <MoreHorizontal className="h-4 w-4" />
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="min-w-[10rem]">
+                            <DropdownMenuContent
+                              align="end"
+                              className={`min-w-[10rem] ${
+                                theme === 'dark'
+                                  ? 'bg-zinc-900 border-zinc-700 text-zinc-100'
+                                  : 'bg-white border-zinc-200 text-zinc-900'
+                              }`}
+                            >
                               <DropdownMenuItem
                                 onSelect={() => closeRecentAgent(agent.id)}
                               >
@@ -216,13 +315,13 @@ export default function DashboardSidebar() {
                               </DropdownMenuItem>
                               {isFavorite(agent.id) ? (
                                 <DropdownMenuItem
-                                  onSelect={() => removeFavorite(agent.id)}
+                                  onSelect={() => void removeFavorite(agent.id)}
                                 >
                                   {t.unfavoriteAgent}
                                 </DropdownMenuItem>
                               ) : (
                                 <DropdownMenuItem
-                                  onSelect={() => addFavorite(agent.id)}
+                                  onSelect={() => void addFavorite(agent.id, agent.label)}
                                 >
                                   {t.favoriteAgent}
                                 </DropdownMenuItem>
@@ -242,8 +341,9 @@ export default function DashboardSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              aria-disabled={navDisabled}
               title={isCollapsed ? t[item.labelKey] : undefined}
-              className={`flex items-center py-3 rounded-2xl text-sm font-medium transition-colors ${navRowLayout} ${
+              className={`flex items-center py-3 rounded-2xl text-sm font-medium transition-colors ${navRowLayout} ${navDisabledClass} ${
                 isActive
                   ? theme === 'dark'
                     ? 'bg-zinc-800 text-amber-400'

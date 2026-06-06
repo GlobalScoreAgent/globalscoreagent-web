@@ -6,6 +6,7 @@ import { AgentHumiTrendChart } from '@/components/dashboard/AgentHumiTrendChart'
 import { dashboardCardInlayClass } from '@/lib/dashboardCardInlay';
 import type { HumiPillarId } from '@/lib/indexHumiPillars';
 import type { HumiChartPoint } from '@/lib/indexHumiSeries';
+import { dashboardFormHeadingClass } from '@/app/(dashboard)/dashboard/components/dashboard-ui';
 import { cn } from '@/lib/utils';
 
 type ViewMode = 'daily' | 'monthly';
@@ -82,7 +83,9 @@ export function AgentHumiPillarTrendCard({
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="mb-2 shrink-0">
-        <h2 className="text-2xl font-semibold">{t.agentHumiPillarTrendTitle}</h2>
+        <h2 className={cn('text-2xl font-semibold', dashboardFormHeadingClass(isDark))}>
+          {t.agentHumiPillarTrendTitle}
+        </h2>
         {hasSelection && pillarLabel ? (
           <p className={cn('mt-1 text-sm font-medium', subtitleClass)}>{pillarLabel}</p>
         ) : null}

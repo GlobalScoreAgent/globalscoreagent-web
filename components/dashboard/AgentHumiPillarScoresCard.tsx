@@ -4,6 +4,7 @@ import type { Translations } from '@/app/(dashboard)/dashboard/components/Langua
 import { AgentHumiPillarBarChart } from '@/components/dashboard/AgentHumiPillarBarChart';
 import { dashboardCardInlayClass } from '@/lib/dashboardCardInlay';
 import type { HumiPillarChartPoint, HumiPillarId } from '@/lib/indexHumiPillars';
+import { dashboardFormHeadingClass } from '@/app/(dashboard)/dashboard/components/dashboard-ui';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -27,7 +28,9 @@ export function AgentHumiPillarScoresCard({
 
   return (
     <>
-      <h2 className="mb-4 text-xl font-semibold">{t.agentHumiPillarsTitle}</h2>
+      <h2 className={cn('mb-4 text-xl font-semibold', dashboardFormHeadingClass(isDark))}>
+        {t.agentHumiPillarsTitle}
+      </h2>
       <div className={cn('min-h-[18rem] h-72 p-4', cardInlay)}>
         <AgentHumiPillarBarChart
           points={points}

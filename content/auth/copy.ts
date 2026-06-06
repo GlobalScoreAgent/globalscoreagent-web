@@ -49,6 +49,8 @@ export const authCopy = {
     passwordPlaceholder: { es: 'Mínimo 6 caracteres', en: 'At least 6 characters' } satisfies Bilingual,
     confirmPasswordLabel: { es: 'Confirmar contraseña', en: 'Confirm password' } satisfies Bilingual,
     confirmPasswordPlaceholder: { es: 'Repite tu contraseña', en: 'Repeat your password' } satisfies Bilingual,
+    nameLabel: { es: 'Nombre', en: 'Name' } satisfies Bilingual,
+    namePlaceholder: { es: 'Tu nombre', en: 'Your name' } satisfies Bilingual,
     promoLabel: { es: 'Código promocional (opcional)', en: 'Promotional code (optional)' } satisfies Bilingual,
     promoPlaceholder: { es: 'Ej. GSA2026', en: 'e.g. GSA2026' } satisfies Bilingual,
     promoHint: {
@@ -101,6 +103,14 @@ export const authCopy = {
     oauthFailed: {
       es: 'No se pudo iniciar sesión con el proveedor seleccionado.',
       en: 'Could not sign in with the selected provider.',
+    } satisfies Bilingual,
+    loginProcessFailed: {
+      es: 'No se pudo completar el acceso a la aplicación. Inténtalo de nuevo.',
+      en: 'Could not complete application access. Please try again.',
+    } satisfies Bilingual,
+    nameRequired: {
+      es: 'Ingresa tu nombre para registrarte.',
+      en: 'Enter your name to sign up.',
     } satisfies Bilingual,
   },
   backHome: { es: 'Volver al inicio', en: 'Back to home' } satisfies Bilingual,

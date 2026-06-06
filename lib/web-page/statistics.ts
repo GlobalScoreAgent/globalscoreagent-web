@@ -22,12 +22,18 @@ export type MainPageKpi = {
   top_total_feedbacks: TopMetric;
 };
 
-export type HumiDistributionBucket = {
-  avg: number;
+export type MaturityBucket = {
   count: number;
+  avg: number | null;
 };
 
-export type HumiDistributionKey = '0_10' | '10_30' | '30_60' | '60_80' | '80_100';
+export type MaturityKey = 'Unstable' | 'Developing' | 'Stable' | 'Very Stable' | 'Elite';
+
+/** @deprecated Use MaturityKey */
+export type HumiMaturityKey = MaturityKey;
+/** @deprecated Use MaturityBucket */
+export type HumiMaturityBucket = MaturityBucket;
+export type WamiMaturityKey = MaturityKey;
 
 export type HumiPageKpi = {
   last_updated: string;
@@ -35,16 +41,19 @@ export type HumiPageKpi = {
   best_agent_score: number;
   total_agents_analysed: number;
   avg_top_100: number;
-  distribution: Record<HumiDistributionKey, HumiDistributionBucket>;
+  distribution: Record<MaturityKey, MaturityBucket>;
 };
 
-export const HUMI_DISTRIBUTION_KEYS: HumiDistributionKey[] = [
-  '0_10',
-  '10_30',
-  '30_60',
-  '60_80',
-  '80_100',
+export const MATURITY_KEYS: MaturityKey[] = [
+  'Unstable',
+  'Developing',
+  'Stable',
+  'Very Stable',
+  'Elite',
 ];
+
+export const HUMI_MATURITY_KEYS = MATURITY_KEYS;
+export const WAMI_MATURITY_KEYS = MATURITY_KEYS;
 
 export type StatisticsPage = 'main' | 'humi' | 'wami';
 
@@ -176,11 +185,18 @@ export function parseMainPageKpi(raw: unknown): MainPageKpi | null {
   };
 }
 
-function parseDistributionBucket(value: unknown): HumiDistributionBucket | null {
-  if (!isRecord(value)) return null;
+function parseMaturityBucket(value: unknown): MaturityBucket {
+  if (value === null || value === undefined) {
+    return { count: 0, avg: null };
+  }
+  if (!isRecord(value)) {
+    return { count: 0, avg: null };
+  }
   const count = coerceNumber(value.count);
   const avg = coerceNumber(value.avg);
-  if (count === null || avg === null) return null;
+  if (count === null || avg === null) {
+    return { count: 0, avg: null };
+  }
   return { count, avg };
 }
 
@@ -206,11 +222,9 @@ export function parseHumiPageKpi(raw: unknown): HumiPageKpi | null {
   const distRaw = record.distribution;
   if (!isRecord(distRaw)) return null;
 
-  const distribution = {} as Record<HumiDistributionKey, HumiDistributionBucket>;
-  for (const key of HUMI_DISTRIBUTION_KEYS) {
-    const bucket = parseDistributionBucket(distRaw[key]);
-    if (!bucket) return null;
-    distribution[key] = bucket;
+  const distribution = {} as Record<MaturityKey, MaturityBucket>;
+  for (const key of MATURITY_KEYS) {
+    distribution[key] = parseMaturityBucket(distRaw[key]);
   }
 
   const last_updated =
@@ -233,7 +247,7 @@ export type WamiPageKpi = {
   nonce_delta: number;
   wallet_link_agent_valid: number;
   wallet_link_agent_not_valid: number;
-  distribution: Record<HumiDistributionKey, HumiDistributionBucket>;
+  distribution: Record<MaturityKey, MaturityBucket>;
   wallet_categories: Record<string, number>;
 };
 
@@ -272,11 +286,9 @@ export function parseWamiPageKpi(raw: unknown): WamiPageKpi | null {
   const distRaw = record.distribution;
   if (!isRecord(distRaw)) return null;
 
-  const distribution = {} as Record<HumiDistributionKey, HumiDistributionBucket>;
-  for (const key of HUMI_DISTRIBUTION_KEYS) {
-    const bucket = parseDistributionBucket(distRaw[key]);
-    if (!bucket) return null;
-    distribution[key] = bucket;
+  const distribution = {} as Record<MaturityKey, MaturityBucket>;
+  for (const key of MATURITY_KEYS) {
+    distribution[key] = parseMaturityBucket(distRaw[key]);
   }
 
   const wallet_categories = parseWalletCategories(record.wallet_categories);

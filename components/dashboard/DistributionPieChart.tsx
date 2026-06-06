@@ -12,6 +12,7 @@ type Props = {
   isDark: boolean;
   fillHeight?: boolean;
   sideLegendWithValues?: boolean;
+  legendDensity?: 'default' | 'comfortable';
   innerRadius?: number | string;
   outerRadius?: number | string;
   className?: string;
@@ -40,10 +41,12 @@ export function DistributionPieChart({
   isDark,
   fillHeight = false,
   sideLegendWithValues = false,
+  legendDensity = 'default',
   innerRadius = '38%',
   outerRadius = '78%',
   className,
 }: Props) {
+  const comfortable = legendDensity === 'comfortable';
   const legendMuted = isDark ? 'text-zinc-400' : 'text-zinc-600';
   const legendValue = isDark ? 'text-zinc-200' : 'text-zinc-800';
   const labelFill = isDark ? '#fafafa' : '#18181b';
@@ -70,7 +73,10 @@ export function DistributionPieChart({
 
   const legendSwatch = (color: string) => (
     <span
-      className="mt-0.5 h-2 w-2 shrink-0 rounded-sm"
+      className={cn(
+        'mt-0.5 shrink-0 rounded-sm',
+        comfortable ? 'h-3 w-3' : 'h-2.5 w-2.5',
+      )}
       style={{ backgroundColor: color }}
       aria-hidden
     />
@@ -114,14 +120,22 @@ export function DistributionPieChart({
       }
     : false;
 
+  const pieMinHeight =
+    sideLegendWithValues && comfortable ? 256 : sideLegendWithValues ? 224 : 176;
+
   const pieChart = (
     <div
       className={cn(
-        'h-full min-h-[11rem] w-full min-w-0 sm:min-h-[12rem]',
+        'h-full w-full min-w-0',
+        sideLegendWithValues && comfortable
+          ? 'min-h-[16rem] sm:min-h-[18rem]'
+          : sideLegendWithValues
+            ? 'min-h-[14rem] sm:min-h-[16rem]'
+            : 'min-h-[11rem] sm:min-h-[12rem]',
         fillHeight && 'min-h-0 flex-1',
       )}
     >
-      <ResponsiveContainer width="100%" height="100%" minHeight={176}>
+      <ResponsiveContainer width="100%" height="100%" minHeight={pieMinHeight}>
         <PieChart margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
           <Pie
             data={segments}
@@ -149,16 +163,33 @@ export function DistributionPieChart({
 
   const sideLegendList = sideLegendWithValues ? (
     <ul
-      className="w-[7.5rem] shrink-0 space-y-1.5 overflow-y-auto overscroll-contain sm:w-32"
+      className={cn(
+        'shrink-0 self-center space-y-2 overflow-y-auto overscroll-contain',
+        comfortable ? 'w-40 sm:w-44' : 'w-36 sm:w-40',
+      )}
       aria-label="Chart legend"
     >
       {segments.map((seg) => (
         <li key={seg.key} className="flex min-w-0 flex-col gap-0.5">
           <span className="flex min-w-0 items-start gap-1.5">
             {legendSwatch(seg.color)}
-            <span className={`truncate text-[10px] leading-tight ${legendMuted}`}>{seg.label}</span>
+            <span
+              className={cn(
+                'truncate leading-tight',
+                comfortable ? 'text-sm' : 'text-xs',
+                legendMuted,
+              )}
+            >
+              {seg.label}
+            </span>
           </span>
-          <span className={`pl-3.5 text-[10px] font-semibold tabular-nums ${legendValue}`}>
+          <span
+            className={cn(
+              'pl-4 font-semibold tabular-nums',
+              comfortable ? 'text-sm' : 'text-xs',
+              legendValue,
+            )}
+          >
             {seg.value.toLocaleString()} · {formatPct(seg.pct)}
           </span>
         </li>
@@ -168,11 +199,29 @@ export function DistributionPieChart({
 
   if (sideLegendWithValues) {
     return (
-      <div className={cn('flex w-full gap-3 sm:items-stretch', fillHeight && 'min-h-0 flex-1', className)}>
+      <div
+        className={cn(
+          'flex w-full gap-4',
+          comfortable
+            ? 'h-full min-h-0 items-center justify-center'
+            : 'items-center justify-center',
+          fillHeight && 'min-h-0 flex-1',
+          className,
+        )}
+      >
         <div
           className={cn(
-            'min-h-[11rem] min-w-0 flex-1 sm:min-h-[12rem]',
-            fillHeight ? 'flex h-full min-h-0 flex-col' : 'h-[11rem] sm:h-[12rem]',
+            'min-w-0 flex-1',
+            comfortable
+              ? 'mx-auto max-w-[min(100%,14rem)]'
+              : undefined,
+            comfortable
+              ? fillHeight
+                ? 'flex h-full min-h-[16rem] flex-col sm:min-h-[18rem]'
+                : 'h-[16rem] sm:h-[18rem]'
+              : fillHeight
+                ? 'flex h-full min-h-0 flex-col'
+                : 'h-[14rem] sm:h-[16rem]',
           )}
         >
           {pieChart}

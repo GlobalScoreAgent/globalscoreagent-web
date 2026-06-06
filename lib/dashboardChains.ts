@@ -28,40 +28,29 @@ export type MonthlyStatRow = {
   active_agents?: number | null;
 };
 
-/** Visual order left→right for stacked HUMI bar (low score → elite). */
-export const HUMI_BUCKET_ORDER = [
-  'Critical',
-  'Moderate Risk',
-  'Stable',
-  'High Performance',
-  'Elite',
-] as const;
+export {
+  MATURITY_ORDER,
+  MATURITY_COLORS,
+  MATURITY_TKEY,
+  MATURITY_SCORE_RANGES,
+  normalizeMaturityDistribution,
+  type MaturityKey,
+  type MaturityTranslationKey,
+} from '@/lib/dashboardMaturityDistribution';
 
-export const HUMI_BUCKET_COLORS: Record<string, string> = {
-  Critical: '#dc2626',
-  'Moderate Risk': '#f97316',
-  Stable: '#eab308',
-  'High Performance': '#84cc16',
-  Elite: '#22c55e',
-};
+export {
+  METADATA_ORDER,
+  METADATA_COLORS,
+  METADATA_TKEY,
+  METADATA_SCORE_RANGES,
+  METADATA_RICHNESS_KEYS,
+  normalizeMetadataDistribution,
+  type MetadataRichnessKey,
+  type MetadataTranslationKey,
+} from '@/lib/dashboardMetadataDistribution';
 
-export type HumiTranslationKey =
-  | 'humiCritical'
-  | 'humiModerateRisk'
-  | 'humiStable'
-  | 'humiHighPerformance'
-  | 'humiElite';
-
-export const HUMI_BUCKET_TKEY: Record<string, HumiTranslationKey> = {
-  Critical: 'humiCritical',
-  'Moderate Risk': 'humiModerateRisk',
-  Stable: 'humiStable',
-  'High Performance': 'humiHighPerformance',
-  Elite: 'humiElite',
-};
-
-/** DB metadata JSON keys → Translation keys on LanguageContext */
-export type MetadataTranslationKey =
+/** @deprecated Agent detail richness tier — phase 2 migration. */
+export type LegacyMetadataTranslationKey =
   | 'metadataPoor'
   | 'metadataLow'
   | 'metadataRegular'
@@ -69,16 +58,8 @@ export type MetadataTranslationKey =
   | 'metadataExcellent'
   | 'metadataElite';
 
-export const METADATA_DB_KEY_TO_TKEY: Record<string, MetadataTranslationKey> = {
-  'Mala (0-10)': 'metadataPoor',
-  'Baja (10-30)': 'metadataLow',
-  'Regular (30-50)': 'metadataRegular',
-  'Buena (50-70)': 'metadataGood',
-  'Excelente (70-90)': 'metadataExcellent',
-  'Elite (90-100)': 'metadataElite',
-};
-
-export const METADATA_BUCKET_COLORS: Record<string, string> = {
+/** @deprecated Agent detail richness tier — phase 2 migration. */
+export const LEGACY_METADATA_BUCKET_COLORS: Record<LegacyMetadataTranslationKey, string> = {
   metadataPoor: '#dc2626',
   metadataLow: '#f97316',
   metadataRegular: '#f59e0b',
@@ -86,6 +67,17 @@ export const METADATA_BUCKET_COLORS: Record<string, string> = {
   metadataExcellent: '#3b82f6',
   metadataElite: '#a855f7',
 };
+
+/** Bar/pie colors keyed by dashboard metadata translation keys. */
+export { METADATA_BUCKET_COLORS } from '@/lib/dashboardMetadataDistribution';
+
+/** @deprecated Agent HUMI badge labels — phase 2 migration. */
+export type HumiTranslationKey =
+  | 'humiCritical'
+  | 'humiModerateRisk'
+  | 'humiStable'
+  | 'humiHighPerformance'
+  | 'humiElite';
 
 function hslToRgbTriplet(h360: number, s: number, l: number): [number, number, number] {
   const h = h360 / 360;
@@ -167,16 +159,6 @@ export function parseMonthlyRows(raw: unknown): MonthlyStatRow[] {
     });
   }
   return out.sort((a, b) => a.month.localeCompare(b.month));
-}
-
-/** Sort metadata distribution keys by lower bound of range in parentheses */
-export function sortedMetadataKeys(keys: string[]): string[] {
-  return [...keys].sort((a, b) => metadataRangeStart(a) - metadataRangeStart(b));
-}
-
-function metadataRangeStart(key: string): number {
-  const m = key.match(/\((\d+)-/);
-  return m ? parseInt(m[1], 10) : 9999;
 }
 
 export function recordToNumberMap(raw: unknown): Record<string, number> {

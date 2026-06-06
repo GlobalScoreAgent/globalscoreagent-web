@@ -1,9 +1,17 @@
 import { type NextRequest, NextResponse } from 'next/server';
+import { API_NO_STORE_HEADERS } from '@/lib/api/route-config';
 import { updateSession } from '@/utils/supabase/middleware';
 
 export async function middleware(request: NextRequest) {
   const { supabaseResponse, user } = await updateSession(request);
   const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith('/api/dashboard') && !user) {
+    return NextResponse.json(
+      { success: false, error: 'No autenticado' },
+      { status: 401, headers: API_NO_STORE_HEADERS },
+    );
+  }
 
   if (pathname.startsWith('/dashboard') && !user) {
     const url = request.nextUrl.clone();

@@ -18,6 +18,8 @@ export type DistributionCarouselSlide = {
 export type DistributionLegendPlacement = 'bottom' | 'side';
 export type DistributionChartVariant = 'stackedBar' | 'pie';
 
+export type DistributionLegendDensity = 'default' | 'comfortable';
+
 type Props = {
   slides: DistributionCarouselSlide[];
   panelTitle: string;
@@ -25,12 +27,15 @@ type Props = {
   nextLabel: string;
   isDark: boolean;
   legendPlacement?: DistributionLegendPlacement;
+  legendDensity?: DistributionLegendDensity;
   chartVariant?: DistributionChartVariant;
   showPanelTitle?: boolean;
   resetKey?: string;
   bordered?: boolean;
   className?: string;
   chartClassName?: string;
+  pieInnerRadius?: number | string;
+  pieOuterRadius?: number | string;
 };
 
 export function DistributionCarouselPanel({
@@ -40,12 +45,15 @@ export function DistributionCarouselPanel({
   nextLabel,
   isDark,
   legendPlacement = 'bottom',
+  legendDensity = 'default',
   chartVariant = 'stackedBar',
   showPanelTitle = true,
   resetKey,
   bordered = true,
   className,
   chartClassName,
+  pieInnerRadius,
+  pieOuterRadius,
 }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const muted = isDark ? 'text-zinc-400' : 'text-zinc-600';
@@ -126,7 +134,12 @@ export function DistributionCarouselPanel({
         </button>
       </div>
 
-      <div className={cn('flex min-h-0 flex-1 flex-col overflow-visible', chartClassName)}>
+      <div
+        className={cn(
+          'flex min-h-0 flex-1 flex-col items-center justify-center overflow-visible',
+          chartClassName,
+        )}
+      >
         {usePie ? (
           <DistributionPieChart
             key={activeSlide.id}
@@ -137,7 +150,10 @@ export function DistributionCarouselPanel({
             isDark={isDark}
             fillHeight
             sideLegendWithValues={useSideLegend}
-            className="min-h-0 flex-1"
+            legendDensity={legendDensity}
+            innerRadius={pieInnerRadius}
+            outerRadius={pieOuterRadius}
+            className="min-h-0 w-full flex-1"
           />
         ) : (
           <StackedDistributionBar

@@ -14,17 +14,18 @@ import { cn } from '@/lib/utils';
 import {
   chainAccentColor,
   chainAccentHex,
-  HUMI_BUCKET_COLORS,
-  HUMI_BUCKET_ORDER,
-  HUMI_BUCKET_TKEY,
   METADATA_BUCKET_COLORS,
-  METADATA_DB_KEY_TO_TKEY,
+  METADATA_ORDER,
+  MATURITY_COLORS,
+  MATURITY_ORDER,
+  MATURITY_TKEY,
+  METADATA_TKEY,
+  normalizeMaturityDistribution,
+  normalizeMetadataDistribution,
   numFromJson,
   parseBest10AgentsHumi,
   parseMonthlyRows,
   parseWarningStats,
-  recordToNumberMap,
-  sortedMetadataKeys,
   WARNING_STAT_HELP_TKEY,
   WARNING_STAT_TKEY,
   type DashboardChainRow,
@@ -203,30 +204,25 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
   const fmtCount = (n: number | null) =>
     n === null || !Number.isFinite(n) ? '—' : Number(n).toLocaleString(locale, { maximumFractionDigits: 0 });
 
-  const humiDist = recordToNumberMap(chain.humi_distribution);
+  const humiNormalized = normalizeMaturityDistribution(chain.humi_distribution);
   const humiRow: Record<string, number | string> = { name: chain.short_name || chain.name };
-  HUMI_BUCKET_ORDER.forEach((k) => {
-    if (k in humiDist) humiRow[k] = humiDist[k];
+  const humiBarKeys = MATURITY_ORDER.map((s) => s.key).filter((k) => (humiNormalized[k] ?? 0) > 0);
+  MATURITY_ORDER.forEach((s) => {
+    if ((humiNormalized[s.key] ?? 0) > 0) humiRow[s.key] = humiNormalized[s.key];
   });
-  const humiBarKeys = HUMI_BUCKET_ORDER.filter((k) => k in humiDist);
 
-  const wamiDist = recordToNumberMap(chain.wami_distribution);
+  const wamiNormalized = normalizeMaturityDistribution(chain.wami_distribution);
   const wamiRow: Record<string, number | string> = { name: chain.short_name || chain.name };
-  HUMI_BUCKET_ORDER.forEach((k) => {
-    if (k in wamiDist) wamiRow[k] = wamiDist[k];
+  const wamiBarKeys = MATURITY_ORDER.map((s) => s.key).filter((k) => (wamiNormalized[k] ?? 0) > 0);
+  MATURITY_ORDER.forEach((s) => {
+    if ((wamiNormalized[s.key] ?? 0) > 0) wamiRow[s.key] = wamiNormalized[s.key];
   });
-  const wamiBarKeys = HUMI_BUCKET_ORDER.filter((k) => k in wamiDist);
 
-  const metaDist = recordToNumberMap(chain.metadata_distribution);
-  const metaKeysSorted = sortedMetadataKeys(Object.keys(metaDist));
+  const metaNormalized = normalizeMetadataDistribution(chain.metadata_distribution);
   const metaRow: Record<string, number | string> = { name: chain.short_name || chain.name };
-  const metaBarKeys: string[] = [];
-  metaKeysSorted.forEach((dbKey) => {
-    const v = metaDist[dbKey];
-    if (v === undefined) return;
-    const slug = dbKey.replace(/\s+/g, '_').replace(/[()]/g, '');
-    metaRow[slug] = v;
-    metaBarKeys.push(slug);
+  const metaBarKeys = METADATA_ORDER.map((s) => s.key).filter((k) => (metaNormalized[k] ?? 0) > 0);
+  METADATA_ORDER.forEach((s) => {
+    if ((metaNormalized[s.key] ?? 0) > 0) metaRow[s.key] = metaNormalized[s.key];
   });
 
   const muted = isDark ? 'text-zinc-400' : 'text-zinc-600';
@@ -244,10 +240,11 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
         metricLabel: t.chainDistributionRailHumi,
         rowKeys: humiBarKeys,
         row: humiRow,
-        colors: (k) => HUMI_BUCKET_COLORS[k] ?? '#71717a',
+        colors: (k) => MATURITY_COLORS[k as keyof typeof MATURITY_COLORS] ?? '#71717a',
         labelForKey: (k) => {
-          const tk = HUMI_BUCKET_TKEY[k];
-          return tk ? t[tk] : k;
+          const tk = MATURITY_TKEY[k as keyof typeof MATURITY_TKEY];
+          const seg = MATURITY_ORDER.find((s) => s.key === k);
+          return tk && seg ? `${seg.scoreRange} · ${t[tk]}` : k;
         },
       });
     }
@@ -257,15 +254,14 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
         metricLabel: t.chainDistributionRailMetadata,
         rowKeys: metaBarKeys,
         row: metaRow,
-        colors: (slug) => {
-          const dbKey = metaKeysSorted.find((dk) => dk.replace(/\s+/g, '_').replace(/[()]/g, '') === slug);
-          const tkey = dbKey ? METADATA_DB_KEY_TO_TKEY[dbKey] : undefined;
+        colors: (k) => {
+          const tkey = METADATA_TKEY[k as keyof typeof METADATA_TKEY];
           return tkey ? METADATA_BUCKET_COLORS[tkey] ?? '#71717a' : '#71717a';
         },
-        labelForKey: (slug) => {
-          const dbKey = metaKeysSorted.find((dk) => dk.replace(/\s+/g, '_').replace(/[()]/g, '') === slug);
-          const tkey = dbKey ? METADATA_DB_KEY_TO_TKEY[dbKey] : undefined;
-          return tkey ? t[tkey] : slug;
+        labelForKey: (k) => {
+          const tkey = METADATA_TKEY[k as keyof typeof METADATA_TKEY];
+          const seg = METADATA_ORDER.find((s) => s.key === k);
+          return tkey && seg ? `${seg.scoreRange} · ${t[tkey]}` : k;
         },
       });
     }
@@ -275,15 +271,16 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
         metricLabel: t.chainDistributionRailWami,
         rowKeys: wamiBarKeys,
         row: wamiRow,
-        colors: (k) => HUMI_BUCKET_COLORS[k] ?? '#71717a',
+        colors: (k) => MATURITY_COLORS[k as keyof typeof MATURITY_COLORS] ?? '#71717a',
         labelForKey: (k) => {
-          const tk = HUMI_BUCKET_TKEY[k];
-          return tk ? t[tk] : k;
+          const tk = MATURITY_TKEY[k as keyof typeof MATURITY_TKEY];
+          const seg = MATURITY_ORDER.find((s) => s.key === k);
+          return tk && seg ? `${seg.scoreRange} · ${t[tk]}` : k;
         },
       });
     }
     return slides;
-  }, [humiBarKeys, metaBarKeys, wamiBarKeys, humiRow, metaRow, wamiRow, metaKeysSorted, t]);
+  }, [humiBarKeys, metaBarKeys, wamiBarKeys, humiRow, metaRow, wamiRow, t]);
 
   return (
     <AgentDetailCard
@@ -519,7 +516,7 @@ export function DashboardChainCards({ chains, isDark, t, lang }: Props) {
 
   return (
     <div className="flex w-full flex-col items-center gap-6">
-      <div
+      <motion.div
         key={active.chain_id}
         className="w-full"
         initial={{ opacity: 0, y: 16 }}
@@ -527,7 +524,7 @@ export function DashboardChainCards({ chains, isDark, t, lang }: Props) {
         transition={{ duration: 0.25 }}
       >
         <ChainCard chain={active} isDark={isDark} t={t} lang={lang} />
-      </div>
+      </motion.div>
 
       <div className="flex flex-wrap justify-center gap-4">
         {chains.map((c, index) => (

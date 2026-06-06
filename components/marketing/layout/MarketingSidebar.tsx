@@ -12,6 +12,7 @@ import {
   Cog,
   Scale,
   CreditCard,
+  BookOpen,
 } from 'lucide-react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { marketingCopy } from '@/content/marketing/copy';
@@ -31,7 +32,8 @@ const navItems: NavItem[] = [
   { href: '/#products', labelKey: 'products', icon: Package },
   { href: '/humi', labelKey: 'humi', icon: BarChart3, external: true },
   { href: '/wami', labelKey: 'wami', icon: Wallet, external: true },
-  { href: '/#subscriptions', labelKey: 'subscriptions', icon: CreditCard },
+  { href: '/pricing', labelKey: 'pricing', icon: CreditCard, external: true },
+  { href: '/docs/global-score-agent', labelKey: 'documentation', icon: BookOpen, external: true },
   { href: '/#how-we-work', labelKey: 'howWeWork', icon: Cog },
   { href: '/legal', labelKey: 'legal', icon: Scale, external: true },
 ];

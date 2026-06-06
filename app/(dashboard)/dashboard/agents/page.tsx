@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Search, ChevronDown, CalendarDays, Hash, Wrench, Zap, FileText, User, Bot, BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../components/LanguageContext';
-import { useDashboardStats } from '../components/DashboardLayoutClient';
 import { createClient } from '@/utils/supabase/client';
 import {
   getAdvancedFilterOptions,
@@ -16,7 +15,15 @@ import {
 } from '@/lib/dashboardFilters';
 import { normalizeChainName, getChainColor } from '@/lib/agentChains';
 import { AgentDirectoryHumiRibbon } from '@/components/dashboard/AgentDirectoryHumiRibbon';
-import { getHumiScoreColor, getHumiScoreText } from '@/lib/agentHumiDisplay';
+import {
+  getHumiMaturityColor,
+  getHumiMaturityText,
+} from '@/lib/agentHumiDisplay';
+
+function formatAgentHumiScore(score: unknown): string {
+  const n = score != null && Number.isFinite(Number(score)) ? Number(score) : 0;
+  return n.toLocaleString(undefined, { maximumFractionDigits: 2 });
+}
 
 // Componente Image con fallback automático
 function AgentImage({ src, alt, ...props }: { src: string; alt: string; [key: string]: any }) {
@@ -77,8 +84,6 @@ type AgentsListFiltersSnapshot = {
 export default function AgentsPage() {
   const PAGE_SIZE = 10;
   const { t, theme } = useLanguage();
-  const dashboardStats = useDashboardStats();
-  const totalAgents = dashboardStats?.totalAgents || 0;
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOpenFilter, setSelectedOpenFilter] = useState('searchGeneral');
   const [selectedSpecificFilter, setSelectedSpecificFilter] = useState('searchNetwork');
@@ -162,7 +167,7 @@ export default function AgentsPage() {
   // Estados para datos de base de datos
   const [advancedFilters, setAdvancedFilters] = useState<Record<string, any>>({});
   const [agents, setAgents] = useState<any[]>([]);
-  const [totalCount, setTotalCount] = useState(totalAgents || 0);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [isRefetching, setIsRefetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -214,7 +219,7 @@ export default function AgentsPage() {
         sortDirection: filters.sortDirection,
         page: filters.page.toString(),
         limit: filters.limit.toString(),
-        totalAgents: totalAgents?.toString() || '',
+        totalAgents: '',
       });
 
       if (filters.chainId !== undefined) {
@@ -1072,12 +1077,15 @@ export default function AgentsPage() {
                   {/* Cara Frontal */}
                   <div className="absolute inset-0 z-20 h-full w-full overflow-hidden rounded-3xl backface-hidden">
                     <AgentDirectoryHumiRibbon
-                      categoryLabel={
-                        agent.humi_score_filter
-                          ? getHumiScoreText(agent.humi_score_filter, t)
-                          : ''
-                      }
-                      accentColor={getHumiScoreColor(agent.humi_score_filter ?? '')}
+                      categoryLabel={getHumiMaturityText(
+                        agent.humi_madurity_level,
+                        agent.humi_score_filter,
+                        t,
+                      )}
+                      accentColor={getHumiMaturityColor(
+                        agent.humi_madurity_level,
+                        agent.humi_score_filter,
+                      )}
                       isDark={theme === 'dark'}
                     />
                     {/* Elemento decorativo sutil */}
@@ -1128,18 +1136,18 @@ export default function AgentsPage() {
                         <span className="opacity-50">·</span>
                         <span
                           className="inline-flex min-w-0 items-center gap-1 font-semibold tabular-nums truncate"
-                          style={{ color: getHumiScoreColor(agent.humi_score_filter ?? '') }}
+                          style={{
+                            color: getHumiMaturityColor(
+                              agent.humi_madurity_level,
+                              agent.humi_score_filter,
+                            ),
+                          }}
                         >
                           <span className="text-[10px] font-medium opacity-80 shrink-0">
                             {t.humiScoreShort}:
                           </span>
                           <span className="truncate">
-                            {agent.current_humi_score != null &&
-                            Number.isFinite(Number(agent.current_humi_score))
-                              ? Number(agent.current_humi_score).toLocaleString(undefined, {
-                                  maximumFractionDigits: 2,
-                                })
-                              : t.notAvailable}
+                            {formatAgentHumiScore(agent.current_humi_score)}
                           </span>
                         </span>
                         {agent.is_dummy === true && (
@@ -1266,7 +1274,7 @@ export default function AgentsPage() {
                           <div className="flex items-center gap-2">
                             <BarChart3 size={14} className={`${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'} shrink-0`} />
                             <span className={`${theme === 'dark' ? 'text-zinc-200' : 'text-zinc-800'} min-w-0`}>
-                              HUMI: {agent.current_humi_score || t.notAvailable}
+                              HUMI: {formatAgentHumiScore(agent.current_humi_score)}
                             </span>
                           </div>
                         </div>

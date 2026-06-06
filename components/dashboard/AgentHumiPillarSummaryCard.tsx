@@ -6,6 +6,7 @@ import { dashboardCardInlayClass } from '@/lib/dashboardCardInlay';
 import type { HumiPillarId } from '@/lib/indexHumiPillars';
 import type { PillarSummaryBlockId, PillarSummaryChartPoint } from '@/lib/indexHumiPillarSummary';
 import { hasPillarSummaryChartData } from '@/lib/indexHumiPillarSummary';
+import { dashboardFormHeadingClass } from '@/app/(dashboard)/dashboard/components/dashboard-ui';
 import { cn } from '@/lib/utils';
 
 type Props = {
@@ -40,7 +41,9 @@ export function AgentHumiPillarSummaryCard({
   return (
     <>
       <div className="mb-4">
-        <h2 className="text-xl font-semibold">{t.agentHumiPillarSummaryTitle}</h2>
+        <h2 className={cn('text-xl font-semibold', dashboardFormHeadingClass(isDark))}>
+          {t.agentHumiPillarSummaryTitle}
+        </h2>
         {hasSelection && pillarLabel ? (
           <p className={cn('mt-1 text-sm font-medium', subtitleClass)}>{pillarLabel}</p>
         ) : null}

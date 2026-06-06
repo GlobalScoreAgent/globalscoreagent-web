@@ -49,8 +49,8 @@ export function DashboardNonceInsightCard({ isDark, t, agentNonce, className }: 
       isDark={isDark}
       variant="transactional"
       accentHex="#38bdf8"
-      className={cn('min-h-0 w-full min-w-0 flex-1', className)}
-      contentClassName="flex min-h-[280px] flex-col gap-3 p-4 pt-14 sm:p-5 sm:pt-14"
+      className={cn('min-h-0 h-full w-full min-w-0 flex-1', className)}
+      contentClassName="flex h-full min-h-[280px] flex-col gap-2 p-4 pt-14 sm:p-5 sm:pt-14"
     >
       <div className="absolute left-4 top-4 z-10 max-w-[calc(100%-2rem)]">
         <div
@@ -62,7 +62,7 @@ export function DashboardNonceInsightCard({ isDark, t, agentNonce, className }: 
         </div>
       </div>
 
-      <div className="flex flex-wrap items-start justify-end gap-2">
+      <div className="flex min-h-8 shrink-0 items-start justify-end">
         {lastPoint ? (
           <div
             className={`max-w-full shrink-0 rounded-lg border px-2 py-1 text-right text-[11px] font-semibold leading-snug ${
@@ -77,12 +77,12 @@ export function DashboardNonceInsightCard({ isDark, t, agentNonce, className }: 
         ) : null}
       </div>
 
-      <div className="relative h-44 w-full shrink-0 sm:h-48">
+      <div className="relative min-h-[10rem] w-full flex-1">
         {nonceSeries.length > 0 ? (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minHeight={160}>
             <AreaChart
               data={nonceSeries}
-              margin={{ top: 8, right: 8, left: 12, bottom: 4 }}
+              margin={{ top: 8, right: 4, left: 4, bottom: 4 }}
             >
               <defs>
                 <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">

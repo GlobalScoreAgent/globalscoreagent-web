@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { marketingCopy } from '@/content/marketing/copy';
 import { pick } from '@/content/marketing/i18n';
@@ -60,6 +61,14 @@ export default function MarketingFooter() {
         </div>
 
         <p className="mt-10 text-center text-xs text-zinc-600">
+          <Link href="/docs/global-score-agent" className="text-zinc-500 transition-colors hover:text-zinc-400">
+            {pick(language, marketingCopy.footer.docsLink)}
+          </Link>
+          <span className="mx-2 text-zinc-700">·</span>
+          <Link href="/pricing" className="text-zinc-500 transition-colors hover:text-zinc-400">
+            {pick(language, marketingCopy.footer.pricingLink)}
+          </Link>
+          <span className="mx-2 text-zinc-700">·</span>
           <a
             href="/llms.txt"
             className="text-zinc-500 transition-colors hover:text-zinc-400"

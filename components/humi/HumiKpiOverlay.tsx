@@ -5,7 +5,7 @@ import { useLanguage } from '@/app/contexts/LanguageContext';
 import { humiKpiLabels } from '@/content/humi/kpi-labels';
 import { pick } from '@/content/marketing/i18n';
 import { fetchApiNoStore } from '@/lib/api/client-fetch';
-import { HUMI_DISTRIBUTION_KEYS, type HumiPageKpi } from '@/lib/web-page/statistics';
+import { HUMI_MATURITY_KEYS, type HumiPageKpi } from '@/lib/web-page/statistics';
 import KpiPanelSkeleton from '@/components/marketing/shared/KpiPanelSkeleton';
 import { kpiGridGap, kpiLastUpdated } from '@/components/marketing/shared/kpiTypography';
 import NumericKpiCard from '@/components/marketing/home/kpi/NumericKpiCard';
@@ -99,11 +99,12 @@ export default function HumiKpiOverlay({ className = '' }: HumiKpiOverlayProps) 
             value={kpi.total_agents_analysed}
           />
           <DecimalKpiCard label={humiKpiLabels.avgTop100} value={kpi.avg_top_100} />
-          {HUMI_DISTRIBUTION_KEYS.map((key) => (
+          {HUMI_MATURITY_KEYS.map((key) => (
             <DistributionKpiCard
               key={key}
               band={humiKpiLabels.distribution[key].band}
               scoreRange={humiKpiLabels.distribution[key].scoreRange}
+              userDescription={humiKpiLabels.distribution[key].userDescription}
               count={kpi.distribution[key].count}
               avg={kpi.distribution[key].avg}
             />

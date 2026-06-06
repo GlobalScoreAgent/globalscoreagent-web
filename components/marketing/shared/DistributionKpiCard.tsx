@@ -24,10 +24,11 @@ export type DistributionKpiCardLabels = {
 
 type DistributionKpiCardProps = {
   band: Bilingual;
-  scoreRange: Bilingual;
+  infoContent: Bilingual;
   count: number;
-  avg: number;
+  avg: number | null;
   labels: DistributionKpiCardLabels;
+  scoreRange?: Bilingual;
 };
 
 function formatAvg(value: number, language: 'es' | 'en'): string {
@@ -39,10 +40,11 @@ function formatAvg(value: number, language: 'es' | 'en'): string {
 
 export default function DistributionKpiCard({
   band,
-  scoreRange,
+  infoContent,
   count,
   avg,
   labels,
+  scoreRange,
 }: DistributionKpiCardProps) {
   const { language } = useLanguage();
 
@@ -51,8 +53,15 @@ export default function DistributionKpiCard({
       <div className="mb-1">
         <p className={kpiLabel}>{pick(language, labels.categoryHeader)}</p>
         <div className="mt-0.5 flex items-start justify-between gap-1">
-          <p className={`min-w-0 flex-1 break-words ${kpiBandName}`}>{pick(language, band)}</p>
-          <KpiInfoTooltip content={scoreRange} ariaLabel={labels.scoreRangeInfoLabel} />
+          <div className="min-w-0 flex-1">
+            <p className={`flex flex-wrap items-baseline gap-x-1.5 ${kpiBandName}`}>
+              <span>{pick(language, band)}</span>
+              {scoreRange ? (
+                <span className="font-normal text-zinc-500">{pick(language, scoreRange)}</span>
+              ) : null}
+            </p>
+          </div>
+          <KpiInfoTooltip content={infoContent} ariaLabel={labels.scoreRangeInfoLabel} />
         </div>
       </div>
 
@@ -64,7 +73,9 @@ export default function DistributionKpiCard({
           <p className={`mt-0.5 ${kpiSubtext}`}>{pick(language, labels.countSubtitle)}</p>
         </div>
         <div className="min-w-0 text-right">
-          <p className={kpiValueSecondary}>{formatAvg(avg, language)}</p>
+          <p className={kpiValueSecondary}>
+            {avg === null ? '—' : formatAvg(avg, language)}
+          </p>
           <p className={`mt-0.5 ${kpiSubtext}`}>{pick(language, labels.avgSubtitle)}</p>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { sanitizeRedirectPath } from '@/lib/auth/redirect';
+import { runLoginProcessForUser } from '@/lib/gsa/login-process';
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -33,6 +34,18 @@ export async function GET(request: Request) {
 
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        try {
+          await runLoginProcessForUser(supabase, user, { is_registration: true });
+        } catch (loginProcessError) {
+          console.error('[auth/callback] user_login_process failed:', loginProcessError);
+        }
+      }
+
       return NextResponse.redirect(`${origin}${redirect}`);
     }
   }

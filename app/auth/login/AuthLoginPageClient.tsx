@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { authCopy } from '@/content/auth/copy';
 import { pick } from '@/content/marketing/i18n';
+import { clientLoginProcess } from '@/lib/gsa/login-process-client';
 import { getCallbackUrl, sanitizeRedirectPath } from '@/lib/auth/redirect';
 import { createClient } from '@/utils/supabase/client';
 
@@ -31,6 +32,9 @@ function mapAuthError(message: string, lang: 'es' | 'en'): string {
   if (lower.includes('password') && lower.includes('6')) {
     return pick(lang, authCopy.errors.weakPassword);
   }
+  if (lower.includes('login_process')) {
+    return pick(lang, authCopy.errors.loginProcessFailed);
+  }
   return pick(lang, authCopy.errors.generic);
 }
 
@@ -47,7 +51,7 @@ export default function AuthLoginPageClient() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [promoCode, setPromoCode] = useState('');
+  const [name, setName] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [awaitingEmailConfirm, setAwaitingEmailConfirm] = useState(false);
@@ -64,6 +68,21 @@ export default function AuthLoginPageClient() {
     }
   }, [oauthError, language]);
 
+  const goToDashboard = async (
+    loginBody?: Parameters<typeof clientLoginProcess>[0],
+  ) => {
+    try {
+      await clientLoginProcess(loginBody);
+      router.push(redirectTo);
+      router.refresh();
+    } catch (err) {
+      setStatus('error');
+      setErrorMessage(
+        mapAuthError(err instanceof Error ? err.message : '', language),
+      );
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('loading');
@@ -78,13 +97,19 @@ export default function AuthLoginPageClient() {
       return;
     }
 
-    router.push(redirectTo);
-    router.refresh();
+    await goToDashboard();
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setStatus('error');
+      setErrorMessage(pick(language, authCopy.errors.nameRequired));
+      return;
+    }
 
     if (password !== confirmPassword) {
       setStatus('error');
@@ -101,13 +126,13 @@ export default function AuthLoginPageClient() {
     setStatus('loading');
 
     const supabase = createClient();
-    const trimmedPromo = promoCode.trim();
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          promo_code: trimmedPromo || null,
+          display_name: trimmedName,
+          full_name: trimmedName,
         },
         emailRedirectTo: getCallbackUrl(redirectTo),
       },
@@ -120,8 +145,11 @@ export default function AuthLoginPageClient() {
     }
 
     if (data.session) {
-      router.push(redirectTo);
-      router.refresh();
+      await goToDashboard({
+        is_registration: true,
+        display_name: trimmedName,
+        avatar_url: null,
+      });
       return;
     }
 
@@ -282,6 +310,20 @@ export default function AuthLoginPageClient() {
               <form onSubmit={handleRegister} className="space-y-5">
                 <div>
                   <label className="mb-2 block text-sm text-zinc-400">
+                    {pick(language, authCopy.register.nameLabel)}
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    autoComplete="name"
+                    className={inputClass}
+                    placeholder={pick(language, authCopy.register.namePlaceholder)}
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm text-zinc-400">
                     {pick(language, authCopy.register.emailLabel)}
                   </label>
                   <input
@@ -323,22 +365,6 @@ export default function AuthLoginPageClient() {
                     className={inputClass}
                     placeholder={pick(language, authCopy.register.confirmPasswordPlaceholder)}
                   />
-                </div>
-                <div>
-                  <label className="mb-2 block text-sm text-zinc-400">
-                    {pick(language, authCopy.register.promoLabel)}
-                  </label>
-                  <input
-                    type="text"
-                    value={promoCode}
-                    onChange={(e) => setPromoCode(e.target.value)}
-                    autoComplete="off"
-                    className={inputClass}
-                    placeholder={pick(language, authCopy.register.promoPlaceholder)}
-                  />
-                  <p className="mt-2 text-xs text-zinc-500">
-                    {pick(language, authCopy.register.promoHint)}
-                  </p>
                 </div>
                 {status === 'error' && errorMessage && (
                   <p className="text-sm text-red-400" role="alert">
@@ -393,12 +419,6 @@ export default function AuthLoginPageClient() {
                   : pick(language, authCopy.oauth.github)}
               </button>
             </div>
-
-            {tab === 'register' && (
-              <p className="mt-4 text-center text-xs text-zinc-500">
-                {pick(language, authCopy.oauth.promoNote)}
-              </p>
-            )}
           </>
         )}
       </div>

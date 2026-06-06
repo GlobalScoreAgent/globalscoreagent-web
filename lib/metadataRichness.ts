@@ -4,8 +4,8 @@
  */
 
 import {
-  METADATA_BUCKET_COLORS,
-  type MetadataTranslationKey,
+  LEGACY_METADATA_BUCKET_COLORS,
+  type LegacyMetadataTranslationKey,
 } from '@/lib/dashboardChains';
 
 export function clampRichnessScore(n: number): number {
@@ -14,7 +14,7 @@ export function clampRichnessScore(n: number): number {
 
 /** Map 0–100 score to metadata tier label + bar colors (same as chain/dashboard metadata distribution). */
 export function metadataRichnessTier(score: number | null | undefined): {
-  labelKey: MetadataTranslationKey;
+  labelKey: LegacyMetadataTranslationKey;
   colorHex: string;
   clamped: number;
 } | null {
@@ -22,7 +22,7 @@ export function metadataRichnessTier(score: number | null | undefined): {
   const n = Number(score);
   if (!Number.isFinite(n)) return null;
   const clamped = clampRichnessScore(n);
-  let labelKey: MetadataTranslationKey;
+  let labelKey: LegacyMetadataTranslationKey;
   if (clamped < 10) labelKey = 'metadataPoor';
   else if (clamped < 30) labelKey = 'metadataLow';
   else if (clamped < 50) labelKey = 'metadataRegular';
@@ -31,7 +31,7 @@ export function metadataRichnessTier(score: number | null | undefined): {
   else labelKey = 'metadataElite';
   return {
     labelKey,
-    colorHex: METADATA_BUCKET_COLORS[labelKey],
+    colorHex: LEGACY_METADATA_BUCKET_COLORS[labelKey],
     clamped,
   };
 }

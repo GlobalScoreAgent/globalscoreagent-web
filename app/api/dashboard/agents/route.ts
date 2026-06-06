@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { requireDashboardUser } from '@/lib/auth/require-dashboard-user';
 import { isSimpleFilterValues } from '@/lib/dashboardFilters';
+import {
+  applyNotCalculatedMaturityFilter,
+  isNotCalculateFilterValue,
+  normalizeAgentHumiMaturity,
+  normalizeAgentHumiScore,
+} from '@/lib/agentHumiDisplay';
 
 // Función para determinar si es filtro simple
 function isSimpleFilter(values: any): boolean {
@@ -14,7 +20,6 @@ interface FilterParams {
   searchType?: 'general' | 'name' | 'description' | 'owner_wallet' | 'wallet' | 'metadata';
   selectedOpenFilter?: string;
   chainId?: number | null;
-  humiFilter?: string;
   tagsFilter?: string;
   skillsFilter?: string;
   capabilitiesFilter?: string;
@@ -58,7 +63,9 @@ function jsonbContainsStringArrayPayload(rawValue: string): string {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const auth = await requireDashboardUser();
+    if (!auth.ok) return auth.response;
+    const supabase = auth.supabase;
 
     // Parsear parámetros de la URL
     const { searchParams } = new URL(request.url);
@@ -67,7 +74,6 @@ export async function GET(request: NextRequest) {
       searchType: searchParams.get('searchType') as FilterParams['searchType'] || 'general',
       selectedOpenFilter: searchParams.get('selectedOpenFilter') || 'searchGeneral',
       chainId: searchParams.get('chainId') ? parseInt(searchParams.get('chainId')!) : null,
-      humiFilter: searchParams.get('humiFilter') || undefined,
       tagsFilter: searchParams.get('tagsFilter') || undefined,
       skillsFilter: searchParams.get('skillsFilter') || undefined,
       capabilitiesFilter: searchParams.get('capabilitiesFilter') || undefined,
@@ -119,6 +125,7 @@ export async function GET(request: NextRequest) {
         description,
         image_url,
         humi_score_filter,
+        humi_madurity_level,
         on_chain_created_at,
         on_chain_id,
         wallet_chain_register,
@@ -141,11 +148,6 @@ export async function GET(request: NextRequest) {
     // Aplicar filtro de cadena si se especifica
     if (filters.chainId !== null) {
       query = query.eq('chain_id', filters.chainId);
-    }
-
-    // Aplicar filtro de Index HUMI si se especifica
-    if (filters.humiFilter && filters.humiFilter !== 'all') {
-      query = query.eq('humi_score_filter', filters.humiFilter);
     }
 
     // Aplicar filtros dinámicos desde la base de datos usando contrato explícito
@@ -192,7 +194,14 @@ export async function GET(request: NextRequest) {
           query = query.eq('id', -1);
         }
       } else if (hasSimpleValue && isSimpleFilter(filterValues)) {
-        query = query.eq(columnName, filters.advancedFilterValue.trim());
+        const trimmedValue = filters.advancedFilterValue!.trim();
+        if (columnName === 'humi_madurity_level' && isNotCalculateFilterValue(trimmedValue)) {
+          // IS NULL only — btree skips NULLs; .or() forces seq scan + sort on ~165k rows.
+          // Partial indexes: db/indexes_web_dashboard_agents_humi_madurity_level.sql
+          query = applyNotCalculatedMaturityFilter(query);
+        } else {
+          query = query.eq(columnName, trimmedValue);
+        }
       }
     }
 
@@ -270,7 +279,10 @@ export async function GET(request: NextRequest) {
         query = query.order('balance_current', { ascending: sortDirection });
         break;
       case 'current_humi_score':
-        query = query.order('current_humi_score', { ascending: sortDirection });
+        query = query.order('current_humi_score', {
+          ascending: sortDirection,
+          nullsFirst: false,
+        });
         break;
       case 'on_chain_created_at':
       default:
@@ -311,7 +323,8 @@ export async function GET(request: NextRequest) {
       oasf_domains_filters: agent.oasf_domains_filters,
       is_dummy: agent.is_dummy,
       has_duplicate_agent: agent.has_duplicate_agent,
-      current_humi_score: agent.current_humi_score,
+      current_humi_score: normalizeAgentHumiScore(agent.current_humi_score),
+      humi_madurity_level: normalizeAgentHumiMaturity(agent.humi_madurity_level),
       humi_score_filter: agent.humi_score_filter,
       nonce_current: agent.nonce_current,
       balance_current: agent.balance_current

@@ -9,7 +9,12 @@ import {
   buildBalanceDeltaSeries,
   buildNonceDeltaSeries,
 } from '@/lib/agentDeltaSeries';
-import { getHumiScoreColor, getHumiScoreText } from '@/lib/agentHumiDisplay';
+import {
+  getAgentDetailMaturityTier,
+  getHumiMaturityColor,
+  getHumiMaturityText,
+  normalizeAgentHumiScore,
+} from '@/lib/agentHumiDisplay';
 import { normalizeChainName } from '@/lib/agentChains';
 import { publicChainLogoUrl } from '@/lib/chainPublicLogo';
 import { formatDashboardDateUtc } from '@/lib/formatDashboardDate';
@@ -258,25 +263,23 @@ export default function AgentDetailPage() {
   const description = typeof agent?.description === 'string' ? agent.description : '';
   const showReadMore = description.length > DESC_PREVIEW_CHARS;
 
-  const humiFilter = typeof agent?.humi_score_filter === 'string' ? agent.humi_score_filter : '';
-  const humiColor = getHumiScoreColor(humiFilter);
-  const humiText = getHumiScoreText(humiFilter, t);
+  const humiMaturity =
+    typeof agent?.humi_madurity_level === 'string' ? agent.humi_madurity_level : null;
+  const humiLegacyFilter =
+    typeof agent?.humi_score_filter === 'string' ? agent.humi_score_filter : null;
+  const humiTier = getAgentDetailMaturityTier(humiMaturity, humiLegacyFilter);
+  const humiColor = getHumiMaturityColor(humiMaturity, humiLegacyFilter);
+  const humiText = getHumiMaturityText(humiMaturity, humiLegacyFilter, t);
+  const humiScore = normalizeAgentHumiScore(agent?.current_humi_score);
 
-  const wamiFilter = typeof agent?.wami_score_filter === 'string' ? agent.wami_score_filter : '';
-  const wamiColor = getHumiScoreColor(wamiFilter);
-  const wamiText = getHumiScoreText(wamiFilter, t);
-
-  const humiScoreRaw = agent?.current_humi_score;
-  const humiScore =
-    humiScoreRaw !== null && humiScoreRaw !== undefined && Number.isFinite(Number(humiScoreRaw))
-      ? Number(humiScoreRaw)
-      : null;
-
-  const wamiScoreRaw = agent?.current_wami_score;
-  const wamiScore =
-    wamiScoreRaw !== null && wamiScoreRaw !== undefined && Number.isFinite(Number(wamiScoreRaw))
-      ? Number(wamiScoreRaw)
-      : null;
+  const wamiMaturity =
+    typeof agent?.wami_madurity_level === 'string' ? agent.wami_madurity_level : null;
+  const wamiLegacyFilter =
+    typeof agent?.wami_score_filter === 'string' ? agent.wami_score_filter : null;
+  const wamiTier = getAgentDetailMaturityTier(wamiMaturity, wamiLegacyFilter);
+  const wamiColor = getHumiMaturityColor(wamiMaturity, wamiLegacyFilter);
+  const wamiText = getHumiMaturityText(wamiMaturity, wamiLegacyFilter, t);
+  const wamiScore = normalizeAgentHumiScore(agent?.current_wami_score);
 
   const agentWarnings = useMemo(
     () => parseAgentWarnings(agent?.agent_warnings),
@@ -566,7 +569,7 @@ export default function AgentDetailPage() {
                     cardTitle={t.agentDetailIndexHumiTitle}
                     cardHelpText={t.agentDetailIndexHumiHelp}
                     score={humiScore}
-                    filterTier={humiFilter}
+                    filterTier={humiTier}
                     filterLabel={humiText}
                     accentColor={humiColor}
                     detailsHref={`/dashboard/agents/${encodeURIComponent(routeId)}/humi`}
@@ -579,7 +582,7 @@ export default function AgentDetailPage() {
                     cardTitle={t.agentDetailIndexWamiTitle}
                     cardHelpText={t.agentDetailIndexWamiHelp}
                     score={wamiScore}
-                    filterTier={wamiFilter}
+                    filterTier={wamiTier}
                     filterLabel={wamiText}
                     accentColor={wamiColor}
                     plusAriaLabel={t.agentDetailIndexPlusAriaLabelWami}

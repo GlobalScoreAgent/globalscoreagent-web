@@ -5,6 +5,7 @@ import type { Translations } from '@/app/(dashboard)/dashboard/components/Langua
 import { AgentHumiTrendChart } from '@/components/dashboard/AgentHumiTrendChart';
 import { dashboardCardInlayClass } from '@/lib/dashboardCardInlay';
 import type { HumiChartPoint } from '@/lib/indexHumiSeries';
+import { dashboardFormHeadingClass } from '@/app/(dashboard)/dashboard/components/dashboard-ui';
 import { cn } from '@/lib/utils';
 
 type ViewMode = 'daily' | 'monthly';
@@ -57,7 +58,9 @@ export function AgentHumiTrendCard({
   return (
     <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="shrink-0 text-2xl font-semibold">{t.agentHumiChartTitle}</h2>
+        <h2 className={cn('shrink-0 text-2xl font-semibold', dashboardFormHeadingClass(isDark))}>
+          {t.agentHumiChartTitle}
+        </h2>
         <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
           {toggleBtn('daily', t.agentHumiChart30d)}
           {toggleBtn('monthly', t.agentHumiChartMonthly)}

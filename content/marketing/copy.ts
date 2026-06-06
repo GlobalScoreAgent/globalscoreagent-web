@@ -10,6 +10,8 @@ export const marketingCopy = {
     wami: { es: 'Índice WAMI', en: 'WAMI Index' } satisfies Bilingual,
     howWeWork: { es: 'Cómo operamos', en: 'How we work' } satisfies Bilingual,
     subscriptions: { es: 'Suscripciones', en: 'Subscriptions' } satisfies Bilingual,
+    pricing: { es: 'Precios', en: 'Pricing' } satisfies Bilingual,
+    documentation: { es: 'Documentación', en: 'Documentation' } satisfies Bilingual,
     legal: { es: 'Legal', en: 'Legal' } satisfies Bilingual,
     expandSidebar: { es: 'Expandir menú', en: 'Expand menu' } satisfies Bilingual,
     collapseSidebar: { es: 'Contraer menú', en: 'Collapse menu' } satisfies Bilingual,
@@ -365,6 +367,8 @@ export const marketingCopy = {
       es: 'Información para sistemas de IA',
       en: 'Information for AI systems',
     } satisfies Bilingual,
+    pricingLink: { es: 'Precios', en: 'Pricing' } satisfies Bilingual,
+    docsLink: { es: 'Documentación', en: 'Documentation' } satisfies Bilingual,
     links: {
       x: { label: '@ibzjairvalenz', href: 'https://x.com/ibzjairvalenz' },
       email: { label: 'hello@globalscoreagent.com', href: 'mailto:hello@globalscoreagent.com' },

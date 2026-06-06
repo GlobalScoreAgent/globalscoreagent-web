@@ -6,6 +6,10 @@ import { getHumiBusinessDescription } from '@/lib/indexHumiBusinessDescriptions'
 import type { HumiPillarId } from '@/lib/indexHumiPillars';
 import type { PillarSummaryBlockId, PillarSummaryItem } from '@/lib/indexHumiPillarSummary';
 import { formatPillarSummaryReasonShort } from '@/lib/indexHumiReasonSummary';
+import {
+  dashboardFormBodyClass,
+  dashboardFormHeadingClass,
+} from '@/app/(dashboard)/dashboard/components/dashboard-ui';
 import { cn } from '@/lib/utils';
 
 type Lang = 'es' | 'en';
@@ -63,7 +67,9 @@ export function AgentHumiBlockDetailsCard({
   return (
     <>
       <div className="mb-4">
-        <h2 className="text-xl font-semibold">{t.agentHumiBlockDetailsTitle}</h2>
+        <h2 className={cn('text-xl font-semibold', dashboardFormHeadingClass(isDark))}>
+          {t.agentHumiBlockDetailsTitle}
+        </h2>
         {hasPillar && pillarLabel && hasBlock && blockLabel ? (
           <p className={cn('mt-1 text-sm font-medium', muted)}>
             {pillarLabel} · {blockLabel}
@@ -101,7 +107,14 @@ export function AgentHumiBlockDetailsCard({
                     key={`${row.item.name}-${index}`}
                     className={cn('border-b transition-colors', border, rowHover)}
                   >
-                    <td className="px-4 py-3 align-top font-medium">{row.item.name}</td>
+                    <td
+                      className={cn(
+                        'px-4 py-3 align-top font-medium',
+                        dashboardFormBodyClass(isDark),
+                      )}
+                    >
+                      {row.item.name}
+                    </td>
                     <td className={cn('px-4 py-3 align-top', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
                       {row.businessDescription}
                     </td>

@@ -3,7 +3,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 type Language = 'es' | 'en';
 type Theme = 'dark' | 'light';
@@ -30,10 +30,35 @@ export interface Translations {
   dashboardTitle: string;
   searchPlaceholder: string;
   profile: string;
-  settings: string;
   subscriptions: string;
-  usage: string;
+  api: string;
   signOut: string;
+  subscriptionsPageTitle: string;
+  apiPageTitle: string;
+  subscriptionsActiveTitle: string;
+  subscriptionsHistoryTitle: string;
+  subscriptionsPlanColumn: string;
+  subscriptionsStatusColumn: string;
+  subscriptionsPeriodStartColumn: string;
+  subscriptionsPeriodEndColumn: string;
+  subscriptionsCreatedColumn: string;
+  subscriptionsActiveBadge: string;
+  subscriptionsNoActive: string;
+  subscriptionsNoHistory: string;
+  subscriptionsPlansBilling: string;
+  subscriptionsLoading: string;
+  subscriptionsAvailablePlansTitle: string;
+  subscriptionsSoonBadge: string;
+  subscriptionsSubscribe: string;
+  subscriptionsCurrentPlan: string;
+  subscriptionsFaqTitle: string;
+  subscriptionsMonthlyLabel: string;
+  subscriptionsAnnualLabel: string;
+  subscriptionsSavingsLabel: string;
+  subscriptionsIncludesLabel: string;
+  subscriptionTagLabel: string;
+  subscriptionPeriodStart: string;
+  subscriptionPeriodEnd: string;
 
   // Página principal
   welcomeTitle: string;
@@ -49,8 +74,12 @@ export interface Translations {
   dashboardOverviewTitle: string;
   agentOverviewTitle: string;
   humiElite: string;
-  humiHighPerformance: string;
+  humiVeryStable: string;
   humiStable: string;
+  humiDeveloping: string;
+  humiUnstable: string;
+  humiNotCalculate: string;
+  humiHighPerformance: string;
   humiModerateRisk: string;
   humiCritical: string;
 
@@ -85,8 +114,13 @@ export interface Translations {
   noncesTooltip: string;
 
   // Dashboard - Categorías Metadata
-    metadataElite: string;
     metadataExcellent: string;
+    metadataStrong: string;
+    metadataModerate: string;
+    metadataBasic: string;
+    metadataLimited: string;
+    metadataIncomplete: string;
+    metadataElite: string;
     metadataGood: string;
     metadataRegular: string;
     metadataLow: string;
@@ -173,6 +207,7 @@ export interface Translations {
 
   // Sidebar - Recientes agentes
   recentAgentsSubmenu: string;
+  favoriteAgentsSubmenu: string;
   closeSidebarAgent: string;
   favoriteAgent: string;
   unfavoriteAgent: string;
@@ -421,6 +456,9 @@ export interface Translations {
 
   // Dashboard — chains (dynamic cards)
   dashboardChainsEmpty: string;
+  dashboardDataLoading: string;
+  dashboardDataLoadError: string;
+  dashboardDataRetry: string;
   chainSectionLast30Days: string;
   chainSectionOwners: string;
   chainSectionAgentInformation: string;
@@ -498,10 +536,35 @@ const translations: Record<Language, Translations> = {
     platformTitle: 'GSA Plataforma',
     searchPlaceholder: 'Buscar agentes...',
     profile: 'Perfil',
-    settings: 'Configuración',
     subscriptions: 'Subscripciones',
-    usage: 'Uso',
+    api: 'API',
     signOut: 'Cerrar sesión',
+    subscriptionsPageTitle: 'Subscripciones',
+    apiPageTitle: 'API',
+    subscriptionsActiveTitle: 'Suscripción activa',
+    subscriptionsHistoryTitle: 'Historial de subscripciones',
+    subscriptionsPlanColumn: 'Plan',
+    subscriptionsStatusColumn: 'Estado',
+    subscriptionsPeriodStartColumn: 'Inicio periodo',
+    subscriptionsPeriodEndColumn: 'Fin periodo',
+    subscriptionsCreatedColumn: 'Alta',
+    subscriptionsActiveBadge: 'Activa',
+    subscriptionsNoActive: 'No tienes una suscripción activa.',
+    subscriptionsNoHistory: 'No hay subscripciones en el historial.',
+    subscriptionsPlansBilling: 'Planes y pagos',
+    subscriptionsLoading: 'Cargando subscripciones...',
+    subscriptionsAvailablePlansTitle: 'Planes disponibles',
+    subscriptionsSoonBadge: 'Próximamente',
+    subscriptionsSubscribe: 'Contratar',
+    subscriptionsCurrentPlan: 'Tu plan actual',
+    subscriptionsFaqTitle: 'Preguntas frecuentes',
+    subscriptionsMonthlyLabel: 'Mensual',
+    subscriptionsAnnualLabel: 'Anual',
+    subscriptionsSavingsLabel: 'Ahorro',
+    subscriptionsIncludesLabel: 'Qué incluye',
+    subscriptionTagLabel: 'Suscripción',
+    subscriptionPeriodStart: 'Inicio',
+    subscriptionPeriodEnd: 'Fin',
 
     welcomeTitle: 'Bienvenido!',
     welcomeSubtitle: 'Resumen General Ecosistema ERC-8004',
@@ -516,8 +579,12 @@ const translations: Record<Language, Translations> = {
     dashboardOverviewTitle: 'Resumen General Ecosistema ERC-8004',
     agentOverviewTitle: 'Vista General',
     humiElite: 'Elite',
+    humiVeryStable: 'Muy estable',
+    humiStable: 'Estable',
+    humiDeveloping: 'En desarrollo',
+    humiUnstable: 'Inestable',
+    humiNotCalculate: 'Sin calcular',
     humiHighPerformance: 'Alto Rendimiento',
-    humiStable: 'Estables',
     humiModerateRisk: 'Riesgo Moderado',
     humiCritical: 'Críticos',
 
@@ -528,7 +595,7 @@ const translations: Record<Language, Translations> = {
     dashboardOverviewDistributionTitle: 'Distribución global',
     agentNonceTitle: 'Agente Nonce',
     dashboardInsightNonceBadge: 'Agente Nonce - Últimos 30 días',
-    dashboardInsightEcosystemBadge: 'Últimos 30 días · Nonce',
+    dashboardInsightEcosystemBadge: 'Nonce diario (últimos 30 días)',
     last30DaysTitle: 'Ultimos 30 dias',
     totalLabel: 'Total',
     nonceLabel: 'nonce',
@@ -550,8 +617,13 @@ const translations: Record<Language, Translations> = {
     noncesTooltip: 'nonces',
 
     // Dashboard - Categorías Metadata
-    metadataElite: 'Elite',
     metadataExcellent: 'Excelente',
+    metadataStrong: 'Fuerte',
+    metadataModerate: 'Moderado',
+    metadataBasic: 'Básico',
+    metadataLimited: 'Limitado',
+    metadataIncomplete: 'Incompleto',
+    metadataElite: 'Elite',
     metadataGood: 'Bueno',
     metadataRegular: 'Regular',
     metadataLow: 'Baja',
@@ -637,6 +709,7 @@ const translations: Record<Language, Translations> = {
     duplicateLabel: 'Duplicado',
 
     recentAgentsSubmenu: 'Recientes',
+    favoriteAgentsSubmenu: 'Favoritos',
     closeSidebarAgent: 'Cerrar pestaña',
     favoriteAgent: 'Agregar a favoritos',
     unfavoriteAgent: 'Quitar de favoritos',
@@ -908,6 +981,10 @@ const translations: Record<Language, Translations> = {
     transactionalDeltaVsPrevious: 'vs anterior',
 
     dashboardChainsEmpty: 'No hay datos de chains disponibles.',
+    dashboardDataLoading: 'Cargando datos del dashboard…',
+    dashboardDataLoadError:
+      'No hay conexión con la base de datos. Comprueba tu sesión o inténtalo más tarde.',
+    dashboardDataRetry: 'Reintentar',
     chainSectionLast30Days: 'Últimos 30 días',
     chainSectionOwners: 'Owners',
     chainSectionAgentInformation: 'Información de agentes',
@@ -994,10 +1071,35 @@ const translations: Record<Language, Translations> = {
     platformTitle: 'GSA Platform',
     searchPlaceholder: 'Search agents...',
     profile: 'Profile',
-    settings: 'Settings',
     subscriptions: 'Subscriptions',
-    usage: 'Usage',
+    api: 'API',
     signOut: 'Sign Out',
+    subscriptionsPageTitle: 'Subscriptions',
+    apiPageTitle: 'API',
+    subscriptionsActiveTitle: 'Active subscription',
+    subscriptionsHistoryTitle: 'Subscription history',
+    subscriptionsPlanColumn: 'Plan',
+    subscriptionsStatusColumn: 'Status',
+    subscriptionsPeriodStartColumn: 'Period start',
+    subscriptionsPeriodEndColumn: 'Period end',
+    subscriptionsCreatedColumn: 'Created',
+    subscriptionsActiveBadge: 'Active',
+    subscriptionsNoActive: 'You do not have an active subscription.',
+    subscriptionsNoHistory: 'No subscriptions in history.',
+    subscriptionsPlansBilling: 'Plans & billing',
+    subscriptionsLoading: 'Loading subscriptions...',
+    subscriptionsAvailablePlansTitle: 'Available plans',
+    subscriptionsSoonBadge: 'Coming soon',
+    subscriptionsSubscribe: 'Subscribe',
+    subscriptionsCurrentPlan: 'Your current plan',
+    subscriptionsFaqTitle: 'Frequently asked questions',
+    subscriptionsMonthlyLabel: 'Monthly',
+    subscriptionsAnnualLabel: 'Annual',
+    subscriptionsSavingsLabel: 'Savings',
+    subscriptionsIncludesLabel: "What's included",
+    subscriptionTagLabel: 'Subscription',
+    subscriptionPeriodStart: 'Start',
+    subscriptionPeriodEnd: 'End',
 
     welcomeTitle: 'Welcome!',
     welcomeSubtitle: 'General Overview ERC-8004 Ecosystem',
@@ -1012,8 +1114,12 @@ const translations: Record<Language, Translations> = {
     dashboardOverviewTitle: 'Overview ERC-8004 Ecosystem',
     agentOverviewTitle: 'General Overview',
     humiElite: 'Elite',
-    humiHighPerformance: 'High Performance',
+    humiVeryStable: 'Very Stable',
     humiStable: 'Stable',
+    humiDeveloping: 'Developing',
+    humiUnstable: 'Unstable',
+    humiNotCalculate: 'Not calculated',
+    humiHighPerformance: 'High Performance',
     humiModerateRisk: 'Moderate Risk',
     humiCritical: 'Critical',
 
@@ -1024,7 +1130,7 @@ const translations: Record<Language, Translations> = {
     dashboardOverviewDistributionTitle: 'Global distribution',
     agentNonceTitle: 'Agent Nonce',
     dashboardInsightNonceBadge: 'Agent Nonce - Last 30 Days',
-    dashboardInsightEcosystemBadge: 'Last 30 Days Nonce',
+    dashboardInsightEcosystemBadge: 'Daily Nonce (Last 30 Days)',
     last30DaysTitle: 'Last 30 Days',
     totalLabel: 'Total',
     nonceLabel: 'nonce',
@@ -1046,8 +1152,13 @@ const translations: Record<Language, Translations> = {
     noncesTooltip: 'nonces',
 
     // Dashboard - Categorías Metadata
-    metadataElite: 'Elite',
     metadataExcellent: 'Excellent',
+    metadataStrong: 'Strong',
+    metadataModerate: 'Moderate',
+    metadataBasic: 'Basic',
+    metadataLimited: 'Limited',
+    metadataIncomplete: 'Incomplete',
+    metadataElite: 'Elite',
     metadataGood: 'Good',
     metadataRegular: 'Regular',
     metadataLow: 'Low',
@@ -1133,6 +1244,7 @@ const translations: Record<Language, Translations> = {
     duplicateLabel: 'Duplicated',
 
     recentAgentsSubmenu: 'Recent',
+    favoriteAgentsSubmenu: 'Favorites',
     closeSidebarAgent: 'Close tab',
     favoriteAgent: 'Add to favorites',
     unfavoriteAgent: 'Remove from favorites',
@@ -1403,6 +1515,10 @@ const translations: Record<Language, Translations> = {
     transactionalDeltaVsPrevious: 'vs previous',
 
     dashboardChainsEmpty: 'No chain data available.',
+    dashboardDataLoading: 'Loading dashboard data…',
+    dashboardDataLoadError:
+      'No database connection. Check your session or try again later.',
+    dashboardDataRetry: 'Retry',
     chainSectionLast30Days: 'Last 30 days',
     chainSectionOwners: 'Owners',
     chainSectionAgentInformation: 'Agent information',
@@ -1479,6 +1595,7 @@ interface ContextType {
   setLanguage: (lang: Language) => void;
   theme: Theme;
   toggleTheme: () => void;
+  applyPersistedPreferences: (preferences: { language?: Language; theme?: Theme }) => void;
 }
 
 const Context = createContext<ContextType | undefined>(undefined);
@@ -1496,19 +1613,45 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     document.documentElement.classList.toggle('dark', savedTheme === 'dark');
   }, []);
 
-  const setLanguage = (newLang: Language) => {
+  const setLanguage = useCallback((newLang: Language) => {
     setLang(newLang);
     localStorage.setItem('gsa-language', newLang);
-  };
+  }, []);
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
     localStorage.setItem('gsa-theme', newTheme);
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
-  };
+  }, [theme]);
 
-  const value = { lang, t: translations[lang], setLanguage, theme, toggleTheme };
+  const applyPersistedPreferences = useCallback(({
+    language,
+    theme: persistedTheme,
+  }: {
+    language?: Language;
+    theme?: Theme;
+  }) => {
+    if (language === 'es' || language === 'en') {
+      setLang(language);
+      localStorage.setItem('gsa-language', language);
+    }
+
+    if (persistedTheme === 'dark' || persistedTheme === 'light') {
+      setTheme(persistedTheme);
+      localStorage.setItem('gsa-theme', persistedTheme);
+      document.documentElement.classList.toggle('dark', persistedTheme === 'dark');
+    }
+  }, []);
+
+  const value = useMemo(() => ({
+    lang,
+    t: translations[lang],
+    setLanguage,
+    theme,
+    toggleTheme,
+    applyPersistedPreferences,
+  }), [lang, setLanguage, theme, toggleTheme, applyPersistedPreferences]);
 
   return <Context.Provider value={value}>{children}</Context.Provider>;
 }

@@ -1,0 +1,13 @@
+{
+  "folders": [
+    {
+      "name": "web",
+      "path": "."
+    },
+    {
+      "name": "base-de-datos",
+      "path": "C:\\Global Score Agent\\BD_Supabase\\gsa-supabase-schema"
+    }
+  ],
+  "settings": {}
+}

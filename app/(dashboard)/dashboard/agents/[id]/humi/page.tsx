@@ -15,14 +15,19 @@ import { AgentHumiPillarTrendCard } from '@/components/dashboard/AgentHumiPillar
 import { AgentHumiTrendCard } from '@/components/dashboard/AgentHumiTrendCard';
 import { useDashboardTitleOverride } from '@/app/(dashboard)/dashboard/components/DashboardTitleOverrideContext';
 import { useLanguage } from '@/app/(dashboard)/dashboard/components/LanguageContext';
-import { getHumiScoreColor, getHumiScoreText } from '@/lib/agentHumiDisplay';
+import {
+  getAgentDetailMaturityTier,
+  getHumiMaturityColor,
+  getHumiMaturityText,
+  normalizeAgentHumiScore,
+} from '@/lib/agentHumiDisplay';
 import {
   getBlockPercentBandColor,
   getPillarScoreBandColor,
   HUMI_BAND_NEUTRAL,
 } from '@/lib/indexHumiScoreColors';
 import { formatDashboardDateUtc } from '@/lib/formatDashboardDate';
-import { parseIndexHumiRow, resolveHumiCategory, type IndexHumiCardData } from '@/lib/indexHumi';
+import { parseIndexHumiRow, type IndexHumiCardData } from '@/lib/indexHumi';
 import {
   buildPillarSummaryChartPoints,
   getPillarSummaryBlockMax,
@@ -43,6 +48,7 @@ import {
 } from '@/lib/indexHumiPillars';
 import { parseHumiLast30Days, parseHumiMonthlyTracking } from '@/lib/indexHumiSeries';
 import { cn } from '@/lib/utils';
+import { dashboardFormHeadingClass } from '@/app/(dashboard)/dashboard/components/dashboard-ui';
 
 type AgentDetailRow = Record<string, unknown>;
 
@@ -169,13 +175,12 @@ export default function AgentHumiDetailPage() {
 
   const title = typeof agent?.name === 'string' ? agent.name : '';
 
-  const humiCategory = useMemo(
-    () => resolveHumiCategory(indexHumi?.humi_score_category, indexHumi?.humi_score),
-    [indexHumi?.humi_score, indexHumi?.humi_score_category],
-  );
-
-  const humiColor = getHumiScoreColor(humiCategory);
-  const humiText = getHumiScoreText(humiCategory, t);
+  const humiMaturity = indexHumi?.madurity_level ?? null;
+  const humiLegacyCategory = indexHumi?.humi_score_category ?? null;
+  const humiTier = getAgentDetailMaturityTier(humiMaturity, humiLegacyCategory);
+  const humiColor = getHumiMaturityColor(humiMaturity, humiLegacyCategory);
+  const humiText = getHumiMaturityText(humiMaturity, humiLegacyCategory, t);
+  const humiDisplayScore = normalizeAgentHumiScore(indexHumi?.humi_score);
 
   const locale = lang === 'es' ? 'es-ES' : 'en-US';
 
@@ -376,6 +381,7 @@ export default function AgentHumiDetailPage() {
   );
 
   return (
+    <div className={cn('min-h-full', isDark ? 'text-zinc-100' : 'text-zinc-900')}>
     <div className="mx-auto max-w-7xl space-y-6 px-6 pt-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 flex-1 flex-col gap-3">
@@ -411,13 +417,15 @@ export default function AgentHumiDetailPage() {
             className="w-full"
             contentClassName="p-6"
           >
-            <h2 className="mb-4 text-xl font-semibold">{t.agentHumiIndexScoreTitle}</h2>
+            <h2 className={cn('mb-4 text-xl font-semibold', dashboardFormHeadingClass(isDark))}>
+              {t.agentHumiIndexScoreTitle}
+            </h2>
             <AgentDetailIndexScoreCard
               bare
               hideHeader
               categoryPlacement="below"
-              score={indexHumi?.humi_score ?? null}
-              filterTier={humiCategory}
+              score={humiDisplayScore}
+              filterTier={humiTier}
               filterLabel={humiText}
               accentColor={humiColor}
               notAvailableLabel={t.notAvailable}
@@ -527,6 +535,7 @@ export default function AgentHumiDetailPage() {
           t={t}
         />
       </AgentDetailCard>
+    </div>
     </div>
   );
 }

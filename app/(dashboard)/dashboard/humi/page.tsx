@@ -30,6 +30,7 @@ import {
 } from '@/lib/indexHumiPillars';
 import { parseHumiLast30Days, parseHumiMonthlyTracking } from '@/lib/indexHumiSeries';
 import { cn } from '@/lib/utils';
+import { dashboardFormHeadingClass } from '@/app/(dashboard)/dashboard/components/dashboard-ui';
 
 type AgentDetailRow = Record<string, unknown>;
 
@@ -141,8 +142,12 @@ export default function HumiIndexPage() {
   const title = typeof agent?.name === 'string' ? agent.name : '';
 
   const humiCategory = useMemo(
-    () => resolveHumiCategory(indexHumi?.humi_score_category, indexHumi?.humi_score),
-    [indexHumi?.humi_score, indexHumi?.humi_score_category],
+    () => resolveHumiCategory(
+      indexHumi?.madurity_level,
+      indexHumi?.humi_score_category,
+      indexHumi?.humi_score,
+    ),
+    [indexHumi?.madurity_level, indexHumi?.humi_score, indexHumi?.humi_score_category],
   );
 
   const humiColor = getHumiScoreColor(humiCategory);
@@ -296,6 +301,7 @@ export default function HumiIndexPage() {
   );
 
   return (
+    <div className={cn('min-h-full', isDark ? 'text-zinc-100' : 'text-zinc-900')}>
     <div className="mx-auto max-w-7xl space-y-6 px-6 pt-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 flex-1 flex-col gap-3">
@@ -338,7 +344,9 @@ export default function HumiIndexPage() {
             className="w-full"
             contentClassName="p-6"
           >
-            <h2 className="mb-4 text-xl font-semibold">{t.agentHumiIndexScoreTitle}</h2>
+            <h2 className={cn('mb-4 text-xl font-semibold', dashboardFormHeadingClass(isDark))}>
+              {t.agentHumiIndexScoreTitle}
+            </h2>
             <AgentDetailIndexScoreCard
               bare
               hideHeader
@@ -431,6 +439,7 @@ export default function HumiIndexPage() {
           </AgentDetailCard>
         </div>
       </div>
+    </div>
     </div>
   );
 }

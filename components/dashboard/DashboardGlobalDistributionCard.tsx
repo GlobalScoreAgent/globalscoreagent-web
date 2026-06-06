@@ -7,46 +7,41 @@ import {
   DistributionCarouselPanel,
   type DistributionCarouselSlide,
 } from '@/components/dashboard/DistributionCarouselPanel';
+import {
+  MATURITY_ORDER,
+  normalizeMaturityDistribution,
+} from '@/lib/dashboardMaturityDistribution';
+import {
+  METADATA_ORDER,
+  normalizeMetadataDistribution,
+} from '@/lib/dashboardMetadataDistribution';
 import { cn } from '@/lib/utils';
 
 export type GlobalDistributionStats = {
   humi_index_distribution: Record<string, number>;
   wami_index_distribution: Record<string, number>;
-  agent_metadata_distribution: Record<
-    string,
-    { count: number; percentage: number } | undefined
-  >;
+  agent_metadata_distribution: Record<string, number>;
 };
 
-const GLOBAL_HUMI_ORDER = [
-  { rangeKey: '0-10', slug: 'r0_10', color: '#dc2626', labelKey: 'humiCritical' as const },
-  { rangeKey: '10-30', slug: 'r10_30', color: '#f97316', labelKey: 'humiModerateRisk' as const },
-  { rangeKey: '30-60', slug: 'r30_60', color: '#eab308', labelKey: 'humiStable' as const },
-  { rangeKey: '60-80', slug: 'r60_80', color: '#84cc16', labelKey: 'humiHighPerformance' as const },
-  { rangeKey: '80-100', slug: 'r80_100', color: '#22c55e', labelKey: 'humiElite' as const },
-];
-
-const GLOBAL_WAMI_ORDER = GLOBAL_HUMI_ORDER;
-
-const GLOBAL_META_ORDER = [
-  { dbKey: 'Mala', slug: 'mala', color: '#dc2626', labelKey: 'metadataPoor' as const },
-  { dbKey: 'Baja', slug: 'baja', color: '#f97316', labelKey: 'metadataLow' as const },
-  { dbKey: 'Regular', slug: 'regular', color: '#f59e0b', labelKey: 'metadataRegular' as const },
-  { dbKey: 'Bueno', slug: 'bueno', color: '#10b981', labelKey: 'metadataGood' as const },
-  { dbKey: 'Excelente', slug: 'excelente', color: '#3b82f6', labelKey: 'metadataExcellent' as const },
-  { dbKey: 'Elite', slug: 'elite', color: '#a855f7', labelKey: 'metadataElite' as const },
-];
-
-function buildRangeStack(
-  dist: Record<string, number>,
-  order: typeof GLOBAL_HUMI_ORDER,
-  rowName: string,
-) {
+function buildMaturityStack(dist: Record<string, number>, rowName: string) {
+  const normalized = normalizeMaturityDistribution(dist);
   const row: Record<string, number | string> = { name: rowName };
   const rowKeys: string[] = [];
-  for (const seg of order) {
-    row[seg.slug] = Number(dist[seg.rangeKey]) || 0;
-    rowKeys.push(seg.slug);
+  for (const seg of MATURITY_ORDER) {
+    row[seg.key] = normalized[seg.key] ?? 0;
+    rowKeys.push(seg.key);
+  }
+  const total = rowKeys.reduce((s, k) => s + (Number(row[k]) || 0), 0);
+  return { row, rowKeys, total };
+}
+
+function buildMetadataStack(dist: Record<string, number>) {
+  const normalized = normalizeMetadataDistribution(dist);
+  const row: Record<string, number | string> = { name: 'meta' };
+  const rowKeys: string[] = [];
+  for (const seg of METADATA_ORDER) {
+    row[seg.key] = normalized[seg.key] ?? 0;
+    rowKeys.push(seg.key);
   }
   const total = rowKeys.reduce((s, k) => s + (Number(row[k]) || 0), 0);
   return { row, rowKeys, total };
@@ -63,44 +58,34 @@ export function DashboardGlobalDistributionCard({ isDark, t, currentStats, class
   const muted = isDark ? 'text-zinc-400' : 'text-zinc-600';
 
   const humiStack = useMemo(
-    () => buildRangeStack(currentStats.humi_index_distribution ?? {}, GLOBAL_HUMI_ORDER, 'humi'),
+    () => buildMaturityStack(currentStats.humi_index_distribution ?? {}, 'humi'),
     [currentStats.humi_index_distribution],
   );
 
   const wamiStack = useMemo(
-    () => buildRangeStack(currentStats.wami_index_distribution ?? {}, GLOBAL_WAMI_ORDER, 'wami'),
+    () => buildMaturityStack(currentStats.wami_index_distribution ?? {}, 'wami'),
     [currentStats.wami_index_distribution],
   );
 
-  const metaStack = useMemo(() => {
-    const md = currentStats.agent_metadata_distribution ?? {};
-    const row: Record<string, number | string> = { name: 'meta' };
-    const rowKeys: string[] = [];
-    for (const seg of GLOBAL_META_ORDER) {
-      const c = md[seg.dbKey]?.count;
-      row[seg.slug] = c ?? 0;
-      rowKeys.push(seg.slug);
-    }
-    const total = rowKeys.reduce((s, k) => s + (Number(row[k]) || 0), 0);
-    return { row, rowKeys, total };
-  }, [currentStats.agent_metadata_distribution]);
+  const metaStack = useMemo(
+    () => buildMetadataStack(currentStats.agent_metadata_distribution ?? {}),
+    [currentStats.agent_metadata_distribution],
+  );
 
   const distributionSlides = useMemo((): DistributionCarouselSlide[] => {
-    const humiLabelForKey = (slug: string) => {
-      const seg = GLOBAL_HUMI_ORDER.find((s) => s.slug === slug);
-      return seg ? `${seg.rangeKey} · ${t[seg.labelKey]}` : slug;
+    const maturityLabelForKey = (key: string) => {
+      const seg = MATURITY_ORDER.find((s) => s.key === key);
+      return seg ? `${seg.scoreRange} · ${t[seg.labelKey]}` : key;
     };
-    const wamiLabelForKey = (slug: string) => {
-      const seg = GLOBAL_WAMI_ORDER.find((s) => s.slug === slug);
-      return seg ? `${seg.rangeKey} · ${t[seg.labelKey]}` : slug;
+    const maturityColor = (key: string) =>
+      MATURITY_ORDER.find((s) => s.key === key)?.color ?? '#71717a';
+
+    const metaLabelForKey = (key: string) => {
+      const seg = METADATA_ORDER.find((s) => s.key === key);
+      return seg ? `${seg.scoreRange} · ${t[seg.labelKey]}` : key;
     };
-    const metaLabelForKey = (slug: string) => {
-      const seg = GLOBAL_META_ORDER.find((s) => s.slug === slug);
-      return seg ? t[seg.labelKey] : slug;
-    };
-    const humiColor = (slug: string) => GLOBAL_HUMI_ORDER.find((s) => s.slug === slug)?.color ?? '#71717a';
-    const wamiColor = (slug: string) => GLOBAL_WAMI_ORDER.find((s) => s.slug === slug)?.color ?? '#71717a';
-    const metaColor = (slug: string) => GLOBAL_META_ORDER.find((s) => s.slug === slug)?.color ?? '#71717a';
+    const metaColor = (key: string) =>
+      METADATA_ORDER.find((s) => s.key === key)?.color ?? '#71717a';
 
     const slides: DistributionCarouselSlide[] = [];
     if (humiStack.total > 0) {
@@ -109,8 +94,8 @@ export function DashboardGlobalDistributionCard({ isDark, t, currentStats, class
         metricLabel: t.humiDistributionTitle,
         rowKeys: humiStack.rowKeys,
         row: humiStack.row,
-        colors: humiColor,
-        labelForKey: humiLabelForKey,
+        colors: maturityColor,
+        labelForKey: maturityLabelForKey,
       });
     }
     if (metaStack.total > 0) {
@@ -129,8 +114,8 @@ export function DashboardGlobalDistributionCard({ isDark, t, currentStats, class
         metricLabel: t.wamiDistributionTitle,
         rowKeys: wamiStack.rowKeys,
         row: wamiStack.row,
-        colors: wamiColor,
-        labelForKey: wamiLabelForKey,
+        colors: maturityColor,
+        labelForKey: maturityLabelForKey,
       });
     }
     return slides;
@@ -142,7 +127,7 @@ export function DashboardGlobalDistributionCard({ isDark, t, currentStats, class
       variant="metadata"
       accentHex="#a855f7"
       className={cn('min-h-0 w-full min-w-0 flex-1', className)}
-      contentClassName="flex flex-col gap-3 p-4 pt-14 sm:p-5 sm:pt-14"
+      contentClassName="flex min-h-[280px] flex-col gap-3 p-4 pt-14 sm:p-5 sm:pt-14"
     >
       <div className="absolute left-4 top-4 z-10 max-w-[calc(100%-2rem)]">
         <div
@@ -164,10 +149,14 @@ export function DashboardGlobalDistributionCard({ isDark, t, currentStats, class
             nextLabel={t.chainDistributionNext}
             isDark={isDark}
             legendPlacement="side"
+            legendDensity="comfortable"
             chartVariant="pie"
             bordered={false}
             showPanelTitle={false}
-            className="min-h-[220px] sm:min-h-[260px]"
+            pieInnerRadius="40%"
+            pieOuterRadius="88%"
+            className="min-h-[280px] flex-1 sm:min-h-[320px]"
+            chartClassName="flex-1"
           />
         ) : (
           <p className={`text-xs ${muted}`}>—</p>

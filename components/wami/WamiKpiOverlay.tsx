@@ -5,21 +5,14 @@ import { useLanguage } from '@/app/contexts/LanguageContext';
 import { wamiKpiLabels } from '@/content/wami/kpi-labels';
 import { pick } from '@/content/marketing/i18n';
 import { fetchApiNoStore } from '@/lib/api/client-fetch';
-import { HUMI_DISTRIBUTION_KEYS, type WamiPageKpi } from '@/lib/web-page/statistics';
+import { WAMI_MATURITY_KEYS, type WamiPageKpi } from '@/lib/web-page/statistics';
 import KpiPanelSkeleton from '@/components/marketing/shared/KpiPanelSkeleton';
-import DistributionKpiCard from '@/components/marketing/shared/DistributionKpiCard';
+import DistributionKpiCard from './kpi/DistributionKpiCard';
 import { kpiGridGap, kpiLastUpdated } from '@/components/marketing/shared/kpiTypography';
 import NonceTotalKpiCard from './kpi/NonceTotalKpiCard';
 import WalletsAnalysedKpiCard from './kpi/WalletsAnalysedKpiCard';
 import WalletLinkKpiCard from './kpi/WalletLinkKpiCard';
 import WalletCategoriesKpiCard from './kpi/WalletCategoriesKpiCard';
-
-const WAMI_DISTRIBUTION_LABELS = {
-  categoryHeader: wamiKpiLabels.distributionCategoryHeader,
-  countSubtitle: wamiKpiLabels.distributionWalletsSubtitle,
-  avgSubtitle: wamiKpiLabels.distributionAvgSubtitle,
-  scoreRangeInfoLabel: wamiKpiLabels.scoreRangeInfoLabel,
-};
 
 type WamiKpiOverlayProps = {
   className?: string;
@@ -107,14 +100,14 @@ export default function WamiKpiOverlay({ className = '' }: WamiKpiOverlayProps) 
             valid={kpi.wallet_link_agent_valid}
             notValid={kpi.wallet_link_agent_not_valid}
           />
-          {HUMI_DISTRIBUTION_KEYS.map((key) => (
+          {WAMI_MATURITY_KEYS.map((key) => (
             <DistributionKpiCard
               key={key}
               band={wamiKpiLabels.distribution[key].band}
               scoreRange={wamiKpiLabels.distribution[key].scoreRange}
+              userDescription={wamiKpiLabels.distribution[key].userDescription}
               count={kpi.distribution[key].count}
               avg={kpi.distribution[key].avg}
-              labels={WAMI_DISTRIBUTION_LABELS}
             />
           ))}
           <WalletCategoriesKpiCard categories={kpi.wallet_categories} />
