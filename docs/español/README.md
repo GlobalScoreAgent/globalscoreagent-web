@@ -23,10 +23,10 @@ Aquí encontrarás guías de negocio, especificaciones técnicas y explicaciones
 
 ### Índices de Reputación
 
-- **[Índice HUMI – Agent Human-like Intelligence Index](./Index-HUMI.md)**  
+- **[Índice HUMI – Agent Human-like Intelligence Index](./index-humi.md)**  
   Explicación completa del puntaje de reputación de los Agentes.
 
-- **[Índice WAMI – Wallet Advanced Metrics Index](./Index-WAMI.md)**  
+- **[Índice WAMI – Wallet Advanced Metrics Index](./index-wami.md)**  
   Explicación completa del puntaje de reputación de las Wallets.
 
 ### Análisis y Evaluaciones
@@ -40,10 +40,10 @@ Aquí encontrarás guías de negocio, especificaciones técnicas y explicaciones
 - **[Sistema de Advertencias de Agentes](./agent-warning-system.md)**  
   Tipos de advertencias, su significado y cómo afectan la reputación.
 
-- **[Tipos de Feedback de Agentes](./Agent-Feedback-Types.md)**  
+- **[Tipos de Feedback de Agentes](./agent-feedback-types.md)**  
   Explicación de los diferentes tipos de feedback (attestations, comments, audits, etc.).
 
-- **[Categorías Transaccionales de Wallets](./Wallet-Transactional-Categories.md)**  
+- **[Categorías Transaccionales de Wallets](./wallet-transactional-categories.md)**  
   Cómo clasificamos el comportamiento de las wallets (Explosive, Hyper Growth, Stable, etc.).
 
 ---
