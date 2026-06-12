@@ -6,14 +6,19 @@ Aquí encontrarás guías de negocio, especificaciones técnicas y explicaciones
 
 ---
 
-## 📋 Índice de Documentos
+## Índice de Documentos
+
+### Estándares Fundamentales
+
+- **[ERC-8004: Agentes Sin Confianza Previa](./erc-8004.md)**  
+  Explicación del estándar de Ethereum que habilita la identidad, reputación y validación de agentes de IA sin confianza previa. (Negocio + Técnico)
 
 ### Documentos Principales
 
-- **[Global Score Agent – Plataforma de Reputación para ERC-8004](./GlobalScoreAgent.md)**  
+- **[Global Score Agent – Plataforma de Reputación para ERC-8004](./global-score-agent.md)**  
   Descripción general del proyecto, misión, productos y visión.
 
-- **[Precios de Global Score Agent (GSA)](./Pricing.md)**  
+- **[Precios de Global Score Agent (GSA)](./gsa-pricing.md)**  
   Planes del Dashboard, paquetes de créditos API y preguntas frecuentes.
 
 ### Índices de Reputación
@@ -26,13 +31,13 @@ Aquí encontrarás guías de negocio, especificaciones técnicas y explicaciones
 
 ### Análisis y Evaluaciones
 
-- **[Análisis de Realness del Agente](./Agent-Realness.md)**  
+- **[Análisis de Realness del Agente](./agent-realness-analysis.md)**  
   Cómo evaluamos la legitimidad y calidad básica de cada Agente.
 
-- **[Puntaje de Riqueza de Metadatos](./Metadata-Richness.md)**  
+- **[Puntaje de Riqueza de Metadatos](./agent-metadata-richness-analysis.md)**  
   Cómo medimos la completitud y profesionalismo del perfil de un Agente.
 
-- **[Sistema de Advertencias de Agentes](./Agent-Warning-System.md)**  
+- **[Sistema de Advertencias de Agentes](./agent-warning-system.md)**  
   Tipos de advertencias, su significado y cómo afectan la reputación.
 
 - **[Tipos de Feedback de Agentes](./Agent-Feedback-Types.md)**  
@@ -45,7 +50,7 @@ Aquí encontrarás guías de negocio, especificaciones técnicas y explicaciones
 
 ## ¿Cómo usar esta documentación?
 
-- **Usuarios y Creadores**: Empieza por **Global Score Agent** y **Análisis de Realness** para entender cómo mejorar tu Agente.
+- **Usuarios y Creadores**: Empieza por **ERC-8004** y **Global Score Agent** para entender la base del ecosistema y cómo mejorar tu Agente.
 - **Desarrolladores**: Revisa los documentos técnicos de **HUMI** y **WAMI** para integraciones vía API.
 - **Inversores y Analistas**: Usa **Precios** y los índices de reputación para evaluar oportunidades.
 
@@ -58,8 +63,8 @@ Si encuentras errores, quieres proponer mejoras o agregar nuevos documentos, por
 
 ---
 
-**Última actualización:** Mayo 2026  
-**Versión:** 1.0
+**Última actualización:** Junio 2026  
+**Versión:** 1.1
 
 ---
 
