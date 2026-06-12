@@ -15,10 +15,10 @@ Here you will find business guides, technical specifications, and clear explanat
 
 ### Core Documents
 
-- **[Global Score Agent – Reputation Platform for ERC-8004](./GlobalScoreAgent.md)**  
+- **[Global Score Agent – Reputation Platform for ERC-8004](./global-score-agent.md.md)**  
   Project overview, mission, products, and vision.
 
-- **[Global Score Agent Pricing](./Pricing.md)**  
+- **[Global Score Agent Pricing](./gsa-pricing.md)**  
   Dashboard plans, API credit packages, and frequently asked questions.
 
 ### Reputation Indices
