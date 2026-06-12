@@ -8,6 +8,11 @@ Here you will find business guides, technical specifications, and clear explanat
 
 ## 📋 Table of Contents
 
+### Foundational Standards
+
+- **[ERC-8004: Trustless Agents](./erc-8004.md)**  
+  Explanation of the Ethereum standard that enables trustless AI agent identity, reputation, and validation. (Business + Technical)
+
 ### Core Documents
 
 - **[Global Score Agent – Reputation Platform for ERC-8004](./GlobalScoreAgent.md)**  
@@ -45,7 +50,7 @@ Here you will find business guides, technical specifications, and clear explanat
 
 ## How to Use This Documentation
 
-- **Users & Creators**: Start with **Global Score Agent** and **Agent Realness** to understand how to improve your Agent.
+- **Users & Creators**: Start with **ERC-8004** and **Global Score Agent** to understand the foundation and how to improve your Agent.
 - **Developers**: Check the technical documents for **HUMI** and **WAMI** for API integrations.
 - **Investors & Analysts**: Use **Pricing** and the reputation indices to evaluate opportunities.
 
@@ -58,8 +63,8 @@ If you find errors, want to suggest improvements, or would like to add new docum
 
 ---
 
-**Last updated:** May 2026  
-**Version:** 1.0
+**Last updated:** June 2026  
+**Version:** 1.1
 
 ---
 
