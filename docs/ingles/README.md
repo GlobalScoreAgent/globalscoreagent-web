@@ -15,7 +15,7 @@ Here you will find business guides, technical specifications, and clear explanat
 
 ### Core Documents
 
-- **[Global Score Agent – Reputation Platform for ERC-8004](./global-score-agent.md.md)**  
+- **[Global Score Agent – Reputation Platform for ERC-8004](./global-score-agent.md)**  
   Project overview, mission, products, and vision.
 
 - **[Global Score Agent Pricing](./gsa-pricing.md)**  
@@ -23,27 +23,27 @@ Here you will find business guides, technical specifications, and clear explanat
 
 ### Reputation Indices
 
-- **[Index HUMI – Agent Human-like Intelligence Index](./Index-HUMI.md)**  
+- **[Index HUMI – Agent Human-like Intelligence Index](./index-humi.md)**  
   Complete explanation of the Agent reputation score.
 
-- **[Index WAMI – Wallet Advanced Metrics Index](./Index-WAMI.md)**  
+- **[Index WAMI – Wallet Advanced Metrics Index](./index-wami.md)**  
   Complete explanation of the Wallet reputation score.
 
 ### Analysis & Evaluations
 
-- **[Agent Realness Analysis](./Agent-Realness.md)**  
+- **[Agent Realness Analysis](./agent-realness-analysis.md)**  
   How we evaluate the basic legitimacy and quality of each Agent.
 
-- **[Metadata Richness Score](./Metadata-Richness.md)**  
+- **[Metadata Richness Score](./agent-metadata-richness-analysis.md)**  
   How we measure the completeness and professionalism of an Agent’s profile.
 
-- **[Agent Warning System](./Agent-Warning-System.md)**  
+- **[Agent Warning System](./agent-warning-system.md)**  
   Types of warnings, their meaning, and how they affect reputation.
 
-- **[Agent Feedback Types](./Agent-Feedback-Types.md)**  
+- **[Agent Feedback Types](./agent-feedback-types.md)**  
   Explanation of the different types of feedback (attestations, comments, audits, etc.).
 
-- **[Wallet Transactional Categories](./Wallet-Transactional-Categories.md)**  
+- **[Wallet Transactional Categories](./wallet-transactional-categories.md)**  
   How we classify wallet behavior (Explosive, Hyper Growth, Stable, etc.).
 
 ---
