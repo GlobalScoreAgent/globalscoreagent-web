@@ -18,11 +18,11 @@ El Dashboard está organizado en las siguientes secciones principales:
 
 | Sección                    | Descripción                                                                 | Documentación detallada                          |
 |---------------------------|-----------------------------------------------------------------------------|--------------------------------------------------|
-| **Home**                  | Vista general con métricas clave y acceso rápido                            | [Home](./home.md)                                |
-| **Agents Directory**      | Buscar, filtrar y explorar todos los Agentes registrados                    | [Directorio de Agentes](./agents-directory.md)   |
-| **Páginas de Agente**     | Vista detallada de un Agente individual (incluye General Overview, HUMI y WAMI) | [Vista General del Agente](./agent-general-overview.md)<br>[Índice HUMI](./agent-humi-index.md)<br>[Índice WAMI](./agent-wami-index.md) |
-| **Profile**               | Información y configuración de tu cuenta                                    | [Perfil](./profile.md)                           |
-| **Subscriptions**         | Gestionar tu plan actual y facturación                                      | [Suscripciones](./subscriptions.md)              |
+| **Inicio**                | Vista general con métricas clave y acceso rápido                            | [Inicio](./home.md)                              |
+| **Directorio de Agentes** | Buscar, filtrar y explorar todos los Agentes registrados                    | [Directorio de Agentes](./agents-directory.md)   |
+| **Páginas de Agente**     | Vista detallada de un Agente individual (incluye Vista General, HUMI y WAMI)| [Vista General del Agente](./agent-general-overview.md)<br>[Índice HUMI](./agent-humi-index.md)<br>[Índice WAMI](./agent-wami-index.md) |
+| **Perfil**                | Información y configuración de tu cuenta                                    | [Perfil](./profile.md)                           |
+| **Suscripciones**         | Gestionar tu plan actual y facturación                                      | [Suscripciones](./subscriptions.md)              |
 | **API**                   | Gestión de API Keys e información básica de integración                     | [API](./api.md)                                  |
 | **Feedbacks**             | Ver y gestionar el feedback que has dado o recibido                         | [Feedbacks](./feedbacks.md)                      |
 
