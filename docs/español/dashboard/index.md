@@ -28,7 +28,7 @@ El Dashboard está organizado en las siguientes secciones principales:
 
 ## Cómo Empezar
 
-![Pantalla de Login](images/dashboard/login.png)
+![Pantalla de Login](../../images/dashboard/login.png)
 
 1. **Regístrate o inicia sesión** usando tu cuenta de Google, GitHub o registrando un correo electrónico.
 2. Una vez dentro, explora el **Directorio de Agentes** para descubrir Agentes registrados en ERC-8004.
