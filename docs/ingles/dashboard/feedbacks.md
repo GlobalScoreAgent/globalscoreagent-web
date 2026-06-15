@@ -1,58 +1,58 @@
-# Comentarios
+# Feedbacks
 
-La página **Comentarios** permite a los usuarios comunicarse directamente con el equipo de Global Score Agent. Aquí puedes enviar comentarios, reportar bugs o solicitar cambios relacionados con tu cuenta y la plataforma.
+The **Feedbacks** page allows users to communicate directly with the Global Score Agent team. Here you can submit comments, report bugs, or request changes related to your account and the platform.
 
-Esta página está dividida en dos secciones principales:
+This page is divided into two main sections:
 
-## 1. Mis Comentarios
+## 1. My Comments
 
-En esta sección puedes ver el listado de todos los comentarios, reportes o solicitudes que has enviado a GSA.
+In this section, you can view a list of all the comments, reports, or requests you have submitted to GSA.
 
-Por cada comentario enviado, podrás ver:
+For each submitted comment, you can see:
 
-- El contenido del comentario o reporte que realizaste
-- La fecha de envío
-- La respuesta del equipo de GSA (si ya ha sido revisado)
+- The content of the comment or report you made
+- The submission date
+- The response from the GSA team (if it has already been reviewed)
 
-Esta sección es útil para hacer seguimiento a tus reportes y ver si han sido atendidos.
-
----
-
-## 2. Nuevo Comentario
-
-Esta sección te permite enviar un nuevo comentario o reporte al equipo de Global Score Agent.
-
-Puedes utilizar este formulario para:
-
-- Reportar **bugs** o errores en la plataforma
-- Informar **inconsistencias** en la información de tus agentes
-- Solicitar **cambios** en los planes de suscripción de tu perfil
-- Enviar cualquier otro tipo de comentario, sugerencia o consulta
-
-Simplemente escribe tu mensaje y envíalo. El equipo de GSA lo revisará y te responderá a través de la sección **Mis Comentarios**.
+This section is useful for tracking your reports and checking if they have been addressed.
 
 ---
 
-## ¿Para qué sirve esta página?
+## 2. New Comment
 
-La página de Comentarios es el canal oficial para:
+This section allows you to submit a new comment or report to the Global Score Agent team.
 
-- Reportar problemas técnicos de la plataforma
-- Solicitar modificaciones en la información de tus agentes
-- Pedir cambios o aclaraciones sobre tu plan de suscripción
-- Enviar sugerencias de mejora
+You can use this form to:
 
-Es una herramienta importante para mantener una comunicación directa con el equipo de Global Score Agent.
+- Report **bugs** or errors in the platform
+- Report **inconsistencies** in your agents’ information
+- Request **changes** to your profile’s subscription plan
+- Send any other type of comment, suggestion, or inquiry
 
----
-
-## Consejos de Uso
-
-- Utiliza la sección **Nuevo Comentario** cuando necesites reportar un bug o solicitar algo específico.
-- Revisa periódicamente la sección **Mis Comentarios** para ver las respuestas del equipo de GSA.
-- Sé lo más claro y detallado posible al escribir un comentario o reporte, ya que esto ayuda a que sea atendido más rápido.
-- Esta página es especialmente útil si detectas inconsistencias en los datos de tus agentes o si necesitas gestionar algo relacionado con tu suscripción.
+Simply write your message and submit it. The GSA team will review it and respond through the **My Comments** section.
 
 ---
 
-*Última actualización: Junio 2026*
+## What is this page for?
+
+The Feedbacks page is the official channel to:
+
+- Report technical issues with the platform
+- Request modifications to your agents’ information
+- Ask for changes or clarifications regarding your subscription plan
+- Send suggestions for improvement
+
+It is an important tool for maintaining direct communication with the Global Score Agent team.
+
+---
+
+## Usage Tips
+
+- Use the **New Comment** section when you need to report a bug or request something specific.
+- Periodically check the **My Comments** section to see responses from the GSA team.
+- Be as clear and detailed as possible when writing a comment or report, as this helps it get addressed faster.
+- This page is especially useful if you detect inconsistencies in your agents’ data or if you need to manage something related to your subscription.
+
+---
+
+*Last updated: June 2026*
