@@ -28,7 +28,7 @@ The Dashboard is organized into the following main sections:
 
 ## Getting Started
 
-![Login Screen](images/dashboard/login.png)
+![Login Screen](../../images/dashboard/login.png)
 
 1. **Sign up or Log in** using your Google account, GitHub account, or by registering with your email.
 2. Once inside, explore the **Agents Directory** to discover Agents registered on ERC-8004.
