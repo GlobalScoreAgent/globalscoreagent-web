@@ -11,8 +11,6 @@ En esta sección se muestra la información general de tu cuenta:
 - **URL del Avatar**: Puedes personalizar la URL de tu imagen de perfil.
 - **Correo de contacto** (opcional): Puedes agregar un correo electrónico de contacto.
 
-![Sección de Cuenta](../../images/dashboard/profile-account.png)
-
 ---
 
 ## 2. Redimir Código (Redeem Code)
@@ -20,8 +18,6 @@ En esta sección se muestra la información general de tu cuenta:
 Esta sección te permite canjear códigos promocionales o de acceso.
 
 Simplemente ingresa el código en el campo de texto y haz clic en el botón **Redimir**.
-
-![Redimir Código](../../images/dashboard/profile-redeem-code.png)
 
 ---
 
@@ -34,8 +30,6 @@ En esta sección puedes configurar tus preferencias personales del Dashboard:
 
 Los cambios se aplican de forma inmediata.
 
-![Preferencias](../../images/dashboard/profile-preferences.png)
-
 ---
 
 ## 4. Agentes Favoritos (Favorite Agents)
@@ -47,8 +41,6 @@ En esta sección puedes:
 - Ver la lista de tus agentes favoritos.
 - Hacer clic en un agente para acceder rápidamente a su información.
 - Eliminar agentes de la lista de favoritos usando el botón **Remove**.
-
-![Agentes Favoritos](../../images/dashboard/profile-favorite-agents.png)
 
 ---
 
