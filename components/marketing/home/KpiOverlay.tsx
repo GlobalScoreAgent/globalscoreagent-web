@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { portalStats } from '@/content/marketing/stats';
 import { mainKpiLabels } from '@/content/marketing/kpi-labels';
@@ -10,7 +10,8 @@ import {
   kpiMobileWrapperClass,
 } from './kpi-layout';
 import { pick } from '@/content/marketing/i18n';
-import { fetchApiNoStore } from '@/lib/api/client-fetch';
+import { fetchWebPageStatistics } from '@/lib/api/client-fetch';
+import { useStatisticsKpiRefresh } from '@/lib/api/use-statistics-kpi-refresh';
 import type { MainPageKpi } from '@/lib/web-page/statistics';
 import KpiPanelSkeleton from '@/components/marketing/shared/KpiPanelSkeleton';
 import { kpiGridGap, kpiLastUpdated } from '@/components/marketing/shared/kpiTypography';
@@ -65,10 +66,12 @@ export default function KpiOverlay({ className = '' }: KpiOverlayProps) {
   const [kpi, setKpi] = useState<MainPageKpi | null>(null);
   const [status, setStatus] = useState<LoadStatus>('loading');
 
-  const load = useCallback(async () => {
-    setStatus('loading');
+  const load = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) {
+      setStatus('loading');
+    }
     try {
-      const res = await fetchApiNoStore('/api/web-page/statistics?page=main');
+      const res = await fetchWebPageStatistics('main');
       const json = await res.json();
 
       if (json.success && json.data) {
@@ -80,13 +83,13 @@ export default function KpiOverlay({ className = '' }: KpiOverlayProps) {
       /* degraded below */
     }
 
-    setKpi(buildFallbackKpi());
-    setStatus('degraded');
+    if (!options?.silent) {
+      setKpi(buildFallbackKpi());
+      setStatus('degraded');
+    }
   }, []);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  useStatisticsKpiRefresh(load);
 
   if (status === 'loading') {
     return <KpiPanelSkeleton className={className} layout="home" />;

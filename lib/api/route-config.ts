@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 
 export const API_NO_STORE_HEADERS = {
   'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+  'CDN-Cache-Control': 'no-store',
+  'Vercel-CDN-Cache-Control': 'no-store',
   Pragma: 'no-cache',
 } as const;
 

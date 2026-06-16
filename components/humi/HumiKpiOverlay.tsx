@@ -1,10 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { humiKpiLabels } from '@/content/humi/kpi-labels';
 import { pick } from '@/content/marketing/i18n';
-import { fetchApiNoStore } from '@/lib/api/client-fetch';
+import { fetchWebPageStatistics } from '@/lib/api/client-fetch';
+import { useStatisticsKpiRefresh } from '@/lib/api/use-statistics-kpi-refresh';
 import { HUMI_MATURITY_KEYS, type HumiPageKpi } from '@/lib/web-page/statistics';
 import KpiPanelSkeleton from '@/components/marketing/shared/KpiPanelSkeleton';
 import { kpiGridGap, kpiLastUpdated } from '@/components/marketing/shared/kpiTypography';
@@ -36,10 +37,12 @@ export default function HumiKpiOverlay({ className = '' }: HumiKpiOverlayProps) 
   const [kpi, setKpi] = useState<HumiPageKpi | null>(null);
   const [status, setStatus] = useState<LoadStatus>('loading');
 
-  const load = useCallback(async () => {
-    setStatus('loading');
+  const load = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) {
+      setStatus('loading');
+    }
     try {
-      const res = await fetchApiNoStore('/api/web-page/statistics?page=humi');
+      const res = await fetchWebPageStatistics('humi');
       const json = await res.json();
 
       if (json.success && json.data) {
@@ -51,13 +54,13 @@ export default function HumiKpiOverlay({ className = '' }: HumiKpiOverlayProps) 
       /* error below */
     }
 
-    setKpi(null);
-    setStatus('error');
+    if (!options?.silent) {
+      setKpi(null);
+      setStatus('error');
+    }
   }, []);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  useStatisticsKpiRefresh(load);
 
   if (status === 'loading') {
     return <KpiPanelSkeleton className={className} cardCount={8} />;

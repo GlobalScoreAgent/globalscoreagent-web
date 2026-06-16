@@ -1,10 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { wamiKpiLabels } from '@/content/wami/kpi-labels';
 import { pick } from '@/content/marketing/i18n';
-import { fetchApiNoStore } from '@/lib/api/client-fetch';
+import { fetchWebPageStatistics } from '@/lib/api/client-fetch';
+import { useStatisticsKpiRefresh } from '@/lib/api/use-statistics-kpi-refresh';
 import { WAMI_MATURITY_KEYS, type WamiPageKpi } from '@/lib/web-page/statistics';
 import KpiPanelSkeleton from '@/components/marketing/shared/KpiPanelSkeleton';
 import DistributionKpiCard from './kpi/DistributionKpiCard';
@@ -37,10 +38,12 @@ export default function WamiKpiOverlay({ className = '' }: WamiKpiOverlayProps) 
   const [kpi, setKpi] = useState<WamiPageKpi | null>(null);
   const [status, setStatus] = useState<LoadStatus>('loading');
 
-  const load = useCallback(async () => {
-    setStatus('loading');
+  const load = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) {
+      setStatus('loading');
+    }
     try {
-      const res = await fetchApiNoStore('/api/web-page/statistics?page=wami');
+      const res = await fetchWebPageStatistics('wami');
       const json = await res.json();
 
       if (json.success && json.data) {
@@ -52,13 +55,13 @@ export default function WamiKpiOverlay({ className = '' }: WamiKpiOverlayProps) 
       /* error below */
     }
 
-    setKpi(null);
-    setStatus('error');
+    if (!options?.silent) {
+      setKpi(null);
+      setStatus('error');
+    }
   }, []);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  useStatisticsKpiRefresh(load);
 
   if (status === 'loading') {
     return <KpiPanelSkeleton className={className} layout="wami" />;
