@@ -78,7 +78,7 @@ export default function WamiKpiOverlay({ className = '' }: WamiKpiOverlayProps) 
         <p className="mb-2 text-xs text-zinc-500">{pick(language, wamiKpiLabels.unavailable)}</p>
         <button
           type="button"
-          onClick={load}
+          onClick={() => load()}
           className="self-start rounded border border-zinc-700 bg-zinc-900/80 px-2.5 py-1 text-xs text-zinc-300 transition-colors hover:border-gold/40 hover:text-gold"
         >
           {pick(language, wamiKpiLabels.retry)}
