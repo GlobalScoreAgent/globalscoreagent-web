@@ -3,6 +3,12 @@ const nextConfig = {
   async redirects() {
     return [
       {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.globalscoreagent.com' }],
+        destination: 'https://globalscoreagent.com/:path*',
+        permanent: true,
+      },
+      {
         source: '/certificaciones',
         destination: '/',
         permanent: true,

@@ -3,8 +3,16 @@ import { API_NO_STORE_HEADERS } from '@/lib/api/route-config';
 import { updateSession } from '@/utils/supabase/middleware';
 
 export async function middleware(request: NextRequest) {
-  const { supabaseResponse, user } = await updateSession(request);
+  const code = request.nextUrl.searchParams.get('code');
   const { pathname } = request.nextUrl;
+
+  if (code && pathname !== '/auth/callback') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/auth/callback';
+    return NextResponse.redirect(url);
+  }
+
+  const { supabaseResponse, user } = await updateSession(request);
 
   if (pathname.startsWith('/api/dashboard') && !user) {
     return NextResponse.json(

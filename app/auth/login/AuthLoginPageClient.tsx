@@ -7,7 +7,7 @@ import { useLanguage } from '@/app/contexts/LanguageContext';
 import { authCopy } from '@/content/auth/copy';
 import { pick } from '@/content/marketing/i18n';
 import { clientLoginProcess } from '@/lib/gsa/login-process-client';
-import { getCallbackUrl } from '@/lib/auth/redirect';
+import { getOAuthCallbackUrl, setOAuthRedirectCookie } from '@/lib/auth/redirect';
 
 type Tab = 'login' | 'register';
 
@@ -135,6 +135,7 @@ export default function AuthLoginPageClient({
     setStatus('loading');
 
     const supabase = await getSupabaseClient();
+    setOAuthRedirectCookie(redirectTo);
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -143,7 +144,7 @@ export default function AuthLoginPageClient({
           display_name: trimmedName,
           full_name: trimmedName,
         },
-        emailRedirectTo: getCallbackUrl(redirectTo),
+        emailRedirectTo: getOAuthCallbackUrl(),
       },
     });
 
@@ -171,10 +172,11 @@ export default function AuthLoginPageClient({
     setErrorMessage('');
 
     const supabase = await getSupabaseClient();
+    setOAuthRedirectCookie(redirectTo);
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: getCallbackUrl(redirectTo),
+        redirectTo: getOAuthCallbackUrl(),
       },
     });
 
