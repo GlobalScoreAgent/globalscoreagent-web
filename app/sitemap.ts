@@ -1,36 +1,59 @@
 import { MetadataRoute } from 'next';
+import { getAllDocSlugs } from '@/content/docs/manifest';
+import { SITE_URL } from '@/lib/seo/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://globalscoreagent.com';
+  const baseUrl = SITE_URL;
+  const now = new Date();
+
+  const docEntries: MetadataRoute.Sitemap = getAllDocSlugs().map((slug) => ({
+    url: `${baseUrl}/docs/${slug}`,
+    lastModified: now,
+    changeFrequency: 'monthly',
+    priority: 0.75,
+  }));
 
   return [
     {
       url: baseUrl,
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: 'daily',
       priority: 1,
     },
     {
       url: `${baseUrl}/humi`,
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/wami`,
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: 'daily',
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/waitlist`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.7,
+      url: `${baseUrl}/top-10-agents`,
+      lastModified: now,
+      changeFrequency: 'daily',
+      priority: 0.85,
     },
     {
+      url: `${baseUrl}/pricing`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/docs/global-score-agent`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    },
+    ...docEntries,
+    {
       url: `${baseUrl}/legal`,
-      lastModified: new Date(),
+      lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.5,
     },

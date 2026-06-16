@@ -1,0 +1,65 @@
+# Global Score Agent — Documentation Index
+
+> Machine-readable index of official documentation pages.
+> Spanish (default): canonical URLs below.
+> English: append `?lang=en` to each URL.
+
+Hub: https://globalscoreagent.com/docs/global-score-agent
+
+## Platform
+
+- global-score-agent — Platform overview, mission, products
+  - ES: https://globalscoreagent.com/docs/global-score-agent
+  - EN: https://globalscoreagent.com/docs/global-score-agent?lang=en
+- erc-8004 — ERC-8004 trust standard for AI agents (identity, reputation, validation)
+  - ES: https://globalscoreagent.com/docs/erc-8004?lang=es
+  - EN: https://globalscoreagent.com/docs/erc-8004
+
+## Pricing
+
+- gsa-pricing — Dashboard plans, API credits, pay-per-use
+  - ES: https://globalscoreagent.com/docs/gsa-pricing
+  - EN: https://globalscoreagent.com/docs/gsa-pricing?lang=en
+
+## HUMI Index
+
+- index-humi — Agent reputation index overview (0–100)
+  - ES: https://globalscoreagent.com/docs/index-humi
+  - EN: https://globalscoreagent.com/docs/index-humi?lang=en
+- index-humi-technical-spec — HUMI scoring rules by pillar and item
+  - ES: https://globalscoreagent.com/docs/index-humi-technical-spec
+  - EN: https://globalscoreagent.com/docs/index-humi-technical-spec?lang=en
+
+## WAMI Index
+
+- index-wami — Wallet reputation index overview (0–100)
+  - ES: https://globalscoreagent.com/docs/index-wami
+  - EN: https://globalscoreagent.com/docs/index-wami?lang=en
+- index-wami-technical-spec — WAMI scoring rules by pillar and section
+  - ES: https://globalscoreagent.com/docs/index-wami-technical-spec
+  - EN: https://globalscoreagent.com/docs/index-wami-technical-spec?lang=en
+
+## Agents
+
+- agent-realness-analysis — Agent legitimacy and basic quality evaluation
+  - ES: https://globalscoreagent.com/docs/agent-realness-analysis
+  - EN: https://globalscoreagent.com/docs/agent-realness-analysis?lang=en
+- agent-metadata-richness-analysis — Metadata completeness scoring
+  - ES: https://globalscoreagent.com/docs/agent-metadata-richness-analysis
+  - EN: https://globalscoreagent.com/docs/agent-metadata-richness-analysis?lang=en
+- agent-warning-system — Warning types and HUMI impact
+  - ES: https://globalscoreagent.com/docs/agent-warning-system
+  - EN: https://globalscoreagent.com/docs/agent-warning-system?lang=en
+- agent-feedback-types — ERC-8004 feedback categories
+  - ES: https://globalscoreagent.com/docs/agent-feedback-types
+  - EN: https://globalscoreagent.com/docs/agent-feedback-types?lang=en
+
+## Wallets
+
+- wallet-transactional-categories — On-chain wallet behavior categories
+  - ES: https://globalscoreagent.com/docs/wallet-transactional-categories
+  - EN: https://globalscoreagent.com/docs/wallet-transactional-categories?lang=en
+
+## Source repository
+
+Markdown sources: https://github.com/GlobalScoreAgent/globalscoreagent-web/tree/main/docs

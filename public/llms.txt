@@ -12,13 +12,27 @@
 - Portal (ERC-8004 ecosystem stats): https://globalscoreagent.com/
 - HUMI Index: https://globalscoreagent.com/humi
 - WAMI Index: https://globalscoreagent.com/wami
-- Waitlist: https://globalscoreagent.com/waitlist
+- Pricing: https://globalscoreagent.com/pricing
+- Documentation (hub): https://globalscoreagent.com/docs/global-score-agent
 - Legal: https://globalscoreagent.com/legal
+
+## Documentation
+
+Official product documentation (Spanish default; append `?lang=en` for English):
+
+- Platform overview: https://globalscoreagent.com/docs/global-score-agent
+- ERC-8004 standard: https://globalscoreagent.com/docs/erc-8004
+- Pricing: https://globalscoreagent.com/docs/gsa-pricing
+- HUMI overview: https://globalscoreagent.com/docs/index-humi
+- HUMI technical spec: https://globalscoreagent.com/docs/index-humi-technical-spec
+- WAMI overview: https://globalscoreagent.com/docs/index-wami
+- WAMI technical spec: https://globalscoreagent.com/docs/index-wami-technical-spec
+- Full documentation index: https://globalscoreagent.com/llms-full.txt
 
 ## Language
 
 - Default: Spanish (es)
-- English UI: append `?lang=en` to any URL above
+- English UI and docs: append `?lang=en` to any URL above
 
 ## Contact
 
@@ -28,7 +42,7 @@
 
 ## API and dashboard
 
-Full wallet/agent lookup dashboard and public API are coming soon. Join the waitlist at https://globalscoreagent.com/waitlist
+The wallet/agent lookup dashboard is available at https://globalscoreagent.com/auth/login. The public API is coming soon.
 
 ## Sitemap
 

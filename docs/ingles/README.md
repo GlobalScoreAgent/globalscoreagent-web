@@ -6,7 +6,7 @@ Here you will find business guides, technical specifications, and clear explanat
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 ### Foundational Standards
 

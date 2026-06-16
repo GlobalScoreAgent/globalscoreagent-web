@@ -1,25 +1,19 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { wamiKpiLabels } from '@/content/wami/kpi-labels';
 import { pick } from '@/content/marketing/i18n';
-import { fetchApiNoStore } from '@/lib/api/client-fetch';
-import { HUMI_DISTRIBUTION_KEYS, type WamiPageKpi } from '@/lib/web-page/statistics';
+import { fetchWebPageStatistics } from '@/lib/api/client-fetch';
+import { useStatisticsKpiRefresh } from '@/lib/api/use-statistics-kpi-refresh';
+import { WAMI_MATURITY_KEYS, type WamiPageKpi } from '@/lib/web-page/statistics';
 import KpiPanelSkeleton from '@/components/marketing/shared/KpiPanelSkeleton';
-import DistributionKpiCard from '@/components/marketing/shared/DistributionKpiCard';
+import DistributionKpiCard from './kpi/DistributionKpiCard';
 import { kpiGridGap, kpiLastUpdated } from '@/components/marketing/shared/kpiTypography';
 import NonceTotalKpiCard from './kpi/NonceTotalKpiCard';
 import WalletsAnalysedKpiCard from './kpi/WalletsAnalysedKpiCard';
 import WalletLinkKpiCard from './kpi/WalletLinkKpiCard';
 import WalletCategoriesKpiCard from './kpi/WalletCategoriesKpiCard';
-
-const WAMI_DISTRIBUTION_LABELS = {
-  categoryHeader: wamiKpiLabels.distributionCategoryHeader,
-  countSubtitle: wamiKpiLabels.distributionWalletsSubtitle,
-  avgSubtitle: wamiKpiLabels.distributionAvgSubtitle,
-  scoreRangeInfoLabel: wamiKpiLabels.scoreRangeInfoLabel,
-};
 
 type WamiKpiOverlayProps = {
   className?: string;
@@ -44,10 +38,12 @@ export default function WamiKpiOverlay({ className = '' }: WamiKpiOverlayProps) 
   const [kpi, setKpi] = useState<WamiPageKpi | null>(null);
   const [status, setStatus] = useState<LoadStatus>('loading');
 
-  const load = useCallback(async () => {
-    setStatus('loading');
+  const load = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) {
+      setStatus('loading');
+    }
     try {
-      const res = await fetchApiNoStore('/api/web-page/statistics?page=wami');
+      const res = await fetchWebPageStatistics('wami');
       const json = await res.json();
 
       if (json.success && json.data) {
@@ -59,13 +55,13 @@ export default function WamiKpiOverlay({ className = '' }: WamiKpiOverlayProps) 
       /* error below */
     }
 
-    setKpi(null);
-    setStatus('error');
+    if (!options?.silent) {
+      setKpi(null);
+      setStatus('error');
+    }
   }, []);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  useStatisticsKpiRefresh(load);
 
   if (status === 'loading') {
     return <KpiPanelSkeleton className={className} layout="wami" />;
@@ -82,7 +78,7 @@ export default function WamiKpiOverlay({ className = '' }: WamiKpiOverlayProps) 
         <p className="mb-2 text-xs text-zinc-500">{pick(language, wamiKpiLabels.unavailable)}</p>
         <button
           type="button"
-          onClick={load}
+          onClick={() => load()}
           className="self-start rounded border border-zinc-700 bg-zinc-900/80 px-2.5 py-1 text-xs text-zinc-300 transition-colors hover:border-gold/40 hover:text-gold"
         >
           {pick(language, wamiKpiLabels.retry)}
@@ -107,14 +103,14 @@ export default function WamiKpiOverlay({ className = '' }: WamiKpiOverlayProps) 
             valid={kpi.wallet_link_agent_valid}
             notValid={kpi.wallet_link_agent_not_valid}
           />
-          {HUMI_DISTRIBUTION_KEYS.map((key) => (
+          {WAMI_MATURITY_KEYS.map((key) => (
             <DistributionKpiCard
               key={key}
               band={wamiKpiLabels.distribution[key].band}
               scoreRange={wamiKpiLabels.distribution[key].scoreRange}
+              userDescription={wamiKpiLabels.distribution[key].userDescription}
               count={kpi.distribution[key].count}
               avg={kpi.distribution[key].avg}
-              labels={WAMI_DISTRIBUTION_LABELS}
             />
           ))}
           <WalletCategoriesKpiCard categories={kpi.wallet_categories} />

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Home,
+  Shield,
   AlertCircle,
   Target,
   Package,
@@ -12,6 +13,9 @@ import {
   Cog,
   Scale,
   CreditCard,
+  BookOpen,
+  Trophy,
+  Map,
 } from 'lucide-react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { marketingCopy } from '@/content/marketing/copy';
@@ -26,12 +30,16 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { href: '/#overview', labelKey: 'home', icon: Home },
+  { href: '/#erc-8004', labelKey: 'erc8004', icon: Shield },
   { href: '/#problem', labelKey: 'problem', icon: AlertCircle },
   { href: '/#mission', labelKey: 'mission', icon: Target },
   { href: '/#products', labelKey: 'products', icon: Package },
   { href: '/humi', labelKey: 'humi', icon: BarChart3, external: true },
   { href: '/wami', labelKey: 'wami', icon: Wallet, external: true },
-  { href: '/#subscriptions', labelKey: 'subscriptions', icon: CreditCard },
+  { href: '/top-10-agents', labelKey: 'top10Agents', icon: Trophy, external: true },
+  { href: '/pricing', labelKey: 'pricing', icon: CreditCard, external: true },
+  { href: '/docs/global-score-agent', labelKey: 'documentation', icon: BookOpen, external: true },
+  { href: '/#roadmap', labelKey: 'roadmap', icon: Map },
   { href: '/#how-we-work', labelKey: 'howWeWork', icon: Cog },
   { href: '/legal', labelKey: 'legal', icon: Scale, external: true },
 ];
@@ -52,14 +60,14 @@ export default function MarketingSidebar() {
   };
 
   const linkClass =
-    'flex items-center justify-center rounded-xl px-3 py-2.5 text-sm text-zinc-400 transition-colors hover:bg-white/5 hover:text-gold md:group-hover:justify-start md:group-hover:gap-3';
+    'flex items-center justify-center rounded-xl px-3 py-2.5 text-sm text-zinc-400 transition-colors hover:bg-white/5 hover:text-gold md:justify-start md:gap-3';
 
   const labelClass =
-    'max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-300 md:group-hover:max-w-[12rem] md:group-hover:opacity-100';
+    'max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-all duration-300 md:max-w-[12rem] md:opacity-100';
 
   return (
-    <aside className="group fixed left-0 top-0 z-40 flex h-screen w-16 flex-col border-r border-zinc-800/50 bg-zinc-950/35 backdrop-blur-md transition-[width,background-color,backdrop-filter] duration-300 md:hover:w-64 md:hover:bg-zinc-950/55 md:hover:backdrop-blur-xl">
-      <div className="flex items-center justify-center border-b border-zinc-800/50 p-4 md:justify-start md:group-hover:gap-3">
+    <aside className="group fixed left-0 top-0 z-40 flex h-screen w-16 flex-col border-r border-zinc-800/50 bg-zinc-950/35 backdrop-blur-md transition-[background-color,backdrop-filter] duration-300 md:w-64 md:bg-zinc-950/55 md:backdrop-blur-xl">
+      <div className="flex items-center justify-center border-b border-zinc-800/50 p-4 md:justify-start md:gap-3">
         <img
           src="/logo-gsa.png"
           alt="Global Score Agent"

@@ -1,0 +1,3 @@
+# Webhooks from NOWPayments do not send a Supabase JWT.
+[functions.gsa_nowpayments_webhook]
+verify_jwt = false

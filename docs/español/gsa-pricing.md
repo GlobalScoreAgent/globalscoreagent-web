@@ -71,6 +71,14 @@ Para realizar cualquiera de las siguientes acciones, el usuario debe enviar un t
 
 Actualmente trabajamos con **NOWPayments** como pasarela de pagos principal. Aceptamos pagos mediante **billeteras de criptomonedas** (principalmente USDC y otras stablecoins).
 
+**Flujo de pago de suscripción:**
+
+1. Eliges un plan en el Dashboard.
+2. Recibes un **correo de NOWPayments** con el enlace de pago.
+3. Completas el pago con tu **billetera de criptomonedas**.
+4. Tras confirmarse el pago, tu suscripción se **activa automáticamente**.
+5. Las suscripciones se **renuevan** según el ciclo contratado (mensual o anual).
+
 Próximamente incorporaremos también el **pago con tarjetas de crédito y débito**.
 
 ## Notas Adicionales

@@ -1,188 +1,113 @@
 import type { Bilingual } from '@/content/marketing/i18n';
 
-import type { HumiDistributionKey } from '@/lib/web-page/statistics';
-
-
+import type { HumiMaturityKey } from '@/lib/web-page/statistics';
 
 export const humiKpiLabels = {
-
   lastUpdated: {
-
     es: 'Última actualización',
-
     en: 'Last updated',
-
   } satisfies Bilingual,
 
   loading: {
-
     es: 'Cargando estadísticas del índice…',
-
     en: 'Loading index stats…',
-
   } satisfies Bilingual,
 
   unavailable: {
-
     es: 'Estadísticas del índice no disponibles',
-
     en: 'Index stats unavailable',
-
   } satisfies Bilingual,
 
   retry: {
-
     es: 'Reintentar',
-
     en: 'Retry',
-
   } satisfies Bilingual,
 
   bestAgent: {
-
     es: 'Mejor agente',
-
     en: 'Best agent',
-
   } satisfies Bilingual,
 
   bestAgentNameTooltipLabel: {
-
     es: 'Nombre completo del agente',
-
     en: 'Full agent name',
-
   } satisfies Bilingual,
 
   scoreRangeInfoLabel: {
-
-    es: 'Información del rango de puntuación',
-
-    en: 'Score range information',
-
+    es: 'Información del nivel de madurez',
+    en: 'Maturity level information',
   } satisfies Bilingual,
 
   humiScoreSuffix: {
-
     es: 'Puntuación HUMI',
-
     en: 'HUMI score',
-
   } satisfies Bilingual,
 
   totalAgentsAnalysed: {
-
     es: 'Agentes analizados',
-
     en: 'Agents analyzed',
-
   } satisfies Bilingual,
 
   avgTop100: {
-
     es: 'Media de los 100 mejores agentes',
-
     en: 'Top 100 agents (avg.)',
-
   } satisfies Bilingual,
 
   distributionCategoryHeader: {
-
-    es: 'Categoría',
-
-    en: 'Category',
-
+    es: 'Madurez',
+    en: 'Maturity',
   } satisfies Bilingual,
 
   distributionAgentsSubtitle: {
-
     es: 'Agentes totales',
-
     en: 'Total agents',
-
   } satisfies Bilingual,
 
   distributionAvgSubtitle: {
-
     es: 'Puntuación media',
-
     en: 'Avg. score',
-
   } satisfies Bilingual,
 
   distribution: {
-
-    '0_10': {
-
-      band: { es: 'Crítica', en: 'Critical' },
-
-      scoreRange: {
-
-        es: 'Rango de puntuación HUMI: 0–10',
-
-        en: 'HUMI score range: 0–10',
-
+    Unstable: {
+      band: { es: 'Unstable', en: 'Unstable' },
+      scoreRange: { es: '0–49', en: '0–49' },
+      userDescription: {
+        es: 'Agente de alto riesgo o muy baja madurez. Se requiere extrema precaución.',
+        en: 'High-risk or very low maturity Agent. Extreme caution required.',
       },
-
     },
-
-    '10_30': {
-
-      band: { es: 'Riesgo moderado', en: 'Moderate risk' },
-
-      scoreRange: {
-
-        es: 'Rango de puntuación HUMI: 10–30',
-
-        en: 'HUMI score range: 10–30',
-
+    Developing: {
+      band: { es: 'Developing', en: 'Developing' },
+      scoreRange: { es: '50–64', en: '50–64' },
+      userDescription: {
+        es: 'Agente básico. Tiene presencia mínima pero aún es inmaduro.',
+        en: 'Basic Agent. Has minimal presence but still immature.',
       },
-
     },
-
-    '30_60': {
-
-      band: { es: 'Estable', en: 'Stable' },
-
-      scoreRange: {
-
-        es: 'Rango de puntuación HUMI: 30–60',
-
-        en: 'HUMI score range: 30–60',
-
+    Stable: {
+      band: { es: 'Stable', en: 'Stable' },
+      scoreRange: { es: '65–79', en: '65–79' },
+      userDescription: {
+        es: 'Agente confiable con madurez intermedia sólida. Recomendado para uso general.',
+        en: 'Reliable Agent with solid intermediate maturity. Recommended for general use.',
       },
-
     },
-
-    '60_80': {
-
-      band: { es: 'Alto rendimiento', en: 'High performance' },
-
-      scoreRange: {
-
-        es: 'Rango de puntuación HUMI: 60–80',
-
-        en: 'HUMI score range: 60–80',
-
+    'Very Stable': {
+      band: { es: 'Very Stable', en: 'Very Stable' },
+      scoreRange: { es: '80–89', en: '80–89' },
+      userDescription: {
+        es: 'Agente maduro, consistente y de alta calidad. Alta confiabilidad.',
+        en: 'Mature, consistent, and high-quality Agent. High reliability.',
       },
-
     },
-
-    '80_100': {
-
+    Elite: {
       band: { es: 'Elite', en: 'Elite' },
-
-      scoreRange: {
-
-        es: 'Rango de puntuación HUMI: 80–100',
-
-        en: 'HUMI score range: 80–100',
-
+      scoreRange: { es: '90–100', en: '90–100' },
+      userDescription: {
+        es: 'Agente de referencia en el ecosistema. Máxima calidad y madurez.',
+        en: 'Reference Agent in the ecosystem. Maximum quality and maturity.',
       },
-
     },
-
-  } satisfies Record<HumiDistributionKey, { band: Bilingual; scoreRange: Bilingual }>,
-
+  } satisfies Record<HumiMaturityKey, { band: Bilingual; scoreRange: Bilingual; userDescription: Bilingual }>,
 } as const;
-

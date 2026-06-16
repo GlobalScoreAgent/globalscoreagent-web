@@ -3,7 +3,8 @@ import type { Bilingual } from '@/content/marketing/i18n';
 import { humiCopy } from '@/content/humi/copy';
 import { wamiCopy } from '@/content/wami/copy';
 import { legalCopy } from '@/content/legal/copy';
-import { waitlistCopy } from '@/content/waitlist/copy';
+import { pricingCopy } from '@/content/pricing/copy';
+import { docsHubSeo, getDocManifestEntry } from '@/content/docs/manifest';
 import { SITE_URL } from '@/lib/seo/site';
 
 export { SITE_URL };
@@ -12,7 +13,9 @@ export type SeoLang = 'es' | 'en';
 
 export function parseSeoLang(param: string | string[] | undefined): SeoLang {
   const v = Array.isArray(param) ? param[0] : param;
-  return v === 'en' ? 'en' : 'es';
+  if (v === 'es') return 'es';
+  if (v === 'en') return 'en';
+  return 'en';
 }
 
 function pickBilingual(b: Bilingual, lang: SeoLang): string {
@@ -25,8 +28,8 @@ const homeSeo = {
     en: 'Global Score Agent — Reputation and trust for ERC-8004 agents',
   } satisfies Bilingual,
   description: {
-    es: 'Plataforma de reputación y confianza para ERC-8004. Los índices HUMI (agentes) y WAMI (wallets) ofrecen confianza medible, transparente y on-chain.',
-    en: 'Reputation and trust platform for ERC-8004. HUMI (agents) and WAMI (wallets) indices deliver measurable, transparent, on-chain trust.',
+    es: 'Plataforma de reputación y confianza para ERC-8004. Los índices HUMI (agentes) y WAMI (wallets) ofrecen confianza medible on-chain. Explora el ranking público Top 10.',
+    en: 'Reputation and trust platform for ERC-8004. HUMI (agents) and WAMI (wallets) indices deliver measurable on-chain trust. Explore the public Top 10 ranking.',
   } satisfies Bilingual,
 };
 
@@ -56,11 +59,29 @@ export const routeMetadata = {
     canonical: `${SITE_URL}/legal`,
     ogPath: '/opengraph-image',
   },
-  waitlist: {
-    title: waitlistCopy.seo.title,
-    description: waitlistCopy.seo.description,
-    canonical: `${SITE_URL}/waitlist`,
+  pricing: {
+    title: pricingCopy.seo.title,
+    description: pricingCopy.seo.description,
+    canonical: `${SITE_URL}/pricing`,
     ogPath: '/opengraph-image',
+  },
+  docs: {
+    title: docsHubSeo.title,
+    description: docsHubSeo.description,
+    canonical: `${SITE_URL}/docs/global-score-agent`,
+    ogPath: '/opengraph-image',
+  },
+  top10Agents: {
+    title: {
+      es: 'Top 10 agentes | Global Score Agent',
+      en: 'Top 10 agents | Global Score Agent',
+    } satisfies Bilingual,
+    description: {
+      es: 'Ranking público de los 10 mejores agentes ERC-8004 por índice HUMI. Actualizado diariamente con datos on-chain verificables.',
+      en: 'Public ranking of the top 10 ERC-8004 agents by HUMI index. Updated daily with verifiable on-chain data.',
+    } satisfies Bilingual,
+    canonical: `${SITE_URL}/top-10-agents`,
+    ogPath: '/top-10-agents/opengraph-image',
   },
 } as const satisfies Record<string, RouteMetaEntry>;
 
@@ -81,19 +102,24 @@ function buildLanguageAlternates(canonical: string): NonNullable<Metadata['alter
   return {
     canonical,
     languages: {
-      'es-ES': canonical,
-      'en-US': `${canonical}?lang=en`,
+      'en-US': canonical,
+      'es-ES': `${canonical}?lang=es`,
       'x-default': canonical,
     },
   };
 }
 
-export function buildRouteMetadata(route: RouteMetadataKey, lang: SeoLang = 'es'): Metadata {
+function localizedPageUrl(canonical: string, lang: SeoLang): string {
+  return lang === 'es' ? `${canonical}?lang=es` : canonical;
+}
+
+export function buildRouteMetadata(route: RouteMetadataKey, lang: SeoLang = 'en'): Metadata {
   const { title, description, canonical, ogPath } = routeMetadata[route];
   const titleText = pickBilingual(title, lang);
   const descriptionText = pickBilingual(description, lang);
   const ogLocale = lang === 'en' ? 'en_US' : 'es_ES';
   const ogAlternate = lang === 'en' ? ['es_ES'] : ['en_US'];
+  const ogUrl = localizedPageUrl(canonical, lang);
 
   return {
     title: titleText,
@@ -101,7 +127,7 @@ export function buildRouteMetadata(route: RouteMetadataKey, lang: SeoLang = 'es'
     openGraph: {
       title: titleText,
       description: descriptionText,
-      url: canonical,
+      url: ogUrl,
       siteName: 'Global Score Agent',
       type: 'website',
       locale: ogLocale,
@@ -118,10 +144,46 @@ export function buildRouteMetadata(route: RouteMetadataKey, lang: SeoLang = 'es'
   };
 }
 
-export function buildHomeMetadata(lang: SeoLang = 'es'): Metadata {
+export function buildHomeMetadata(lang: SeoLang = 'en'): Metadata {
   const titleText = pickBilingual(homeSeo.title, lang);
   const descriptionText = pickBilingual(homeSeo.description, lang);
   const canonical = SITE_URL;
+  const ogLocale = lang === 'en' ? 'en_US' : 'es_ES';
+  const ogAlternate = lang === 'en' ? ['es_ES'] : ['en_US'];
+  const ogUrl = localizedPageUrl(canonical, lang);
+
+  return {
+    title: titleText,
+    description: descriptionText,
+    openGraph: {
+      title: titleText,
+      description: descriptionText,
+      url: ogUrl,
+      siteName: 'Global Score Agent',
+      type: 'website',
+      locale: ogLocale,
+      alternateLocale: ogAlternate,
+      images: buildOgImages('/opengraph-image', titleText),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: titleText,
+      description: descriptionText,
+      images: ['/opengraph-image'],
+    },
+    alternates: buildLanguageAlternates(canonical),
+  };
+}
+
+export function buildDocMetadata(slug: string, lang: SeoLang = 'en'): Metadata {
+  const entry = getDocManifestEntry(slug);
+  if (!entry) {
+    throw new Error(`Unknown documentation slug: ${slug}`);
+  }
+
+  const canonical = `${SITE_URL}/docs/${slug}`;
+  const titleText = `${pickBilingual(entry.title, lang)} | Global Score Agent`;
+  const descriptionText = pickBilingual(entry.description, lang);
   const ogLocale = lang === 'en' ? 'en_US' : 'es_ES';
   const ogAlternate = lang === 'en' ? ['es_ES'] : ['en_US'];
 
@@ -131,9 +193,9 @@ export function buildHomeMetadata(lang: SeoLang = 'es'): Metadata {
     openGraph: {
       title: titleText,
       description: descriptionText,
-      url: canonical,
+      url: localizedPageUrl(canonical, lang),
       siteName: 'Global Score Agent',
-      type: 'website',
+      type: 'article',
       locale: ogLocale,
       alternateLocale: ogAlternate,
       images: buildOgImages('/opengraph-image', titleText),

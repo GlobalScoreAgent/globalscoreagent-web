@@ -71,6 +71,14 @@ To request any of the following actions, users must submit a ticket through the 
 
 We currently use **NOWPayments** as our main payment gateway. We accept payments through **cryptocurrency wallets** (primarily USDC and other stablecoins).
 
+**Subscription payment flow:**
+
+1. Choose a plan in the Dashboard.
+2. You receive a **NOWPayments email** with the payment link.
+3. Complete the payment with your **cryptocurrency wallet**.
+4. Once the payment is confirmed, your subscription is **activated automatically**.
+5. Subscriptions **renew** according to your billing cycle (monthly or annual).
+
 We will soon also support payments with **credit and debit cards**.
 
 ## Additional Notes

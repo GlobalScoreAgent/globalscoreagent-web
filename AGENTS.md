@@ -11,4 +11,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 Detalle de zonas compartidas y flujo de merge: [`docs/BRANCHING.md`](docs/BRANCHING.md).
 
-Reglas Cursor: `.cursor/rules/` (`branch-workflow.mdc` siempre; reglas por glob para marketing o dashboard).
+**Reglas generales para agentes:** [`docs/AGENT-RULES.md`](docs/AGENT-RULES.md) — ramas, BD, migraciones, HUMI/WAMI, convenciones.  
+Contexto del dashboard: [`docs/dashboard-context-summary.md`](docs/dashboard-context-summary.md).
+
+Reglas Cursor: `.cursor/rules/` (`agent-rules.mdc` y `branch-workflow.mdc` siempre; reglas por glob para marketing o dashboard).

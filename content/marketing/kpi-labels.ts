@@ -96,9 +96,17 @@ export const mainKpiLabels = {
 
   localFallback: {
 
-    es: ' · datos locales',
+    es: ' · datos locales (API no disponible)',
 
-    en: ' · local fallback',
+    en: ' · local fallback (API unavailable)',
+
+  } satisfies Bilingual,
+
+  degradedBanner: {
+
+    es: 'Mostrando cifras de respaldo. Comprueba la conexión con Supabase.',
+
+    en: 'Showing fallback figures. Check Supabase connection.',
 
   } satisfies Bilingual,
 

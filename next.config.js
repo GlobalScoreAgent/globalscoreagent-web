@@ -14,6 +14,13 @@ const nextConfig = {
       },
     ];
   },
+  experimental: {
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
+  },
+  // Dashboard API routes: allow heavier agent queries
+  serverRuntimeConfig: {
+    timeout: 30000,
+  },
 };
 
 module.exports = nextConfig;

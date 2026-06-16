@@ -14,10 +14,18 @@ const humiDistributionLabels = {
 type DistributionKpiCardProps = {
   band: Bilingual;
   scoreRange: Bilingual;
+  userDescription: Bilingual;
   count: number;
-  avg: number;
+  avg: number | null;
 };
 
 export default function DistributionKpiCard(props: DistributionKpiCardProps) {
-  return <SharedDistributionKpiCard {...props} labels={humiDistributionLabels} />;
+  const { userDescription, ...rest } = props;
+  return (
+    <SharedDistributionKpiCard
+      {...rest}
+      infoContent={userDescription}
+      labels={humiDistributionLabels}
+    />
+  );
 }

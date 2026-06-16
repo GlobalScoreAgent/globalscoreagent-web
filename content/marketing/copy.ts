@@ -3,20 +3,25 @@ import type { Bilingual } from './i18n';
 export const marketingCopy = {
   nav: {
     home: { es: 'Inicio', en: 'Home' } satisfies Bilingual,
+    erc8004: { es: 'ERC-8004', en: 'ERC-8004' } satisfies Bilingual,
     problem: { es: 'Problema', en: 'Problem' } satisfies Bilingual,
     mission: { es: 'Misión', en: 'Mission' } satisfies Bilingual,
     products: { es: 'Productos', en: 'Products' } satisfies Bilingual,
     humi: { es: 'Índice HUMI', en: 'HUMI Index' } satisfies Bilingual,
     wami: { es: 'Índice WAMI', en: 'WAMI Index' } satisfies Bilingual,
+    top10Agents: { es: 'Top 10 agentes', en: 'Top 10 agents' } satisfies Bilingual,
     howWeWork: { es: 'Cómo operamos', en: 'How we work' } satisfies Bilingual,
+    roadmap: { es: 'Roadmap', en: 'Roadmap' } satisfies Bilingual,
     subscriptions: { es: 'Suscripciones', en: 'Subscriptions' } satisfies Bilingual,
+    pricing: { es: 'Precios', en: 'Pricing' } satisfies Bilingual,
+    documentation: { es: 'Documentación', en: 'Documentation' } satisfies Bilingual,
     legal: { es: 'Legal', en: 'Legal' } satisfies Bilingual,
     expandSidebar: { es: 'Expandir menú', en: 'Expand menu' } satisfies Bilingual,
     collapseSidebar: { es: 'Contraer menú', en: 'Collapse menu' } satisfies Bilingual,
   },
   topBar: {
-    waitlist: { es: 'Únete a la lista de espera', en: 'Join the waitlist' } satisfies Bilingual,
-    waitlistShort: { es: 'Únete', en: 'Join' } satisfies Bilingual,
+    accessDashboard: { es: 'Acceder al Dashboard', en: 'Access Dashboard' } satisfies Bilingual,
+    accessDashboardShort: { es: 'Dashboard', en: 'Dashboard' } satisfies Bilingual,
   },
   hero: {
     eyebrow: {
@@ -38,6 +43,65 @@ export const marketingCopy = {
     kpiContext: {
       es: 'Panel lateral: estadísticas en vivo del ecosistema ERC-8004. Las métricas del índice HUMI están en la página HUMI.',
       en: 'Side panel: live ERC-8004 ecosystem statistics. HUMI index metrics are on the HUMI page.',
+    } satisfies Bilingual,
+  },
+  erc8004: {
+    title: {
+      es: 'ERC-8004: el estándar de confianza para agentes de IA',
+      en: 'ERC-8004: the trust standard for AI agents',
+    } satisfies Bilingual,
+    subtitle: {
+      es: 'Un estándar Ethereum que crea infraestructura universal on-chain para que agentes autónomos demuestren identidad, construyan reputación portable y validen su trabajo.',
+      en: 'An Ethereum standard that creates universal on-chain infrastructure for autonomous agents to prove identity, build portable reputation, and validate their work.',
+    } satisfies Bilingual,
+    trustQuote: {
+      es: '¿Cómo puede un agente de IA confiar en otro con el que nunca ha interactuado — especialmente si pertenecen a organizaciones o ecosistemas diferentes?',
+      en: 'How can an AI agent trust another agent it has never interacted with before — especially when they belong to different organizations or ecosystems?',
+    } satisfies Bilingual,
+    capabilities: [
+      {
+        es: 'Demostrar identidad de forma portable y resistente a la censura.',
+        en: 'Prove identity in a portable, censorship-resistant way.',
+      },
+      {
+        es: 'Construir y llevar reputación entre plataformas y cadenas.',
+        en: 'Build and carry reputation across platforms and chains.',
+      },
+      {
+        es: 'Verificar la calidad del trabajo de otros agentes mediante validaciones independientes.',
+        en: 'Verify the quality of other agents’ work through independent validation.',
+      },
+    ],
+    registries: [
+      {
+        name: { es: 'Identity Registry', en: 'Identity Registry' } satisfies Bilingual,
+        description: {
+          es: 'Identidad on-chain única (ERC-721) con metadatos estandarizados para descubrir capacidades del agente.',
+          en: 'Unique on-chain identity (ERC-721) with standardized metadata to discover agent capabilities.',
+        } satisfies Bilingual,
+      },
+      {
+        name: { es: 'Reputation Registry', en: 'Reputation Registry' } satisfies Bilingual,
+        description: {
+          es: 'Feedback estructurado y portable: puntuaciones, categorías y pruebas off-chain.',
+          en: 'Structured, portable feedback: scores, categories, and off-chain proofs.',
+        } satisfies Bilingual,
+      },
+      {
+        name: { es: 'Validation Registry', en: 'Validation Registry' } satisfies Bilingual,
+        description: {
+          es: 'Validación independiente por terceros (re-ejecución, zkML, TEE) para tareas de alto riesgo.',
+          en: 'Independent third-party validation (re-execution, zkML, TEE) for high-stakes tasks.',
+        } satisfies Bilingual,
+      },
+    ],
+    gsaBridge: {
+      es: 'Global Score Agent se construye sobre ERC-8004. Mientras el estándar provee los registros on-chain, GSA aporta inteligencia avanzada con el índice HUMI (agentes) y WAMI (wallets), enriqueciendo la capa de reputación del ecosistema.',
+      en: 'Global Score Agent is built on ERC-8004. While the standard provides on-chain registries, GSA delivers advanced intelligence through the HUMI index (agents) and WAMI index (wallets), enriching the ecosystem reputation layer.',
+    } satisfies Bilingual,
+    cta: {
+      es: 'Leer documentación completa',
+      en: 'Read full documentation',
     } satisfies Bilingual,
   },
   problem: {
@@ -139,7 +203,7 @@ export const marketingCopy = {
         es: 'Explora agentes, consulta scores HUMI y WAMI, aplica filtros avanzados y analiza datos en tiempo real.',
         en: 'Explore agents, view HUMI and WAMI scores, apply advanced filters, and analyze data in real time.',
       } satisfies Bilingual,
-      cta: { es: 'Lista de espera', en: 'Join waitlist' } satisfies Bilingual,
+      cta: { es: 'Abrir dashboard', en: 'Open dashboard' } satisfies Bilingual,
     },
     api: {
       title: { es: 'Public API', en: 'Public API' } satisfies Bilingual,
@@ -147,8 +211,23 @@ export const marketingCopy = {
         es: 'Acceso programático a índices, datos de agentes y métricas de wallets para protocolos, marketplaces y dashboards.',
         en: 'Programmatic access to indices, agent data, and wallet metrics for protocols, marketplaces, and dashboards.',
       } satisfies Bilingual,
-      cta: { es: 'Lista de espera', en: 'Join waitlist' } satisfies Bilingual,
     },
+  },
+  roadmap: {
+    title: { es: 'Roadmap', en: 'Roadmap' } satisfies Bilingual,
+    subtitle: {
+      es: 'Próximas funcionalidades y mejoras planificadas para la plataforma Global Score Agent.',
+      en: 'Upcoming features and planned improvements for the Global Score Agent platform.',
+    } satisfies Bilingual,
+    expectedDeploy: { es: 'Despliegue previsto', en: 'Expected deploy' } satisfies Bilingual,
+    completed: { es: 'Completado', en: 'Completed' } satisfies Bilingual,
+    completedOn: { es: 'Completado el', en: 'Completed on' } satisfies Bilingual,
+    prev: { es: 'Feature anterior', en: 'Previous feature' } satisfies Bilingual,
+    next: { es: 'Siguiente feature', en: 'Next feature' } satisfies Bilingual,
+    empty: {
+      es: 'El roadmap se publicará pronto. Vuelve a visitarnos para conocer las próximas novedades.',
+      en: 'The roadmap will be published soon. Check back for upcoming updates.',
+    } satisfies Bilingual,
   },
   subscriptions: {
     title: { es: 'Suscripciones', en: 'Subscriptions' } satisfies Bilingual,
@@ -188,8 +267,8 @@ export const marketingCopy = {
             text: { es: 'Índices HUMI y WAMI', en: 'HUMI and WAMI Indices' } satisfies Bilingual,
           },
         ],
-        cta: { es: 'Lista de Espera', en: 'Join Waitlist' } satisfies Bilingual,
-        ctaHref: '/waitlist',
+        cta: { es: 'Ver precios', en: 'View pricing' } satisfies Bilingual,
+        ctaHref: '/pricing',
         ctaStyle: 'outline' as const,
       },
       {
@@ -224,8 +303,8 @@ export const marketingCopy = {
             } satisfies Bilingual,
           },
         ],
-        cta: { es: 'Lista de Espera', en: 'Join Waitlist' } satisfies Bilingual,
-        ctaHref: '/waitlist',
+        cta: { es: 'Ver precios', en: 'View pricing' } satisfies Bilingual,
+        ctaHref: '/pricing',
         ctaStyle: 'solid' as const,
       },
       {
@@ -259,8 +338,8 @@ export const marketingCopy = {
             } satisfies Bilingual,
           },
         ],
-        cta: { es: 'Lista de Espera', en: 'Join Waitlist' } satisfies Bilingual,
-        ctaHref: '/waitlist',
+        cta: { es: 'Ver precios', en: 'View pricing' } satisfies Bilingual,
+        ctaHref: '/pricing',
         ctaStyle: 'outline' as const,
       },
       {
@@ -272,8 +351,8 @@ export const marketingCopy = {
           es: 'Contacta nuestro equipo de ventas para ofrecerte la solución personalizada que mejor se adapte a tus necesidades.',
           en: 'Contact our sales team for a custom solution tailored to your specific needs.',
         } satisfies Bilingual,
-        cta: { es: 'Lista de Espera', en: 'Join Waitlist' } satisfies Bilingual,
-        ctaHref: '/waitlist',
+        cta: { es: 'Ver precios', en: 'View pricing' } satisfies Bilingual,
+        ctaHref: '/pricing',
         ctaStyle: 'outline' as const,
       },
     ],
@@ -283,6 +362,10 @@ export const marketingCopy = {
     subtitle: {
       es: 'Nuestra plataforma está diseñada para entregar confianza real y verificable',
       en: 'Our platform is designed to deliver real and verifiable trust',
+    } satisfies Bilingual,
+    infrastructureAlt: {
+      es: 'Diagrama de la infraestructura de Global Score Agent',
+      en: 'Global Score Agent infrastructure diagram',
     } satisfies Bilingual,
     steps: [
       {
@@ -351,6 +434,43 @@ export const marketingCopy = {
     ] as Bilingual[],
     backToPortal: { es: 'Volver al portal', en: 'Back to portal' } satisfies Bilingual,
   },
+  top10Agents: {
+    title: {
+      es: 'Top 10 agentes del ecosistema',
+      en: 'Top 10 ecosystem agents',
+    } satisfies Bilingual,
+    subtitle: {
+      es: 'Los agentes ERC-8004 con mayor índice HUMI, actualizados diariamente desde datos on-chain.',
+      en: 'ERC-8004 agents with the highest HUMI index, updated daily from on-chain data.',
+    } satisfies Bilingual,
+    empty: {
+      es: 'No hay datos de ranking disponibles en este momento.',
+      en: 'No ranking data available at this time.',
+    } satisfies Bilingual,
+    loadError: {
+      es: 'No se pudo cargar el ranking de agentes.',
+      en: 'Could not load the agent ranking.',
+    } satisfies Bilingual,
+    loading: {
+      es: 'Cargando ranking…',
+      en: 'Loading ranking…',
+    } satisfies Bilingual,
+    humiScoreLabel: {
+      es: 'Índice HUMI',
+      en: 'HUMI Index',
+    } satisfies Bilingual,
+  },
+  top10AgentsPromo: {
+    cta: { es: 'Ver Top 10 agentes', en: 'View Top 10 agents' } satisfies Bilingual,
+    hintHome: {
+      es: 'Ranking público diario por índice HUMI',
+      en: 'Daily public ranking by HUMI index',
+    } satisfies Bilingual,
+    hintComingSoon: {
+      es: 'Ya disponible: explora el Top 10 actual de agentes',
+      en: 'Available now: explore the current Top 10 agents',
+    } satisfies Bilingual,
+  },
   footer: {
     tagline: {
       es: 'Reputación on-chain transparente, fiable y accesible para todos.',
@@ -365,6 +485,8 @@ export const marketingCopy = {
       es: 'Información para sistemas de IA',
       en: 'Information for AI systems',
     } satisfies Bilingual,
+    pricingLink: { es: 'Precios', en: 'Pricing' } satisfies Bilingual,
+    docsLink: { es: 'Documentación', en: 'Documentation' } satisfies Bilingual,
     links: {
       x: { label: '@ibzjairvalenz', href: 'https://x.com/ibzjairvalenz' },
       email: { label: 'hello@globalscoreagent.com', href: 'mailto:hello@globalscoreagent.com' },

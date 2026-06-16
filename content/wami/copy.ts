@@ -25,8 +25,8 @@ export const wamiCopy = {
   seo: {
     title: { es: 'Índice WAMI', en: 'WAMI Index' } satisfies Bilingual,
     description: {
-      es: 'Índice WAMI: reputación 0–100 para wallets on-chain. Cuatro pilares independientes, datos verificables e integración con HUMI.',
-      en: 'WAMI Index: 0–100 reputation for on-chain wallets. Four independent pillars, verifiable data, and HUMI integration.',
+      es: 'Índice WAMI: reputación 0–100 para wallets on-chain. Cuatro pilares independientes, integración con HUMI y acceso al Top 10 público de agentes.',
+      en: 'WAMI Index: 0–100 reputation for on-chain wallets. Four independent pillars, HUMI integration, and access to the public Top 10 agent ranking.',
     } satisfies Bilingual,
   },
   hero: {
@@ -448,7 +448,6 @@ export const wamiCopy = {
     ] as WamiPillar[],
   },
   comingSoon: {
-    badge: { es: 'Próximamente', en: 'Coming soon' } satisfies Bilingual,
     title: {
       es: 'Dashboard + API completa',
       en: 'Full Dashboard + API',
@@ -470,9 +469,9 @@ export const wamiCopy = {
       en: 'Ready to evaluate wallets with WAMI?',
     } satisfies Bilingual,
     description: {
-      es: 'Únete a la lista de espera para acceso anticipado al dashboard y la API.',
-      en: 'Join the waitlist for early access to the dashboard and API.',
+      es: 'Accede al dashboard para explorar scores WAMI y analizar wallets. La API pública estará disponible próximamente.',
+      en: 'Access the dashboard to explore WAMI scores and analyze wallets. The public API is coming soon.',
     } satisfies Bilingual,
-    button: { es: 'Únete a la Lista de Espera', en: 'Join the Waitlist' } satisfies Bilingual,
+    button: { es: 'Acceder al Dashboard', en: 'Access Dashboard' } satisfies Bilingual,
   },
 } as const;

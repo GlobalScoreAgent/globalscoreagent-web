@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Globe } from 'lucide-react';
+import { buildAuthLoginUrl } from '@/lib/auth/redirect';
 import { useEffect, useState } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { marketingCopy } from '@/content/marketing/copy';
@@ -41,7 +42,7 @@ export default function MarketingTopBar({
 
   const headerClass = [
     'z-30 flex h-16 items-center justify-end px-4 transition-colors duration-300 md:px-6',
-    overlay ? 'fixed left-16 right-0 top-0' : 'sticky top-0 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md',
+    overlay ? 'fixed left-16 right-0 top-0 md:left-64' : 'sticky top-0 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md',
     isTransparent && 'border-transparent bg-transparent',
     overlay && scrolledPastHero && 'border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md',
   ]
@@ -70,11 +71,11 @@ export default function MarketingTopBar({
           </span>
         </button>
         <Link
-          href="/waitlist"
+          href={buildAuthLoginUrl('/dashboard')}
           className="rounded-2xl bg-gradient-to-r from-amber-400 to-yellow-400 px-5 py-2.5 text-sm font-semibold text-black shadow-lg shadow-amber-500/20 transition-all hover:from-amber-300 hover:to-yellow-300 active:scale-95 md:px-8 md:py-3 md:text-base"
         >
-          <span className="md:hidden">{pick(language, marketingCopy.topBar.waitlistShort)}</span>
-          <span className="hidden md:inline">{pick(language, marketingCopy.topBar.waitlist)}</span>
+          <span className="md:hidden">{pick(language, marketingCopy.topBar.accessDashboardShort)}</span>
+          <span className="hidden md:inline">{pick(language, marketingCopy.topBar.accessDashboard)}</span>
         </Link>
       </div>
     </header>

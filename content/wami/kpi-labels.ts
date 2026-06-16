@@ -1,5 +1,5 @@
 import type { Bilingual } from '@/content/marketing/i18n';
-import type { HumiDistributionKey } from '@/lib/web-page/statistics';
+import type { WamiMaturityKey } from '@/lib/web-page/statistics';
 
 export type WamiWalletCategoryKey =
   | 'Explosive'
@@ -78,8 +78,8 @@ export const wamiKpiLabels = {
     en: 'To Agent Invalid',
   } satisfies Bilingual,
   distributionCategoryHeader: {
-    es: 'Categoría',
-    en: 'Category',
+    es: 'Madurez',
+    en: 'Maturity',
   } satisfies Bilingual,
   distributionWalletsSubtitle: {
     es: 'Wallets totales',
@@ -90,50 +90,55 @@ export const wamiKpiLabels = {
     en: 'Avg. score',
   } satisfies Bilingual,
   scoreRangeInfoLabel: {
-    es: 'Información del rango de puntuación',
-    en: 'Score range information',
+    es: 'Información del nivel de madurez',
+    en: 'Maturity level information',
   } satisfies Bilingual,
   walletCategoriesTitle: {
     es: 'Categorías de wallet',
     en: 'Wallet categories',
   } satisfies Bilingual,
   distribution: {
-    '0_10': {
-      band: { es: 'Crítica', en: 'Critical' },
-      scoreRange: {
-        es: 'Rango de puntuación WAMI: 0–10',
-        en: 'WAMI score range: 0–10',
+    Unstable: {
+      band: { es: 'Unstable', en: 'Unstable' },
+      scoreRange: { es: '0–49', en: '0–49' },
+      userDescription: {
+        es: 'Wallet de alto riesgo con orígenes sospechosos, baja actividad o baja calidad. Se requiere extrema precaución.',
+        en: 'High-risk wallet with suspicious origins, low activity or poor quality. Extreme caution required.',
       },
     },
-    '10_30': {
-      band: { es: 'Riesgo moderado', en: 'Moderate risk' },
-      scoreRange: {
-        es: 'Rango de puntuación WAMI: 10–30',
-        en: 'WAMI score range: 10–30',
+    Developing: {
+      band: { es: 'Developing', en: 'Developing' },
+      scoreRange: { es: '50–64', en: '50–64' },
+      userDescription: {
+        es: 'Wallet básica. Tiene presencia mínima pero aún es inmadura.',
+        en: 'Basic wallet. Has minimal presence but still immature.',
       },
     },
-    '30_60': {
-      band: { es: 'Estable', en: 'Stable' },
-      scoreRange: {
-        es: 'Rango de puntuación WAMI: 30–60',
-        en: 'WAMI score range: 30–60',
+    Stable: {
+      band: { es: 'Stable', en: 'Stable' },
+      scoreRange: { es: '65–79', en: '65–79' },
+      userDescription: {
+        es: 'Wallet confiable con calidad y madurez sólida. Recomendada para uso general.',
+        en: 'Reliable wallet with solid quality and maturity. Recommended for general use.',
       },
     },
-    '60_80': {
-      band: { es: 'Alto rendimiento', en: 'High performance' },
-      scoreRange: {
-        es: 'Rango de puntuación WAMI: 60–80',
-        en: 'WAMI score range: 60–80',
+    'Very Stable': {
+      band: { es: 'Very Stable', en: 'Very Stable' },
+      scoreRange: { es: '80–89', en: '80–89' },
+      userDescription: {
+        es: 'Wallet madura, consistente y de alta calidad. Alta confiabilidad.',
+        en: 'Mature, consistent, and high-quality wallet. High reliability.',
       },
     },
-    '80_100': {
+    Elite: {
       band: { es: 'Elite', en: 'Elite' },
-      scoreRange: {
-        es: 'Rango de puntuación WAMI: 80–100',
-        en: 'WAMI score range: 80–100',
+      scoreRange: { es: '90–100', en: '90–100' },
+      userDescription: {
+        es: 'Wallet excepcional en el ecosistema. Máxima calidad y madurez.',
+        en: 'Exceptional wallet in the ecosystem. Maximum quality and maturity.',
       },
     },
-  } satisfies Record<HumiDistributionKey, { band: Bilingual; scoreRange: Bilingual }>,
+  } satisfies Record<WamiMaturityKey, { band: Bilingual; scoreRange: Bilingual; userDescription: Bilingual }>,
   walletCategoryLabels: {
     Explosive: { es: 'Explosivo', en: 'Explosive' },
     Hyper_Growth: { es: 'Hipercrecimiento', en: 'Hyper growth' },

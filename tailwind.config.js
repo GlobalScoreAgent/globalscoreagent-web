@@ -1,10 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',     // ← Solo agregá esta línea
+
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
     "./content/**/*.{js,ts}",
+    "./lib/**/*.{js,ts}",
   ],
+
   theme: {
     extend: {
       colors: {
@@ -13,5 +17,6 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+
+  plugins: [require('@tailwindcss/typography')],
 }
