@@ -29,3 +29,9 @@ CREATE POLICY "authenticated read agents"
 DROP POLICY IF EXISTS "authenticated read agent_advanced_filters" ON web_dashboard.agent_advanced_filters;
 CREATE POLICY "authenticated read agent_advanced_filters"
   ON web_dashboard.agent_advanced_filters FOR SELECT TO authenticated USING (true);
+
+ALTER TABLE web_dashboard.news ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "authenticated read active dashboard news" ON web_dashboard.news;
+CREATE POLICY "authenticated read active dashboard news"
+  ON web_dashboard.news FOR SELECT TO authenticated USING (true);

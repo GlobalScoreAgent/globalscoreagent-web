@@ -3,6 +3,7 @@ export type RegistrationSource =
   | 'registration_dashboard_only'
   | 'registration_dashboard_plus_credits';
 
+/** Used by public marketing/pricing (`DashboardPlansPricingGrid`). Dashboard subscriptions use `gsa.subscription_dashboard_type` instead. */
 export type BilingualText = { es: string; en: string };
 
 export type DashboardPlanDefinition = {
@@ -13,11 +14,6 @@ export type DashboardPlanDefinition = {
   savings: string;
   includes: BilingualText;
   comingSoon?: boolean;
-};
-
-export type SubscriptionFaqItem = {
-  question: BilingualText;
-  answer: BilingualText;
 };
 
 const REGISTRATION_SOURCES: RegistrationSource[] = [
@@ -60,59 +56,6 @@ export const DASHBOARD_PLANS: DashboardPlanDefinition[] = [
       en: 'Unlimited Dashboard + 130 API credits per month',
     },
     comingSoon: true,
-  },
-];
-
-export const SUBSCRIPTION_FAQ_ITEMS: SubscriptionFaqItem[] = [
-  {
-    question: {
-      es: '¿Qué ocurre después de la prueba gratuita de 5 días?',
-      en: 'What happens after the 5-day free trial?',
-    },
-    answer: {
-      es: 'Todo el acceso al Dashboard y a la API queda completamente bloqueado hasta que contrates un plan de pago.',
-      en: 'All access to both the Dashboard and the API is completely blocked until you upgrade to a paid plan.',
-    },
-  },
-  {
-    question: {
-      es: '¿Puedo cancelar mi suscripción en cualquier momento?',
-      en: 'Can I cancel my subscription at any time?',
-    },
-    answer: {
-      es: 'Sí. Puedes cancelar o pausar tu suscripción cuando quieras, sin penalizaciones.',
-      en: 'Yes. You can cancel or pause your subscription whenever you want with no penalties.',
-    },
-  },
-  {
-    question: {
-      es: '¿Los créditos se acumulan al mes siguiente?',
-      en: 'Do credits roll over to the next month?',
-    },
-    answer: {
-      es: 'No. Los créditos mensuales se renuevan al inicio de cada ciclo de facturación. Los no usados caducan al final del mes.',
-      en: 'No. Monthly credits are refreshed at the beginning of each billing cycle. Unused credits expire at the end of the month.',
-    },
-  },
-  {
-    question: {
-      es: '¿Hay política de reembolso?',
-      en: 'Is there a refund policy?',
-    },
-    answer: {
-      es: 'Ofrecemos garantía de devolución de 14 días en todos los planes de pago (excluyendo créditos ya consumidos).',
-      en: 'We offer a 14-day money-back guarantee on all paid plans (excluding credit usage already consumed).',
-    },
-  },
-  {
-    question: {
-      es: '¿Tenéis planes para equipos o empresas?',
-      en: 'Do you have team / enterprise plans?',
-    },
-    answer: {
-      es: 'Sí. Contáctanos para asientos multiusuario, soporte dedicado, SLA o necesidades a medida.',
-      en: 'Yes. Contact us for multi-user seats, dedicated support, SLA, or custom needs.',
-    },
   },
 ];
 

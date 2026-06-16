@@ -84,6 +84,56 @@ function labelForKey(key: string, lang: Lang): string {
   return key.replace(/_/g, ' ');
 }
 
+function readNonEmptyString(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed || null;
+}
+
+function localizedReasonText(reason: Record<string, unknown>, lang: Lang): string | null {
+  const primary = lang === 'es' ? readNonEmptyString(reason.reason_esp) : readNonEmptyString(reason.reason_eng);
+  if (primary) return primary;
+
+  const fallback = lang === 'es' ? readNonEmptyString(reason.reason_eng) : readNonEmptyString(reason.reason_esp);
+  return fallback;
+}
+
+const FLATTEN_SKIP_KEYS = new Set(['reason_eng', 'reason_esp']);
+
+const ITEM_DETAILS_SKIP_KEYS = new Set(['reason_eng', 'reason_esp', 'reason']);
+
+function normalizeItemDetailKey(key: string): string {
+  return key.replace(/_/g, ' ');
+}
+
+function flattenItemDetailEntries(obj: Record<string, unknown>, lang: Lang): string[] {
+  const parts: string[] = [];
+  for (const [key, value] of Object.entries(obj)) {
+    if (ITEM_DETAILS_SKIP_KEYS.has(key)) continue;
+    if (key === 'layers' && isPlainObject(value)) {
+      const layerScore = value.total_score ?? value.basic_score;
+      if (layerScore !== undefined) {
+        parts.push(`${normalizeItemDetailKey(key)}: ${formatValue(layerScore, lang)}`);
+      }
+      continue;
+    }
+    if (key === 'sources' && isPlainObject(value)) {
+      const count = Object.values(value).filter((v) => Number(v) > 0).length;
+      parts.push(`${normalizeItemDetailKey(key)}: ${count}`);
+      continue;
+    }
+    if (isPlainObject(value)) {
+      const nested = flattenItemDetailEntries(value, lang);
+      if (nested.length > 0) {
+        parts.push(`${normalizeItemDetailKey(key)}: ${nested.join(', ')}`);
+      }
+      continue;
+    }
+    parts.push(`${normalizeItemDetailKey(key)}: ${formatValue(value, lang)}`);
+  }
+  return parts;
+}
+
 function flattenReasonEntries(
   obj: Record<string, unknown>,
   lang: Lang,
@@ -91,6 +141,7 @@ function flattenReasonEntries(
 ): string[] {
   const parts: string[] = [];
   for (const [key, value] of Object.entries(obj)) {
+    if (FLATTEN_SKIP_KEYS.has(key)) continue;
     if (parts.length >= maxParts) break;
     if (key === 'layers' && isPlainObject(value)) {
       const layerScore = value.total_score ?? value.basic_score;
@@ -126,10 +177,28 @@ export function formatPillarSummaryReasonShort(
 ): string {
   if (!reason || !isPlainObject(reason)) return emptyLabel;
 
+  const localized = localizedReasonText(reason, lang);
+  if (localized) return localized;
+
   const direct = reason.reason;
   if (typeof direct === 'string' && direct.trim()) return direct.trim();
 
   const parts = flattenReasonEntries(reason, lang, 3);
+  if (parts.length === 0) return emptyLabel;
+  return parts.join(' · ');
+}
+
+/**
+ * Builds an inline summary of additional reason metadata (excludes narrative text fields).
+ */
+export function formatPillarSummaryItemDetails(
+  reason: PillarSummaryItemReason | null | undefined,
+  lang: Lang,
+  emptyLabel: string,
+): string {
+  if (!reason || !isPlainObject(reason)) return emptyLabel;
+
+  const parts = flattenItemDetailEntries(reason, lang);
   if (parts.length === 0) return emptyLabel;
   return parts.join(' · ');
 }

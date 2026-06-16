@@ -7,6 +7,7 @@ import {
   normalizeAgentHumiMaturity,
   normalizeAgentHumiScore,
 } from '@/lib/agentHumiDisplay';
+import { parseAgentWarnings } from '@/lib/agentWarnings';
 
 // Función para determinar si es filtro simple
 function isSimpleFilter(values: any): boolean {
@@ -124,7 +125,6 @@ export async function GET(request: NextRequest) {
         name,
         description,
         image_url,
-        humi_score_filter,
         humi_madurity_level,
         on_chain_created_at,
         on_chain_id,
@@ -137,8 +137,7 @@ export async function GET(request: NextRequest) {
         capabilities_filters,
         tags_filters,
         oasf_domains_filters,
-        is_dummy,
-        has_duplicate_agent,
+        agent_warnings,
         current_humi_score,
         balance_current
       `);
@@ -162,7 +161,7 @@ export async function GET(request: NextRequest) {
 
       // Booleans: siempre eq (evita rama jsonb/cs si agent_advanced_filters envía tag_raw_values por error)
       if (hasSimpleValue && isSimpleFilter(filterValues) && isBooleanLikeFilter(filterValues)) {
-        const parsed = parseBooleanValue(filters.advancedFilterValue);
+        const parsed = parseBooleanValue(filters.advancedFilterValue!);
         if (parsed === null) {
           query = query.eq('id', -1);
         } else {
@@ -305,8 +304,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Mapear agentes usando chain_name directamente de la tabla agents
-    const mappedAgents = (data || []).map((agent: any) => ({
-      agent_id: agent.id,
+    const mappedAgents = (data || []).map((agent: any) => {
+      const warnings = parseAgentWarnings(agent.agent_warnings);
+      const hasDuplicateWarning = warnings.some((w) => w.type === 'duplication_metadata');
+      const hasDummyWarning = warnings.some((w) => w.type === 'dummy_metadata');
+
+      return {
+      id: agent.id,
+      agent_id: agent.agent_id,
       chain: agent.chain_name,
       on_chain_id: agent.on_chain_id,
       created_at: agent.on_chain_created_at,
@@ -321,14 +326,14 @@ export async function GET(request: NextRequest) {
       capabilities_filters: agent.capabilities_filters,
       tags_filters: agent.tags_filters,
       oasf_domains_filters: agent.oasf_domains_filters,
-      is_dummy: agent.is_dummy,
-      has_duplicate_agent: agent.has_duplicate_agent,
+      is_dummy: hasDummyWarning,
+      has_duplicate_agent: hasDuplicateWarning,
       current_humi_score: normalizeAgentHumiScore(agent.current_humi_score),
       humi_madurity_level: normalizeAgentHumiMaturity(agent.humi_madurity_level),
-      humi_score_filter: agent.humi_score_filter,
       nonce_current: agent.nonce_current,
       balance_current: agent.balance_current
-    }));
+    };
+    });
 
     // Usar totalAgents del cliente si está disponible, sino usar count de la consulta
     const totalCount = filters.totalAgents || count || 0;

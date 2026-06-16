@@ -30,7 +30,7 @@ export default function MarketingShell({ children }: MarketingShellProps) {
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <MarketingSidebar />
-      <div className={`ml-16 flex min-h-screen flex-col ${hasOverlayHero ? 'relative' : ''}`}>
+      <div className={`ml-16 flex min-h-screen flex-col md:ml-64 ${hasOverlayHero ? 'relative' : ''}`}>
         <MarketingTopBar overlay={hasOverlayHero} heroSectionId={heroSectionId} />
         <main className="flex-1">{children}</main>
         <MarketingFooter />

@@ -35,6 +35,30 @@ export interface Translations {
   signOut: string;
   subscriptionsPageTitle: string;
   apiPageTitle: string;
+  apiCreditsTitle: string;
+  apiCreditsLoading: string;
+  apiCreditsEmpty: string;
+  apiCreditsType: string;
+  apiCreditsAmount: string;
+  apiCreditsValidFrom: string;
+  apiCreditsValidTo: string;
+  newsTickerEmpty: string;
+  feedbacks: string;
+  feedbacksPageTitle: string;
+  feedbacksHistoryTitle: string;
+  feedbacksNewTitle: string;
+  feedbacksEmpty: string;
+  feedbacksType: string;
+  feedbacksMessage: string;
+  feedbacksDate: string;
+  feedbacksGsaReply: string;
+  feedbacksTypePlaceholder: string;
+  feedbacksMessagePlaceholder: string;
+  feedbacksSave: string;
+  feedbacksSaving: string;
+  feedbacksSaved: string;
+  feedbacksLoading: string;
+  feedbacksInvalidForm: string;
   subscriptionsActiveTitle: string;
   subscriptionsHistoryTitle: string;
   subscriptionsPlanColumn: string;
@@ -50,12 +74,21 @@ export interface Translations {
   subscriptionsAvailablePlansTitle: string;
   subscriptionsSoonBadge: string;
   subscriptionsSubscribe: string;
+  subscriptionsSubscribeLoading: string;
+  subscriptionsCheckoutError: string;
+  subscriptionsCheckoutEmailSent: string;
+  subscriptionsCheckoutMissingSubscription: string;
   subscriptionsCurrentPlan: string;
-  subscriptionsFaqTitle: string;
+  subscriptionsMoreDetailsTitle: string;
   subscriptionsMonthlyLabel: string;
   subscriptionsAnnualLabel: string;
   subscriptionsSavingsLabel: string;
   subscriptionsIncludesLabel: string;
+  subscriptionsDaysValidLabel: string;
+  subscriptionsApiCreditsLabel: string;
+  subscriptionsPriceLabel: string;
+  subscriptionsDiscountLabel: string;
+  subscriptionsNoPlansAvailable: string;
   subscriptionTagLabel: string;
   subscriptionPeriodStart: string;
   subscriptionPeriodEnd: string;
@@ -67,6 +100,11 @@ export interface Translations {
   activeAgents: string;
   agentsWithFeedback: string;
   monitoredWallets: string;
+  dashboardKpiOwnerTotal: string;
+  dashboardKpiAgentNew: string;
+  dashboardKpiFeedbackNew: string;
+  dashboardKpiAgentsWithFeedback: string;
+  dashboardKpiFeedbackTotal: string;
   humiDistributionTitle: string;
   cerowTitle: string;           // ← Nuevo
   cerexTitle: string;           // ← Nuevo
@@ -88,6 +126,8 @@ export interface Translations {
   metadataRichnessTitle: string;
   wamiDistributionTitle: string;
   dashboardOverviewDistributionTitle: string;
+  /** Overview top-10 card badge (global ecosystem) */
+  dashboardOverviewTop10Badge: string;
   agentNonceTitle: string;
   /** Insight card: Agent Nonce section title including 30-day window */
   dashboardInsightNonceBadge: string;
@@ -226,6 +266,18 @@ export interface Translations {
   agentDetailViewDetails: string;
   agentDetailIndexPlusAriaLabelHumi: string;
   agentDetailIndexPlusAriaLabelWami: string;
+  agentDetailRealnessTitle: string;
+  agentDetailRealnessHelp: string;
+  agentDetailRealnessInfoAriaLabel: string;
+  realnessStatusValid: string;
+  realnessStatusInsufficientInfo: string;
+  realnessStatusDummy: string;
+  realnessStatusTest: string;
+  realnessBusinessMeaningValid: string;
+  realnessBusinessMeaningInsufficientInfo: string;
+  realnessBusinessMeaningDummy: string;
+  realnessBusinessMeaningTest: string;
+  realnessStatusInfoAriaLabel: string;
   agentHumiBackToOverview: string;
   agentHumiMissingAgentId: string;
   agentHumiGoToDirectory: string;
@@ -233,6 +285,22 @@ export interface Translations {
   agentHumiIndexScoreTitle: string;
   agentHumiPageTitleSuffix: string;
   agentHumiChartTitle: string;
+  agentHumiTrendTitle: string;
+  agentHumiTrendScopeLabel: string;
+  agentHumiTrendPeriodLabel: string;
+  agentHumiTrendScopeIndex: string;
+  agentHumiTrendScopePillar: string;
+  agentHumiPillarDetailsTitle: string;
+  agentHumiPillarDetailsSelectPillar: string;
+  agentHumiPillarDetailsNoData: string;
+  agentHumiPillarDetailsColInformation: string;
+  agentHumiPillarDetailsColDescription: string;
+  agentHumiPillarDetailsEmpty: string;
+  agentHumiPillarDetailsKeyStrengths: string;
+  agentHumiPillarDetailsMainConcerns: string;
+  agentHumiPillarDetailsRecommendation: string;
+  agentHumiPillarDetailsOverallAssessment: string;
+  agentHumiPillarDetailsBusinessInterpretation: string;
   agentHumiChart30d: string;
   agentHumiChartMonthly: string;
   agentHumiChartEmpty: string;
@@ -258,10 +326,72 @@ export interface Translations {
   agentHumiBlockDetailsColItem: string;
   agentHumiBlockDetailsColBusiness: string;
   agentHumiBlockDetailsColReason: string;
+  agentHumiBlockDetailsColItemDetails: string;
   agentHumiBlockDetailsColScore: string;
   agentHumiBlockDetailsGenericDescription: string;
   agentHumiBlockDetailsReasonEmpty: string;
-  agentHumiBlockDetailsTotalLabel: string;
+  agentHumiBlockDetailsItemDetailsEmpty: string;
+    agentHumiBlockDetailsTotalLabel: string;
+  agentWamiBackToOverview: string;
+  agentWamiMissingAgentId: string;
+  agentWamiGoToDirectory: string;
+  agentWamiCalculatedAt: string;
+  agentWamiPageTitleSuffix: string;
+  agentWamiAgentSummaryTitle: string;
+  agentWamiWalletAnalysisTitle: string;
+  agentWamiWalletMaturityLabel: string;
+  agentWamiWalletPillarsTitle: string;
+  agentWamiWalletCarouselLabel: string;
+  agentWamiWalletCarouselPrev: string;
+  agentWamiWalletCarouselNext: string;
+  agentWamiWalletCarouselEmpty: string;
+  agentWamiWalletCarouselCopy: string;
+  agentWamiWalletCarouselCopied: string;
+  agentWamiTrendTitle: string;
+  agentWamiTrendScopeLabel: string;
+  agentWamiTrendPeriodLabel: string;
+  agentWamiTrendScopeIndex: string;
+  agentWamiTrendScopePillar: string;
+  agentWamiPillarDetailsTitle: string;
+  agentWamiPillarDetailsSelectPillar: string;
+  agentWamiPillarDetailsNoData: string;
+  agentWamiPillarDetailsColInformation: string;
+  agentWamiPillarDetailsColDescription: string;
+  agentWamiPillarDetailsEmpty: string;
+  agentWamiPillarDetailsKeyStrengths: string;
+  agentWamiPillarDetailsMainConcerns: string;
+  agentWamiPillarDetailsRecommendation: string;
+  agentWamiPillarDetailsOverallAssessment: string;
+  agentWamiPillarDetailsBusinessInterpretation: string;
+  agentWamiChart30d: string;
+  agentWamiChartMonthly: string;
+  agentWamiChartEmpty: string;
+  agentWamiPillarOrigins: string;
+  agentWamiPillarPortfolio: string;
+  agentWamiPillarActivity: string;
+  agentWamiPillarMultichain: string;
+  agentWamiPillarsEmpty: string;
+  agentWamiPillarMax: string;
+  agentWamiPillarTrendNoDbData: string;
+  agentWamiPillarTrendSelectPillar: string;
+  agentWamiPillarSummaryTitle: string;
+  agentWamiPillarBlockBasic: string;
+  agentWamiPillarBlockIntermediate: string;
+  agentWamiPillarBlockAdvanced: string;
+  agentWamiPillarSummaryNoData: string;
+  agentWamiBlockDetailsTitle: string;
+  agentWamiBlockDetailsSelectPillar: string;
+  agentWamiBlockDetailsSelectBlock: string;
+  agentWamiBlockDetailsNoItems: string;
+  agentWamiBlockDetailsColItem: string;
+  agentWamiBlockDetailsColBusiness: string;
+  agentWamiBlockDetailsColReason: string;
+  agentWamiBlockDetailsColItemDetails: string;
+  agentWamiBlockDetailsColScore: string;
+  agentWamiBlockDetailsGenericDescription: string;
+  agentWamiBlockDetailsReasonEmpty: string;
+  agentWamiBlockDetailsItemDetailsEmpty: string;
+  agentWamiBlockDetailsTotalLabel: string;
   agentDetailWeb: string;
   agentDetailEmail: string;
   readMoreDescription: string;
@@ -541,6 +671,30 @@ const translations: Record<Language, Translations> = {
     signOut: 'Cerrar sesión',
     subscriptionsPageTitle: 'Subscripciones',
     apiPageTitle: 'API',
+    apiCreditsTitle: 'Créditos API',
+    apiCreditsLoading: 'Cargando créditos...',
+    apiCreditsEmpty: 'No tienes créditos API registrados.',
+    apiCreditsType: 'Tipo',
+    apiCreditsAmount: 'Créditos disponibles',
+    apiCreditsValidFrom: 'Válido desde',
+    apiCreditsValidTo: 'Válido hasta',
+    newsTickerEmpty: 'No hay noticias activas en este momento.',
+    feedbacks: 'Comentarios',
+    feedbacksPageTitle: 'Comentarios',
+    feedbacksHistoryTitle: 'Mis comentarios',
+    feedbacksNewTitle: 'Nuevo comentario',
+    feedbacksEmpty: 'No has enviado comentarios aún.',
+    feedbacksType: 'Tipo',
+    feedbacksMessage: 'Mensaje',
+    feedbacksDate: 'Fecha',
+    feedbacksGsaReply: 'Respuesta GSA',
+    feedbacksTypePlaceholder: 'Selecciona un tipo',
+    feedbacksMessagePlaceholder: 'Escribe tu comentario...',
+    feedbacksSave: 'Enviar comentario',
+    feedbacksSaving: 'Enviando...',
+    feedbacksSaved: 'Comentario enviado correctamente.',
+    feedbacksLoading: 'Cargando comentarios...',
+    feedbacksInvalidForm: 'Selecciona un tipo y escribe un mensaje.',
     subscriptionsActiveTitle: 'Suscripción activa',
     subscriptionsHistoryTitle: 'Historial de subscripciones',
     subscriptionsPlanColumn: 'Plan',
@@ -556,12 +710,23 @@ const translations: Record<Language, Translations> = {
     subscriptionsAvailablePlansTitle: 'Planes disponibles',
     subscriptionsSoonBadge: 'Próximamente',
     subscriptionsSubscribe: 'Contratar',
+    subscriptionsSubscribeLoading: 'Procesando…',
+    subscriptionsCheckoutError: 'No se pudo iniciar el pago. Inténtalo de nuevo.',
+    subscriptionsCheckoutEmailSent:
+      'Suscripción iniciada. Revisa tu email para completar el pago en NOWPayments.',
+    subscriptionsCheckoutMissingSubscription:
+      'No hay una suscripción activa para iniciar el pago.',
     subscriptionsCurrentPlan: 'Tu plan actual',
-    subscriptionsFaqTitle: 'Preguntas frecuentes',
+    subscriptionsMoreDetailsTitle: 'Más detalles',
     subscriptionsMonthlyLabel: 'Mensual',
     subscriptionsAnnualLabel: 'Anual',
     subscriptionsSavingsLabel: 'Ahorro',
     subscriptionsIncludesLabel: 'Qué incluye',
+    subscriptionsDaysValidLabel: 'Días de validez',
+    subscriptionsApiCreditsLabel: 'Créditos API mensuales',
+    subscriptionsPriceLabel: 'Precio',
+    subscriptionsDiscountLabel: 'Descuento',
+    subscriptionsNoPlansAvailable: 'No hay planes disponibles en este momento.',
     subscriptionTagLabel: 'Suscripción',
     subscriptionPeriodStart: 'Inicio',
     subscriptionPeriodEnd: 'Fin',
@@ -572,6 +737,11 @@ const translations: Record<Language, Translations> = {
     activeAgents: 'Agentes Activos',
     agentsWithFeedback: 'Agentes con Feedback',
     monitoredWallets: 'Wallets Monitoreadas',
+    dashboardKpiOwnerTotal: 'Propietarios totales',
+    dashboardKpiAgentNew: 'Agentes nuevos',
+    dashboardKpiFeedbackNew: 'Feedbacks nuevos',
+    dashboardKpiAgentsWithFeedback: 'Agentes con feedback',
+    dashboardKpiFeedbackTotal: 'Feedbacks totales',
     humiDistributionTitle: 'Distribución Índice HUMI',
     cerowTitle: 'Certificado de Owner',
     cerexTitle: 'Certificado de Existencia',
@@ -593,6 +763,7 @@ const translations: Record<Language, Translations> = {
     metadataRichnessTitle: 'Riqueza Metadata',
     wamiDistributionTitle: 'Distribución Índice WAMI',
     dashboardOverviewDistributionTitle: 'Distribución global',
+    dashboardOverviewTop10Badge: 'Top 10 ecosistema',
     agentNonceTitle: 'Agente Nonce',
     dashboardInsightNonceBadge: 'Agente Nonce - Últimos 30 días',
     dashboardInsightEcosystemBadge: 'Nonce diario (últimos 30 días)',
@@ -729,7 +900,23 @@ const translations: Record<Language, Translations> = {
       'El Índice WAMI (Wallet Advanced Metrics Index) es una puntuación de reputación de un solo número del 0 al 100 que mide la calidad general, legitimidad, nivel de riesgo y madurez de cualquier wallet on-chain.',
     agentDetailViewDetails: 'Ver detalles',
     agentDetailIndexPlusAriaLabelHumi: 'Ver índice HUMI',
-    agentDetailIndexPlusAriaLabelWami: 'Índice WAMI (próximamente)',
+    agentDetailIndexPlusAriaLabelWami: 'Ver detalle del Índice WAMI',
+    agentDetailRealnessTitle: 'Realness del agente',
+    agentDetailRealnessHelp:
+      'El Realness del agente es una puntuación de 0 a 100 que evalúa si presenta una identidad legítima y profesional (nombre, descripción, perfil externo e imagen). Actúa como filtro de entrada: solo los agentes con estado válido desbloquean análisis avanzados (WAMI, owner, actividad). Los demás siguen teniendo Índice HUMI, pero con menor visibilidad.',
+    agentDetailRealnessInfoAriaLabel: 'Más información sobre Realness del agente',
+    realnessStatusValid: 'Válido',
+    realnessStatusInsufficientInfo: 'Info insuficiente',
+    realnessStatusDummy: 'Dummy',
+    realnessStatusTest: 'Test',
+    realnessBusinessMeaningValid:
+      'Agente de alta calidad. Desbloquea todos los análisis de la plataforma y mejora su posicionamiento.',
+    realnessBusinessMeaningInsufficientInfo:
+      'Básico pero incompleto. Visibilidad limitada y sin análisis profundos.',
+    realnessBusinessMeaningDummy:
+      'Probablemente un agente de prueba o spam. Se aplican penalizaciones fuertes.',
+    realnessBusinessMeaningTest: 'Agente de baja calidad o experimental.',
+    realnessStatusInfoAriaLabel: 'Más información sobre este estado de Realness',
     agentHumiBackToOverview: 'Volver a la vista general',
     agentHumiMissingAgentId: 'Selecciona un agente desde el directorio para ver su Índice HUMI.',
     agentHumiGoToDirectory: 'Ir al directorio de agentes',
@@ -737,7 +924,24 @@ const translations: Record<Language, Translations> = {
     agentHumiIndexScoreTitle: 'Puntuación del índice',
     agentHumiPageTitleSuffix: '(Índice HUMI)',
     agentHumiChartTitle: 'Evolución del índice',
-    agentHumiChart30d: 'Últimos 30 días',
+    agentHumiTrendTitle: 'Tendencia',
+    agentHumiTrendScopeLabel: 'Tipo de tendencia',
+    agentHumiTrendPeriodLabel: 'Período',
+    agentHumiTrendScopeIndex: 'Tendencia del índice',
+    agentHumiTrendScopePillar: 'Tendencia del pilar',
+    agentHumiPillarDetailsTitle: 'Detalles del pilar',
+    agentHumiPillarDetailsSelectPillar:
+      'Selecciona un pilar en el gráfico de scores para ver su resumen ejecutivo.',
+    agentHumiPillarDetailsNoData: 'Sin resumen ejecutivo para este pilar.',
+    agentHumiPillarDetailsColInformation: 'Información',
+    agentHumiPillarDetailsColDescription: 'Descripción',
+    agentHumiPillarDetailsEmpty: 'Sin información disponible.',
+    agentHumiPillarDetailsKeyStrengths: 'Fortalezas clave',
+    agentHumiPillarDetailsMainConcerns: 'Principales preocupaciones',
+    agentHumiPillarDetailsRecommendation: 'Recomendación',
+    agentHumiPillarDetailsOverallAssessment: 'Evaluación general',
+    agentHumiPillarDetailsBusinessInterpretation: 'Interpretación de negocio',
+    agentHumiChart30d: 'Últimos 30 cambios',
     agentHumiChartMonthly: 'Por mes',
     agentHumiChartEmpty: 'Sin datos de evolución para este período.',
     agentHumiPillarsTitle: 'Score por pilar',
@@ -766,10 +970,77 @@ const translations: Record<Language, Translations> = {
     agentHumiBlockDetailsColItem: 'Ítem',
     agentHumiBlockDetailsColBusiness: 'Descripción de negocio',
     agentHumiBlockDetailsColReason: 'Razón del score',
+    agentHumiBlockDetailsColItemDetails: 'Detalles del ítem',
     agentHumiBlockDetailsColScore: 'Score',
     agentHumiBlockDetailsGenericDescription: 'Sin descripción específica disponible.',
     agentHumiBlockDetailsReasonEmpty: 'Sin detalle de razón disponible.',
+    agentHumiBlockDetailsItemDetailsEmpty: 'Sin detalles adicionales.',
     agentHumiBlockDetailsTotalLabel: 'Total del bloque',
+    agentWamiBackToOverview: 'Volver a la vista general',
+    agentWamiMissingAgentId: 'Selecciona un agente desde el directorio para ver su Índice WAMI.',
+    agentWamiGoToDirectory: 'Ir al directorio de agentes',
+    agentWamiCalculatedAt: 'Índice calculado el',
+    agentWamiPageTitleSuffix: '(Índice WAMI)',
+    agentWamiAgentSummaryTitle: 'Resumen de agente',
+    agentWamiWalletAnalysisTitle: 'Wallets',
+    agentWamiWalletMaturityLabel: 'Madurez',
+    agentWamiWalletPillarsTitle: 'Pilares de la wallet',
+    agentWamiWalletCarouselLabel: 'Wallet',
+    agentWamiWalletCarouselPrev: 'Wallet anterior',
+    agentWamiWalletCarouselNext: 'Siguiente wallet',
+    agentWamiWalletCarouselEmpty: 'Sin wallets disponibles para este agente.',
+    agentWamiWalletCarouselCopy: 'Copiar dirección',
+    agentWamiWalletCarouselCopied: 'Dirección copiada.',
+    agentWamiTrendTitle: 'Tendencia',
+    agentWamiTrendScopeLabel: 'Tipo de tendencia',
+    agentWamiTrendPeriodLabel: 'Período',
+    agentWamiTrendScopeIndex: 'Tendencia del índice',
+    agentWamiTrendScopePillar: 'Tendencia del pilar',
+    agentWamiPillarDetailsTitle: 'Detalles del pilar',
+    agentWamiPillarDetailsSelectPillar:
+      'Selecciona un pilar en el gráfico de pilares de la wallet para ver su resumen ejecutivo.',
+    agentWamiPillarDetailsNoData: 'Sin resumen ejecutivo para este pilar y wallet.',
+    agentWamiPillarDetailsColInformation: 'Información',
+    agentWamiPillarDetailsColDescription: 'Descripción',
+    agentWamiPillarDetailsEmpty: 'Sin información disponible.',
+    agentWamiPillarDetailsKeyStrengths: 'Fortalezas clave',
+    agentWamiPillarDetailsMainConcerns: 'Principales preocupaciones',
+    agentWamiPillarDetailsRecommendation: 'Recomendación',
+    agentWamiPillarDetailsOverallAssessment: 'Evaluación general',
+    agentWamiPillarDetailsBusinessInterpretation: 'Interpretación de negocio',
+    agentWamiChart30d: 'Últimos 30 cambios',
+    agentWamiChartMonthly: 'Por mes',
+    agentWamiChartEmpty: 'Sin datos de evolución para este período.',
+    agentWamiPillarOrigins: 'Orígenes (O)',
+    agentWamiPillarPortfolio: 'Portafolio (P)',
+    agentWamiPillarActivity: 'Actividad (A)',
+    agentWamiPillarMultichain: 'Multi-cadena (M)',
+    agentWamiPillarsEmpty: 'Sin datos de pilares para esta wallet.',
+    agentWamiPillarMax: 'de 25',
+    agentWamiPillarTrendNoDbData:
+      'No hay datos históricos en la base de datos para este pilar.',
+    agentWamiPillarTrendSelectPillar:
+      'Selecciona un pilar en el gráfico de pilares de la wallet para ver su evolución.',
+    agentWamiPillarSummaryTitle: 'Desglose por bloques',
+    agentWamiPillarBlockBasic: 'Básico',
+    agentWamiPillarBlockIntermediate: 'Intermedio',
+    agentWamiPillarBlockAdvanced: 'Avanzado',
+    agentWamiPillarSummaryNoData: 'No hay datos de desglose para este pilar y wallet.',
+    agentWamiBlockDetailsTitle: 'Detalles del bloque',
+    agentWamiBlockDetailsSelectPillar:
+      'Selecciona un pilar en el gráfico de pilares de la wallet para ver el detalle por bloque.',
+    agentWamiBlockDetailsSelectBlock:
+      'Selecciona un bloque en el desglose por bloques para ver sus ítems.',
+    agentWamiBlockDetailsNoItems: 'No hay ítems de detalle para este bloque.',
+    agentWamiBlockDetailsColItem: 'Ítem',
+    agentWamiBlockDetailsColBusiness: 'Descripción de negocio',
+    agentWamiBlockDetailsColReason: 'Razón del score',
+    agentWamiBlockDetailsColItemDetails: 'Detalles del ítem',
+    agentWamiBlockDetailsColScore: 'Score',
+    agentWamiBlockDetailsGenericDescription: 'Sin descripción específica disponible.',
+    agentWamiBlockDetailsReasonEmpty: 'Sin detalle de razón disponible.',
+    agentWamiBlockDetailsItemDetailsEmpty: 'Sin detalles adicionales.',
+    agentWamiBlockDetailsTotalLabel: 'Total del bloque',
     agentDetailWeb: 'Web',
     agentDetailEmail: 'Email',
     readMoreDescription: 'Leer más',
@@ -1076,6 +1347,30 @@ const translations: Record<Language, Translations> = {
     signOut: 'Sign Out',
     subscriptionsPageTitle: 'Subscriptions',
     apiPageTitle: 'API',
+    apiCreditsTitle: 'API credits',
+    apiCreditsLoading: 'Loading credits...',
+    apiCreditsEmpty: 'You have no API credits on record.',
+    apiCreditsType: 'Type',
+    apiCreditsAmount: 'Available credits',
+    apiCreditsValidFrom: 'Valid from',
+    apiCreditsValidTo: 'Valid until',
+    newsTickerEmpty: 'No active news at the moment.',
+    feedbacks: 'Feedbacks',
+    feedbacksPageTitle: 'Feedbacks',
+    feedbacksHistoryTitle: 'My feedback',
+    feedbacksNewTitle: 'New feedback',
+    feedbacksEmpty: 'You have not submitted any feedback yet.',
+    feedbacksType: 'Type',
+    feedbacksMessage: 'Message',
+    feedbacksDate: 'Date',
+    feedbacksGsaReply: 'GSA reply',
+    feedbacksTypePlaceholder: 'Select a type',
+    feedbacksMessagePlaceholder: 'Write your feedback...',
+    feedbacksSave: 'Submit feedback',
+    feedbacksSaving: 'Submitting...',
+    feedbacksSaved: 'Feedback submitted successfully.',
+    feedbacksLoading: 'Loading feedback...',
+    feedbacksInvalidForm: 'Select a type and enter a message.',
     subscriptionsActiveTitle: 'Active subscription',
     subscriptionsHistoryTitle: 'Subscription history',
     subscriptionsPlanColumn: 'Plan',
@@ -1091,12 +1386,23 @@ const translations: Record<Language, Translations> = {
     subscriptionsAvailablePlansTitle: 'Available plans',
     subscriptionsSoonBadge: 'Coming soon',
     subscriptionsSubscribe: 'Subscribe',
+    subscriptionsSubscribeLoading: 'Processing…',
+    subscriptionsCheckoutError: 'Could not start checkout. Please try again.',
+    subscriptionsCheckoutEmailSent:
+      'Subscription started. Check your email to complete payment on NOWPayments.',
+    subscriptionsCheckoutMissingSubscription:
+      'There is no active subscription to start checkout.',
     subscriptionsCurrentPlan: 'Your current plan',
-    subscriptionsFaqTitle: 'Frequently asked questions',
+    subscriptionsMoreDetailsTitle: 'More details',
     subscriptionsMonthlyLabel: 'Monthly',
     subscriptionsAnnualLabel: 'Annual',
     subscriptionsSavingsLabel: 'Savings',
     subscriptionsIncludesLabel: "What's included",
+    subscriptionsDaysValidLabel: 'Days valid',
+    subscriptionsApiCreditsLabel: 'Monthly API credits',
+    subscriptionsPriceLabel: 'Price',
+    subscriptionsDiscountLabel: 'Discount',
+    subscriptionsNoPlansAvailable: 'No plans are available at this time.',
     subscriptionTagLabel: 'Subscription',
     subscriptionPeriodStart: 'Start',
     subscriptionPeriodEnd: 'End',
@@ -1107,6 +1413,11 @@ const translations: Record<Language, Translations> = {
     activeAgents: 'Active Agents',
     agentsWithFeedback: 'Agents with Feedback',
     monitoredWallets: 'Monitored Wallets',
+    dashboardKpiOwnerTotal: 'Total owners',
+    dashboardKpiAgentNew: 'New agents',
+    dashboardKpiFeedbackNew: 'New feedbacks',
+    dashboardKpiAgentsWithFeedback: 'Agents with feedback',
+    dashboardKpiFeedbackTotal: 'Total feedbacks',
     humiDistributionTitle: 'HUMI Index Distribution',
     cerowTitle: 'Owner Certificate',
     cerexTitle: 'Existence Certificate',
@@ -1128,6 +1439,7 @@ const translations: Record<Language, Translations> = {
     metadataRichnessTitle: 'Metadata Richness',
     wamiDistributionTitle: 'WAMI Index Distribution',
     dashboardOverviewDistributionTitle: 'Global distribution',
+    dashboardOverviewTop10Badge: 'Top 10 ecosystem',
     agentNonceTitle: 'Agent Nonce',
     dashboardInsightNonceBadge: 'Agent Nonce - Last 30 Days',
     dashboardInsightEcosystemBadge: 'Daily Nonce (Last 30 Days)',
@@ -1264,7 +1576,23 @@ const translations: Record<Language, Translations> = {
       'The Index WAMI (Wallet Advanced Metrics Index) is a powerful, single-number reputation score ranging from 0 to 100 that measures the overall quality, legitimacy, risk level, and maturity of any on-chain wallet.',
     agentDetailViewDetails: 'View details',
     agentDetailIndexPlusAriaLabelHumi: 'View HUMI index',
-    agentDetailIndexPlusAriaLabelWami: 'WAMI index (coming soon)',
+    agentDetailIndexPlusAriaLabelWami: 'View WAMI index details',
+    agentDetailRealnessTitle: 'Agent Realness',
+    agentDetailRealnessHelp:
+      'Agent Realness is a 0–100 score that evaluates whether an agent presents a legitimate, professional identity (name, description, external profile, and image). It acts as an entry gate: only agents with valid status unlock advanced analysis (WAMI, owner, activity). Others still receive an Index HUMI score, but with lower visibility.',
+    agentDetailRealnessInfoAriaLabel: 'More information about Agent Realness',
+    realnessStatusValid: 'Valid',
+    realnessStatusInsufficientInfo: 'Insufficient info',
+    realnessStatusDummy: 'Dummy',
+    realnessStatusTest: 'Test',
+    realnessBusinessMeaningValid:
+      'High-quality agent. Unlocks full platform analysis and better positioning.',
+    realnessBusinessMeaningInsufficientInfo:
+      'Basic but incomplete. Limited visibility and no deep analysis.',
+    realnessBusinessMeaningDummy:
+      'Likely test or spam agent. Strong penalties applied.',
+    realnessBusinessMeaningTest: 'Low-quality or experimental agent.',
+    realnessStatusInfoAriaLabel: 'More information about this Realness status',
     agentHumiBackToOverview: 'Back to overview',
     agentHumiMissingAgentId: 'Select an agent from the directory to see its HUMI Index.',
     agentHumiGoToDirectory: 'Go to agents directory',
@@ -1272,7 +1600,24 @@ const translations: Record<Language, Translations> = {
     agentHumiIndexScoreTitle: 'Index Score',
     agentHumiPageTitleSuffix: '(HUMI Index)',
     agentHumiChartTitle: 'Index trend',
-    agentHumiChart30d: 'Last 30 days',
+    agentHumiTrendTitle: 'Trend',
+    agentHumiTrendScopeLabel: 'Trend type',
+    agentHumiTrendPeriodLabel: 'Period',
+    agentHumiTrendScopeIndex: 'Index Trend',
+    agentHumiTrendScopePillar: 'Pillar Trend',
+    agentHumiPillarDetailsTitle: 'Pillar Details',
+    agentHumiPillarDetailsSelectPillar:
+      'Select a pillar in the pillar scores chart to view its executive summary.',
+    agentHumiPillarDetailsNoData: 'No executive summary for this pillar.',
+    agentHumiPillarDetailsColInformation: 'Information',
+    agentHumiPillarDetailsColDescription: 'Description',
+    agentHumiPillarDetailsEmpty: 'No information available.',
+    agentHumiPillarDetailsKeyStrengths: 'Key strengths',
+    agentHumiPillarDetailsMainConcerns: 'Main concerns',
+    agentHumiPillarDetailsRecommendation: 'Recommendation',
+    agentHumiPillarDetailsOverallAssessment: 'Overall assessment',
+    agentHumiPillarDetailsBusinessInterpretation: 'Business interpretation',
+    agentHumiChart30d: 'Last 30 changes',
     agentHumiChartMonthly: 'Monthly',
     agentHumiChartEmpty: 'No trend data for this period.',
     agentHumiPillarsTitle: 'Pillar scores',
@@ -1300,10 +1645,76 @@ const translations: Record<Language, Translations> = {
     agentHumiBlockDetailsColItem: 'Item',
     agentHumiBlockDetailsColBusiness: 'Business description',
     agentHumiBlockDetailsColReason: 'Score reason',
+    agentHumiBlockDetailsColItemDetails: 'Item Details',
     agentHumiBlockDetailsColScore: 'Score',
     agentHumiBlockDetailsGenericDescription: 'No specific description available.',
     agentHumiBlockDetailsReasonEmpty: 'No reason detail available.',
+    agentHumiBlockDetailsItemDetailsEmpty: 'No additional details.',
     agentHumiBlockDetailsTotalLabel: 'Block total',
+    agentWamiBackToOverview: 'Back to overview',
+    agentWamiMissingAgentId: 'Select an agent from the directory to view its WAMI Index.',
+    agentWamiGoToDirectory: 'Go to agent directory',
+    agentWamiCalculatedAt: 'Index calculated on',
+    agentWamiPageTitleSuffix: '(WAMI Index)',
+    agentWamiAgentSummaryTitle: 'Agent summary',
+    agentWamiWalletAnalysisTitle: 'Wallets',
+    agentWamiWalletMaturityLabel: 'Maturity',
+    agentWamiWalletPillarsTitle: 'Wallet pillars',
+    agentWamiWalletCarouselLabel: 'Wallet',
+    agentWamiWalletCarouselPrev: 'Previous wallet',
+    agentWamiWalletCarouselNext: 'Next wallet',
+    agentWamiWalletCarouselEmpty: 'No wallets available for this agent.',
+    agentWamiWalletCarouselCopy: 'Copy address',
+    agentWamiWalletCarouselCopied: 'Address copied.',
+    agentWamiTrendTitle: 'Trend',
+    agentWamiTrendScopeLabel: 'Trend type',
+    agentWamiTrendPeriodLabel: 'Period',
+    agentWamiTrendScopeIndex: 'Index trend',
+    agentWamiTrendScopePillar: 'Pillar trend',
+    agentWamiPillarDetailsTitle: 'Pillar details',
+    agentWamiPillarDetailsSelectPillar:
+      'Select a pillar in the wallet pillars chart to view its executive summary.',
+    agentWamiPillarDetailsNoData: 'No executive summary for this pillar and wallet.',
+    agentWamiPillarDetailsColInformation: 'Information',
+    agentWamiPillarDetailsColDescription: 'Description',
+    agentWamiPillarDetailsEmpty: 'No information available.',
+    agentWamiPillarDetailsKeyStrengths: 'Key strengths',
+    agentWamiPillarDetailsMainConcerns: 'Main concerns',
+    agentWamiPillarDetailsRecommendation: 'Recommendation',
+    agentWamiPillarDetailsOverallAssessment: 'Overall assessment',
+    agentWamiPillarDetailsBusinessInterpretation: 'Business interpretation',
+    agentWamiChart30d: 'Last 30 changes',
+    agentWamiChartMonthly: 'Monthly',
+    agentWamiChartEmpty: 'No trend data for this period.',
+    agentWamiPillarOrigins: 'Origins (O)',
+    agentWamiPillarPortfolio: 'Portfolio (P)',
+    agentWamiPillarActivity: 'Activity (A)',
+    agentWamiPillarMultichain: 'Multi-chain (M)',
+    agentWamiPillarsEmpty: 'No pillar data for this wallet.',
+    agentWamiPillarMax: 'of 25',
+    agentWamiPillarTrendNoDbData: 'No historical data in the database for this pillar.',
+    agentWamiPillarTrendSelectPillar:
+      'Select a pillar in the wallet pillars chart to view its trend.',
+    agentWamiPillarSummaryTitle: 'Block breakdown',
+    agentWamiPillarBlockBasic: 'Basic',
+    agentWamiPillarBlockIntermediate: 'Intermediate',
+    agentWamiPillarBlockAdvanced: 'Advanced',
+    agentWamiPillarSummaryNoData: 'No breakdown data for this pillar and wallet.',
+    agentWamiBlockDetailsTitle: 'Block details',
+    agentWamiBlockDetailsSelectPillar:
+      'Select a pillar in the wallet pillars chart to view block-level details.',
+    agentWamiBlockDetailsSelectBlock:
+      'Select a block in the block breakdown chart to view its items.',
+    agentWamiBlockDetailsNoItems: 'No detail items for this block.',
+    agentWamiBlockDetailsColItem: 'Item',
+    agentWamiBlockDetailsColBusiness: 'Business description',
+    agentWamiBlockDetailsColReason: 'Score reason',
+    agentWamiBlockDetailsColItemDetails: 'Item Details',
+    agentWamiBlockDetailsColScore: 'Score',
+    agentWamiBlockDetailsGenericDescription: 'No specific description available.',
+    agentWamiBlockDetailsReasonEmpty: 'No reason detail available.',
+    agentWamiBlockDetailsItemDetailsEmpty: 'No additional details.',
+    agentWamiBlockDetailsTotalLabel: 'Block total',
     agentDetailWeb: 'Web',
     agentDetailEmail: 'Email',
     readMoreDescription: 'Read more',
@@ -1601,12 +2012,12 @@ interface ContextType {
 const Context = createContext<ContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLang] = useState<Language>('es');
+  const [lang, setLang] = useState<Language>('en');
   const [theme, setTheme] = useState<Theme>('dark');
 
   useEffect(() => {
     const savedLang = localStorage.getItem('gsa-language') as Language;
-    if (savedLang) setLang(savedLang);
+    if (savedLang === 'en' || savedLang === 'es') setLang(savedLang);
 
     const savedTheme = (localStorage.getItem('gsa-theme') as Theme) || 'dark';
     setTheme(savedTheme);

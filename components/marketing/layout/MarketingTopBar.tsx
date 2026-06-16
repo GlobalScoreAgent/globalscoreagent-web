@@ -42,7 +42,7 @@ export default function MarketingTopBar({
 
   const headerClass = [
     'z-30 flex h-16 items-center justify-end px-4 transition-colors duration-300 md:px-6',
-    overlay ? 'fixed left-16 right-0 top-0' : 'sticky top-0 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md',
+    overlay ? 'fixed left-16 right-0 top-0 md:left-64' : 'sticky top-0 border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md',
     isTransparent && 'border-transparent bg-transparent',
     overlay && scrolledPastHero && 'border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md',
   ]

@@ -13,12 +13,17 @@ export const dynamic = 'force-dynamic';
 type ProfilePatchBody = {
   display_name?: string | null;
   avatar_url?: string | null;
+  email_address?: string | null;
   preferences?: Partial<ProfilePreferences>;
 };
 
+function isValidEmailAddress(value: string): boolean {
+  return value.includes('@') && value.includes('.');
+}
+
 function normalizePreferences(input: Partial<ProfilePreferences> | undefined): ProfilePreferences {
   return {
-    language: input?.language === 'en' ? 'en' : 'es',
+    language: input?.language === 'es' ? 'es' : 'en',
     theme: input?.theme === 'light' ? 'light' : 'dark',
     agents: Array.isArray(input?.agents)
       ? input.agents
@@ -61,6 +66,7 @@ export async function GET() {
       profile: {
         display_name: profile.display_name ?? '',
         avatar_url: profile.avatar_url ?? '',
+        email_address: profile.email_address ?? '',
         preferences: profile.preferences,
       },
     });
@@ -92,11 +98,36 @@ export async function PATCH(request: Request) {
       return apiJsonResponse({ success: false, error: 'Perfil no encontrado' }, { status: 404 });
     }
 
+    if ('email_address' in body) {
+      const rawEmail =
+        typeof body.email_address === 'string' ? body.email_address.trim() : '';
+      if (rawEmail && !isValidEmailAddress(rawEmail)) {
+        return apiJsonResponse(
+          { success: false, error: 'Invalid email_address' },
+          { status: 400 },
+        );
+      }
+    }
+
+    const accountFields: {
+      display_name?: string | null;
+      avatar_url?: string | null;
+      email_address?: string | null;
+    } = {};
+
     if (!oauthLocked && ('display_name' in body || 'avatar_url' in body)) {
-      await updateProfileAccountFields(auth.supabase, auth.user.id, {
-        display_name: body.display_name ?? null,
-        avatar_url: body.avatar_url ?? null,
-      });
+      accountFields.display_name = body.display_name ?? null;
+      accountFields.avatar_url = body.avatar_url ?? null;
+    }
+
+    if ('email_address' in body) {
+      const rawEmail =
+        typeof body.email_address === 'string' ? body.email_address.trim() : '';
+      accountFields.email_address = rawEmail || null;
+    }
+
+    if (Object.keys(accountFields).length > 0) {
+      await updateProfileAccountFields(auth.supabase, auth.user.id, accountFields);
     }
 
     const mergedPreferences = {
@@ -114,6 +145,7 @@ export async function PATCH(request: Request) {
       profile: {
         display_name: profile.display_name ?? '',
         avatar_url: profile.avatar_url ?? '',
+        email_address: profile.email_address ?? '',
         preferences: profile.preferences,
       },
     });

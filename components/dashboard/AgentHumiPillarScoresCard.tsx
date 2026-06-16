@@ -35,7 +35,7 @@ export function AgentHumiPillarScoresCard({
         <AgentHumiPillarBarChart
           points={points}
           selectedPillarId={selectedPillarId}
-          onPillarSelect={onPillarSelect}
+          onPillarSelect={(id) => onPillarSelect(id as HumiPillarId)}
           isDark={isDark}
           locale={locale}
           emptyMessage={t.agentHumiPillarsEmpty}

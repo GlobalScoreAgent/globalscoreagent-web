@@ -64,6 +64,10 @@ export const METADATA_BUCKET_COLORS: Record<MetadataTranslationKey, string> = Ob
 
 /** Legacy DB / cleaned Spanish keys → new richness key. */
 const LEGACY_METADATA_TO_KEY: Record<string, MetadataRichnessKey> = {
+  'Excellent / Production-Ready': 'Excellent',
+  'Strong / Well-Developed': 'Strong',
+  'Moderate / Basic': 'Moderate',
+  'Limited / Incomplete': 'Limited',
   'Mala (0-10)': 'Incomplete',
   'Baja (10-30)': 'Limited',
   'Regular (30-50)': 'Limited',

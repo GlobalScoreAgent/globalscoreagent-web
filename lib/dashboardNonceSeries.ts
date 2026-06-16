@@ -8,6 +8,14 @@ export type NoncePoint = {
   change: string;
 };
 
+/** Calendar date in local timezone (matches DB `date` strings, avoids UTC shift from toISOString). */
+export function formatLocalDateKey(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 export function buildNonceDailySeries(agentNonce: unknown): NoncePoint[] {
   if (!agentNonce || !Array.isArray(agentNonce)) return [];
 
@@ -19,11 +27,18 @@ export function buildNonceDailySeries(agentNonce: unknown): NoncePoint[] {
 
   const result: NoncePoint[] = [];
   const today = new Date();
+  const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
 
   for (let i = 29; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
-    const dateStr = date.toISOString().split('T')[0] ?? '';
+    const date = new Date(
+      todayLocal.getFullYear(),
+      todayLocal.getMonth(),
+      todayLocal.getDate() - i,
+      12,
+      0,
+      0,
+    );
+    const dateStr = formatLocalDateKey(date);
 
     const nonces = realDataMap.get(dateStr) || 0;
     let change = '0%';
@@ -44,4 +59,16 @@ export function buildNonceDailySeries(agentNonce: unknown): NoncePoint[] {
   }
 
   return result;
+}
+
+/** Latest row from API agent_nonce (by date string), for total badge. */
+export function getLatestNonceFromRaw(agentNonce: unknown): { date: string; nonces: number } | null {
+  if (!agentNonce || !Array.isArray(agentNonce) || agentNonce.length === 0) return null;
+
+  const rows = agentNonce as { date: string; total_nonce?: number }[];
+  let latest = rows[0];
+  for (const row of rows) {
+    if (row.date > latest.date) latest = row;
+  }
+  return { date: latest.date, nonces: latest.total_nonce ?? 0 };
 }

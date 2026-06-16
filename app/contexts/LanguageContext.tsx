@@ -31,7 +31,7 @@ function readLangFromUrl(): Language | null {
 function syncLangToUrl(lang: Language) {
   if (typeof window === 'undefined') return;
   const url = new URL(window.location.href);
-  if (lang === 'es') {
+  if (lang === 'en') {
     url.searchParams.delete('lang');
   } else {
     url.searchParams.set('lang', lang);
@@ -40,11 +40,16 @@ function syncLangToUrl(lang: Language) {
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState<Language>('es');
+  const [language, setLanguage] = useState<Language>('en');
 
   useEffect(() => {
     const fromUrl = readLangFromUrl();
-    if (fromUrl) setLanguage(fromUrl);
+    if (fromUrl) {
+      setLanguage(fromUrl);
+      return;
+    }
+    const saved = localStorage.getItem('gsa-language');
+    if (saved === 'en' || saved === 'es') setLanguage(saved);
   }, []);
 
   useEffect(() => {
@@ -55,6 +60,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setLanguage((prev) => {
       const next = prev === 'es' ? 'en' : 'es';
       syncLangToUrl(next);
+      localStorage.setItem('gsa-language', next);
       return next;
     });
   }, []);

@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next';
 import { getAllDocSlugs } from '@/content/docs/manifest';
+import { SITE_URL } from '@/lib/seo/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://globalscoreagent.com';
+  const baseUrl = SITE_URL;
   const now = new Date();
 
   const docEntries: MetadataRoute.Sitemap = getAllDocSlugs().map((slug) => ({
@@ -32,10 +33,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/waitlist`,
+      url: `${baseUrl}/top-10-agents`,
       lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.7,
+      changeFrequency: 'daily',
+      priority: 0.85,
     },
     {
       url: `${baseUrl}/pricing`,

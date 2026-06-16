@@ -90,8 +90,8 @@ export const legalCopy = {
       {
         heading: { es: '1. Información que recolectamos', en: '1. Information We Collect' } satisfies Bilingual,
         body: {
-          es: 'Recolectamos correo electrónico cuando se registra en la lista de espera o crea una cuenta. También podemos recolectar información técnica (IP, navegador) para mejorar el servicio.',
-          en: 'We collect email address when you register on the waitlist or create an account. We may also collect technical information (IP, browser) to improve the service.',
+          es: 'Recolectamos correo electrónico cuando crea una cuenta. También podemos recolectar información técnica (IP, navegador) para mejorar el servicio.',
+          en: 'We collect email address when you create an account. We may also collect technical information (IP, browser) to improve the service.',
         } satisfies Bilingual,
       },
       {

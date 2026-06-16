@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
       {
         success: false,
         error:
-          'Supabase no configurado: define SUPABASE_SERVICE_ROLE_KEY o NEXT_PUBLIC_SUPABASE_ANON_KEY en .env.local',
+          'Supabase no configurado: define NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY (o NEXT_PUBLIC_SUPABASE_ANON_KEY) en .env.local',
       },
       { status: 503 }
     );

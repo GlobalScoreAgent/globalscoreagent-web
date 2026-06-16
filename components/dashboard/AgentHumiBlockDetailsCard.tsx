@@ -3,9 +3,16 @@
 import type { Translations } from '@/app/(dashboard)/dashboard/components/LanguageContext';
 import { dashboardCardInlayClass } from '@/lib/dashboardCardInlay';
 import { getHumiBusinessDescription } from '@/lib/indexHumiBusinessDescriptions';
+import { getWamiBusinessDescription } from '@/lib/indexWamiBusinessDescriptions';
 import type { HumiPillarId } from '@/lib/indexHumiPillars';
+import type { WamiPillarId } from '@/lib/indexWamiPillars';
 import type { PillarSummaryBlockId, PillarSummaryItem } from '@/lib/indexHumiPillarSummary';
-import { formatPillarSummaryReasonShort } from '@/lib/indexHumiReasonSummary';
+import {
+  formatPillarSummaryItemDetails,
+  formatPillarSummaryReasonShort,
+} from '@/lib/indexHumiReasonSummary';
+import type { IndexDetailCopy } from '@/lib/indexDetailCopy';
+import { getHumiIndexDetailCopy } from '@/lib/indexDetailCopy';
 import {
   dashboardFormBodyClass,
   dashboardFormHeadingClass,
@@ -18,10 +25,11 @@ export type BlockDetailsRow = {
   item: PillarSummaryItem;
   businessDescription: string;
   reasonSummary: string;
+  itemDetails: string;
 };
 
 type Props = {
-  selectedPillarId: HumiPillarId | null;
+  selectedPillarId: string | null;
   selectedBlockId: PillarSummaryBlockId | null;
   pillarLabel: string | null;
   blockLabel: string | null;
@@ -31,8 +39,10 @@ type Props = {
   blockScoreColor: string;
   isDark: boolean;
   locale: string;
-  lang: Lang;
-  t: Translations;
+  notAvailableLabel: string;
+  t?: Translations;
+  copy?: IndexDetailCopy;
+  subtitleExtra?: string | null;
 };
 
 function formatPoints(value: number, locale: string, notAvailable: string): string {
@@ -51,8 +61,12 @@ export function AgentHumiBlockDetailsCard({
   blockScoreColor,
   isDark,
   locale,
+  notAvailableLabel,
   t,
+  copy,
+  subtitleExtra,
 }: Props) {
+  const c = copy ?? getHumiIndexDetailCopy(t as Translations);
   const cardInlay = dashboardCardInlayClass(isDark);
   const muted = isDark ? 'text-zinc-400' : 'text-zinc-500';
   const border = isDark ? 'border-zinc-700/60' : 'border-zinc-200';
@@ -64,41 +78,45 @@ export function AgentHumiBlockDetailsCard({
   const showTotalRow =
     rows.length > 0 && blockTotalScore !== null && blockMaxScore !== null;
 
+  const subtitleParts: string[] = [];
+  if (subtitleExtra) subtitleParts.push(subtitleExtra);
+  if (hasPillar && pillarLabel) subtitleParts.push(pillarLabel);
+  if (hasBlock && blockLabel) subtitleParts.push(blockLabel);
+
   return (
     <>
       <div className="mb-4">
         <h2 className={cn('text-xl font-semibold', dashboardFormHeadingClass(isDark))}>
-          {t.agentHumiBlockDetailsTitle}
+          {c.blockDetailsTitle}
         </h2>
-        {hasPillar && pillarLabel && hasBlock && blockLabel ? (
-          <p className={cn('mt-1 text-sm font-medium', muted)}>
-            {pillarLabel} · {blockLabel}
-          </p>
+        {subtitleParts.length > 0 ? (
+          <p className={cn('mt-1 text-sm font-medium', muted)}>{subtitleParts.join(' · ')}</p>
         ) : null}
       </div>
 
       <div className={cn('overflow-hidden rounded-2xl border', border, cardInlay)}>
         {!hasPillar ? (
           <div className={cn('flex min-h-[12rem] items-center justify-center px-6 py-10 text-center text-sm', muted)}>
-            {t.agentHumiBlockDetailsSelectPillar}
+            {c.blockDetailsSelectPillar}
           </div>
         ) : !hasBlock ? (
           <div className={cn('flex min-h-[12rem] items-center justify-center px-6 py-10 text-center text-sm', muted)}>
-            {t.agentHumiBlockDetailsSelectBlock}
+            {c.blockDetailsSelectBlock}
           </div>
         ) : rows.length === 0 ? (
           <div className={cn('flex min-h-[12rem] items-center justify-center px-6 py-10 text-center text-sm', muted)}>
-            {t.agentHumiBlockDetailsNoItems}
+            {c.blockDetailsNoItems}
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+            <table className="w-full min-w-[780px] border-collapse text-left text-sm">
               <thead>
                 <tr className={cn('border-b text-xs font-semibold uppercase tracking-wide', border, headBg, muted)}>
-                  <th className="px-4 py-3">{t.agentHumiBlockDetailsColItem}</th>
-                  <th className="px-4 py-3">{t.agentHumiBlockDetailsColBusiness}</th>
-                  <th className="px-4 py-3">{t.agentHumiBlockDetailsColReason}</th>
-                  <th className="px-4 py-3 text-right tabular-nums">{t.agentHumiBlockDetailsColScore}</th>
+                  <th className="px-4 py-3">{c.blockDetailsColItem}</th>
+                  <th className="px-4 py-3">{c.blockDetailsColBusiness}</th>
+                  <th className="px-4 py-3">{c.blockDetailsColReason}</th>
+                  <th className="px-4 py-3">{c.blockDetailsColItemDetails}</th>
+                  <th className="px-4 py-3 text-right tabular-nums">{c.blockDetailsColScore}</th>
                 </tr>
               </thead>
               <tbody>
@@ -119,11 +137,12 @@ export function AgentHumiBlockDetailsCard({
                       {row.businessDescription}
                     </td>
                     <td className={cn('px-4 py-3 align-top', muted)}>{row.reasonSummary}</td>
+                    <td className={cn('px-4 py-3 align-top', muted)}>{row.itemDetails}</td>
                     <td
                       className="px-4 py-3 align-top text-right font-semibold tabular-nums"
                       style={{ color: blockScoreColor }}
                     >
-                      {formatPoints(row.item.points, locale, t.notAvailable)}
+                      {formatPoints(row.item.points, locale, notAvailableLabel)}
                     </td>
                   </tr>
                 ))}
@@ -138,14 +157,14 @@ export function AgentHumiBlockDetailsCard({
                       isDark ? 'text-zinc-100' : 'text-zinc-900',
                     )}
                   >
-                    <td colSpan={3} className="px-4 py-3">
-                      {t.agentHumiBlockDetailsTotalLabel}
+                    <td colSpan={4} className="px-4 py-3">
+                      {c.blockDetailsTotalLabel}
                     </td>
                     <td className="px-4 py-3 text-right tabular-nums" style={{ color: blockScoreColor }}>
-                      {formatPoints(blockTotalScore, locale, t.notAvailable)}
+                      {formatPoints(blockTotalScore, locale, notAvailableLabel)}
                       <span className="font-normal opacity-80">
                         {' '}
-                        / {formatPoints(blockMaxScore, locale, t.notAvailable)}
+                        / {formatPoints(blockMaxScore, locale, notAvailableLabel)}
                       </span>
                     </td>
                   </tr>
@@ -166,6 +185,7 @@ export function buildBlockDetailsRows(
   lang: Lang,
   t: Translations,
 ): BlockDetailsRow[] {
+  const copy = getHumiIndexDetailCopy(t);
   return items.map((item) => ({
     item,
     businessDescription: getHumiBusinessDescription(
@@ -173,12 +193,46 @@ export function buildBlockDetailsRows(
       blockId,
       item.name,
       lang,
-      t.agentHumiBlockDetailsGenericDescription,
+      copy.blockDetailsGenericDescription,
     ),
     reasonSummary: formatPillarSummaryReasonShort(
       item.reason,
       lang,
-      t.agentHumiBlockDetailsReasonEmpty,
+      copy.blockDetailsReasonEmpty,
+    ),
+    itemDetails: formatPillarSummaryItemDetails(
+      item.reason,
+      lang,
+      copy.blockDetailsItemDetailsEmpty,
+    ),
+  }));
+}
+
+export function buildWamiBlockDetailsRows(
+  items: PillarSummaryItem[],
+  pillarId: WamiPillarId,
+  blockId: PillarSummaryBlockId,
+  lang: Lang,
+  copy: IndexDetailCopy,
+): BlockDetailsRow[] {
+  return items.map((item) => ({
+    item,
+    businessDescription: getWamiBusinessDescription(
+      pillarId,
+      blockId,
+      item.name,
+      lang,
+      copy.blockDetailsGenericDescription,
+    ),
+    reasonSummary: formatPillarSummaryReasonShort(
+      item.reason,
+      lang,
+      copy.blockDetailsReasonEmpty,
+    ),
+    itemDetails: formatPillarSummaryItemDetails(
+      item.reason,
+      lang,
+      copy.blockDetailsItemDetailsEmpty,
     ),
   }));
 }

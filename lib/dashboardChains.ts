@@ -2,6 +2,9 @@
  * Types and helpers for dashboard chain cards (web_dashboard.chains).
  */
 
+import type { AgentRouteLookupBy } from '@/lib/dashboardAgentLookup';
+import { parseTop10AgentRoute } from '@/lib/dashboardAgentLookup';
+
 export type DashboardChainRow = {
   chain_id: string;
   name: string;
@@ -137,6 +140,50 @@ export function numFromJson(obj: unknown, key: string): number | null {
   return null;
 }
 
+/** Convert agent count to percentage of total agents (2 decimal places). */
+export function pctRateFromCount(
+  count: number | null,
+  totalAgents: number | null,
+): number | null {
+  if (count === null || totalAgents === null || totalAgents <= 0) return null;
+  return Math.round((count / totalAgents) * 10000) / 100;
+}
+
+/** Parse technical maturity JSON — supports raw counts (new MV) or pre-calculated pct (legacy). */
+export function parseTechnicalMaturityPcts(
+  techJson: unknown,
+  totalAgents: number | null,
+): {
+  pctX402: number | null;
+  pctMcpA2a: number | null;
+  countX402: number | null;
+  countMcpA2a: number | null;
+} {
+  const legacyX402 = numFromJson(techJson, 'pct_x402');
+  const legacyMcpA2a = numFromJson(techJson, 'pct_mcp_a2a');
+  if (legacyX402 !== null || legacyMcpA2a !== null) {
+    return {
+      pctX402: legacyX402,
+      pctMcpA2a: legacyMcpA2a,
+      countX402: null,
+      countMcpA2a: null,
+    };
+  }
+
+  const x402 = numFromJson(techJson, 'agents_with_x402_support');
+  const mcp = numFromJson(techJson, 'agents_with_mcp_support');
+  const a2a = numFromJson(techJson, 'agents_with_a2a_support');
+  const mcpA2aSum =
+    mcp !== null || a2a !== null ? (mcp ?? 0) + (a2a ?? 0) : null;
+
+  return {
+    pctX402: pctRateFromCount(x402, totalAgents),
+    pctMcpA2a: pctRateFromCount(mcpA2aSum, totalAgents),
+    countX402: x402,
+    countMcpA2a: mcpA2aSum,
+  };
+}
+
 export function parseMonthlyRows(raw: unknown): MonthlyStatRow[] {
   if (!Array.isArray(raw)) return [];
   const out: MonthlyStatRow[] = [];
@@ -175,9 +222,10 @@ export type Best10AgentHumiRow = {
   name: string;
   humi_score: number;
   agent_id?: number;
+  route_lookup_by?: AgentRouteLookupBy;
+  chain_short_name?: string;
 };
 
-/** Parse and sort top agents by HUMI score (desc), max 10. */
 export function parseBest10AgentsHumi(raw: unknown): Best10AgentHumiRow[] {
   if (!Array.isArray(raw)) return [];
   const rows: Best10AgentHumiRow[] = [];
@@ -188,15 +236,22 @@ export function parseBest10AgentsHumi(raw: unknown): Best10AgentHumiRow[] {
         ? String((item as { name: string }).name).trim()
         : '';
     if (!name) continue;
-    const scoreRaw = (item as { humi_score?: unknown }).humi_score;
+    const scoreRaw =
+      (item as { humi_score?: unknown; index_humi_score?: unknown }).humi_score ??
+      (item as { index_humi_score?: unknown }).index_humi_score;
     const n = typeof scoreRaw === 'number' ? scoreRaw : Number(scoreRaw);
     if (!Number.isFinite(n)) continue;
-    const agentIdRaw = (item as { agent_id?: unknown }).agent_id;
-    const agentId =
-      typeof agentIdRaw === 'number' ? agentIdRaw : Number(agentIdRaw);
+    const route = parseTop10AgentRoute(item);
+    const chainShortRaw = (item as { chain_short_name?: unknown }).chain_short_name;
+    const chainShortName =
+      typeof chainShortRaw === 'string' ? chainShortRaw.trim() : '';
     const row: Best10AgentHumiRow = { name, humi_score: n };
-    if (Number.isFinite(agentId) && agentId > 0) {
-      row.agent_id = agentId;
+    if (route != null) {
+      row.agent_id = route.routeId;
+      row.route_lookup_by = route.lookupBy;
+    }
+    if (chainShortName) {
+      row.chain_short_name = chainShortName;
     }
     rows.push(row);
   }
@@ -274,16 +329,37 @@ export const WARNING_STAT_HELP_TKEY: Record<WarningStatKey, WarningHelpTranslati
   external_audit_warning: 'chainWarningExternalAuditWarningHelp',
 };
 
-export function parseWarningStats(raw: unknown): { key: WarningStatKey; value: number }[] {
+function warningStatsLookLikeCounts(values: number[]): boolean {
+  return values.some((n) => n > 100);
+}
+
+export function parseWarningStats(
+  raw: unknown,
+  totalAgents?: number | null,
+): { key: WarningStatKey; value: number; count: number | null }[] {
   if (!raw || typeof raw !== 'object') return [];
   const obj = raw as Record<string, unknown>;
-  const out: { key: WarningStatKey; value: number }[] = [];
+  const counts: { key: WarningStatKey; value: number }[] = [];
   for (const key of WARNING_STAT_KEYS) {
     const v = obj[key];
     const n = typeof v === 'number' ? v : Number(v);
-    if (Number.isFinite(n)) out.push({ key, value: n });
+    if (Number.isFinite(n)) counts.push({ key, value: n });
   }
-  return out;
+
+  const useCountMode =
+    totalAgents != null &&
+    totalAgents > 0 &&
+    warningStatsLookLikeCounts(counts.map((c) => c.value));
+
+  if (!useCountMode) {
+    return counts.map(({ key, value }) => ({ key, value, count: null }));
+  }
+
+  return counts.map(({ key, value: agentCount }) => ({
+    key,
+    value: pctRateFromCount(agentCount, totalAgents) ?? agentCount,
+    count: agentCount,
+  }));
 }
 
 /** Map numeric HUMI score to filter tier for badge color (approximate bands). */

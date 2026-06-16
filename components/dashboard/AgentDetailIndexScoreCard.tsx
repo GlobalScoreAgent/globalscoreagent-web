@@ -26,6 +26,12 @@ type Props = {
   formatDate?: (dateString: string | null | undefined) => string;
   /** When true, omit outer border/background (use inside AgentDetailCard). */
   bare?: boolean;
+  density?: 'default' | 'compact';
+  align?: 'start' | 'end';
+  tooltipClassName?: string;
+  badgeHelpText?: string;
+  badgeInfoAriaLabel?: string;
+  hideCategory?: boolean;
 };
 
 function formatScore(score: number | null | undefined): string | null {
@@ -38,19 +44,22 @@ function formatScore(score: number | null | undefined): string | null {
 const plusBtnClass =
   'inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-b from-emerald-400 to-emerald-600 text-white shadow-sm transition-opacity';
 
-function CategoryBadge({
+export function AgentDetailCategoryBadge({
   filterLabel,
   accentColor,
   className,
+  compact = false,
 }: {
   filterLabel: string;
   accentColor: string;
   className?: string;
+  compact?: boolean;
 }) {
   return (
     <span
       className={cn(
-        'inline-flex px-4 py-1.5 text-sm font-medium rounded-full border',
+        'inline-flex font-medium rounded-full border',
+        compact ? 'px-3 py-1 text-xs' : 'px-4 py-1.5 text-sm',
         className,
       )}
       style={{
@@ -84,13 +93,20 @@ export function AgentDetailIndexScoreCard({
   calculatedAtLabel,
   formatDate,
   bare = false,
+  density = 'default',
+  align = 'start',
+  tooltipClassName,
+  badgeHelpText,
+  badgeInfoAriaLabel = '',
+  hideCategory = false,
 }: Props) {
   const formattedScore = formatScore(score);
   const hasScore = formattedScore !== null;
   const muted = isDark ? 'text-zinc-400' : 'text-zinc-600';
   const plusEnabled = Boolean(detailsHref);
   const showCalculatedAt = Boolean(calculatedAtLabel && formatDate);
-  const categoryTopRight = categoryPlacement === 'topRight';
+  const compact = density === 'compact';
+  const alignEnd = align === 'end';
 
   const plusControl = plusEnabled ? (
     <Link
@@ -111,6 +127,37 @@ export function AgentDetailIndexScoreCard({
     </button>
   );
 
+  const renderCategoryRow = (position: 'topRight' | 'below') => {
+    if (hideCategory) return null;
+    if (!filterTier) return null;
+    if (categoryPlacement !== position) return null;
+
+    return (
+      <div
+        className={cn(
+          'flex items-center gap-1.5',
+          position === 'topRight' ? 'mb-2' : 'mt-3',
+          alignEnd && 'justify-end',
+        )}
+      >
+        <AgentDetailCategoryBadge
+          filterLabel={filterLabel}
+          accentColor={accentColor}
+          compact={compact}
+        />
+        {badgeHelpText ? (
+          <DashboardInfoTooltip
+            content={badgeHelpText}
+            ariaLabel={badgeInfoAriaLabel}
+            isDark={isDark}
+            placement="top"
+            tooltipClassName="max-w-[18rem] whitespace-normal"
+          />
+        ) : null}
+      </div>
+    );
+  };
+
   return (
     <div
       className={cn(
@@ -127,16 +174,22 @@ export function AgentDetailIndexScoreCard({
         <div className="absolute top-3 right-3 z-10">{plusControl}</div>
       ) : null}
 
-      {filterTier && categoryTopRight ? (
-        <div className="mb-3 flex justify-end">
-          <CategoryBadge filterLabel={filterLabel} accentColor={accentColor} />
-        </div>
-      ) : null}
+      {renderCategoryRow('topRight')}
 
       {!hideHeader ? (
-        <div className={cn('mb-3 flex items-center gap-1.5', !hidePlusButton && 'pr-10')}>
+        <div
+          className={cn(
+            'mb-2 flex items-center gap-1.5',
+            alignEnd && 'justify-end',
+            !hidePlusButton && 'pr-10',
+          )}
+        >
           <h3
-            className={`text-xs font-semibold uppercase tracking-wide ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}
+            className={cn(
+              'font-semibold uppercase tracking-wide',
+              compact ? 'text-[10px]' : 'text-xs',
+              isDark ? 'text-zinc-400' : 'text-zinc-600',
+            )}
           >
             {cardTitle}
           </h3>
@@ -145,7 +198,7 @@ export function AgentDetailIndexScoreCard({
             ariaLabel={infoAriaLabel}
             isDark={isDark}
             placement="top"
-            tooltipClassName="max-w-[18rem] whitespace-normal"
+            tooltipClassName={cn('max-w-[18rem] whitespace-normal', tooltipClassName)}
           />
         </div>
       ) : null}
@@ -153,6 +206,7 @@ export function AgentDetailIndexScoreCard({
       <div
         className={cn(
           'flex items-baseline gap-0.5 tabular-nums',
+          alignEnd && 'justify-end',
           !hasScore && 'text-gray-400',
           hasScore && !filterTier && 'text-gray-300',
         )}
@@ -160,23 +214,32 @@ export function AgentDetailIndexScoreCard({
         {hasScore ? (
           <>
             <span
-              className="text-7xl font-bold leading-none"
+              className={cn(
+                'font-bold leading-none',
+                compact ? 'text-4xl' : 'text-7xl',
+              )}
               style={filterTier ? { color: accentColor } : undefined}
             >
               {formattedScore}
             </span>
-            <span className={`text-2xl font-semibold leading-none ${muted}`}>/100</span>
+            <span
+              className={cn(
+                'font-semibold leading-none',
+                compact ? 'text-lg' : 'text-2xl',
+                muted,
+              )}
+            >
+              /100
+            </span>
           </>
         ) : (
-          <span className="text-7xl font-bold leading-none">{notAvailableLabel}</span>
+          <span className={cn('font-bold leading-none', compact ? 'text-2xl' : 'text-7xl')}>
+            {notAvailableLabel}
+          </span>
         )}
       </div>
 
-      {filterTier && !categoryTopRight ? (
-        <div className="mt-3">
-          <CategoryBadge filterLabel={filterLabel} accentColor={accentColor} />
-        </div>
-      ) : null}
+      {renderCategoryRow('below')}
 
       {showCalculatedAt ? (
         <p className={cn('mt-4 text-xs', muted)}>

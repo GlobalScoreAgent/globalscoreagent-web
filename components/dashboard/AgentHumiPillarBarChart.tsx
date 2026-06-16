@@ -13,23 +13,29 @@ import {
   YAxis,
 } from 'recharts';
 import { barGradientStart } from '@/lib/chartBarGradient';
-import type { HumiPillarChartPoint, HumiPillarId } from '@/lib/indexHumiPillars';
 import { getPillarScoreBandColor } from '@/lib/indexHumiScoreColors';
-import { hasAnyPillarScore } from '@/lib/indexHumiPillars';
+
+export type PillarChartPoint = {
+  id: string;
+  label: string;
+  value: number | null;
+};
 
 export type AgentHumiPillarBarChartProps = {
-  points: HumiPillarChartPoint[];
-  selectedPillarId: HumiPillarId | null;
-  onPillarSelect: (id: HumiPillarId) => void;
+  points: PillarChartPoint[];
+  selectedPillarId: string | null;
+  onPillarSelect: (id: string) => void;
   isDark: boolean;
   locale: string;
   emptyMessage: string;
   maxScoreLabel: string;
   notAvailableLabel: string;
+  orientation?: 'horizontal' | 'vertical';
+  interactive?: boolean;
 };
 
 type ChartRow = {
-  pillarId: HumiPillarId;
+  pillarId: string;
   label: string;
   value: number;
   displayValue: number | null;
@@ -37,7 +43,8 @@ type ChartRow = {
   index: number;
 };
 
-const BAR_RADIUS: [number, number, number, number] = [0, 8, 8, 0];
+const HORIZONTAL_BAR_RADIUS: [number, number, number, number] = [0, 8, 8, 0];
+const VERTICAL_BAR_RADIUS: [number, number, number, number] = [8, 8, 0, 0];
 
 function formatScore(v: number | null, locale: string): string {
   if (v === null || !Number.isFinite(v)) return '—';
@@ -98,9 +105,12 @@ export function AgentHumiPillarBarChart({
   emptyMessage,
   maxScoreLabel,
   notAvailableLabel,
+  orientation = 'horizontal',
+  interactive = true,
 }: AgentHumiPillarBarChartProps) {
   const baseId = useId().replace(/:/g, '');
   const [reduceMotion, setReduceMotion] = useState(false);
+  const isHorizontal = orientation === 'horizontal';
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -115,6 +125,7 @@ export function AgentHumiPillarBarChart({
   const gridStroke = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
   const trackFill = pillarTrackFill(isDark);
   const labelFill = isDark ? '#e4e4e7' : '#3f3f46';
+  const barRadius = isHorizontal ? HORIZONTAL_BAR_RADIUS : VERTICAL_BAR_RADIUS;
 
   const chartData: ChartRow[] = useMemo(
     () =>
@@ -129,7 +140,7 @@ export function AgentHumiPillarBarChart({
     [points],
   );
 
-  if (!hasAnyPillarScore(points)) {
+  if (!points.some((p) => p.value !== null && Number.isFinite(p.value))) {
     return (
       <div
         className={`flex h-full items-center justify-center text-sm ${isDark ? 'text-gray-500' : 'text-zinc-500'}`}
@@ -143,9 +154,13 @@ export function AgentHumiPillarBarChart({
     <div className="h-full w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          layout="vertical"
+          layout={isHorizontal ? 'vertical' : 'horizontal'}
           data={chartData}
-          margin={{ top: 8, right: 44, left: 4, bottom: 4 }}
+          margin={
+            isHorizontal
+              ? { top: 8, right: 44, left: 4, bottom: 4 }
+              : { top: 8, right: 8, left: 4, bottom: 32 }
+          }
         >
           <defs>
             {chartData.map((row) => (
@@ -154,8 +169,8 @@ export function AgentHumiPillarBarChart({
                 id={`${baseId}-grad-${row.index}`}
                 x1="0"
                 y1="0"
-                x2="1"
-                y2="0"
+                x2={isHorizontal ? '1' : '0'}
+                y2={isHorizontal ? '0' : '1'}
               >
                 <stop
                   offset="0%"
@@ -187,30 +202,60 @@ export function AgentHumiPillarBarChart({
           </defs>
           <CartesianGrid
             strokeDasharray="3 3"
-            horizontal={false}
+            horizontal={!isHorizontal}
+            vertical={isHorizontal}
             stroke={gridStroke}
             strokeOpacity={1}
           />
-          <XAxis
-            type="number"
-            domain={[0, 25]}
-            ticks={[0, 5, 10, 15, 20, 25]}
-            tick={{ fill: tickFill, fontSize: 10 }}
-            stroke={axisStroke}
-            tickLine={{ stroke: axisStroke }}
-            axisLine={{ stroke: axisStroke }}
-            height={28}
-            tickMargin={4}
-          />
-          <YAxis
-            type="category"
-            dataKey="label"
-            width={108}
-            tick={{ fill: tickFill, fontSize: 11 }}
-            stroke={axisStroke}
-            tickLine={false}
-            axisLine={{ stroke: axisStroke }}
-          />
+          {isHorizontal ? (
+            <>
+              <XAxis
+                type="number"
+                domain={[0, 25]}
+                ticks={[0, 5, 10, 15, 20, 25]}
+                tick={{ fill: tickFill, fontSize: 10 }}
+                stroke={axisStroke}
+                tickLine={{ stroke: axisStroke }}
+                axisLine={{ stroke: axisStroke }}
+                height={28}
+                tickMargin={4}
+              />
+              <YAxis
+                type="category"
+                dataKey="label"
+                width={108}
+                tick={{ fill: tickFill, fontSize: 11 }}
+                stroke={axisStroke}
+                tickLine={false}
+                axisLine={{ stroke: axisStroke }}
+              />
+            </>
+          ) : (
+            <>
+              <XAxis
+                type="category"
+                dataKey="label"
+                tick={{ fill: tickFill, fontSize: 10 }}
+                stroke={axisStroke}
+                tickLine={false}
+                axisLine={{ stroke: axisStroke }}
+                interval={0}
+                angle={-25}
+                textAnchor="end"
+                height={48}
+              />
+              <YAxis
+                type="number"
+                domain={[0, 25]}
+                ticks={[0, 5, 10, 15, 20, 25]}
+                tick={{ fill: tickFill, fontSize: 10 }}
+                stroke={axisStroke}
+                tickLine={{ stroke: axisStroke }}
+                axisLine={{ stroke: axisStroke }}
+                width={32}
+              />
+            </>
+          )}
           <Tooltip
             cursor={{
               fill: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
@@ -228,22 +273,26 @@ export function AgentHumiPillarBarChart({
           />
           <Bar
             dataKey="value"
-            radius={BAR_RADIUS}
-            maxBarSize={16}
-            background={{ fill: trackFill, radius: BAR_RADIUS }}
+            radius={barRadius}
+            maxBarSize={isHorizontal ? 16 : 40}
+            background={{ fill: trackFill, radius: 8 }}
             isAnimationActive={!reduceMotion}
             animationDuration={reduceMotion ? 0 : 600}
             animationEasing="ease-out"
-            style={{ cursor: 'pointer' }}
-            onClick={(barData) => {
-              const row = (barData as { payload?: ChartRow })?.payload;
-              if (row?.pillarId) onPillarSelect(row.pillarId);
-            }}
+            style={{ cursor: interactive ? 'pointer' : 'default' }}
+            onClick={
+              interactive
+                ? (barData) => {
+                    const row = (barData as { payload?: ChartRow })?.payload;
+                    if (row?.pillarId) onPillarSelect(row.pillarId);
+                  }
+                : undefined
+            }
           >
             {chartData.map((row) => {
               const isSelected = selectedPillarId === row.pillarId;
               const dimmed =
-                selectedPillarId !== null && selectedPillarId !== row.pillarId;
+                interactive && selectedPillarId !== null && selectedPillarId !== row.pillarId;
               return (
                 <Cell
                   key={row.index}
@@ -257,16 +306,17 @@ export function AgentHumiPillarBarChart({
             })}
             <LabelList
               dataKey="displayValue"
-              position="right"
-              offset={8}
+              position={isHorizontal ? 'right' : 'top'}
+              offset={isHorizontal ? 8 : 4}
               fill={labelFill}
               fontSize={11}
               fontWeight={600}
-              formatter={(v: number | null) => {
-                if (v === null || v === undefined || !Number.isFinite(Number(v))) {
+              formatter={(v) => {
+                const n = typeof v === 'number' ? v : Number(v);
+                if (!Number.isFinite(n)) {
                   return notAvailableLabel;
                 }
-                return formatScore(Number(v), locale);
+                return formatScore(n, locale);
               }}
             />
           </Bar>

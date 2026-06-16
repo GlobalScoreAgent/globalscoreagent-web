@@ -25,8 +25,8 @@ export const humiCopy = {
   seo: {
     title: { es: 'Índice HUMI', en: 'HUMI Index' } satisfies Bilingual,
     description: {
-      es: 'Índice HUMI: reputación 0–100 para agentes ERC-8004. Cuatro pilares independientes, datos on-chain verificables y actualización diaria.',
-      en: 'HUMI Index: 0–100 reputation for ERC-8004 agents. Four independent pillars, verifiable on-chain data, and daily updates.',
+      es: 'Índice HUMI: reputación 0–100 para agentes ERC-8004. Cuatro pilares independientes, datos on-chain verificables y ranking público Top 10.',
+      en: 'HUMI Index: 0–100 reputation for ERC-8004 agents. Four independent pillars, verifiable on-chain data, and public Top 10 ranking.',
     } satisfies Bilingual,
   },
   hero: {
@@ -457,8 +457,8 @@ export const humiCopy = {
       en: 'Ready to evaluate agents with HUMI?',
     } satisfies Bilingual,
     description: {
-      es: 'Únete a la lista de espera para acceso anticipado al dashboard y la API.',
-      en: 'Join the waitlist for early access to the dashboard and API.',
+      es: 'Accede al dashboard para explorar scores HUMI y analizar agentes. La API pública estará disponible próximamente.',
+      en: 'Access the dashboard to explore HUMI scores and analyze agents. The public API is coming soon.',
     } satisfies Bilingual,
     button: { es: 'Acceder al Dashboard', en: 'Access Dashboard' } satisfies Bilingual,
   },

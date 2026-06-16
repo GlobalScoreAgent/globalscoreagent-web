@@ -11,6 +11,9 @@ Hub: https://globalscoreagent.com/docs/global-score-agent
 - global-score-agent — Platform overview, mission, products
   - ES: https://globalscoreagent.com/docs/global-score-agent
   - EN: https://globalscoreagent.com/docs/global-score-agent?lang=en
+- erc-8004 — ERC-8004 trust standard for AI agents (identity, reputation, validation)
+  - ES: https://globalscoreagent.com/docs/erc-8004?lang=es
+  - EN: https://globalscoreagent.com/docs/erc-8004
 
 ## Pricing
 

@@ -48,8 +48,8 @@ export function AgentCommentsSummaryPanel({ summary, isDark, t, formatDate }: Pr
           <DistributionPieChart
             rowKeys={rowKeys}
             row={row}
-            colors={colors}
-            labelForKey={labelForKey}
+            colors={(k) => colors(k as CommentsPieKey)}
+            labelForKey={(k) => labelForKey(k as CommentsPieKey)}
             isDark={isDark}
             sideLegendWithValues
             innerRadius={0}

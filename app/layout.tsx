@@ -10,14 +10,14 @@ import { SITE_URL } from '@/lib/seo/site';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Global Score Agent - Reputación y confianza para agentes ERC-8004',
+    default: 'Global Score Agent - Reputation and trust for ERC-8004 agents',
     template: '%s | Global Score Agent',
   },
   description:
-    'Plataforma de reputación y confianza para ERC-8004. Los índices HUMI y WAMI ofrecen confianza medible on-chain para agentes y wallets.',
+    'Reputation and trust platform for ERC-8004. HUMI and WAMI indices, Top 10 ranking, and public on-chain agent profiles.',
   openGraph: {
-    locale: 'es_ES',
-    alternateLocale: ['en_US'],
+    locale: 'en_US',
+    alternateLocale: ['es_ES'],
     siteName: 'Global Score Agent',
     type: 'website',
   },
@@ -25,6 +25,7 @@ export const metadata: Metadata = {
     'ERC-8004',
     'HUMI Index',
     'WAMI Index',
+    'Top 10 agents',
     'agent reputation',
     'trust infrastructure',
     'AI agents',
@@ -38,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={GeistSans.className}>
+    <html lang="en" className={GeistSans.className}>
       <body className="bg-zinc-950 text-white antialiased">
         <JsonLdScript data={organizationJsonLd} />
         <LanguageProvider>

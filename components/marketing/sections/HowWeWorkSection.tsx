@@ -2,6 +2,7 @@
 
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { marketingCopy } from '@/content/marketing/copy';
+import { INFRASTRUCTURE_DIAGRAM_SRC } from '@/content/marketing/media';
 import { pick } from '@/content/marketing/i18n';
 import SectionSurface from '../shared/SectionSurface';
 import GlassCard from '../shared/GlassCard';
@@ -34,6 +35,17 @@ export default function HowWeWorkSection() {
             </GlassCard>
           ))}
         </div>
+        <figure className="mx-auto mt-12 max-w-5xl">
+          <div className="overflow-hidden rounded-2xl border border-gold/20 bg-black/30 p-2 ring-1 ring-inset ring-white/5 backdrop-blur-sm">
+            <img
+              src={INFRASTRUCTURE_DIAGRAM_SRC}
+              alt={pick(language, howWeWork.infrastructureAlt)}
+              className="h-auto w-full rounded-xl object-contain"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </figure>
       </div>
     </SectionSurface>
   );

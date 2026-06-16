@@ -264,8 +264,8 @@ export default function AgentsPage() {
       const incomingAgents = data.data || [];
       setAgents((prev) => {
         if (!append) return incomingAgents;
-        const seen = new Set(prev.map((agent: any) => agent.agent_id));
-        const uniqueIncoming = incomingAgents.filter((agent: any) => !seen.has(agent.agent_id));
+        const seen = new Set(prev.map((agent: any) => agent.id));
+        const uniqueIncoming = incomingAgents.filter((agent: any) => !seen.has(agent.id));
         return [...prev, ...uniqueIncoming];
       });
       setTotalCount(data.totalCount || 0);
@@ -387,7 +387,7 @@ export default function AgentsPage() {
           categorySearch: snapshot.categorySearch ?? '',
           selectedSort: snapshot.selectedSort ?? 'current_humi_score',
           sortDirection:
-            snapshot.sortDirection === 'asc' ? 'asc' : 'desc',
+            snapshot.sortDirection === 'asc' ? ('asc' as const) : ('desc' as const),
           showAdvancedFilters: Boolean(snapshot.showAdvancedFilters),
         }
       : null;
@@ -1045,13 +1045,13 @@ export default function AgentsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
           {paginatedAgents.map((agent, index) => (
             <motion.div
-              key={agent.agent_id}
+              key={agent.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
             >
               <div
-                onClick={() => toggleFlip(agent.agent_id)}
+                onClick={() => toggleFlip(agent.id)}
               className={`group relative rounded-3xl overflow-hidden transition-all cursor-pointer h-64 ${
                   theme === 'dark'
                     ? 'bg-zinc-900/80 border border-zinc-700/50'
@@ -1070,7 +1070,7 @@ export default function AgentsPage() {
                 <motion.div
                   className="relative w-full h-full"
                   initial={false}
-                  animate={{ rotateY: flippedCards.has(agent.agent_id) ? 180 : 0 }}
+                  animate={{ rotateY: flippedCards.has(agent.id) ? 180 : 0 }}
                   transition={{ duration: 0.6, type: "spring", stiffness: 300, damping: 30 }}
                   style={{ transformStyle: "preserve-3d" }}
                 >
@@ -1079,12 +1079,12 @@ export default function AgentsPage() {
                     <AgentDirectoryHumiRibbon
                       categoryLabel={getHumiMaturityText(
                         agent.humi_madurity_level,
-                        agent.humi_score_filter,
+                        null,
                         t,
                       )}
                       accentColor={getHumiMaturityColor(
                         agent.humi_madurity_level,
-                        agent.humi_score_filter,
+                        null,
                       )}
                       isDark={theme === 'dark'}
                     />
@@ -1139,7 +1139,7 @@ export default function AgentsPage() {
                           style={{
                             color: getHumiMaturityColor(
                               agent.humi_madurity_level,
-                              agent.humi_score_filter,
+                              null,
                             ),
                           }}
                         >
@@ -1207,7 +1207,7 @@ export default function AgentsPage() {
                     }}>
 
                       {/* Borde verde lateral derecho como indicador de navegación */}
-                      <Link href={`/dashboard/agents/${agent.agent_id}`}>
+                      <Link href={`/dashboard/agents/${agent.id}`}>
                         <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-b from-emerald-400 to-emerald-600 rounded-r-3xl opacity-60 hover:opacity-100 transition-opacity cursor-pointer flex items-center justify-center">
                           <span className="text-white font-bold text-lg opacity-80">+</span>
                         </div>

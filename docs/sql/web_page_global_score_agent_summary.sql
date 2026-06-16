@@ -162,6 +162,13 @@ SELECT
         LIMIT 1
     ) AS wami_page_kpi,
 
+    COALESCE((
+        SELECT h.top_10_agents
+        FROM index_humi.summary_humi_index h
+        ORDER BY h.calculated_at DESC NULLS LAST
+        LIMIT 1
+    ), '[]'::jsonb) AS top_10_agents,
+
     now() AS calculated_at;
 
 CREATE UNIQUE INDEX idx_global_score_agent_summary_calculated_at

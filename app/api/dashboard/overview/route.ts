@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { requireDashboardUser } from '@/lib/auth/require-dashboard-user';
 import { apiJsonResponse } from '@/lib/api/route-config';
+import { enrichTop10AgentRows } from '@/lib/dashboardAgentLookup';
 import type { DashboardChainRow } from '@/lib/dashboardChains';
 
 export const dynamic = 'force-dynamic';
@@ -70,13 +71,25 @@ export async function GET() {
     );
   }
 
-  const chains = (chainsRes.data ?? []).map((row) =>
-    mapChainsStadisticsRow(row as unknown as Record<string, unknown>),
+  const statsRecord = statsRes.data as Record<string, unknown>;
+  const enrichedTop10 = await enrichTop10AgentRows(auth.supabase, statsRecord.top_10_agents);
+
+  const chains = await Promise.all(
+    (chainsRes.data ?? []).map(async (row) => {
+      const mapped = mapChainsStadisticsRow(row as unknown as Record<string, unknown>);
+      return {
+        ...mapped,
+        best_10_agents_humi: await enrichTop10AgentRows(
+          auth.supabase,
+          mapped.best_10_agents_humi,
+        ),
+      };
+    }),
   );
 
   return apiJsonResponse({
     success: true,
-    stats: statsRes.data,
+    stats: { ...statsRecord, top_10_agents: enrichedTop10 },
     chains,
   });
 }

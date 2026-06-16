@@ -123,3 +123,10 @@ export function dashboardDisabledPrimaryButtonClass(isDark: boolean): string {
   const bg = isDark ? 'bg-emerald-600 text-white' : 'bg-emerald-700 text-white';
   return `mt-auto w-full rounded-xl px-4 py-2 text-sm font-medium opacity-50 cursor-not-allowed ${bg}`;
 }
+
+export function dashboardPrimaryButtonClass(isDark: boolean): string {
+  const bg = isDark
+    ? 'bg-emerald-600 text-white hover:bg-emerald-500'
+    : 'bg-emerald-700 text-white hover:bg-emerald-600';
+  return `mt-auto w-full rounded-xl px-4 py-2 text-sm font-medium transition-colors ${bg}`;
+}

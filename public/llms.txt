@@ -14,7 +14,6 @@
 - WAMI Index: https://globalscoreagent.com/wami
 - Pricing: https://globalscoreagent.com/pricing
 - Documentation (hub): https://globalscoreagent.com/docs/global-score-agent
-- Waitlist: https://globalscoreagent.com/waitlist
 - Legal: https://globalscoreagent.com/legal
 
 ## Documentation
@@ -22,6 +21,7 @@
 Official product documentation (Spanish default; append `?lang=en` for English):
 
 - Platform overview: https://globalscoreagent.com/docs/global-score-agent
+- ERC-8004 standard: https://globalscoreagent.com/docs/erc-8004
 - Pricing: https://globalscoreagent.com/docs/gsa-pricing
 - HUMI overview: https://globalscoreagent.com/docs/index-humi
 - HUMI technical spec: https://globalscoreagent.com/docs/index-humi-technical-spec
@@ -42,7 +42,7 @@ Official product documentation (Spanish default; append `?lang=en` for English):
 
 ## API and dashboard
 
-Full wallet/agent lookup dashboard and public API are coming soon. Join the waitlist at https://globalscoreagent.com/waitlist
+The wallet/agent lookup dashboard is available at https://globalscoreagent.com/auth/login. The public API is coming soon.
 
 ## Sitemap
 

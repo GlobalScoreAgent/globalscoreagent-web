@@ -12,7 +12,7 @@ type Props = {
   isDark: boolean;
   fillHeight?: boolean;
   sideLegendWithValues?: boolean;
-  legendDensity?: 'default' | 'comfortable';
+  legendDensity?: 'default' | 'comfortable' | 'compact';
   innerRadius?: number | string;
   outerRadius?: number | string;
   className?: string;

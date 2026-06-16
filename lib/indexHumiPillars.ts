@@ -35,7 +35,7 @@ export function buildHumiPillarChartPoints(
   }));
 }
 
-export function hasAnyPillarScore(points: HumiPillarChartPoint[]): boolean {
+export function hasAnyPillarScore(points: { value: number | null }[]): boolean {
   return points.some((p) => p.value !== null && Number.isFinite(p.value));
 }
 

@@ -4,11 +4,18 @@ export type SubscriptionStatus = 'Active' | 'Disable';
 
 export type LoginProcessResult = {
   profile_id: number;
+  login_log_id: number;
   subscription: SubscriptionStatus;
   new_user: boolean;
   message_es: string;
   message_en: string;
 };
+
+function positiveInt(raw: unknown): number | null {
+  const n = typeof raw === 'number' ? raw : Number(raw);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return Math.trunc(n);
+}
 
 export type LoginProcessRequest = {
   is_registration?: boolean;
@@ -70,15 +77,21 @@ export function parseLoginProcessResult(raw: unknown): LoginProcessResult | null
   if (!raw || typeof raw !== 'object') return null;
 
   const row = raw as Record<string, unknown>;
-  const profileId = row.profile_id;
+  const profileId = positiveInt(row.profile_id);
+  const loginLogId = positiveInt(row.login_log_id);
   const subscription = row.subscription;
 
-  if (typeof profileId !== 'number' || (subscription !== 'Active' && subscription !== 'Disable')) {
+  if (
+    profileId == null ||
+    loginLogId == null ||
+    (subscription !== 'Active' && subscription !== 'Disable')
+  ) {
     return null;
   }
 
   return {
     profile_id: profileId,
+    login_log_id: loginLogId,
     subscription,
     new_user: row.new_user === true,
     message_es: typeof row.message_es === 'string' ? row.message_es : '',

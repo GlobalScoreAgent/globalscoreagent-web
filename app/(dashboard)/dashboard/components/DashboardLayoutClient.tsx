@@ -5,7 +5,7 @@
 
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import type { DashboardSessionUser } from '../layout';
+import type { DashboardSessionUser } from '../dashboard-session';
 import DashboardSidebar from './DashboardSidebar';
 import DashboardTopNav from './DashboardTopNav';
 import { DashboardLoginProvider, useDashboardLogin } from './DashboardLoginContext';
@@ -16,6 +16,8 @@ import {
   hasHydratedDashboardPreferences,
   markDashboardPreferencesHydrated,
 } from '@/lib/gsa/dashboard-preferences-hydration';
+import DashboardSessionWatcher from '@/components/dashboard/DashboardSessionWatcher';
+import DashboardNewsTicker from './DashboardNewsTicker';
 
 function getPageTitleKey(pathname: string): string {
   if (pathname === '/dashboard/agents' || pathname === '/dashboard/agents/') {
@@ -36,6 +38,10 @@ function getPageTitleKey(pathname: string): string {
 
   if (pathname === '/dashboard/api' || pathname === '/dashboard/api/') {
     return 'apiPageTitle';
+  }
+
+  if (pathname === '/dashboard/feedbacks' || pathname === '/dashboard/feedbacks/') {
+    return 'feedbacksPageTitle';
   }
 
   return 'dashboardOverviewTitle';
@@ -111,7 +117,8 @@ function DashboardLayoutInner({
   }
 
   return (
-    <LanguageProvider>
+    <>
+      <DashboardSessionWatcher />
       <DashboardPreferencesHydrator />
       <div className="flex h-screen text-white overflow-hidden dark:bg-zinc-950 bg-zinc-100">
         <RecentAgentsProvider>
@@ -128,11 +135,12 @@ function DashboardLayoutInner({
               <main className="flex-1 overflow-auto p-8 dark:bg-zinc-950 bg-zinc-100">
                 {children}
               </main>
+              <DashboardNewsTicker />
             </DashboardTitleOverrideProvider>
           </div>
         </RecentAgentsProvider>
       </div>
-    </LanguageProvider>
+    </>
   );
 }
 
@@ -145,7 +153,9 @@ export default function DashboardLayoutClient({
 }) {
   return (
     <DashboardLoginProvider>
-      <DashboardLayoutInner user={user}>{children}</DashboardLayoutInner>
+      <LanguageProvider>
+        <DashboardLayoutInner user={user}>{children}</DashboardLayoutInner>
+      </LanguageProvider>
     </DashboardLoginProvider>
   );
 }

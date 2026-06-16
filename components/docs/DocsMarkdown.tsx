@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { resolveRelativeDocLink } from '@/lib/docs/resolveDocLink';
 
 function slugifyHeading(text: string): string {
   return text
@@ -35,12 +36,28 @@ function nextHeadingId(text: string): string {
   return count === 0 ? base : `${base}-${count + 1}`;
 }
 
+function resolveDocHref(href: string | undefined, docSlug?: string): string | undefined {
+  if (!href) return href;
+  if (href.startsWith('http') || href.startsWith('#') || href.startsWith('/docs/')) {
+    return href;
+  }
+  const mdMatch = href.match(/^\.\/([a-z0-9-]+)\.md$/i);
+  if (mdMatch && docSlug) {
+    return resolveRelativeDocLink(docSlug, mdMatch[1]);
+  }
+  if (mdMatch) {
+    return `/docs/dashboard/${mdMatch[1]}`;
+  }
+  return href;
+}
+
 type DocsMarkdownProps = {
   markdown: string;
   className?: string;
+  docSlug?: string;
 };
 
-export default function DocsMarkdown({ markdown, className }: DocsMarkdownProps) {
+export default function DocsMarkdown({ markdown, className, docSlug }: DocsMarkdownProps) {
   headingSlugCounts.clear();
 
   return (
@@ -83,14 +100,26 @@ export default function DocsMarkdown({ markdown, className }: DocsMarkdownProps)
             </h3>
           );
         },
-        a: ({ href, children }) => (
-          <a
-            href={href}
-            target={href?.startsWith('http') ? '_blank' : undefined}
-            rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}
-          >
-            {children}
-          </a>
+        a: ({ href, children }) => {
+          const resolvedHref = resolveDocHref(href, docSlug);
+          return (
+            <a
+              href={resolvedHref}
+              target={resolvedHref?.startsWith('http') ? '_blank' : undefined}
+              rel={resolvedHref?.startsWith('http') ? 'noopener noreferrer' : undefined}
+            >
+              {children}
+            </a>
+          );
+        },
+        img: ({ src, alt }) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={src ?? ''}
+            alt={alt ?? ''}
+            loading="lazy"
+            className="my-6 w-full rounded-lg border border-zinc-800"
+          />
         ),
       }}
     >

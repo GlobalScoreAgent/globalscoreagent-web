@@ -1,6 +1,6 @@
 import type { Bilingual } from '@/content/marketing/i18n';
 
-export type DocCategory = 'platform' | 'pricing' | 'humi' | 'wami' | 'agents' | 'wallets';
+export type DocCategory = 'platform' | 'dashboard' | 'pricing' | 'humi' | 'wami' | 'agents' | 'wallets';
 
 export type DocManifestEntry = {
   slug: string;
@@ -15,10 +15,10 @@ export const docsHubSeo = {
     es: 'Documentación | Global Score Agent',
     en: 'Documentation | Global Score Agent',
   } satisfies Bilingual,
-  description: {
-    es: 'Guías oficiales sobre la plataforma GSA, índices HUMI y WAMI, evaluaciones de agentes, wallets y precios.',
-    en: 'Official guides on the GSA platform, HUMI and WAMI indices, agent evaluations, wallets, and pricing.',
-  } satisfies Bilingual,
+    description: {
+      es: 'Guías oficiales sobre la plataforma GSA, dashboard, índices HUMI y WAMI, evaluaciones de agentes, wallets y precios.',
+      en: 'Official guides on the GSA platform, dashboard, HUMI and WAMI indices, agent evaluations, wallets, and pricing.',
+    } satisfies Bilingual,
 };
 
 export const docManifest: DocManifestEntry[] = [
@@ -36,9 +36,22 @@ export const docManifest: DocManifestEntry[] = [
     },
   },
   {
+    slug: 'erc-8004',
+    category: 'platform',
+    order: 2,
+    title: {
+      es: 'ERC-8004 – Agentes sin confianza previa',
+      en: 'ERC-8004 – Trustless Agents',
+    },
+    description: {
+      es: 'Estándar Ethereum para identidad, reputación y validación on-chain de agentes de IA.',
+      en: 'Ethereum standard for on-chain identity, reputation, and validation of AI agents.',
+    },
+  },
+  {
     slug: 'gsa-pricing',
     category: 'pricing',
-    order: 2,
+    order: 3,
     title: {
       es: 'Precios de Global Score Agent',
       en: 'Global Score Agent Pricing',
@@ -51,7 +64,7 @@ export const docManifest: DocManifestEntry[] = [
   {
     slug: 'index-humi',
     category: 'humi',
-    order: 3,
+    order: 4,
     title: {
       es: 'Índice HUMI – Visión general',
       en: 'Index HUMI – Overview',
@@ -64,7 +77,7 @@ export const docManifest: DocManifestEntry[] = [
   {
     slug: 'index-humi-technical-spec',
     category: 'humi',
-    order: 4,
+    order: 5,
     title: {
       es: 'Índice HUMI – Especificación técnica',
       en: 'Index HUMI – Technical Specification',
@@ -77,7 +90,7 @@ export const docManifest: DocManifestEntry[] = [
   {
     slug: 'index-wami',
     category: 'wami',
-    order: 5,
+    order: 6,
     title: {
       es: 'Índice WAMI – Visión general',
       en: 'Index WAMI – Overview',
@@ -90,7 +103,7 @@ export const docManifest: DocManifestEntry[] = [
   {
     slug: 'index-wami-technical-spec',
     category: 'wami',
-    order: 6,
+    order: 7,
     title: {
       es: 'Índice WAMI – Especificación técnica',
       en: 'Index WAMI – Technical Specification',
@@ -103,7 +116,7 @@ export const docManifest: DocManifestEntry[] = [
   {
     slug: 'agent-realness-analysis',
     category: 'agents',
-    order: 7,
+    order: 8,
     title: {
       es: 'Análisis de Realness del Agente',
       en: 'Agent Realness Analysis',
@@ -114,9 +127,22 @@ export const docManifest: DocManifestEntry[] = [
     },
   },
   {
+    slug: 'agent-profile-processing',
+    category: 'agents',
+    order: 9,
+    title: {
+      es: 'Procesamiento de Perfiles de Agentes',
+      en: 'Agent Profile Processing',
+    },
+    description: {
+      es: 'Consolidación y priorización de metadata de agentes desde múltiples fuentes.',
+      en: 'Consolidation and prioritization of agent metadata from multiple sources.',
+    },
+  },
+  {
     slug: 'agent-metadata-richness-analysis',
     category: 'agents',
-    order: 8,
+    order: 10,
     title: {
       es: 'Puntaje de Riqueza de Metadatos',
       en: 'Metadata Richness Score',
@@ -129,7 +155,7 @@ export const docManifest: DocManifestEntry[] = [
   {
     slug: 'agent-warning-system',
     category: 'agents',
-    order: 9,
+    order: 11,
     title: {
       es: 'Sistema de Advertencias de Agentes',
       en: 'Agent Warning System',
@@ -142,7 +168,7 @@ export const docManifest: DocManifestEntry[] = [
   {
     slug: 'agent-feedback-types',
     category: 'agents',
-    order: 10,
+    order: 12,
     title: {
       es: 'Tipos de Feedback de Agentes',
       en: 'Agent Feedback Types',
@@ -155,7 +181,7 @@ export const docManifest: DocManifestEntry[] = [
   {
     slug: 'wallet-transactional-categories',
     category: 'wallets',
-    order: 11,
+    order: 13,
     title: {
       es: 'Categorías Transaccionales de Wallets',
       en: 'Wallet Transactional Categories',
@@ -163,6 +189,123 @@ export const docManifest: DocManifestEntry[] = [
     description: {
       es: 'Clasificación de comportamiento on-chain (Explosive, Stable, etc.).',
       en: 'On-chain behavior classification (Explosive, Stable, etc.).',
+    },
+  },
+  {
+    slug: 'dashboard',
+    category: 'dashboard',
+    order: 20,
+    title: {
+      es: 'Dashboard – Visión general',
+      en: 'Dashboard – Overview',
+    },
+    description: {
+      es: 'Introducción al panel de control: navegación, búsqueda de agentes y gestión de cuenta.',
+      en: 'Introduction to the control panel: navigation, agent search, and account management.',
+    },
+  },
+  {
+    slug: 'dashboard/home',
+    category: 'dashboard',
+    order: 21,
+    title: {
+      es: 'Dashboard – Inicio',
+      en: 'Dashboard – Home',
+    },
+    description: {
+      es: 'KPIs globales, Top 10, distribución y resumen por cadena en la página principal.',
+      en: 'Global KPIs, Top 10, distribution charts, and per-chain summary on the home page.',
+    },
+  },
+  {
+    slug: 'dashboard/agents-directory',
+    category: 'dashboard',
+    order: 22,
+    title: {
+      es: 'Dashboard – Directorio de agentes',
+      en: 'Dashboard – Agents Directory',
+    },
+    description: {
+      es: 'Búsqueda, filtros avanzados y ordenación del listado de agentes ERC-8004.',
+      en: 'Search, advanced filters, and sorting in the ERC-8004 agent directory.',
+    },
+  },
+  {
+    slug: 'dashboard/agent-general-overview',
+    category: 'dashboard',
+    order: 23,
+    title: {
+      es: 'Dashboard – Vista general del agente',
+      en: 'Dashboard – Agent General Overview',
+    },
+    description: {
+      es: 'Identidad, scores, warnings, metadata y wallets en la ficha de un agente.',
+      en: 'Identity, scores, warnings, metadata, and wallets on an agent detail page.',
+    },
+  },
+  {
+    slug: 'dashboard/agent-humi-index',
+    category: 'dashboard',
+    order: 24,
+    title: {
+      es: 'Dashboard – Índice HUMI del agente',
+      en: 'Dashboard – Agent HUMI Index',
+    },
+    description: {
+      es: 'Puntaje HUMI, pilares, bloques y tendencia histórica de un agente.',
+      en: 'HUMI score, pillars, blocks, and historical trend for an agent.',
+    },
+  },
+  {
+    slug: 'dashboard/agent-wami-index',
+    category: 'dashboard',
+    order: 25,
+    title: {
+      es: 'Dashboard – Índice WAMI del agente',
+      en: 'Dashboard – Agent WAMI Index',
+    },
+    description: {
+      es: 'Puntaje WAMI de la wallet del agente, pilares y análisis transaccional.',
+      en: 'Agent wallet WAMI score, pillars, and transactional analysis.',
+    },
+  },
+  {
+    slug: 'dashboard/profile',
+    category: 'dashboard',
+    order: 26,
+    title: {
+      es: 'Dashboard – Perfil',
+      en: 'Dashboard – Profile',
+    },
+    description: {
+      es: 'Configuración de cuenta, idioma, tema y agentes favoritos.',
+      en: 'Account settings, language, theme, and favorite agents.',
+    },
+  },
+  {
+    slug: 'dashboard/subscriptions',
+    category: 'dashboard',
+    order: 27,
+    title: {
+      es: 'Dashboard – Suscripciones',
+      en: 'Dashboard – Subscriptions',
+    },
+    description: {
+      es: 'Planes, contratación y gestión de la suscripción al dashboard.',
+      en: 'Plans, checkout, and dashboard subscription management.',
+    },
+  },
+  {
+    slug: 'dashboard/feedbacks',
+    category: 'dashboard',
+    order: 28,
+    title: {
+      es: 'Dashboard – Comentarios',
+      en: 'Dashboard – Feedbacks',
+    },
+    description: {
+      es: 'Ver y enviar comentarios sobre agentes desde el dashboard.',
+      en: 'View and submit agent feedback from the dashboard.',
     },
   },
 ];

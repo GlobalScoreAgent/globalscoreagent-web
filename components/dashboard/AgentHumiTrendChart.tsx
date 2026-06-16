@@ -126,16 +126,6 @@ export function AgentHumiTrendChart({
     return { deltaText, pctText, sign };
   }, [chartData, locale]);
 
-  if (chartData.length === 0) {
-    return (
-      <div
-        className={`flex h-full items-center justify-center text-sm ${isDark ? 'text-gray-500' : 'text-zinc-500'}`}
-      >
-        {emptyMessage}
-      </div>
-    );
-  }
-
   const badgeTone =
     deltaBadge?.sign === 'up'
       ? isDark
@@ -148,9 +138,6 @@ export function AgentHumiTrendChart({
         : isDark
           ? 'border-zinc-600 bg-zinc-800/90 text-zinc-400'
           : 'border-zinc-200 bg-zinc-100 text-zinc-600';
-
-  const chartMarginTop = deltaBadge ? 52 : 16;
-  const xInterval = chartData.length > 14 ? ('preserveStartEnd' as const) : 0;
 
   const renderAreaDot = useCallback(
     (props: { cx?: number; cy?: number; index?: number; r?: number }) => {
@@ -216,6 +203,19 @@ export function AgentHumiTrendChart({
     },
     [chartData.length, deltaBadge, badgeTone, lineColor, isDark, vsPreviousLabel],
   );
+
+  if (chartData.length === 0) {
+    return (
+      <div
+        className={`flex h-full items-center justify-center text-sm ${isDark ? 'text-gray-500' : 'text-zinc-500'}`}
+      >
+        {emptyMessage}
+      </div>
+    );
+  }
+
+  const chartMarginTop = deltaBadge ? 52 : 16;
+  const xInterval = chartData.length > 14 ? ('preserveStartEnd' as const) : 0;
 
   return (
     <div className="h-full w-full">

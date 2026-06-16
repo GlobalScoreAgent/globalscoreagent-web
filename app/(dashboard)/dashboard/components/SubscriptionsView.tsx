@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from './LanguageContext';
 import { getPeriodUrgency } from '@/lib/gsa/subscription-period-urgency';
-import type { RegistrationSource } from '@/lib/gsa/dashboard-plan-catalog';
+import type { DashboardSubscriptionType } from '@/lib/gsa/subscription-dashboard-types';
 import DashboardFormSection from './DashboardFormSection';
 import SubscriptionPlanCards from './SubscriptionPlanCards';
-import SubscriptionFaq from './SubscriptionFaq';
+import SubscriptionMoreDetails from './SubscriptionMoreDetails';
 import {
   dashboardFormBodyClass,
   dashboardFormHeadingClass,
@@ -21,15 +21,13 @@ type SubscriptionRecord = {
   current_period_start: string | null;
   current_period_end: string | null;
   created_at: string;
-  metadata_payment?: Record<string, unknown>;
-  registration_source?: RegistrationSource | null;
 };
 
 type SubscriptionsApiResponse = {
   success: boolean;
   active: SubscriptionRecord | null;
   history: SubscriptionRecord[];
-  registration_source: RegistrationSource | null;
+  plans?: DashboardSubscriptionType[];
   error?: string;
 };
 
@@ -45,9 +43,7 @@ export default function SubscriptionsView() {
   const [error, setError] = useState<string | null>(null);
   const [active, setActive] = useState<SubscriptionRecord | null>(null);
   const [history, setHistory] = useState<SubscriptionRecord[]>([]);
-  const [registrationSource, setRegistrationSource] = useState<RegistrationSource | null>(
-    null,
-  );
+  const [plans, setPlans] = useState<DashboardSubscriptionType[]>([]);
 
   useEffect(() => {
     void (async () => {
@@ -59,7 +55,7 @@ export default function SubscriptionsView() {
         }
         setActive(data.active);
         setHistory(data.history);
-        setRegistrationSource(data.registration_source ?? null);
+        setPlans(Array.isArray(data.plans) ? data.plans : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'subscriptions_fetch_failed');
       } finally {
@@ -83,10 +79,6 @@ export default function SubscriptionsView() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
-      <h1 className={`text-2xl font-semibold ${dashboardFormHeadingClass(isDark)}`}>
-        {t.subscriptionsPageTitle}
-      </h1>
-
       <DashboardFormSection
         isDark={isDark}
         title={t.subscriptionsActiveTitle}
@@ -174,9 +166,13 @@ export default function SubscriptionsView() {
         )}
       </DashboardFormSection>
 
-      <SubscriptionPlanCards registrationSource={registrationSource} />
+      <SubscriptionPlanCards
+        activePlanName={active?.plan_name ?? null}
+        activeSubscriptionId={active?.id ?? null}
+        plans={plans}
+      />
 
-      <SubscriptionFaq />
+      <SubscriptionMoreDetails />
     </div>
   );
 }

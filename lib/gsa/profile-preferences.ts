@@ -19,6 +19,7 @@ export type ProfileRecord = {
   user_id: string;
   display_name: string | null;
   avatar_url: string | null;
+  email_address: string | null;
   preferences: ProfilePreferences;
 };
 
@@ -27,11 +28,12 @@ type RawProfileRow = {
   user_id: string;
   display_name: string | null;
   avatar_url: string | null;
+  email_address: string | null;
   preferences: unknown;
 };
 
 const DEFAULT_PREFERENCES: ProfilePreferences = {
-  language: 'es',
+  language: 'en',
   theme: 'dark',
   agents: [],
 };
@@ -77,6 +79,7 @@ function mapRowToProfile(row: RawProfileRow): ProfileRecord {
     user_id: row.user_id,
     display_name: row.display_name,
     avatar_url: row.avatar_url,
+    email_address: row.email_address,
     preferences: normalizePreferences(row.preferences),
   };
 }
@@ -88,7 +91,7 @@ export async function getProfileByUserId(
   const { data, error } = await supabase
     .schema('gsa')
     .from('profiles')
-    .select('id, user_id, display_name, avatar_url, preferences')
+    .select('id, user_id, display_name, avatar_url, email_address, preferences')
     .eq('user_id', userId)
     .maybeSingle();
 
@@ -110,7 +113,7 @@ export async function updateProfilePreferences(
     .from('profiles')
     .update({ preferences })
     .eq('user_id', userId)
-    .select('id, user_id, display_name, avatar_url, preferences')
+    .select('id, user_id, display_name, avatar_url, email_address, preferences')
     .single();
 
   if (error) {
@@ -123,19 +126,32 @@ export async function updateProfilePreferences(
 export async function updateProfileAccountFields(
   supabase: SupabaseClient,
   userId: string,
-  fields: { display_name?: string | null; avatar_url?: string | null },
+  fields: {
+    display_name?: string | null;
+    avatar_url?: string | null;
+    email_address?: string | null;
+  },
 ): Promise<ProfileRecord> {
-  const payload: { display_name?: string | null; avatar_url?: string | null } = {};
+  const payload: {
+    display_name?: string | null;
+    avatar_url?: string | null;
+    email_address?: string | null;
+  } = {};
 
   if ('display_name' in fields) payload.display_name = fields.display_name ?? null;
   if ('avatar_url' in fields) payload.avatar_url = fields.avatar_url ?? null;
+  if ('email_address' in fields) {
+    const raw = fields.email_address;
+    payload.email_address =
+      typeof raw === 'string' && raw.trim().length > 0 ? raw.trim() : null;
+  }
 
   const { data, error } = await supabase
     .schema('gsa')
     .from('profiles')
     .update(payload)
     .eq('user_id', userId)
-    .select('id, user_id, display_name, avatar_url, preferences')
+    .select('id, user_id, display_name, avatar_url, email_address, preferences')
     .single();
 
   if (error) {

@@ -4,6 +4,10 @@ import Link from 'next/link';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { marketingCopy } from '@/content/marketing/copy';
 import { pick } from '@/content/marketing/i18n';
+import ContactSocialIcon from './ContactSocialIcon';
+
+const contactLinkClass =
+  'flex items-center justify-center gap-2.5 text-zinc-400 transition-colors hover:text-gold md:justify-end';
 
 export default function MarketingFooter() {
   const { language } = useLanguage();
@@ -28,33 +32,37 @@ export default function MarketingFooter() {
             <p className="mb-3 text-sm font-medium text-zinc-400">
               {pick(language, marketingCopy.footer.contactTitle)}
             </p>
-            <div className="flex flex-col gap-1 text-sm">
+            <div className="flex flex-col gap-2 text-sm">
               <a
                 href={links.x.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-400 transition-colors hover:text-gold"
+                className={contactLinkClass}
               >
-                X {links.x.label}
+                <ContactSocialIcon kind="x" />
+                <span>{links.x.label}</span>
               </a>
-              <a href={links.email.href} className="text-zinc-400 transition-colors hover:text-gold">
-                {links.email.label}
+              <a href={links.email.href} className={contactLinkClass}>
+                <ContactSocialIcon kind="email" />
+                <span>{links.email.label}</span>
               </a>
               <a
                 href={links.farcaster.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-400 transition-colors hover:text-gold"
+                className={contactLinkClass}
               >
-                {links.farcaster.label}
+                <ContactSocialIcon kind="farcaster" />
+                <span>{links.farcaster.label}</span>
               </a>
               <a
                 href={links.telegram.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-400 transition-colors hover:text-gold"
+                className={contactLinkClass}
               >
-                Telegram {links.telegram.label}
+                <ContactSocialIcon kind="telegram" />
+                <span>{links.telegram.label}</span>
               </a>
             </div>
           </div>
@@ -83,5 +91,3 @@ export default function MarketingFooter() {
     </footer>
   );
 }
-
-

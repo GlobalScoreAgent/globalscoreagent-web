@@ -1,14 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { authCopy } from '@/content/auth/copy';
 import { pick } from '@/content/marketing/i18n';
 import { clientLoginProcess } from '@/lib/gsa/login-process-client';
-import { getCallbackUrl, sanitizeRedirectPath } from '@/lib/auth/redirect';
-import { createClient } from '@/utils/supabase/client';
+import { getCallbackUrl } from '@/lib/auth/redirect';
 
 type Tab = 'login' | 'register';
 
@@ -38,14 +37,24 @@ function mapAuthError(message: string, lang: 'es' | 'en'): string {
   return pick(lang, authCopy.errors.generic);
 }
 
-export default function AuthLoginPageClient() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { language } = useLanguage();
+async function getSupabaseClient() {
+  const { createClient } = await import('@/utils/supabase/client');
+  return createClient();
+}
 
-  const redirectTo = sanitizeRedirectPath(searchParams.get('redirect'));
-  const oauthError = searchParams.get('error') === 'oauth';
-  const initialTab: Tab = searchParams.get('tab') === 'register' ? 'register' : 'login';
+type AuthLoginPageClientProps = {
+  redirectTo: string;
+  oauthError: boolean;
+  initialTab: Tab;
+};
+
+export default function AuthLoginPageClient({
+  redirectTo,
+  oauthError,
+  initialTab,
+}: AuthLoginPageClientProps) {
+  const router = useRouter();
+  const { language } = useLanguage();
 
   const [tab, setTab] = useState<Tab>(initialTab);
   const [email, setEmail] = useState('');
@@ -83,12 +92,12 @@ export default function AuthLoginPageClient() {
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setStatus('loading');
     setErrorMessage('');
 
-    const supabase = createClient();
+    const supabase = await getSupabaseClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
@@ -100,7 +109,7 @@ export default function AuthLoginPageClient() {
     await goToDashboard();
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
@@ -125,7 +134,7 @@ export default function AuthLoginPageClient() {
 
     setStatus('loading');
 
-    const supabase = createClient();
+    const supabase = await getSupabaseClient();
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -161,7 +170,7 @@ export default function AuthLoginPageClient() {
     setOauthLoading(provider);
     setErrorMessage('');
 
-    const supabase = createClient();
+    const supabase = await getSupabaseClient();
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
@@ -242,7 +251,7 @@ export default function AuthLoginPageClient() {
             </button>
           </div>
         ) : (
-          <>
+          <div className="space-y-0">
             <div className="mb-6">
               <h2 className="text-xl font-semibold text-white">
                 {pick(language, tab === 'login' ? authCopy.login.title : authCopy.register.title)}
@@ -419,7 +428,7 @@ export default function AuthLoginPageClient() {
                   : pick(language, authCopy.oauth.github)}
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
 

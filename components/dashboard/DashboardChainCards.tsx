@@ -25,6 +25,7 @@ import {
   numFromJson,
   parseBest10AgentsHumi,
   parseMonthlyRows,
+  parseTechnicalMaturityPcts,
   parseWarningStats,
   WARNING_STAT_HELP_TKEY,
   WARNING_STAT_TKEY,
@@ -146,10 +147,12 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
   const pctOnchain = numFromJson(d30, 'pct_with_onchain_activity');
 
   const techJson = chain.technical_data_information;
-  const pctX402 = numFromJson(techJson, 'pct_x402');
-  const pctMcpA2a = numFromJson(techJson, 'pct_mcp_a2a');
+  const { pctX402, pctMcpA2a, countX402, countMcpA2a } = parseTechnicalMaturityPcts(
+    techJson,
+    totalAgents,
+  );
 
-  const warningStats = parseWarningStats(chain.warning_stats_information);
+  const warningStats = parseWarningStats(chain.warning_stats_information, totalAgents);
   const topAgents = parseBest10AgentsHumi(chain.best_10_agents_humi);
 
   const warningsRef = useRef<HTMLDivElement>(null);
@@ -226,6 +229,7 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
   });
 
   const muted = isDark ? 'text-zinc-400' : 'text-zinc-600';
+  const mutedCount = isDark ? 'text-zinc-500' : 'text-zinc-400';
   const prose = isDark ? 'text-white' : 'text-zinc-900';
 
   const miniCardShell = isDark ? 'border-zinc-700 bg-black/20' : 'border-zinc-200 bg-zinc-50';
@@ -248,6 +252,20 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
         },
       });
     }
+    if (wamiBarKeys.length > 0) {
+      slides.push({
+        id: 'wami',
+        metricLabel: t.chainDistributionRailWami,
+        rowKeys: wamiBarKeys,
+        row: wamiRow,
+        colors: (k) => MATURITY_COLORS[k as keyof typeof MATURITY_COLORS] ?? '#71717a',
+        labelForKey: (k) => {
+          const tk = MATURITY_TKEY[k as keyof typeof MATURITY_TKEY];
+          const seg = MATURITY_ORDER.find((s) => s.key === k);
+          return tk && seg ? `${seg.scoreRange} · ${t[tk]}` : k;
+        },
+      });
+    }
     if (metaBarKeys.length > 0) {
       slides.push({
         id: 'meta',
@@ -262,20 +280,6 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
           const tkey = METADATA_TKEY[k as keyof typeof METADATA_TKEY];
           const seg = METADATA_ORDER.find((s) => s.key === k);
           return tkey && seg ? `${seg.scoreRange} · ${t[tkey]}` : k;
-        },
-      });
-    }
-    if (wamiBarKeys.length > 0) {
-      slides.push({
-        id: 'wami',
-        metricLabel: t.chainDistributionRailWami,
-        rowKeys: wamiBarKeys,
-        row: wamiRow,
-        colors: (k) => MATURITY_COLORS[k as keyof typeof MATURITY_COLORS] ?? '#71717a',
-        labelForKey: (k) => {
-          const tk = MATURITY_TKEY[k as keyof typeof MATURITY_TKEY];
-          const seg = MATURITY_ORDER.find((s) => s.key === k);
-          return tk && seg ? `${seg.scoreRange} · ${t[tk]}` : k;
         },
       });
     }
@@ -366,11 +370,25 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
             <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm sm:gap-x-10">
               <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.chainPctX402}</span>
-                <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctX402)}</div>
+                <div className={`font-bold tabular-nums ${prose}`}>
+                  {fmtPct(pctX402)}
+                  {countX402 !== null ? (
+                    <span className={`ml-1.5 text-xs font-normal ${mutedCount}`}>
+                      ({fmtCount(countX402)})
+                    </span>
+                  ) : null}
+                </div>
               </div>
               <div className="flex min-w-0 flex-col items-center text-center">
                 <span className={muted}>{t.chainPctMcpA2a}</span>
-                <div className={`font-bold tabular-nums ${prose}`}>{fmtPct(pctMcpA2a)}</div>
+                <div className={`font-bold tabular-nums ${prose}`}>
+                  {fmtPct(pctMcpA2a)}
+                  {countMcpA2a !== null ? (
+                    <span className={`ml-1.5 text-xs font-normal ${mutedCount}`}>
+                      ({fmtCount(countMcpA2a)})
+                    </span>
+                  ) : null}
+                </div>
               </div>
             </div>
           </div>
@@ -450,7 +468,7 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
             </p>
             {warningStats.length > 0 ? (
               <div className="grid grid-cols-1 gap-x-2 gap-y-2.5 text-xs sm:grid-cols-3 sm:gap-y-3">
-                {warningStats.map(({ key, value }) => (
+                {warningStats.map(({ key, value, count }) => (
                   <div key={key}>
                     <div className="flex items-start gap-0.5">
                       <span className={muted}>{t[WARNING_STAT_TKEY[key]]}</span>
@@ -460,7 +478,14 @@ function ChainCard({ chain, isDark, t, lang }: { chain: DashboardChainRow; isDar
                         isDark={isDark}
                       />
                     </div>
-                    <div className={`font-semibold tabular-nums ${prose}`}>{fmtPct(value)}</div>
+                    <div className={`font-semibold tabular-nums ${prose}`}>
+                      {fmtPct(value)}
+                      {count !== null ? (
+                        <span className={`ml-1.5 text-[11px] font-normal ${mutedCount}`}>
+                          ({fmtCount(count)})
+                        </span>
+                      ) : null}
+                    </div>
                   </div>
                 ))}
               </div>

@@ -150,30 +150,26 @@ export function AgentTransactionalChart({
     return { deltaText, pctText, sign };
   }, [data, series, locale]);
 
-  if (data.length === 0) {
-    return (
-      <div
-        className={`flex h-full items-center justify-center text-sm ${isDark ? 'text-gray-500' : 'text-zinc-500'}`}
-      >
-        {emptyMessage}
-      </div>
-    );
-  }
-
-  const badgeTone =
-    deltaBadge?.sign === 'up'
-      ? isDark
+  const badgeTone = useMemo(() => {
+    if (!deltaBadge) {
+      return isDark
+        ? 'border-zinc-600 bg-zinc-800/90 text-zinc-400'
+        : 'border-zinc-200 bg-zinc-100 text-zinc-600';
+    }
+    if (deltaBadge.sign === 'up') {
+      return isDark
         ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
-        : 'border-emerald-500/35 bg-emerald-50 text-emerald-800'
-      : deltaBadge?.sign === 'down'
-        ? isDark
-          ? 'border-rose-500/40 bg-rose-500/12 text-rose-300'
-          : 'border-rose-400/40 bg-rose-50 text-rose-800'
-        : isDark
-          ? 'border-zinc-600 bg-zinc-800/90 text-zinc-400'
-          : 'border-zinc-200 bg-zinc-100 text-zinc-600';
-
-  const chartMarginTop = deltaBadge ? 52 : 16;
+        : 'border-emerald-500/35 bg-emerald-50 text-emerald-800';
+    }
+    if (deltaBadge.sign === 'down') {
+      return isDark
+        ? 'border-rose-500/40 bg-rose-500/12 text-rose-300'
+        : 'border-rose-400/40 bg-rose-50 text-rose-800';
+    }
+    return isDark
+      ? 'border-zinc-600 bg-zinc-800/90 text-zinc-400'
+      : 'border-zinc-200 bg-zinc-100 text-zinc-600';
+  }, [deltaBadge, isDark]);
 
   const renderAreaDot = useCallback(
     (props: { cx?: number; cy?: number; index?: number; r?: number }) => {
@@ -246,6 +242,18 @@ export function AgentTransactionalChart({
       vsPreviousLabel,
     ]
   );
+
+  if (data.length === 0) {
+    return (
+      <div
+        className={`flex h-full items-center justify-center text-sm ${isDark ? 'text-gray-500' : 'text-zinc-500'}`}
+      >
+        {emptyMessage}
+      </div>
+    );
+  }
+
+  const chartMarginTop = deltaBadge ? 52 : 16;
 
   return (
     <div className="h-full w-full">

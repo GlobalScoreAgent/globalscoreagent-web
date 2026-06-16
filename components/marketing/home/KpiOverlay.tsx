@@ -123,6 +123,11 @@ export default function KpiOverlay({ className = '' }: KpiOverlayProps) {
         {formatLastUpdated(kpi.last_updated, language)}
         {isDegraded ? pick(language, mainKpiLabels.localFallback) : ''}
       </p>
+      {isDegraded ? (
+        <p className="mb-2 shrink-0 rounded-lg border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-[10px] leading-snug text-amber-200/90 sm:text-xs">
+          {pick(language, mainKpiLabels.degradedBanner)}
+        </p>
+      ) : null}
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-0.5 [-ms-overflow-style:none] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-zinc-700">
         <div className={`grid grid-cols-2 ${kpiGridGap}`}>
           <ChainsKpiCard

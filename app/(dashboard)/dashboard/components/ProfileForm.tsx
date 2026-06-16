@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { markDashboardPreferencesHydrated } from '@/lib/gsa/dashboard-preferences-hydration';
+import { useDashboardLogin } from './DashboardLoginContext';
 import { useLanguage } from './LanguageContext';
 import DashboardFormSection from './DashboardFormSection';
 import {
   dashboardFormBodyClass,
-  dashboardFormHeadingClass,
   dashboardFormInputClass,
   dashboardFormInsetClass,
   dashboardFormLabelClass,
@@ -22,6 +22,7 @@ type Preferences = {
 type ProfilePayload = {
   display_name: string;
   avatar_url: string;
+  email_address: string;
   preferences: Preferences;
 };
 
@@ -32,8 +33,33 @@ type ProfileApiResponse = {
   error?: string;
 };
 
+type RedeemApiResponse = {
+  success: boolean;
+  error_code?: string;
+  message_es?: string;
+  message_en?: string;
+  error?: string;
+};
+
+type RedeemMessageState = {
+  kind: 'success' | 'error';
+  message_es: string;
+  message_en: string;
+};
+
+function pickRpcMessage(lang: 'es' | 'en', message_es: string, message_en: string): string {
+  const primary = lang === 'es' ? message_es : message_en;
+  const fallback = lang === 'es' ? message_en : message_es;
+  return (
+    primary.trim() ||
+    fallback.trim() ||
+    (lang === 'es' ? 'Operación completada' : 'Operation completed')
+  );
+}
+
 export default function ProfileForm() {
   const { lang, theme, applyPersistedPreferences } = useLanguage();
+  const { profileId, loginReady, refreshLoginProcess } = useDashboardLogin();
   const isDark = theme === 'dark';
   const inputClass = dashboardFormInputClass(isDark);
   const [loading, setLoading] = useState(true);
@@ -44,11 +70,16 @@ export default function ProfileForm() {
 
   const [displayName, setDisplayName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [emailAddress, setEmailAddress] = useState('');
   const [preferences, setPreferences] = useState<Preferences>({
-    language: 'es',
+    language: 'en',
     theme: 'dark',
     agents: [],
   });
+
+  const [promoCode, setPromoCode] = useState('');
+  const [redeeming, setRedeeming] = useState(false);
+  const [redeemMessage, setRedeemMessage] = useState<RedeemMessageState | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -62,6 +93,7 @@ export default function ProfileForm() {
         setOauthLocked(data.oauth_locked === true);
         setDisplayName(data.profile.display_name ?? '');
         setAvatarUrl(data.profile.avatar_url ?? '');
+        setEmailAddress(data.profile.email_address ?? '');
         setPreferences({
           ...data.profile.preferences,
           language: lang,
@@ -84,8 +116,15 @@ export default function ProfileForm() {
             account: 'Cuenta',
             name: 'Nombre visible',
             avatar: 'URL del avatar',
+            email: 'Correo de contacto (opcional)',
             oauthLock:
               'Cuenta OAuth (Google/GitHub): el nombre y avatar se gestionan desde el proveedor.',
+            redeemCode: 'Redimir Código',
+            redeemPlaceholder: 'Introduce tu código',
+            redeem: 'Redimir',
+            redeeming: 'Redimiendo...',
+            redeemNotReady: 'Espera a que la sesión esté lista para redimir un código.',
+            redeemNetworkError: 'No se pudo redimir el código. Inténtalo de nuevo.',
             preferences: 'Preferencias',
             language: 'Idioma',
             theme: 'Entorno',
@@ -101,8 +140,15 @@ export default function ProfileForm() {
             account: 'Account',
             name: 'Display name',
             avatar: 'Avatar URL',
+            email: 'Contact email (optional)',
             oauthLock:
               'OAuth account (Google/GitHub): name and avatar are managed by your provider.',
+            redeemCode: 'Redeem Code',
+            redeemPlaceholder: 'Enter your code',
+            redeem: 'Redeem',
+            redeeming: 'Redeeming...',
+            redeemNotReady: 'Wait for the session to be ready before redeeming a code.',
+            redeemNetworkError: 'Could not redeem the code. Please try again.',
             preferences: 'Preferences',
             language: 'Language',
             theme: 'Theme',
@@ -116,11 +162,71 @@ export default function ProfileForm() {
     [lang],
   );
 
+  const redeemMessageText = useMemo(() => {
+    if (!redeemMessage) return null;
+    return pickRpcMessage(lang, redeemMessage.message_es, redeemMessage.message_en);
+  }, [lang, redeemMessage]);
+
   const removeFavorite = (id: string) => {
     setPreferences((prev) => ({
       ...prev,
       agents: prev.agents.filter((item) => item.id !== id),
     }));
+  };
+
+  const onRedeem = async () => {
+    setRedeemMessage(null);
+
+    if (!loginReady || profileId == null) {
+      setRedeemMessage({
+        kind: 'error',
+        message_es: 'Espera a que la sesión esté lista para redimir un código.',
+        message_en: 'Wait for the session to be ready before redeeming a code.',
+      });
+      return;
+    }
+
+    const trimmedCode = promoCode.trim();
+    if (!trimmedCode) return;
+
+    setRedeeming(true);
+    try {
+      const res = await fetch('/api/dashboard/redeem-promotional-code', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: trimmedCode }),
+      });
+      const data = (await res.json()) as RedeemApiResponse;
+
+      if (data.message_es != null || data.message_en != null) {
+        setRedeemMessage({
+          kind: data.success ? 'success' : 'error',
+          message_es: data.message_es ?? '',
+          message_en: data.message_en ?? '',
+        });
+      } else {
+        setRedeemMessage({
+          kind: 'error',
+          message_es: texts.redeemNetworkError,
+          message_en: 'Could not redeem the code. Please try again.',
+        });
+        return;
+      }
+
+      if (data.success) {
+        setPromoCode('');
+        await refreshLoginProcess({ force: true });
+      }
+    } catch {
+      setRedeemMessage({
+        kind: 'error',
+        message_es: texts.redeemNetworkError,
+        message_en: 'Could not redeem the code. Please try again.',
+      });
+    } finally {
+      setRedeeming(false);
+    }
   };
 
   const onSave = async () => {
@@ -135,6 +241,7 @@ export default function ProfileForm() {
         body: JSON.stringify({
           display_name: displayName,
           avatar_url: avatarUrl,
+          email_address: emailAddress.trim() || null,
           preferences,
         }),
       });
@@ -146,6 +253,7 @@ export default function ProfileForm() {
       setPreferences(data.profile.preferences);
       setDisplayName(data.profile.display_name ?? '');
       setAvatarUrl(data.profile.avatar_url ?? '');
+      setEmailAddress(data.profile.email_address ?? '');
       applyPersistedPreferences({
         language: data.profile.preferences.language,
         theme: data.profile.preferences.theme,
@@ -170,10 +278,6 @@ export default function ProfileForm() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <h1 className={`text-2xl font-semibold ${dashboardFormHeadingClass(isDark)}`}>
-        {texts.title}
-      </h1>
-
       <DashboardFormSection
         isDark={isDark}
         title={texts.account}
@@ -206,6 +310,59 @@ export default function ProfileForm() {
               disabled={oauthLocked}
             />
           </div>
+          <div>
+            <label className={`mb-1 block text-xs ${dashboardFormLabelClass(isDark)}`}>
+              {texts.email}
+            </label>
+            <input
+              type="email"
+              value={emailAddress}
+              onChange={(e) => setEmailAddress(e.target.value)}
+              className={inputClass}
+            />
+          </div>
+        </div>
+      </DashboardFormSection>
+
+      <DashboardFormSection
+        isDark={isDark}
+        title={texts.redeemCode}
+        variant="profiles"
+        accentHex="#22c55e"
+      >
+        <div className="space-y-3">
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value)}
+              placeholder={texts.redeemPlaceholder}
+              className={`min-w-0 flex-1 ${inputClass}`}
+              disabled={redeeming || !loginReady || profileId == null}
+            />
+            <button
+              type="button"
+              onClick={() => void onRedeem()}
+              disabled={redeeming || !promoCode.trim() || !loginReady || profileId == null}
+              className={`shrink-0 rounded-xl px-4 py-2 text-sm font-medium ${
+                isDark
+                  ? 'bg-emerald-600 text-white hover:bg-emerald-500 disabled:opacity-60'
+                  : 'bg-emerald-700 text-white hover:bg-emerald-600 disabled:opacity-60'
+              }`}
+            >
+              {redeeming ? texts.redeeming : texts.redeem}
+            </button>
+          </div>
+          {redeemMessageText && redeemMessage && (
+            <p
+              className={`text-sm ${
+                redeemMessage.kind === 'success'
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-red-500'
+              }`}
+            >
+              {redeemMessageText}
+            </p>
+          )}
         </div>
       </DashboardFormSection>
 

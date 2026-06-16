@@ -2,12 +2,9 @@
 
 'use client';
 
+import Link from 'next/link';
 import { User, Sun, Moon } from 'lucide-react';
-import { buildAuthLoginUrl } from '@/lib/auth/redirect';
-import { clearDashboardPreferencesHydration } from '@/lib/gsa/dashboard-preferences-hydration';
-import { clearLoginProcess } from '@/lib/gsa/login-process-storage';
-import { createClient } from '@/utils/supabase/client';
-import { useRouter } from 'next/navigation';
+import { performDashboardLogout } from '@/lib/gsa/dashboard-logout';
 import { useLanguage } from './LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import SubscriptionStatusTags from './SubscriptionStatusTags';
@@ -27,16 +24,11 @@ interface Props {
 }
 
 export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) {
-  const router = useRouter();
-  const supabase = createClient();
   const { t, theme, toggleTheme } = useLanguage();
   const { titleOverride } = useDashboardTitleOverride();
 
-  const handleSignOut = async () => {
-    clearLoginProcess();
-    clearDashboardPreferencesHydration();
-    await supabase.auth.signOut();
-    router.push(buildAuthLoginUrl('/dashboard'));
+  const handleSignOut = () => {
+    void performDashboardLogout();
   };
 
   const displayName = profile?.display_name || user.email?.split('@')[0] || 'Usuario';
@@ -110,13 +102,24 @@ export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) 
             }`}
           >
             <DropdownMenuItem asChild>
-              <a href="/dashboard/perfil" className="px-4 py-2.5">{t.profile}</a>
+              <Link href="/dashboard/perfil" className="px-4 py-2.5">
+                {t.profile}
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <a href="/dashboard/subscripciones" className="px-4 py-2.5">{t.subscriptions}</a>
+              <Link href="/dashboard/subscripciones" className="px-4 py-2.5">
+                {t.subscriptions}
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <a href="/dashboard/api" className="px-4 py-2.5">{t.api}</a>
+              <Link href="/dashboard/api" className="px-4 py-2.5">
+                {t.api}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/feedbacks" className="px-4 py-2.5">
+                {t.feedbacks}
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem

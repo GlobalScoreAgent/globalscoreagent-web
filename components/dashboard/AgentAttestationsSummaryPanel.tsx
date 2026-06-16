@@ -54,8 +54,8 @@ export function AgentAttestationsSummaryPanel({ summary, isDark, t, formatDate }
           <DistributionPieChart
             rowKeys={rowKeys}
             row={row}
-            colors={colors}
-            labelForKey={labelForKey}
+            colors={(k) => colors(k as AttestationsPieKey)}
+            labelForKey={(k) => labelForKey(k as AttestationsPieKey)}
             isDark={isDark}
             sideLegendWithValues
             innerRadius={0}

@@ -239,7 +239,7 @@ export function AgentHumiPillarSummaryBarChart({
               fill={labelFill}
               fontSize={11}
               fontWeight={600}
-              formatter={(v: number) => formatScore(Number(v), locale)}
+              formatter={(v) => formatScore(Number(v), locale)}
             />
           </Bar>
         </BarChart>

@@ -9,11 +9,11 @@ export default function HeaderWrapper({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isDashboard = pathname?.startsWith('/dashboard');
-  const isAuth = pathname?.startsWith('/auth');
+  const isDashboard = pathname?.startsWith('/dashboard') ?? false;
+  const isAuth = pathname?.startsWith('/auth') ?? false;
 
   if (isDashboard || isAuth) {
-    return <>{children}</>;
+    return children;
   }
 
   return <MarketingShell>{children}</MarketingShell>;

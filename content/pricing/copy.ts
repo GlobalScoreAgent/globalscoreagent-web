@@ -35,10 +35,6 @@ export const pricingCopy = {
   sections: {
     dashboardPlans: {
       title: { es: 'Planes Dashboard', en: 'Dashboard Plans' } satisfies Bilingual,
-      trialNote: {
-        es: 'Importante: tras la prueba de 5 días, todo el acceso (Dashboard y API) queda bloqueado hasta que contrates un plan de pago.',
-        en: 'Important: after the 5-day trial, all access (Dashboard and API) is blocked until you upgrade to a paid plan.',
-      } satisfies Bilingual,
       columns: {
         plan: { es: 'Plan', en: 'Plan' } satisfies Bilingual,
         monthly: { es: 'Precio mensual', en: 'Monthly price' } satisfies Bilingual,
@@ -159,81 +155,7 @@ export const pricingCopy = {
       ],
     },
   },
-  faq: {
-    title: { es: 'Preguntas frecuentes', en: 'Frequently asked questions' } satisfies Bilingual,
-    items: [
-      {
-        question: {
-          es: '¿Qué ocurre después de la prueba gratuita de 5 días?',
-          en: 'What happens after the 5-day free trial?',
-        } satisfies Bilingual,
-        answer: {
-          es: 'Todo el acceso al Dashboard y a la API queda completamente bloqueado hasta que contrates un plan de pago.',
-          en: 'All access to both the Dashboard and the API is completely blocked until you upgrade to a paid plan.',
-        } satisfies Bilingual,
-      },
-      {
-        question: {
-          es: '¿Puedo cancelar mi suscripción en cualquier momento?',
-          en: 'Can I cancel my subscription at any time?',
-        } satisfies Bilingual,
-        answer: {
-          es: 'Sí. Puedes cancelar o pausar tu suscripción cuando quieras, sin penalizaciones.',
-          en: 'Yes. You can cancel or pause your subscription whenever you want with no penalties.',
-        } satisfies Bilingual,
-      },
-      {
-        question: {
-          es: '¿Los créditos se acumulan al mes siguiente?',
-          en: 'Do credits roll over to the next month?',
-        } satisfies Bilingual,
-        answer: {
-          es: 'No. Los créditos mensuales se renuevan al inicio de cada ciclo de facturación. Los no usados caducan al final del mes.',
-          en: 'No. Monthly credits are refreshed at the beginning of each billing cycle. Unused credits expire at the end of the month.',
-        } satisfies Bilingual,
-      },
-      {
-        question: {
-          es: '¿Puedo usar la API sin contratar el plan Dashboard?',
-          en: 'Can I use the API without buying the Dashboard plan?',
-        } satisfies Bilingual,
-        answer: {
-          es: 'Sí. Puedes comprar paquetes de créditos de forma independiente.',
-          en: 'Yes. You can purchase credit packages independently.',
-        } satisfies Bilingual,
-      },
-      {
-        question: {
-          es: '¿Hay política de reembolso?',
-          en: 'Is there a refund policy?',
-        } satisfies Bilingual,
-        answer: {
-          es: 'Ofrecemos garantía de devolución de 14 días en todos los planes de pago (excluyendo créditos ya consumidos).',
-          en: 'We offer a 14-day money-back guarantee on all paid plans (excluding credit usage already consumed).',
-        } satisfies Bilingual,
-      },
-      {
-        question: {
-          es: '¿Ofrecen descuentos por volumen?',
-          en: 'Do you offer volume discounts for high usage?',
-        } satisfies Bilingual,
-        answer: {
-          es: 'Sí. El paquete Enterprise ya ofrece la mejor tarifa. Para más de 2.000 créditos/mes, contáctanos para precios especiales.',
-          en: 'Yes. The Enterprise credit package already offers the best rate. For usage above 2,000 credits/month, contact us for special pricing.',
-        } satisfies Bilingual,
-      },
-      {
-        question: {
-          es: '¿Tenéis planes para equipos o empresas?',
-          en: 'Do you have team / enterprise plans?',
-        } satisfies Bilingual,
-        answer: {
-          es: 'Sí. Contáctanos para asientos multiusuario, soporte dedicado, SLA o necesidades a medida.',
-          en: 'Yes. Contact us for multi-user seats, dedicated support, SLA, or custom needs.',
-        } satisfies Bilingual,
-      },
-    ],
-  },
+  moreDetails: { es: 'Más detalles', en: 'More details' } satisfies Bilingual,
   cta: {
     title: { es: '¿Listo para empezar?', en: 'Ready to get started?' } satisfies Bilingual,
     trial: { es: 'Iniciar prueba gratuita de 5 días', en: 'Start 5-day free trial' } satisfies Bilingual,

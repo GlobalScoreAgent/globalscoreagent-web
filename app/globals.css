@@ -47,6 +47,31 @@ body {
   100% { opacity: 0.08; }
 }
 
+@keyframes dashboardNewsMarquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.dashboard-news-marquee-viewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.dashboard-news-marquee-track {
+  display: inline-flex;
+  width: max-content;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: dashboardNewsMarquee var(--marquee-duration, 30s) linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-news-marquee-track {
+    animation: none;
+  }
+}
+
 /* Marketing portal section backgrounds */
 .marketing-section-glow {
   background: radial-gradient(

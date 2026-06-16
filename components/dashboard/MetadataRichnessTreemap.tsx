@@ -46,7 +46,6 @@ function TreemapCellLabel({
 
   return (
     <div
-      xmlns="http://www.w3.org/1999/xhtml"
       className={cn(
         'box-border flex h-full w-full flex-col items-start justify-start px-2 pt-2 pb-1 text-left pointer-events-none select-none antialiased',
         textClass,
@@ -121,7 +120,7 @@ export function MetadataRichnessTreemap({ data, isDark, className }: Props) {
           isAnimationActive={false}
           isUpdateAnimationActive={false}
           content={(nodeProps) => (
-            <TreemapCell {...(nodeProps as TreemapContentProps)} />
+            <TreemapCell {...(nodeProps as unknown as TreemapContentProps)} />
           )}
         />
       </ResponsiveContainer>

@@ -42,6 +42,7 @@ After a valid Auth session, the app calls the Postgres RPC **`gsa.user_login_pro
 | Field | Type | Meaning |
 |-------|------|---------|
 | `profile_id` | number | GSA profile primary key |
+| `login_log_id` | number | Active login log row; required for `user_logout_process` on session end |
 | `subscription` | `"Active"` \| `"Disable"` | Whether the user may use dashboard data |
 | `new_user` | boolean | Profile + Free subscription were just created |
 | `message_es` / `message_en` | string | Localized message when `subscription` is `Disable` |
@@ -51,11 +52,11 @@ After a valid Auth session, the app calls the Postgres RPC **`gsa.user_login_pro
 | Moment | `p_display_name` / `p_avatar_url` |
 |--------|-----------------------------------|
 | Email/password **register** (immediate session) | Name from form; avatar `NULL` |
-| Email confirmation / OAuth **`/auth/callback`** | From `user_metadata` (registration) |
-| Email/password **login** (existing user) | Both `NULL` |
-| Every dashboard visit (safety net) | `POST /api/auth/login-process` if `sessionStorage` has no `gsa:loginProcess` |
+| Email/password **login** (existing user) | Both `NULL` (via login page → cache) |
+| OAuth / email confirmation → dashboard | `is_registration: true`; name/avatar from `user_metadata` (hint `?gsa_login=registration` from callback, consumed once) |
+| Dashboard entry without cache (deep link) | `POST /api/auth/login-process` with empty body → both `NULL` |
 
-Client state is stored in **`sessionStorage`** key `gsa:loginProcess` (fast paint on refresh) and revalidated on each dashboard load via `POST /api/auth/login-process` in [`DashboardLoginContext`](../app/(dashboard)/dashboard/components/DashboardLoginContext.tsx).
+Client state is stored in **`sessionStorage`** key `gsa:loginProcess`. After email/password login, [`clientLoginProcess`](../lib/gsa/login-process-client.ts) runs once on the login page; the dashboard reuses that cache and does **not** call login-process again until logout or missing cache. OAuth/email-callback only establishes the Auth session; GSA login-process runs once when the dashboard loads without cache.
 
 - **`Active`:** dashboard home loads `/api/dashboard/overview` as usual.
 - **`Disable`:** sidebar navigation is disabled; home shows `message_es` / `message_en` (no overview fetch). Logout remains available.
@@ -65,6 +66,9 @@ Client state is stored in **`sessionStorage`** key `gsa:loginProcess` (fast pain
 | Route | Purpose |
 |-------|---------|
 | `POST /api/auth/login-process` | Session user → RPC → JSON (see [`lib/gsa/login-process.ts`](../lib/gsa/login-process.ts)) |
+| `POST /api/auth/logout-process` | Body `{ login_log_id }` → RPC `gsa.user_logout_process` (authenticated or service_role fallback) |
+
+Client stores `login_log_id` in `sessionStorage` (`gsa:loginProcess`) and calls logout-process on: manual sign-out, `SIGNED_OUT`, tab close (`pagehide`), and dashboard API `401`.
 
 Promotional codes are **not** part of this flow in v1; registration collects **name** only (`display_name` / `full_name` in Auth metadata).
 

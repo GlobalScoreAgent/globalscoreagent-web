@@ -20,6 +20,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (pathname === '/dashboard/humi' || pathname.startsWith('/dashboard/humi/')) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/dashboard';
+    url.search = '';
+    return NextResponse.redirect(url);
+  }
+
   if (pathname.startsWith('/auth/login') && user) {
     const redirect = request.nextUrl.searchParams.get('redirect') ?? '/dashboard';
     const url = request.nextUrl.clone();

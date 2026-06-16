@@ -3,7 +3,10 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { DistributionPieChart } from '@/components/dashboard/DistributionPieChart';
-import { StackedDistributionBar } from '@/components/dashboard/StackedDistributionBar';
+import {
+  StackedDistributionBar,
+  type StackedBarOrientation,
+} from '@/components/dashboard/StackedDistributionBar';
 import { cn } from '@/lib/utils';
 
 export type DistributionCarouselSlide = {
@@ -18,7 +21,7 @@ export type DistributionCarouselSlide = {
 export type DistributionLegendPlacement = 'bottom' | 'side';
 export type DistributionChartVariant = 'stackedBar' | 'pie';
 
-export type DistributionLegendDensity = 'default' | 'comfortable';
+export type DistributionLegendDensity = 'default' | 'comfortable' | 'compact';
 
 type Props = {
   slides: DistributionCarouselSlide[];
@@ -29,6 +32,7 @@ type Props = {
   legendPlacement?: DistributionLegendPlacement;
   legendDensity?: DistributionLegendDensity;
   chartVariant?: DistributionChartVariant;
+  stackedBarOrientation?: StackedBarOrientation;
   showPanelTitle?: boolean;
   resetKey?: string;
   bordered?: boolean;
@@ -47,6 +51,7 @@ export function DistributionCarouselPanel({
   legendPlacement = 'bottom',
   legendDensity = 'default',
   chartVariant = 'stackedBar',
+  stackedBarOrientation = 'vertical',
   showPanelTitle = true,
   resetKey,
   bordered = true,
@@ -94,6 +99,7 @@ export function DistributionCarouselPanel({
 
   const useSideLegend = legendPlacement === 'side';
   const usePie = chartVariant === 'pie';
+  const useHorizontalBar = !usePie && stackedBarOrientation === 'horizontal';
 
   return (
     <div
@@ -136,7 +142,8 @@ export function DistributionCarouselPanel({
 
       <div
         className={cn(
-          'flex min-h-0 flex-1 flex-col items-center justify-center overflow-visible',
+          'flex min-h-0 flex-1 flex-col overflow-visible',
+          useHorizontalBar ? 'w-full items-stretch' : 'items-center justify-center',
           chartClassName,
         )}
       >
@@ -164,16 +171,18 @@ export function DistributionCarouselPanel({
             colors={activeSlide.colors}
             labelForKey={activeSlide.labelForKey}
             isDark={isDark}
-            orientation="vertical"
+            orientation={stackedBarOrientation}
             density="default"
-            verticalBarSize={40}
-            fillHeight
+            verticalBarSize={stackedBarOrientation === 'vertical' ? 40 : undefined}
+            fillHeight={stackedBarOrientation === 'vertical'}
             hideTitle
             sideLegend={useSideLegend}
             sideLegendWithValues={useSideLegend}
-            bottomLegend={!useSideLegend}
-            showTooltip={false}
-            className="min-h-0 flex-1"
+            bottomLegend={!useSideLegend && stackedBarOrientation === 'vertical'}
+            showTooltip={stackedBarOrientation === 'horizontal'}
+            legendDensity={legendDensity}
+            horizontalBarSize={40}
+            className="min-h-0 w-full flex-1"
           />
         )}
       </div>

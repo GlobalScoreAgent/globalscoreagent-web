@@ -8,7 +8,7 @@ import { buildAuthLoginUrl } from '@/lib/auth/redirect';
 import SectionSurface from '@/components/marketing/shared/SectionSurface';
 import GlassCard from '@/components/marketing/shared/GlassCard';
 import DashboardDetailsBanner from './DashboardDetailsBanner';
-import PricingFaq from './PricingFaq';
+import PricingMoreDetails from './PricingMoreDetails';
 import DashboardPlansPricingGrid from './DashboardPlansPricingGrid';
 import PayPerUsePricingGrid from './PayPerUsePricingGrid';
 import CreditPackagesPricingGrid from './CreditPackagesPricingGrid';
@@ -34,12 +34,9 @@ export default function PricingPageClient() {
 
       <SectionSurface id="dashboard-plans" tone="darker">
         <div className="mx-auto max-w-7xl px-6 py-14">
-          <h2 className="mb-2 text-3xl font-bold text-white md:text-4xl">
+          <h2 className="mb-6 text-3xl font-bold text-white md:text-4xl">
             {pick(language, sections.dashboardPlans.title)}
           </h2>
-          <p className="mb-6 text-base text-amber-200/90 md:text-lg">
-            {pick(language, sections.dashboardPlans.trialNote)}
-          </p>
           <DashboardPlansPricingGrid />
         </div>
       </SectionSurface>
@@ -96,9 +93,9 @@ export default function PricingPageClient() {
         </div>
       </SectionSurface>
 
-      <SectionSurface id="pricing-faq" tone="dark">
+      <SectionSurface id="pricing-details" tone="dark">
         <div className="mx-auto max-w-7xl px-6 py-14">
-          <PricingFaq />
+          <PricingMoreDetails />
         </div>
       </SectionSurface>
 

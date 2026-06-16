@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireDashboardUser } from '@/lib/auth/require-dashboard-user';
+import { fetchAgentHumiIndex } from '@/lib/agents/agentDetailFetch';
+import { parseAgentRouteLookupBy } from '@/lib/dashboardAgentLookup';
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: { id: string } },
 ) {
   try {
@@ -15,53 +17,17 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid agent id' }, { status: 400 });
     }
 
-    const supabase = auth.supabase;
+    const lookupBy = parseAgentRouteLookupBy(new URL(request.url).searchParams.get('by'));
+    const result = await fetchAgentHumiIndex(auth.supabase, numericId, lookupBy);
 
-    const { data, error } = await supabase
-      .schema('web_dashboard')
-      .from('index_humi')
-      .select(
-        `
-        humi_score,
-        madurity_level,
-        humi_score_category,
-        current_humi_score_calculated_at,
-        humi_score_last_30_days,
-        humi_score_tracking,
-        pillar_history_score,
-        pillar_history_summary,
-        pillar_usage_score,
-        pillar_usage_summary,
-        pillar_measure_score,
-        pillar_measure_summary,
-        pillar_information_score,
-        pillar_information_summary,
-        pillar_history_score_last_30_days,
-        pillar_history_score_tracking,
-        pillar_information_score_last_30_days,
-        pillar_information_score_tracking,
-        pillar_measure_score_last_30_days,
-        pillar_measure_score_tracking,
-        pillar_usage_score_last_30_days,
-        pillar_usage_score_tracking
-      `,
-      )
-      .eq('agent_id', numericId)
-      .maybeSingle();
-
-    if (error) {
-      console.error('Index HUMI fetch error:', error);
+    if (!result.ok) {
       return NextResponse.json(
-        { error: 'Error al consultar la base de datos', details: error.message },
-        { status: 500 },
+        { error: result.error, details: result.details },
+        { status: result.status },
       );
     }
 
-    if (!data) {
-      return NextResponse.json({ error: 'Index HUMI not found' }, { status: 404 });
-    }
-
-    return NextResponse.json({ data });
+    return NextResponse.json({ data: result.data });
   } catch (err) {
     console.error('Index HUMI API:', err);
     return NextResponse.json(

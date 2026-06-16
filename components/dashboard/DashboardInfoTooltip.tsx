@@ -1,6 +1,15 @@
 'use client';
 
-import { useCallback, useId, useRef, useState, type FocusEvent } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type FocusEvent,
+} from 'react';
+import { createPortal } from 'react-dom';
 import { Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -15,18 +24,47 @@ type Props = {
   placement?: DashboardInfoTooltipPlacement;
 };
 
-function placementClasses(placement: DashboardInfoTooltipPlacement): string {
+type TooltipPosition = { top: number; left: number };
+
+const GAP_PX = 4;
+const VIEWPORT_PAD = 8;
+
+function computeTooltipPosition(
+  triggerRect: DOMRect,
+  tooltipWidth: number,
+  tooltipHeight: number,
+  placement: DashboardInfoTooltipPlacement,
+): TooltipPosition {
+  let top = 0;
+  let left = 0;
+
   switch (placement) {
     case 'bottom':
-      return 'top-full left-1/2 mt-1 -translate-x-1/2';
+      top = triggerRect.bottom + GAP_PX;
+      left = triggerRect.left + triggerRect.width / 2 - tooltipWidth / 2;
+      break;
     case 'left':
-      return 'right-full top-1/2 mr-1 -translate-y-1/2';
+      top = triggerRect.top + triggerRect.height / 2 - tooltipHeight / 2;
+      left = triggerRect.left - tooltipWidth - GAP_PX;
+      break;
     case 'right':
-      return 'left-full top-1/2 ml-1 -translate-y-1/2';
+      top = triggerRect.top + triggerRect.height / 2 - tooltipHeight / 2;
+      left = triggerRect.right + GAP_PX;
+      break;
     case 'top':
     default:
-      return 'bottom-full left-1/2 mb-1 -translate-x-1/2';
+      top = triggerRect.top - tooltipHeight - GAP_PX;
+      left = triggerRect.left + triggerRect.width / 2 - tooltipWidth / 2;
+      break;
   }
+
+  const maxLeft = Math.max(VIEWPORT_PAD, window.innerWidth - tooltipWidth - VIEWPORT_PAD);
+  const maxTop = Math.max(VIEWPORT_PAD, window.innerHeight - tooltipHeight - VIEWPORT_PAD);
+
+  return {
+    top: Math.min(Math.max(VIEWPORT_PAD, top), maxTop),
+    left: Math.min(Math.max(VIEWPORT_PAD, left), maxLeft),
+  };
 }
 
 export function DashboardInfoTooltip({
@@ -38,10 +76,49 @@ export function DashboardInfoTooltip({
   placement = 'top',
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [position, setPosition] = useState<TooltipPosition | null>(null);
   const tooltipId = useId();
   const rootRef = useRef<HTMLSpanElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const tooltipRef = useRef<HTMLSpanElement>(null);
 
   const close = useCallback(() => setOpen(false), []);
+
+  const updatePosition = useCallback(() => {
+    const button = buttonRef.current;
+    const tooltip = tooltipRef.current;
+    if (!button || !tooltip) return;
+
+    const triggerRect = button.getBoundingClientRect();
+    const { width, height } = tooltip.getBoundingClientRect();
+    setPosition(computeTooltipPosition(triggerRect, width, height, placement));
+  }, [placement]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!open) {
+      setPosition(null);
+      return;
+    }
+    updatePosition();
+  }, [open, content, placement, tooltipClassName, updatePosition]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleReposition = () => updatePosition();
+    window.addEventListener('resize', handleReposition);
+    window.addEventListener('scroll', handleReposition, true);
+
+    return () => {
+      window.removeEventListener('resize', handleReposition);
+      window.removeEventListener('scroll', handleReposition, true);
+    };
+  }, [open, updatePosition]);
 
   const handleBlur = (e: FocusEvent) => {
     if (!rootRef.current?.contains(e.relatedTarget as Node)) {
@@ -49,16 +126,40 @@ export function DashboardInfoTooltip({
     }
   };
 
+  const tooltipNode =
+    open && mounted ? (
+      <span
+        ref={tooltipRef}
+        id={tooltipId}
+        role="tooltip"
+        style={
+          position
+            ? { position: 'fixed', top: position.top, left: position.left, zIndex: 9999 }
+            : { position: 'fixed', top: -9999, left: -9999, zIndex: 9999, visibility: 'hidden' as const }
+        }
+        className={cn(
+          'pointer-events-none w-max max-w-[12rem] rounded-md border px-2 py-1 text-left text-[10px] leading-snug shadow-lg',
+          isDark
+            ? 'border-zinc-600 bg-zinc-900/95 text-zinc-200 backdrop-blur-sm'
+            : 'border-zinc-200 bg-white text-zinc-700',
+          tooltipClassName,
+        )}
+      >
+        {content}
+      </span>
+    ) : null;
+
   return (
     <span
       ref={rootRef}
-      className={cn('relative inline-flex shrink-0', className)}
+      className={cn('inline-flex shrink-0', className)}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={close}
       onFocus={() => setOpen(true)}
       onBlur={handleBlur}
     >
       <button
+        ref={buttonRef}
         type="button"
         className={cn(
           'rounded p-0.5 transition-colors focus:outline-none focus-visible:ring-1',
@@ -73,21 +174,7 @@ export function DashboardInfoTooltip({
       >
         <Info className="h-3 w-3" aria-hidden />
       </button>
-      <span
-        id={tooltipId}
-        role="tooltip"
-        className={cn(
-          'pointer-events-none absolute z-50 w-max max-w-[12rem] rounded-md border px-2 py-1 text-left text-[10px] leading-snug shadow-lg transition-opacity',
-          placementClasses(placement),
-          open ? 'opacity-100' : 'opacity-0',
-          isDark
-            ? 'border-zinc-600 bg-zinc-900/95 text-zinc-200 backdrop-blur-sm'
-            : 'border-zinc-200 bg-white text-zinc-700',
-          tooltipClassName,
-        )}
-      >
-        {content}
-      </span>
+      {mounted && tooltipNode ? createPortal(tooltipNode, document.body) : null}
     </span>
   );
 }

@@ -47,7 +47,7 @@ export default function DocsArticleClient({ slug, docs }: DocsArticleClientProps
         </aside>
 
         <article className="min-w-0">
-          <DocsMarkdown markdown={doc.markdown} />
+          <DocsMarkdown markdown={doc.markdown} docSlug={slug} />
           <footer className="mt-12 border-t border-zinc-800 pt-6">
             <a
               href={doc.githubUrl}

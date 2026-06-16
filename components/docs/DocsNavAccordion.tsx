@@ -13,7 +13,15 @@ type DocsNavAccordionProps = {
   headings: DocHeading[];
 };
 
-const categoryOrder: DocCategory[] = ['platform', 'pricing', 'humi', 'wami', 'agents', 'wallets'];
+const categoryOrder: DocCategory[] = [
+  'platform',
+  'dashboard',
+  'pricing',
+  'humi',
+  'wami',
+  'agents',
+  'wallets',
+];
 
 export default function DocsNavAccordion({ activeSlug, headings }: DocsNavAccordionProps) {
   const { language } = useLanguage();
