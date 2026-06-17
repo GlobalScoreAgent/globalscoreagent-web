@@ -17,43 +17,36 @@ Global Score Agent ofrece una estructura de precios flexible y transparente, dis
 - Los planes **Annual** ofrecen un descuento respecto a la facturación mensual.
 - Los créditos API incluidos en los planes **Pro** se renuevan mensualmente.
 
-## Opciones de Acceso a la API
+## Precios de la API (Créditos)
 
-### 1. Pago por Uso
-Ideal para uso ocasional o exploratorio.
+Global Score Agent ofrece dos formas de acceder a la API:
 
-| Tipo de Reporte                          | Precio por Agente |
-|------------------------------------------|-------------------|
-| **Básico** (HUMI + WAMI + Advertencias)  | $0.20             |
-| **Con Análisis** (HUMI o WAMI completo)  | $0.45             |
-| **GSA Index Completo**                   | $0.85             |
+- **Pago Directo** (sin comprar créditos por adelantado).
+- **Planes de Créditos** (Starter, Growth, Pro y Enterprise), donde el precio por consulta es más bajo cuanto mayor sea el volumen de créditos que adquieres.
 
-### 2. Paquetes de Créditos (Recomendado)
-Compra créditos por adelantado. Ideal para uso recurrente o para agentes de IA.
+### Tabla de Precios API
 
-| Paquete     | Precio | Créditos | Precio por crédito |
-|-------------|--------|----------|--------------------|
-| **Starter** | $10    | 120      | $0.083             |
-| **Growth**  | $25    | 320      | $0.078             |
-| **Pro**     | $50    | 700      | $0.071             |
-| **Enterprise** | $100 | 1,500    | $0.067             |
+| Tipo de Reporte                              | Precio Directo (Pago por Uso) | Starter ($0.0833/crédito) | Growth ($0.0781/crédito) | Pro ($0.0714/crédito) | Enterprise ($0.0667/crédito) |
+|----------------------------------------------|-------------------------------|---------------------------|--------------------------|-----------------------|------------------------------|
+| **Básico** (HUMI + WAMI + Advertencias)      | $0.20                         | $0.17 (2 créditos)        | $0.16 (2 créditos)       | $0.14 (2 créditos)    | $0.13 (2 créditos)           |
+| **Con Análisis** (HUMI o WAMI completo)      | $0.45                         | $0.42 (5 créditos)        | $0.39 (5 créditos)       | $0.36 (5 créditos)    | $0.33 (5 créditos)           |
+| **GSA Index Completo**                       | $0.85                         | $0.83 (10 créditos)       | $0.78 (10 créditos)      | $0.71 (10 créditos)   | $0.67 (10 créditos)          |
 
-## Consumo de Créditos
+### Notas sobre los precios de la API:
 
-| Tipo de Reporte                     | Créditos por consulta |
-|-------------------------------------|-----------------------|
-| **Básico** (HUMI / WAMI / Advertencias) | 8                     |
-| **Con Análisis** (HUMI o WAMI completo) | 18                    |
-| **GSA Index Completo**              | 35                    |
+- Los precios de los planes **Starter, Growth, Pro y Enterprise** aplican cuando compras créditos por adelantado.
+- Cuanto mayor sea el paquete de créditos que adquieres, menor será el costo por consulta.
+- El plan **Enterprise** ofrece el mejor precio por crédito para usuarios de alto volumen o agentes de IA.
 
 ## Vencimiento de Créditos
 
 - Los créditos obtenidos mediante la **prueba gratuita** o **códigos promocionales** **no tienen fecha de vencimiento**. Quedan asociados al perfil del usuario y pueden utilizarse en cualquier momento.
-- Los créditos mensuales incluidos en los planes **Pro** tienen una validez de **30 días** y **no son acumulables**. Si no se utilizan durante el período de facturación, se pierden al finalizar el mes.
+- Los créditos mensuales incluidos en los planes **Pro** del Dashboard tienen una validez de **30 días** y **no son acumulables**. Si no se utilizan durante el período de facturación, se pierden al finalizar el mes.
 
 ## Política de Prueba Gratuita
 
 Al finalizar los **5 días de prueba gratuita**, las funcionalidades de consulta y análisis del Dashboard quedan **bloqueadas**. Sin embargo, el usuario **sigue teniendo acceso** al Dashboard para poder:
+
 - Suscribirse a un plan de pago, o
 - Crear una API Key y utilizar los créditos de API disponibles (en caso de que los tenga).
 
@@ -86,3 +79,5 @@ Próximamente incorporaremos también el **pago con tarjetas de crédito y débi
 - **Precios actualizados:** Junio 2026. Global Score Agent se reserva el derecho de modificar los precios con aviso previo.
 - Los planes están sujetos a cambios. Cualquier modificación importante será comunicada con anticipación a los usuarios activos.
 - Para consultas sobre planes Enterprise o necesidades personalizadas, por favor contactar a través del Dashboard.
+
+---
