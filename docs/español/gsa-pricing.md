@@ -19,12 +19,18 @@ Global Score Agent ofrece una estructura de precios flexible y transparente, dis
 
 ## Precios de la API (Créditos)
 
-Global Score Agent ofrece dos formas de acceder a la API:
+### 1. Paquetes de Créditos
 
-- **Pago Directo** (sin comprar créditos por adelantado).
-- **Planes de Créditos** (Starter, Growth, Pro y Enterprise), donde el precio por consulta es más bajo cuanto mayor sea el volumen de créditos que adquieres.
+Puedes comprar créditos por adelantado. Cuanto mayor sea el paquete, menor será el precio por crédito.
 
-### Tabla de Precios API
+| Paquete      | Precio | Créditos Incluidos |
+|--------------|--------|--------------------|
+| **Starter**  | $10    | 120                |
+| **Growth**   | $25    | 320                |
+| **Pro**      | $50    | 700                |
+| **Enterprise** | $100 | 1,500              |
+
+### 2. Precio por Tipo de Reporte según Plan
 
 | Tipo de Reporte                              | Precio Directo (Pago por Uso) | Starter ($0.0833/crédito) | Growth ($0.0781/crédito) | Pro ($0.0714/crédito) | Enterprise ($0.0667/crédito) |
 |----------------------------------------------|-------------------------------|---------------------------|--------------------------|-----------------------|------------------------------|
@@ -79,5 +85,3 @@ Próximamente incorporaremos también el **pago con tarjetas de crédito y débi
 - **Precios actualizados:** Junio 2026. Global Score Agent se reserva el derecho de modificar los precios con aviso previo.
 - Los planes están sujetos a cambios. Cualquier modificación importante será comunicada con anticipación a los usuarios activos.
 - Para consultas sobre planes Enterprise o necesidades personalizadas, por favor contactar a través del Dashboard.
-
----
