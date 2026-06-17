@@ -8,9 +8,9 @@ Global Score Agent ofrece una estructura de precios flexible y transparente, dis
 |----------------------------|----------------|--------------|--------|---------|
 | **Prueba Gratuita**        | $0             | $0           | -      | Acceso completo al Dashboard durante 5 días + 20 créditos API |
 | **Dashboard Solo Monthly** | $9             | -            | -      | Acceso ilimitado al Dashboard |
-| **Dashboard Pro Monthly**  | $15            | -            | -      | Acceso ilimitado al Dashboard + 130 créditos API mensuales |
+| **Dashboard Pro Monthly**  | $15            | -            | -      | Acceso ilimitado al Dashboard + **120 créditos API mensuales** |
 | **Dashboard Solo Annual**  | -              | $99          | 8%     | Acceso ilimitado al Dashboard |
-| **Dashboard Pro Annual**   | -              | $159         | 12%    | Acceso ilimitado al Dashboard + 130 créditos API mensuales |
+| **Dashboard Pro Annual**   | -              | $159         | 12%    | Acceso ilimitado al Dashboard + **120 créditos API mensuales** |
 
 ### Notas sobre los planes:
 - El plan **Prueba Gratuita** tiene una duración de **5 días**.
@@ -43,6 +43,7 @@ Puedes comprar créditos por adelantado. Cuanto mayor sea el paquete, menor ser�
 - Los precios de los planes **Starter, Growth, Pro y Enterprise** aplican cuando compras créditos por adelantado.
 - Cuanto mayor sea el paquete de créditos que adquieres, menor será el costo por consulta.
 - El plan **Enterprise** ofrece el mejor precio por crédito para usuarios de alto volumen o agentes de IA.
+- Los **créditos incluidos en la Prueba Gratuita** se consumen según el tipo de reporte: **2 créditos** para Básico, **5 créditos** para Con Análisis y **10 créditos** para GSA Index Completo.
 
 ## Vencimiento de Créditos
 
