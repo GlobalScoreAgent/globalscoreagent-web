@@ -42,39 +42,19 @@ export const pricingCopy = {
         savings: { es: 'Ahorro', en: 'Savings' } satisfies Bilingual,
         includes: { es: 'Qué incluye', en: "What's included" } satisfies Bilingual,
       },
-      rows: [
+      notes: [
         {
-          plan: { es: 'Prueba gratuita', en: 'Free Trial' } satisfies Bilingual,
-          monthly: '$0',
-          annual: '$0',
-          savings: '—',
-          includes: {
-            es: '5 días de acceso completo al Dashboard + 20 créditos API (válidos solo durante esos 5 días)',
-            en: '5-day full Dashboard access + 20 API credits (valid only during the 5 days)',
-          } satisfies Bilingual,
-        },
+          es: 'El plan Prueba Gratuita tiene una duración de 5 días.',
+          en: 'The Free Trial plan lasts for 5 days.',
+        } satisfies Bilingual,
         {
-          plan: { es: 'Dashboard Solo', en: 'Dashboard Solo' } satisfies Bilingual,
-          monthly: '$9',
-          annual: '$99',
-          savings: '8%',
-          includes: {
-            es: 'Acceso ilimitado al Dashboard completo',
-            en: 'Unlimited access to the full Dashboard',
-          } satisfies Bilingual,
-        },
+          es: 'Los planes anuales ofrecen un descuento respecto a la facturación mensual.',
+          en: 'Annual plans offer a discount compared to monthly billing.',
+        } satisfies Bilingual,
         {
-          plan: { es: 'Dashboard + Créditos', en: 'Dashboard + Credits' } satisfies Bilingual,
-          monthly: '$15',
-          annual: '$159',
-          savings: '12%',
-          includes: {
-            es: 'Dashboard ilimitado + 130 créditos API al mes',
-            en: 'Unlimited Dashboard + 130 API credits per month',
-          } satisfies Bilingual,
-          highlight: true,
-          comingSoon: true,
-        },
+          es: 'Los créditos API incluidos en los planes Pro se renuevan mensualmente.',
+          en: 'API credits included in Pro plans renew monthly.',
+        } satisfies Bilingual,
       ],
     },
     apiAccess: {
@@ -85,10 +65,10 @@ export const pricingCopy = {
       } satisfies Bilingual,
     },
     payPerUse: {
-      title: { es: 'Pay per use', en: 'Pay per use' } satisfies Bilingual,
+      title: { es: 'Pago por uso', en: 'Pay-as-you-go' } satisfies Bilingual,
       intro: {
         es: 'Ideal para uso ocasional o exploratorio.',
-        en: 'Best for occasional or exploratory usage.',
+        en: 'Ideal for occasional or exploratory use.',
       } satisfies Bilingual,
       columns: {
         reportType: { es: 'Tipo de informe', en: 'Report type' } satisfies Bilingual,
@@ -97,22 +77,22 @@ export const pricingCopy = {
       rows: [
         {
           reportType: {
-            es: 'Basic (puntuación HUMI / WAMI / advertencias)',
-            en: 'Basic (HUMI score / WAMI score / warnings)',
+            es: 'Básico (HUMI + WAMI + Advertencias)',
+            en: 'Basic (HUMI + WAMI + Warnings)',
           } satisfies Bilingual,
           price: '$0.20',
         },
         {
           reportType: {
-            es: 'With Analysis (HUMI o WAMI completo con pilares y razones)',
-            en: 'With Analysis (full HUMI or WAMI with pillars & reasons)',
+            es: 'Con Análisis (HUMI o WAMI completo)',
+            en: 'With Analysis (Full HUMI or WAMI)',
           } satisfies Bilingual,
           price: '$0.45',
         },
         {
           reportType: {
-            es: 'GSA Index Complete (HUMI + WAMI + Richness + advertencias)',
-            en: 'GSA Index Complete (HUMI + WAMI + Richness + warnings)',
+            es: 'GSA Index Completo',
+            en: 'GSA Index Complete',
           } satisfies Bilingual,
           price: '$0.85',
         },
@@ -121,20 +101,50 @@ export const pricingCopy = {
     creditPackages: {
       title: { es: 'Paquetes de créditos (recomendado)', en: 'Credit packages (recommended)' } satisfies Bilingual,
       intro: {
-        es: 'Compra créditos por adelantado y úsalos cuando quieras. Ideal para agentes IA y uso recurrente.',
-        en: 'Buy credits in advance and use them anytime. Ideal for AI agents and recurring usage.',
+        es: 'Compra créditos por adelantado. Ideal para uso recurrente o para agentes de IA.',
+        en: 'Purchase credits in advance. Ideal for recurring use or AI agents.',
       } satisfies Bilingual,
       columns: {
         package: { es: 'Paquete', en: 'Package' } satisfies Bilingual,
         price: { es: 'Precio', en: 'Price' } satisfies Bilingual,
-        credits: { es: 'Créditos incluidos', en: 'Credits included' } satisfies Bilingual,
-        effective: { es: 'Precio efectivo por crédito', en: 'Effective price per credit' } satisfies Bilingual,
+        credits: { es: 'Créditos', en: 'Credits' } satisfies Bilingual,
+        effective: { es: 'Precio por crédito', en: 'Price per credit' } satisfies Bilingual,
       },
       rows: [
         { package: 'Starter', price: '$10', credits: '120', effective: '$0.083' },
         { package: 'Growth', price: '$25', credits: '320', effective: '$0.078' },
         { package: 'Pro', price: '$50', credits: '700', effective: '$0.071' },
         { package: 'Enterprise', price: '$100', credits: '1,500', effective: '$0.067' },
+      ],
+    },
+    creditConsumption: {
+      title: { es: 'Consumo de créditos', en: 'Credit consumption' } satisfies Bilingual,
+      columns: {
+        reportType: { es: 'Tipo de informe', en: 'Report type' } satisfies Bilingual,
+        credits: { es: 'Créditos por consulta', en: 'Credits per query' } satisfies Bilingual,
+      },
+      rows: [
+        {
+          reportType: {
+            es: 'Básico (HUMI / WAMI / Advertencias)',
+            en: 'Basic (HUMI / WAMI / Warnings)',
+          } satisfies Bilingual,
+          credits: '8',
+        },
+        {
+          reportType: {
+            es: 'Con Análisis (HUMI o WAMI completo)',
+            en: 'With Analysis (Full HUMI or WAMI)',
+          } satisfies Bilingual,
+          credits: '18',
+        },
+        {
+          reportType: {
+            es: 'GSA Index Completo',
+            en: 'GSA Index Complete',
+          } satisfies Bilingual,
+          credits: '35',
+        },
       ],
     },
     whyModel: {
@@ -149,8 +159,8 @@ export const pricingCopy = {
           en: 'API + credits: optimized for autonomous AI agents and developers needing programmatic access.',
         } satisfies Bilingual,
         {
-          es: 'Claro y transparente: tras la prueba de 5 días, todo queda bloqueado hasta suscribirte — sin sorpresas.',
-          en: 'Clear & transparent: after the 5-day trial, everything is blocked until you subscribe — no surprises.',
+          es: 'Claro y transparente: tras la prueba de 5 días, las consultas del Dashboard quedan bloqueadas, pero conservas acceso para suscribirte o usar la API.',
+          en: 'Clear & transparent: after the 5-day trial, Dashboard queries are locked, but you retain access to subscribe or use the API.',
         } satisfies Bilingual,
       ],
     },
@@ -163,8 +173,8 @@ export const pricingCopy = {
     contactHref: 'mailto:sales@globalscoreagent.com',
   },
   footerNote: {
-    es: 'Precios actualizados mayo 2026. Global Score Agent se reserva el derecho de modificar los precios con aviso previo.',
-    en: 'Prices updated May 2026. Global Score Agent reserves the right to modify pricing with prior notice.',
+    es: 'Precios actualizados junio 2026. Global Score Agent se reserva el derecho de modificar los precios con aviso previo.',
+    en: 'Prices updated June 2026. Global Score Agent reserves the right to modify pricing with prior notice.',
   } satisfies Bilingual,
   homeTeaser: {
     title: { es: 'Suscripciones y API', en: 'Subscriptions and API' } satisfies Bilingual,

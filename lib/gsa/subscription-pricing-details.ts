@@ -86,4 +86,18 @@ Próximamente incorporaremos también el **pago con tarjetas de crédito y débi
 We will soon also support payments with **credit and debit cards**.`,
     },
   },
+  {
+    title: {
+      es: 'Notas Adicionales',
+      en: 'Additional Notes',
+    },
+    bodyMarkdown: {
+      es: `- **Precios actualizados:** Junio 2026. Global Score Agent se reserva el derecho de modificar los precios con aviso previo.
+- Los planes están sujetos a cambios. Cualquier modificación importante será comunicada con anticipación a los usuarios activos.
+- Para consultas sobre planes Enterprise o necesidades personalizadas, contacta a través del Dashboard.`,
+      en: `- **Last updated:** June 2026. Global Score Agent reserves the right to modify pricing with prior notice.
+- Plans are subject to change. Any significant modifications will be communicated in advance to active users.
+- For Enterprise plans or custom requirements, please contact us through the Dashboard.`,
+    },
+  },
 ];

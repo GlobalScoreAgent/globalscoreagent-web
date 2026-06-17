@@ -30,8 +30,8 @@ export const DASHBOARD_PLANS: DashboardPlanDefinition[] = [
     annualPrice: '$0',
     savings: '—',
     includes: {
-      es: '5 días de acceso completo al Dashboard + 20 créditos API (válidos solo durante esos 5 días)',
-      en: '5-day full Dashboard access + 20 API credits (valid only during the 5 days)',
+      es: 'Acceso completo al Dashboard durante 5 días + 20 créditos API',
+      en: 'Full Dashboard access for 5 days + 20 API credits',
     },
   },
   {
@@ -41,21 +41,20 @@ export const DASHBOARD_PLANS: DashboardPlanDefinition[] = [
     annualPrice: '$99',
     savings: '8%',
     includes: {
-      es: 'Acceso ilimitado al Dashboard completo',
-      en: 'Unlimited access to the full Dashboard',
+      es: 'Acceso ilimitado al Dashboard',
+      en: 'Unlimited Dashboard access',
     },
   },
   {
     source: 'registration_dashboard_plus_credits',
-    name: { es: 'Dashboard + Créditos', en: 'Dashboard + Credits' },
+    name: { es: 'Dashboard Pro', en: 'Dashboard Pro' },
     monthlyPrice: '$15',
     annualPrice: '$159',
     savings: '12%',
     includes: {
-      es: 'Dashboard ilimitado + 130 créditos API al mes',
-      en: 'Unlimited Dashboard + 130 API credits per month',
+      es: 'Acceso ilimitado al Dashboard + 130 créditos API mensuales',
+      en: 'Unlimited Dashboard access + 130 monthly API credits',
     },
-    comingSoon: true,
   },
 ];
 

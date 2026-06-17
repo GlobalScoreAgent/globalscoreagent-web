@@ -12,6 +12,7 @@ import PricingMoreDetails from './PricingMoreDetails';
 import DashboardPlansPricingGrid from './DashboardPlansPricingGrid';
 import PayPerUsePricingGrid from './PayPerUsePricingGrid';
 import CreditPackagesPricingGrid from './CreditPackagesPricingGrid';
+import CreditConsumptionPricingGrid from './CreditConsumptionPricingGrid';
 
 export default function PricingPageClient() {
   const { language } = useLanguage();
@@ -38,6 +39,14 @@ export default function PricingPageClient() {
             {pick(language, sections.dashboardPlans.title)}
           </h2>
           <DashboardPlansPricingGrid />
+          <ul className="mt-8 space-y-2 text-sm text-zinc-400 md:text-base">
+            {sections.dashboardPlans.notes.map((note, index) => (
+              <li key={index} className="flex gap-2">
+                <span className="text-gold">•</span>
+                <span>{pick(language, note)}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       </SectionSurface>
 
@@ -72,6 +81,13 @@ export default function PricingPageClient() {
                 {pick(language, sections.creditPackages.intro)}
               </p>
               <CreditPackagesPricingGrid />
+            </div>
+
+            <div>
+              <h3 className="mb-2 text-2xl font-semibold text-white md:text-3xl">
+                {pick(language, sections.creditConsumption.title)}
+              </h3>
+              <CreditConsumptionPricingGrid />
             </div>
           </div>
         </div>
