@@ -8,9 +8,9 @@ Global Score Agent offers a flexible and transparent pricing structure designed 
 |----------------------------|---------------|--------------|---------|-----------------|
 | **Free Trial**             | $0            | $0           | -       | Full Dashboard access for 5 days + 20 API credits |
 | **Dashboard Solo Monthly** | $9            | -            | -       | Unlimited Dashboard access |
-| **Dashboard Pro Monthly**  | $15           | -            | -       | Unlimited Dashboard access + 130 API credits per month |
+| **Dashboard Pro Monthly**  | $15           | -            | -       | Unlimited Dashboard access + **120 API credits per month** |
 | **Dashboard Solo Annual**  | -             | $99          | 8%      | Unlimited Dashboard access |
-| **Dashboard Pro Annual**   | -             | $159         | 12%     | Unlimited Dashboard access + 130 API credits per month |
+| **Dashboard Pro Annual**   | -             | $159         | 12%     | Unlimited Dashboard access + **120 API credits per month** |
 
 ### Plan Notes:
 - The **Free Trial** lasts **5 days**.
@@ -19,12 +19,18 @@ Global Score Agent offers a flexible and transparent pricing structure designed 
 
 ## API Pricing (Credits)
 
-Global Score Agent offers two ways to access the API:
+### 1. Credit Packages
 
-- **Direct Payment** (Pay Per Use, without buying credits in advance).
-- **Credit Plans** (Starter, Growth, Pro, and Enterprise), where the price per query is lower the more credits you purchase in advance.
+You can purchase credits in advance. The larger the package, the lower the price per credit.
 
-### API Pricing Table
+| Package      | Price | Credits Included |
+|--------------|-------|------------------|
+| **Starter**  | $10   | 120              |
+| **Growth**   | $25   | 320              |
+| **Pro**      | $50   | 700              |
+| **Enterprise** | $100 | 1,500            |
+
+### 2. Price per Report Type by Plan
 
 | Report Type                                  | Direct Price (Pay Per Use) | Starter ($0.0833/credit) | Growth ($0.0781/credit) | Pro ($0.0714/credit) | Enterprise ($0.0667/credit) |
 |----------------------------------------------|----------------------------|--------------------------|-------------------------|----------------------|-----------------------------|
@@ -37,6 +43,7 @@ Global Score Agent offers two ways to access the API:
 - The prices under **Starter, Growth, Pro, and Enterprise** apply when you purchase credits in advance.
 - The higher the credit package you buy, the lower the cost per query.
 - The **Enterprise** plan offers the best price per credit for high-volume users or AI agents.
+- **Credits included in the Free Trial** are consumed based on the report type: **2 credits** for Basic, **5 credits** for With Analysis, and **10 credits** for GSA Index Complete.
 
 ## Credit Expiration
 
@@ -58,4 +65,24 @@ To perform any of the following actions, you must submit a ticket through the **
 - Plan change (upgrade or downgrade)
 - Refund request
 
-**Note:**
+**Note:** Refunds are subject to review and only apply within the first 14 days from plan purchase (excluding already consumed credits).
+
+## Payment Methods
+
+We currently work with **NOWPayments** as our main payment gateway. We accept payments via **cryptocurrency wallets** (mainly USDC and other stablecoins).
+
+**Subscription payment flow:**
+
+1. You select a plan in the Dashboard.
+2. You receive a **NOWPayments email** with the payment link.
+3. You complete the payment with your **cryptocurrency wallet**.
+4. Once the payment is confirmed, your subscription is **automatically activated**.
+5. Subscriptions **renew** according to the billing cycle you chose (monthly or annual).
+
+We will soon also support **credit and debit card payments**.
+
+## Additional Notes
+
+- **Prices updated:** June 2026. Global Score Agent reserves the right to modify pricing with prior notice.
+- Plans are subject to change. Any significant modifications will be communicated in advance to active users.
+- For inquiries about Enterprise plans or custom needs, please contact us through the Dashboard.
