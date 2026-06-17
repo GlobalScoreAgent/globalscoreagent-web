@@ -58,21 +58,42 @@ export const pricingCopy = {
       ],
     },
     apiAccess: {
-      title: { es: 'Opciones de acceso API', en: 'API access options' } satisfies Bilingual,
+      title: { es: 'Precios de la API (Créditos)', en: 'API Pricing (Credits)' } satisfies Bilingual,
       comingSoonNotice: {
         es: 'Próximamente — disponible cuando la API sea desplegada.',
         en: 'Coming soon — available when the API is deployed.',
       } satisfies Bilingual,
     },
-    payPerUse: {
-      title: { es: 'Pago por uso', en: 'Pay-as-you-go' } satisfies Bilingual,
+    creditPackages: {
+      title: { es: 'Paquetes de créditos', en: 'Credit packages' } satisfies Bilingual,
       intro: {
-        es: 'Ideal para uso ocasional o exploratorio.',
-        en: 'Ideal for occasional or exploratory use.',
+        es: 'Puedes comprar créditos por adelantado. Cuanto mayor sea el paquete, menor será el precio por crédito.',
+        en: 'You can purchase credits in advance. The larger the package, the lower the price per credit.',
+      } satisfies Bilingual,
+      columns: {
+        package: { es: 'Paquete', en: 'Package' } satisfies Bilingual,
+        price: { es: 'Precio', en: 'Price' } satisfies Bilingual,
+        credits: { es: 'Créditos incluidos', en: 'Credits included' } satisfies Bilingual,
+      },
+      rows: [
+        { package: 'Starter', price: '$10', credits: '120' },
+        { package: 'Growth', price: '$25', credits: '320' },
+        { package: 'Pro', price: '$50', credits: '700' },
+        { package: 'Enterprise', price: '$100', credits: '1,500' },
+      ],
+    },
+    reportTypeByPlan: {
+      title: {
+        es: 'Precio por tipo de reporte según plan',
+        en: 'Price per report type by plan',
       } satisfies Bilingual,
       columns: {
         reportType: { es: 'Tipo de informe', en: 'Report type' } satisfies Bilingual,
-        price: { es: 'Precio por agente', en: 'Price per agent' } satisfies Bilingual,
+        direct: { es: 'Precio directo (pago por uso)', en: 'Direct price (pay per use)' } satisfies Bilingual,
+        starter: { es: 'Starter ($0.0833/crédito)', en: 'Starter ($0.0833/credit)' } satisfies Bilingual,
+        growth: { es: 'Growth ($0.0781/crédito)', en: 'Growth ($0.0781/credit)' } satisfies Bilingual,
+        pro: { es: 'Pro ($0.0714/crédito)', en: 'Pro ($0.0714/credit)' } satisfies Bilingual,
+        enterprise: { es: 'Enterprise ($0.0667/crédito)', en: 'Enterprise ($0.0667/credit)' } satisfies Bilingual,
       },
       rows: [
         {
@@ -80,71 +101,52 @@ export const pricingCopy = {
             es: 'Básico (HUMI + WAMI + Advertencias)',
             en: 'Basic (HUMI + WAMI + Warnings)',
           } satisfies Bilingual,
-          price: '$0.20',
+          direct: '$0.20',
+          starter: { es: '$0.17 (2 créditos)', en: '$0.17 (2 credits)' } satisfies Bilingual,
+          growth: { es: '$0.16 (2 créditos)', en: '$0.16 (2 credits)' } satisfies Bilingual,
+          pro: { es: '$0.14 (2 créditos)', en: '$0.14 (2 credits)' } satisfies Bilingual,
+          enterprise: { es: '$0.13 (2 créditos)', en: '$0.13 (2 credits)' } satisfies Bilingual,
         },
         {
           reportType: {
             es: 'Con Análisis (HUMI o WAMI completo)',
             en: 'With Analysis (Full HUMI or WAMI)',
           } satisfies Bilingual,
-          price: '$0.45',
+          direct: '$0.45',
+          starter: { es: '$0.42 (5 créditos)', en: '$0.42 (5 credits)' } satisfies Bilingual,
+          growth: { es: '$0.39 (5 créditos)', en: '$0.39 (5 credits)' } satisfies Bilingual,
+          pro: { es: '$0.36 (5 créditos)', en: '$0.36 (5 credits)' } satisfies Bilingual,
+          enterprise: { es: '$0.33 (5 créditos)', en: '$0.33 (5 credits)' } satisfies Bilingual,
         },
         {
           reportType: {
             es: 'GSA Index Completo',
             en: 'GSA Index Complete',
           } satisfies Bilingual,
-          price: '$0.85',
+          direct: '$0.85',
+          starter: { es: '$0.83 (10 créditos)', en: '$0.83 (10 credits)' } satisfies Bilingual,
+          growth: { es: '$0.78 (10 créditos)', en: '$0.78 (10 credits)' } satisfies Bilingual,
+          pro: { es: '$0.71 (10 créditos)', en: '$0.71 (10 credits)' } satisfies Bilingual,
+          enterprise: { es: '$0.67 (10 créditos)', en: '$0.67 (10 credits)' } satisfies Bilingual,
         },
       ],
-    },
-    creditPackages: {
-      title: { es: 'Paquetes de créditos (recomendado)', en: 'Credit packages (recommended)' } satisfies Bilingual,
-      intro: {
-        es: 'Compra créditos por adelantado. Ideal para uso recurrente o para agentes de IA.',
-        en: 'Purchase credits in advance. Ideal for recurring use or AI agents.',
-      } satisfies Bilingual,
-      columns: {
-        package: { es: 'Paquete', en: 'Package' } satisfies Bilingual,
-        price: { es: 'Precio', en: 'Price' } satisfies Bilingual,
-        credits: { es: 'Créditos', en: 'Credits' } satisfies Bilingual,
-        effective: { es: 'Precio por crédito', en: 'Price per credit' } satisfies Bilingual,
-      },
-      rows: [
-        { package: 'Starter', price: '$10', credits: '120', effective: '$0.083' },
-        { package: 'Growth', price: '$25', credits: '320', effective: '$0.078' },
-        { package: 'Pro', price: '$50', credits: '700', effective: '$0.071' },
-        { package: 'Enterprise', price: '$100', credits: '1,500', effective: '$0.067' },
-      ],
-    },
-    creditConsumption: {
-      title: { es: 'Consumo de créditos', en: 'Credit consumption' } satisfies Bilingual,
-      columns: {
-        reportType: { es: 'Tipo de informe', en: 'Report type' } satisfies Bilingual,
-        credits: { es: 'Créditos por consulta', en: 'Credits per query' } satisfies Bilingual,
-      },
-      rows: [
+      notes: [
         {
-          reportType: {
-            es: 'Básico (HUMI / WAMI / Advertencias)',
-            en: 'Basic (HUMI / WAMI / Warnings)',
-          } satisfies Bilingual,
-          credits: '8',
-        },
+          es: 'Los precios de los planes Starter, Growth, Pro y Enterprise aplican cuando compras créditos por adelantado.',
+          en: 'The prices under Starter, Growth, Pro, and Enterprise apply when you purchase credits in advance.',
+        } satisfies Bilingual,
         {
-          reportType: {
-            es: 'Con Análisis (HUMI o WAMI completo)',
-            en: 'With Analysis (Full HUMI or WAMI)',
-          } satisfies Bilingual,
-          credits: '18',
-        },
+          es: 'Cuanto mayor sea el paquete de créditos que adquieres, menor será el costo por consulta.',
+          en: 'The higher the credit package you buy, the lower the cost per query.',
+        } satisfies Bilingual,
         {
-          reportType: {
-            es: 'GSA Index Completo',
-            en: 'GSA Index Complete',
-          } satisfies Bilingual,
-          credits: '35',
-        },
+          es: 'El plan Enterprise ofrece el mejor precio por crédito para usuarios de alto volumen o agentes de IA.',
+          en: 'The Enterprise plan offers the best price per credit for high-volume users or AI agents.',
+        } satisfies Bilingual,
+        {
+          es: 'Los créditos incluidos en la Prueba Gratuita se consumen según el tipo de reporte: 2 créditos para Básico, 5 para Con Análisis y 10 para GSA Index Completo.',
+          en: 'Credits included in the Free Trial are consumed based on report type: 2 credits for Basic, 5 for With Analysis, and 10 for GSA Index Complete.',
+        } satisfies Bilingual,
       ],
     },
     whyModel: {

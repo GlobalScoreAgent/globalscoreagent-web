@@ -52,8 +52,8 @@ export const DASHBOARD_PLANS: DashboardPlanDefinition[] = [
     annualPrice: '$159',
     savings: '12%',
     includes: {
-      es: 'Acceso ilimitado al Dashboard + 130 créditos API mensuales',
-      en: 'Unlimited Dashboard access + 130 monthly API credits',
+      es: 'Acceso ilimitado al Dashboard + 120 créditos API mensuales',
+      en: 'Unlimited Dashboard access + 120 monthly API credits',
     },
   },
 ];

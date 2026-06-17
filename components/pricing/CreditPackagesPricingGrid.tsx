@@ -27,12 +27,6 @@ export default function CreditPackagesPricingGrid() {
               </dt>
               <dd className="mt-1 font-medium text-white">{row.credits}</dd>
             </div>
-            <div>
-              <dt className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                {pick(language, columns.effective)}
-              </dt>
-              <dd className="mt-1 font-medium text-zinc-200">{row.effective}</dd>
-            </div>
           </dl>
         </PricingGlassCard>
       ))}

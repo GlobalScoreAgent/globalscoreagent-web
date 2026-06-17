@@ -10,9 +10,8 @@ import GlassCard from '@/components/marketing/shared/GlassCard';
 import DashboardDetailsBanner from './DashboardDetailsBanner';
 import PricingMoreDetails from './PricingMoreDetails';
 import DashboardPlansPricingGrid from './DashboardPlansPricingGrid';
-import PayPerUsePricingGrid from './PayPerUsePricingGrid';
 import CreditPackagesPricingGrid from './CreditPackagesPricingGrid';
-import CreditConsumptionPricingGrid from './CreditConsumptionPricingGrid';
+import ReportTypePricingMatrix from './ReportTypePricingMatrix';
 
 export default function PricingPageClient() {
   const { language } = useLanguage();
@@ -65,16 +64,6 @@ export default function PricingPageClient() {
           <div className="pointer-events-none space-y-12 opacity-60">
             <div>
               <h3 className="mb-2 text-2xl font-semibold text-white md:text-3xl">
-                {pick(language, sections.payPerUse.title)}
-              </h3>
-              <p className="mb-6 text-base text-zinc-400 md:text-lg">
-                {pick(language, sections.payPerUse.intro)}
-              </p>
-              <PayPerUsePricingGrid />
-            </div>
-
-            <div>
-              <h3 className="mb-2 text-2xl font-semibold text-white md:text-3xl">
                 {pick(language, sections.creditPackages.title)}
               </h3>
               <p className="mb-6 text-base text-zinc-400 md:text-lg">
@@ -84,10 +73,18 @@ export default function PricingPageClient() {
             </div>
 
             <div>
-              <h3 className="mb-2 text-2xl font-semibold text-white md:text-3xl">
-                {pick(language, sections.creditConsumption.title)}
+              <h3 className="mb-6 text-2xl font-semibold text-white md:text-3xl">
+                {pick(language, sections.reportTypeByPlan.title)}
               </h3>
-              <CreditConsumptionPricingGrid />
+              <ReportTypePricingMatrix />
+              <ul className="mt-6 space-y-2 text-sm text-zinc-400 md:text-base">
+                {sections.reportTypeByPlan.notes.map((note, index) => (
+                  <li key={index} className="flex gap-2">
+                    <span className="text-gold">•</span>
+                    <span>{pick(language, note)}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
