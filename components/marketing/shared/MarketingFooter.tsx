@@ -11,7 +11,7 @@ const contactLinkClass =
 
 export default function MarketingFooter() {
   const { language } = useLanguage();
-  const { links } = marketingCopy.footer;
+  const { links, meetingBooking } = marketingCopy.footer;
   const year = new Date().getFullYear();
 
   return (
@@ -28,43 +28,66 @@ export default function MarketingFooter() {
             </div>
           </div>
 
-          <div className="text-center md:text-right">
-            <p className="mb-3 text-sm font-medium text-zinc-400">
-              {pick(language, marketingCopy.footer.contactTitle)}
-            </p>
-            <div className="flex flex-col gap-2 text-sm">
-              <a
-                href={links.x.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={contactLinkClass}
-              >
-                <ContactSocialIcon kind="x" />
-                <span>{links.x.label}</span>
-              </a>
-              <a href={links.email.href} className={contactLinkClass}>
-                <ContactSocialIcon kind="email" />
-                <span>{links.email.label}</span>
-              </a>
-              <a
-                href={links.farcaster.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={contactLinkClass}
-              >
-                <ContactSocialIcon kind="farcaster" />
-                <span>{links.farcaster.label}</span>
-              </a>
-              <a
-                href={links.telegram.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={contactLinkClass}
-              >
-                <ContactSocialIcon kind="telegram" />
-                <span>{links.telegram.label}</span>
-              </a>
+          <div className="flex flex-col items-center gap-8 sm:flex-row sm:items-start md:gap-10">
+            <div className="text-center md:text-right">
+              <p className="mb-3 text-sm font-medium text-zinc-400">
+                {pick(language, marketingCopy.footer.contactTitle)}
+              </p>
+              <div className="flex flex-col gap-2 text-sm">
+                <a
+                  href={links.x.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={contactLinkClass}
+                >
+                  <ContactSocialIcon kind="x" />
+                  <span>{links.x.label}</span>
+                </a>
+                <a href={links.email.href} className={contactLinkClass}>
+                  <ContactSocialIcon kind="email" />
+                  <span>{links.email.label}</span>
+                </a>
+                <a
+                  href={links.farcaster.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={contactLinkClass}
+                >
+                  <ContactSocialIcon kind="farcaster" />
+                  <span>{links.farcaster.label}</span>
+                </a>
+                <a
+                  href={links.telegram.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={contactLinkClass}
+                >
+                  <ContactSocialIcon kind="telegram" />
+                  <span>{links.telegram.label}</span>
+                </a>
+              </div>
             </div>
+
+            <a
+              href={meetingBooking.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex flex-col items-center gap-3 text-center transition-colors hover:text-gold md:items-end md:text-right"
+            >
+              <p className="max-w-[14rem] text-sm text-zinc-400 group-hover:text-gold">
+                {pick(language, meetingBooking.title)}
+              </p>
+              <img
+                src="/booking-qr.png"
+                alt={pick(language, meetingBooking.hint)}
+                className="h-24 w-24 rounded-lg border border-zinc-700 bg-white p-1"
+                width={96}
+                height={96}
+              />
+              <p className="max-w-[14rem] text-xs text-zinc-500 group-hover:text-gold/80">
+                {pick(language, meetingBooking.hint)}
+              </p>
+            </a>
           </div>
         </div>
 

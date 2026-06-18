@@ -477,6 +477,17 @@ export const marketingCopy = {
       en: 'Making on-chain reputation transparent, reliable, and accessible to everyone.',
     } satisfies Bilingual,
     contactTitle: { es: 'Contáctanos', en: 'Contact us' } satisfies Bilingual,
+    meetingBooking: {
+      title: {
+        es: '¿Quieres agendar una reunión para hablar con nosotros?',
+        en: 'Want to schedule a meeting to talk with us?',
+      },
+      hint: {
+        es: 'Escanea el código QR o haz clic para reservar.',
+        en: 'Scan the QR code or click to book a slot.',
+      },
+      href: 'https://calendar.zoho.com/zc/view/slot-booking/zz08011220683ceca239a1ec9e2c7efd4e528fe3906b7a9754166042f6d07aeffd9931a45e',
+    },
     rights: {
       es: 'Todos los derechos reservados.',
       en: 'All rights reserved.',
