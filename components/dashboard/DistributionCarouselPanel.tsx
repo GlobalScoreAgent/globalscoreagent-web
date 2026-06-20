@@ -143,7 +143,7 @@ export function DistributionCarouselPanel({
       <div
         className={cn(
           'flex min-h-0 flex-1 flex-col overflow-visible',
-          useHorizontalBar ? 'w-full items-stretch' : 'items-center justify-center',
+          useHorizontalBar ? 'w-full items-stretch' : 'w-full items-stretch justify-center',
           chartClassName,
         )}
       >

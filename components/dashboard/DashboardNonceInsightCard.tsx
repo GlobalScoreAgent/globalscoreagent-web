@@ -66,6 +66,40 @@ export function DashboardNonceInsightCard({ isDark, t, agentNonce, compact = fal
   }, [nonceSeries]);
   const chartWrapRef = useRef<HTMLDivElement>(null);
 
+  const titleBadgeClass = cn(
+    'rounded-lg border font-bold tracking-wider',
+    compact ? 'px-2 py-0.5 text-[10px]' : 'px-3 py-1 text-xs',
+    isDark ? 'border-blue-400/20 bg-blue-400/10 text-blue-400' : 'border-blue-400/30 bg-blue-400/20 text-blue-600',
+  );
+
+  const totalBadgeClass = cn(
+    'rounded-lg border font-semibold leading-snug',
+    compact ? 'px-1.5 py-0.5 text-[10px] text-right' : 'px-2 py-1 text-[11px] break-words',
+    isDark ? 'border-emerald-400/15 bg-emerald-400/5 text-emerald-300' : 'border-emerald-400/25 bg-emerald-400/10 text-emerald-700',
+  );
+
+  const totalBadgeContent = latestNonce ? (
+    <>
+      {t.totalLabel}: {latestNonce.nonces.toLocaleString()} {t.nonceLabel}
+      {latestSeriesPoint?.change && latestSeriesPoint.change !== '0%' ? (
+        <> ({latestSeriesPoint.change})</>
+      ) : null}
+    </>
+  ) : null;
+
+  const titleBadge = (
+    <div className={cn('w-fit max-w-full', compact && 'min-w-0 max-w-[58%]')}>
+      <div className={titleBadgeClass}>{t.dashboardInsightEcosystemBadge}</div>
+    </div>
+  );
+
+  const totalBadge =
+    latestNonce && totalBadgeContent ? (
+      <div className={cn('w-fit max-w-full', compact && 'min-w-0 max-w-[42%] shrink-0 text-right')}>
+        <div className={totalBadgeClass}>{totalBadgeContent}</div>
+      </div>
+    ) : null;
+
   return (
     <AgentDetailCard
       isDark={isDark}
@@ -74,35 +108,20 @@ export function DashboardNonceInsightCard({ isDark, t, agentNonce, compact = fal
       className={cn('h-full min-h-0 max-h-full w-full min-w-0 flex-1', className)}
       contentClassName={cn(
         'flex h-full min-h-0 flex-col gap-0',
-        compact ? 'p-2 pt-8' : 'p-3 pt-10 sm:p-4 sm:pt-10',
+        compact ? 'p-2 pt-8' : 'p-3 sm:p-4',
       )}
     >
-      <div className={cn('absolute left-4 z-10 max-w-[calc(100%-2rem)]', compact ? 'top-2' : 'top-4')}>
-        <div
-          className={cn(
-            'rounded-lg border font-bold tracking-wider',
-            compact ? 'px-2 py-0.5 text-[10px]' : 'px-3 py-1 text-xs',
-            isDark ? 'border-blue-400/20 bg-blue-400/10 text-blue-400' : 'border-blue-400/30 bg-blue-400/20 text-blue-600',
-          )}
-        >
-          {t.dashboardInsightEcosystemBadge}
+      {compact ? (
+        <div className="absolute inset-x-4 top-2 z-10 flex items-start justify-between gap-2">
+          {titleBadge}
+          {totalBadge}
         </div>
-      </div>
-
-      {latestNonce ? (
-        <div
-          className={cn(
-            'absolute right-4 z-10 max-w-[calc(50%-1rem)] shrink-0 rounded-lg border text-right font-semibold leading-snug',
-            compact ? 'top-2 px-1.5 py-0.5 text-[10px]' : 'top-4 px-2 py-1 text-[11px]',
-            isDark ? 'border-emerald-400/15 bg-emerald-400/5 text-emerald-300' : 'border-emerald-400/25 bg-emerald-400/10 text-emerald-700',
-          )}
-        >
-          {t.totalLabel}: {latestNonce.nonces.toLocaleString()} {t.nonceLabel}
-          {latestSeriesPoint?.change && latestSeriesPoint.change !== '0%' ? (
-            <> ({latestSeriesPoint.change})</>
-          ) : null}
+      ) : (
+        <div className="mb-2 flex min-w-0 flex-col gap-2">
+          {titleBadge}
+          {totalBadge}
         </div>
-      ) : null}
+      )}
 
       <div ref={chartWrapRef} className="relative min-h-[11rem] flex-1">
         {nonceSeries.length > 0 ? (

@@ -30,6 +30,12 @@ export type DashboardOverviewPanelsProps = {
   lang: 'es' | 'en';
 };
 
+const distributionStatsPick = (currentStats: DashboardOverviewPanelsProps['currentStats']) => ({
+  humi_index_distribution: currentStats.humi_index_distribution,
+  wami_index_distribution: currentStats.wami_index_distribution,
+  agent_metadata_distribution: currentStats.agent_metadata_distribution,
+});
+
 export default function DashboardOverviewPanels({
   stats,
   dashboardChains,
@@ -39,9 +45,30 @@ export default function DashboardOverviewPanels({
   t,
   lang,
 }: DashboardOverviewPanelsProps) {
+  const distributionStats = distributionStatsPick(currentStats);
+
   return (
     <>
-      <div className="mb-16 flex flex-col gap-2">
+      <div className="mb-16 flex flex-col gap-4 md:hidden">
+        <DashboardStatsGrid section="all" currentStats={currentStats} isDark={isDark} t={t} />
+        <DashboardGlobalTop10AgentsCard isDark={isDark} t={t} lang={lang} agents={top10Agents} className="w-full" />
+        <DashboardNonceInsightCard
+          isDark={isDark}
+          t={t}
+          agentNonce={stats?.agent_nonce}
+          className="min-h-[220px] w-full"
+        />
+        <DashboardGlobalDistributionBarCard
+          isDark={isDark}
+          t={t}
+          currentStats={distributionStats}
+          stackedBarOrientation="vertical"
+          legendPlacement="bottom"
+          className="w-full min-h-[280px]"
+        />
+      </div>
+
+      <div className="mb-16 hidden flex-col gap-2 md:flex">
         <div className="grid grid-cols-1 gap-2 lg:grid-cols-12 lg:h-[15rem] lg:items-stretch lg:gap-2">
           <DashboardStatsGrid
             compact
@@ -51,7 +78,7 @@ export default function DashboardOverviewPanels({
             t={t}
             className="h-full min-h-0 lg:col-span-5 lg:col-start-1"
           />
-          <div className="flex min-h-0 gap-2 overflow-hidden lg:col-span-7 lg:col-start-6">
+          <div className="flex min-h-0 flex-col gap-2 lg:col-span-7 lg:col-start-6 lg:flex-row lg:overflow-hidden">
             <DashboardNonceInsightCard
               compact
               isDark={isDark}
@@ -83,11 +110,9 @@ export default function DashboardOverviewPanels({
               compact
               isDark={isDark}
               t={t}
-              currentStats={{
-                humi_index_distribution: currentStats.humi_index_distribution,
-                wami_index_distribution: currentStats.wami_index_distribution,
-                agent_metadata_distribution: currentStats.agent_metadata_distribution,
-              }}
+              currentStats={distributionStats}
+              stackedBarOrientation="horizontal"
+              legendPlacement="side"
               className="h-full min-h-0 w-full"
             />
           </div>

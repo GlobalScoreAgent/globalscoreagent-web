@@ -164,7 +164,9 @@ export function DashboardStatsGrid({
         : dualCards;
 
   const gridClass =
-    section === 'all' ? 'grid-cols-2 grid-rows-2' : 'grid-cols-2';
+    section === 'all'
+      ? 'grid-cols-1 sm:grid-cols-2 grid-rows-none sm:grid-rows-2'
+      : 'grid-cols-1 sm:grid-cols-2';
 
   return (
     <div className={cn('grid w-full', compact && 'h-full', compact ? 'gap-1.5' : 'gap-2', gridClass, className)}>

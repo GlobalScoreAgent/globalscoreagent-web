@@ -68,7 +68,18 @@ export function AgentHumiPillarDetailsCard({
             {c.pillarDetailsNoData}
           </div>
         ) : (
-          <div className="h-full overflow-x-auto overflow-y-auto">
+          <>
+            <div className="space-y-3 overflow-y-auto p-4 md:hidden">
+              {rows.map((row) => (
+                <div key={row.key} className={cn('rounded-xl border p-4', border, rowHover)}>
+                  <p className={cn('font-medium', dashboardFormBodyClass(isDark))}>{row.label}</p>
+                  <p className={cn('mt-2 text-sm', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                    {row.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="hidden h-full overflow-x-auto overflow-y-auto md:block">
             <table className="w-full min-w-[480px] border-collapse text-left text-sm">
               <thead>
                 <tr className={cn('border-b text-xs font-semibold uppercase tracking-wide', border, headBg, muted)}>
@@ -98,6 +109,7 @@ export function AgentHumiPillarDetailsCard({
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
     </div>

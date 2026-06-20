@@ -704,11 +704,11 @@ export default function AgentsPage() {
   return (
     <div className="space-y-6">
       <div className={`p-5 rounded-2xl space-y-4 ${theme === 'dark' ? 'bg-zinc-900' : 'bg-white border border-zinc-200'}`}>
-        <div className="flex flex-wrap gap-3 items-center">
-          <div className="relative" onMouseEnter={() => clearDropdownTimer('open')} onMouseLeave={() => startDropdownTimer('open')}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="relative w-full sm:w-auto sm:min-w-[190px]" onMouseEnter={() => clearDropdownTimer('open')} onMouseLeave={() => startDropdownTimer('open')}>
             <button
               onClick={() => setIsOpenDropdownOpen(!isOpenDropdownOpen)}
-              className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors min-w-[190px] ${
+              className={`flex w-full items-center gap-2 px-4 py-3 rounded-xl border transition-colors sm:min-w-[190px] ${
                 theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700' : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
               }`}
             >
@@ -737,7 +737,7 @@ export default function AgentsPage() {
             )}
           </div>
 
-          <div className="flex-1 relative min-w-[260px]">
+          <div className="relative w-full min-w-0 flex-1 sm:min-w-[260px]">
             <Search size={18} className={`absolute left-4 top-1/2 transform -translate-y-1/2 ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-500'}`} />
             <input
               type="text"
@@ -752,10 +752,10 @@ export default function AgentsPage() {
             />
           </div>
 
-          <div className="relative" onMouseEnter={() => clearDropdownTimer('sort')} onMouseLeave={() => startDropdownTimer('sort')}>
+          <div className="relative w-full sm:w-auto sm:min-w-[190px]" onMouseEnter={() => clearDropdownTimer('sort')} onMouseLeave={() => startDropdownTimer('sort')}>
             <button
               onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-              className={`flex items-center gap-2 px-4 py-3 rounded-xl border transition-colors min-w-[190px] ${
+              className={`flex w-full items-center gap-2 px-4 py-3 rounded-xl border transition-colors sm:min-w-[190px] ${
                 theme === 'dark' ? 'bg-zinc-800 border-zinc-700 text-zinc-200 hover:bg-zinc-700' : 'bg-zinc-50 border-zinc-300 text-zinc-900 hover:bg-zinc-100'
               }`}
             >

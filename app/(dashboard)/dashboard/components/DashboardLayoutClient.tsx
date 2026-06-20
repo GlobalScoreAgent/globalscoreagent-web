@@ -12,6 +12,7 @@ import { DashboardLoginProvider, useDashboardLogin } from './DashboardLoginConte
 import { LanguageProvider, useLanguage } from './LanguageContext';
 import { RecentAgentsProvider } from './AgentRecentNavigationContext';
 import { DashboardTitleOverrideProvider } from './DashboardTitleOverrideContext';
+import { DashboardMobileNavProvider, useDashboardMobileNav } from './DashboardMobileNavContext';
 import {
   hasHydratedDashboardPreferences,
   markDashboardPreferencesHydrated,
@@ -86,6 +87,21 @@ function DashboardPreferencesHydrator() {
   return null;
 }
 
+function MobileNavBackdrop() {
+  const { mobileNavOpen, closeMobileNav } = useDashboardMobileNav();
+
+  if (!mobileNavOpen) return null;
+
+  return (
+    <button
+      type="button"
+      aria-label="Close navigation menu"
+      className="fixed inset-0 z-40 bg-black/50 md:hidden"
+      onClick={closeMobileNav}
+    />
+  );
+}
+
 function DashboardLayoutInner({
   children,
   user,
@@ -120,26 +136,29 @@ function DashboardLayoutInner({
     <>
       <DashboardSessionWatcher />
       <DashboardPreferencesHydrator />
-      <div className="flex h-screen text-white overflow-hidden dark:bg-zinc-950 bg-zinc-100">
-        <RecentAgentsProvider>
-          <DashboardSidebar />
+      <DashboardMobileNavProvider>
+        <div className="flex h-screen text-white overflow-hidden dark:bg-zinc-950 bg-zinc-100">
+          <RecentAgentsProvider>
+            <MobileNavBackdrop />
+            <DashboardSidebar />
 
-          <div className="flex-1 flex flex-col">
-            <DashboardTitleOverrideProvider>
-              <DashboardTopNav
-                user={{ email: user.email }}
-                profile={{ display_name: user.display_name, avatar_url: user.avatar_url }}
-                pageTitleKey={pageTitleKey}
-              />
+            <div className="flex min-w-0 flex-1 flex-col">
+              <DashboardTitleOverrideProvider>
+                <DashboardTopNav
+                  user={{ email: user.email }}
+                  profile={{ display_name: user.display_name, avatar_url: user.avatar_url }}
+                  pageTitleKey={pageTitleKey}
+                />
 
-              <main className="flex-1 overflow-auto p-8 dark:bg-zinc-950 bg-zinc-100">
-                {children}
-              </main>
-              <DashboardNewsTicker />
-            </DashboardTitleOverrideProvider>
-          </div>
-        </RecentAgentsProvider>
-      </div>
+                <main className="flex-1 overflow-auto p-4 pb-6 sm:p-6 lg:p-8 dark:bg-zinc-950 bg-zinc-100">
+                  {children}
+                </main>
+                <DashboardNewsTicker />
+              </DashboardTitleOverrideProvider>
+            </div>
+          </RecentAgentsProvider>
+        </div>
+      </DashboardMobileNavProvider>
     </>
   );
 }

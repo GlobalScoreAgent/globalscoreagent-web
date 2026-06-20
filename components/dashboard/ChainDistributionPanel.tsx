@@ -16,10 +16,13 @@ type Props = {
   chainKey: string;
   isDark: boolean;
   t: Translations;
+  layout?: 'rail' | 'bottomCard';
   className?: string;
 };
 
-export function ChainDistributionPanel({ slides, chainKey, isDark, t, className }: Props) {
+export function ChainDistributionPanel({ slides, chainKey, isDark, t, layout = 'bottomCard', className }: Props) {
+  const isRail = layout === 'rail';
+
   return (
     <DistributionCarouselPanel
       slides={slides}
@@ -29,8 +32,11 @@ export function ChainDistributionPanel({ slides, chainKey, isDark, t, className 
       nextLabel={t.chainDistributionNext}
       isDark={isDark}
       legendPlacement="bottom"
+      stackedBarOrientation="vertical"
       className={cn(
-        'lg:min-h-0 lg:w-[13rem] lg:self-stretch xl:w-[14rem]',
+        isRail
+          ? 'lg:min-h-0 lg:w-[13rem] lg:self-stretch xl:w-[14rem]'
+          : 'min-h-[260px] lg:min-h-0 lg:w-full lg:self-stretch',
         className,
       )}
     />

@@ -13,11 +13,14 @@ import {
   ChevronLeft,
   ChevronRight,
   MoreHorizontal,
+  X,
 } from 'lucide-react';
 import { performDashboardLogout } from '@/lib/gsa/dashboard-logout';
+import { cn } from '@/lib/utils';
 import { useDashboardLogin } from './DashboardLoginContext';
 import { useLanguage } from './LanguageContext';
 import { useAgentRecentNavigation } from './AgentRecentNavigationContext';
+import { useDashboardMobileNav } from './DashboardMobileNavContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +36,7 @@ const navItems = [
 export default function DashboardSidebar() {
   const pathname = usePathname();
   const { t, theme } = useLanguage();
+  const { mobileNavOpen, closeMobileNav } = useDashboardMobileNav();
   const { recentAgents, favoriteAgents, closeRecentAgent, addFavorite, removeFavorite, isFavorite } =
     useAgentRecentNavigation();
   const { subscription } = useDashboardLogin();
@@ -40,305 +44,352 @@ export default function DashboardSidebar() {
   const recentAgentsFiltered = recentAgents.filter((agent) => !isFavorite(agent.id));
 
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const showExpanded = !isCollapsed || mobileNavOpen;
 
   const handleLogout = () => {
     void performDashboardLogout();
+  };
+
+  const handleNavClick = () => {
+    closeMobileNav();
   };
 
   const navDisabledClass = navDisabled
     ? 'pointer-events-none opacity-50 cursor-not-allowed'
     : '';
 
-  /** Rail colapsado (w-16): íconos centrados, sin padding horizontal agresivo */
-  const navRowLayout = isCollapsed
-    ? 'justify-center gap-0 px-2 min-h-[2.75rem]'
-    : 'gap-3 px-4';
+  const navRowLayout = showExpanded
+    ? 'gap-3 px-4'
+    : 'justify-center gap-0 px-2 min-h-[2.75rem]';
+
+  const shellClass =
+    theme === 'dark'
+      ? 'bg-zinc-900 border-zinc-800'
+      : 'bg-white border-zinc-200 text-zinc-900';
 
   return (
-    <div className={`h-screen border-r flex flex-col transition-all duration-300 ${
-      isCollapsed ? 'w-16' : 'w-64'
-    } ${theme === 'dark' 
-      ? 'bg-zinc-900 border-zinc-800' 
-      : 'bg-white border-zinc-200 text-zinc-900'}`}
+    <aside
+      className={cn(
+        'flex h-screen w-64 flex-col border-r transition-transform duration-300',
+        shellClass,
+        'fixed inset-y-0 left-0 z-50 md:static md:z-auto md:translate-x-0',
+        mobileNavOpen ? 'translate-x-0' : '-translate-x-full',
+        !showExpanded && 'md:w-16',
+        showExpanded && 'md:w-64',
+      )}
+      aria-hidden={!mobileNavOpen ? undefined : false}
     >
-      {/* Logo + Título */}
       <div
-        className={`border-b flex items-center ${
-          isCollapsed ? 'justify-center px-2 py-5' : 'gap-3 px-4 py-6'
-        } ${theme === 'dark' ? 'border-zinc-800' : 'border-zinc-200'}`}
+        className={cn(
+          'border-b flex items-center',
+          showExpanded ? 'gap-3 px-4 py-6' : 'justify-center px-2 py-5',
+          theme === 'dark' ? 'border-zinc-800' : 'border-zinc-200',
+        )}
       >
         <img
           src="/logo-gsa.png"
           alt="Global Score Agent"
-          className={`transition-all object-contain object-center ${
-            isCollapsed
-              ? 'mx-auto h-10 max-h-10 w-auto max-w-[2.75rem]'
-              : 'h-12 w-auto'
-          }`}
+          className={cn(
+            'transition-all object-contain object-center',
+            showExpanded ? 'h-12 w-auto' : 'mx-auto h-10 max-h-10 w-auto max-w-[2.75rem]',
+          )}
         />
-        {!isCollapsed && (
-          <div className="flex flex-col leading-none">
+        {showExpanded && (
+          <div className="min-w-0 flex-1 flex-col leading-none">
             <span className="text-2xl font-semibold tracking-tighter">Global Score</span>
             <span className="text-2xl font-semibold tracking-tighter -mt-1">Agent</span>
           </div>
         )}
+        <button
+          type="button"
+          onClick={closeMobileNav}
+          className={cn(
+            'rounded-xl p-2 transition-colors md:hidden',
+            theme === 'dark'
+              ? 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+              : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900',
+          )}
+          aria-label="Close menu"
+        >
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
-      {/* Botón colapsar */}
-      <div className={`py-2 flex ${isCollapsed ? 'justify-center px-2' : 'justify-end px-4'}`}>
+      <div className={cn('hidden py-2 md:flex', showExpanded ? 'justify-end px-4' : 'justify-center px-2')}>
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className={`p-2 rounded-xl transition-colors ${
-            theme === 'dark' 
-              ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' 
-              : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'
-          }`}
+          className={cn(
+            'p-2 rounded-xl transition-colors',
+            theme === 'dark'
+              ? 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+              : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100',
+          )}
+          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
         </button>
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col">
-      {/* Navigation */}
-      <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-6 space-y-1">
-        {navItems.map((item) => {
-          const isAgentsNav = item.href === '/dashboard/agents';
-          const isActive = isAgentsNav
-            ? pathname === item.href || pathname.startsWith(`${item.href}/`)
-            : pathname === item.href;
+        <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-4 md:py-6 space-y-1">
+          {navItems.map((item) => {
+            const isAgentsNav = item.href === '/dashboard/agents';
+            const isActive = isAgentsNav
+              ? pathname === item.href || pathname.startsWith(`${item.href}/`)
+              : pathname === item.href;
 
-          if (isAgentsNav) {
-            return (
-              <div key={item.href} className="space-y-1">
-                <Link
-                  href={item.href}
-                  aria-disabled={navDisabled}
-                  title={isCollapsed ? t[item.labelKey] : undefined}
-                  className={`flex items-center py-3 rounded-2xl text-sm font-medium transition-colors ${navRowLayout} ${navDisabledClass} ${
-                    isActive
-                      ? theme === 'dark'
-                        ? 'bg-zinc-800 text-amber-400'
-                        : 'bg-zinc-100 text-amber-600'
-                      : theme === 'dark'
-                        ? 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
-                        : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
-                  }`}
-                >
-                  <item.icon className="h-5 w-5 shrink-0" />
-                  {!isCollapsed && <span>{t[item.labelKey]}</span>}
-                </Link>
-                {!isCollapsed && (recentAgentsFiltered.length > 0 || favoriteAgents.length > 0) && (
-                  <div
-                    className={`ml-2 pl-3 border-l ${
-                      theme === 'dark' ? 'border-zinc-700' : 'border-zinc-200'
-                    } space-y-0.5 pt-1 pb-1`}
+            if (isAgentsNav) {
+              return (
+                <div key={item.href} className="space-y-1">
+                  <Link
+                    href={item.href}
+                    onClick={handleNavClick}
+                    aria-disabled={navDisabled}
+                    title={!showExpanded ? t[item.labelKey] : undefined}
+                    className={cn(
+                      'flex items-center py-3 rounded-2xl text-sm font-medium transition-colors',
+                      navRowLayout,
+                      navDisabledClass,
+                      isActive
+                        ? theme === 'dark'
+                          ? 'bg-zinc-800 text-amber-400'
+                          : 'bg-zinc-100 text-amber-600'
+                        : theme === 'dark'
+                          ? 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                          : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100',
+                    )}
                   >
-                    {favoriteAgents.length > 0 && (
-                      <>
-                        <p
-                          className={`px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wide ${
-                            theme === 'dark' ? 'text-zinc-500' : 'text-zinc-400'
-                          }`}
-                        >
-                          {t.favoriteAgentsSubmenu}
-                        </p>
-                        {favoriteAgents.map((agent) => {
-                          const detailPath = `/dashboard/agents/${agent.id}`;
-                          const isAgentActive = pathname === detailPath;
-                          return (
-                            <div
-                              key={`favorite-${agent.id}`}
-                              className={`group flex items-center gap-0.5 rounded-xl pl-1 pr-0.5 ${
-                                isAgentActive
-                                  ? theme === 'dark'
-                                    ? 'bg-zinc-800/80'
-                                    : 'bg-zinc-100'
-                                  : ''
-                              }`}
-                            >
-                              <Link
-                                href={detailPath}
-                                aria-disabled={navDisabled}
-                                title={agent.label}
-                                className={`min-w-0 flex-1 truncate py-1.5 px-2 text-xs font-medium transition-colors ${navDisabledClass} ${
+                    <item.icon className="h-5 w-5 shrink-0" />
+                    {showExpanded && <span>{t[item.labelKey]}</span>}
+                  </Link>
+                  {showExpanded && (recentAgentsFiltered.length > 0 || favoriteAgents.length > 0) && (
+                    <div
+                      className={cn(
+                        'ml-2 pl-3 border-l space-y-0.5 pt-1 pb-1',
+                        theme === 'dark' ? 'border-zinc-700' : 'border-zinc-200',
+                      )}
+                    >
+                      {favoriteAgents.length > 0 && (
+                        <>
+                          <p
+                            className={cn(
+                              'px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wide',
+                              theme === 'dark' ? 'text-zinc-500' : 'text-zinc-400',
+                            )}
+                          >
+                            {t.favoriteAgentsSubmenu}
+                          </p>
+                          {favoriteAgents.map((agent) => {
+                            const detailPath = `/dashboard/agents/${agent.id}`;
+                            const isAgentActive = pathname === detailPath;
+                            return (
+                              <div
+                                key={`favorite-${agent.id}`}
+                                className={cn(
+                                  'group flex items-center gap-0.5 rounded-xl pl-1 pr-0.5',
                                   isAgentActive
                                     ? theme === 'dark'
-                                      ? 'text-amber-400'
-                                      : 'text-amber-700'
-                                    : theme === 'dark'
-                                      ? 'text-zinc-300 hover:text-zinc-100'
-                                      : 'text-zinc-700 hover:text-zinc-900'
-                                }`}
+                                      ? 'bg-zinc-800/80'
+                                      : 'bg-zinc-100'
+                                    : '',
+                                )}
                               >
-                                {agent.label}
-                              </Link>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <button
-                                    type="button"
-                                    className={`shrink-0 rounded-lg p-1.5 transition-colors outline-none ${
-                                      theme === 'dark'
-                                        ? 'text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100'
-                                        : 'text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900'
-                                    }`}
-                                    aria-label={t.agentMenuAria}
-                                  >
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                  align="end"
-                                  className={`min-w-[10rem] ${
-                                    theme === 'dark'
-                                      ? 'bg-zinc-900 border-zinc-700 text-zinc-100'
-                                      : 'bg-white border-zinc-200 text-zinc-900'
-                                  }`}
+                                <Link
+                                  href={detailPath}
+                                  onClick={handleNavClick}
+                                  aria-disabled={navDisabled}
+                                  title={agent.label}
+                                  className={cn(
+                                    'min-w-0 flex-1 truncate py-1.5 px-2 text-xs font-medium transition-colors',
+                                    navDisabledClass,
+                                    isAgentActive
+                                      ? theme === 'dark'
+                                        ? 'text-amber-400'
+                                        : 'text-amber-700'
+                                      : theme === 'dark'
+                                        ? 'text-zinc-300 hover:text-zinc-100'
+                                        : 'text-zinc-700 hover:text-zinc-900',
+                                  )}
                                 >
+                                  {agent.label}
+                                </Link>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <button
+                                      type="button"
+                                      className={cn(
+                                        'shrink-0 rounded-lg p-1.5 transition-colors outline-none',
+                                        theme === 'dark'
+                                          ? 'text-zinc-400 hover:bg-zinc-700 hover:text-zinc-100'
+                                          : 'text-zinc-500 hover:bg-zinc-200 hover:text-zinc-900',
+                                      )}
+                                      aria-label={t.agentMenuAria}
+                                    >
+                                      <MoreHorizontal className="h-4 w-4" />
+                                    </button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent
+                                    align="end"
+                                    className={cn(
+                                      'min-w-[10rem]',
+                                      theme === 'dark'
+                                        ? 'bg-zinc-900 border-zinc-700 text-zinc-100'
+                                        : 'bg-white border-zinc-200 text-zinc-900',
+                                    )}
+                                  >
+                                    <DropdownMenuItem onSelect={() => void removeFavorite(agent.id)}>
+                                      {t.unfavoriteAgent}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            );
+                          })}
+                        </>
+                      )}
+
+                      {recentAgentsFiltered.length > 0 && (
+                        <p
+                          className={cn(
+                            'px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wide',
+                            theme === 'dark' ? 'text-zinc-500' : 'text-zinc-400',
+                          )}
+                        >
+                          {t.recentAgentsSubmenu}
+                        </p>
+                      )}
+                      {recentAgentsFiltered.map((agent) => {
+                        const detailPath = `/dashboard/agents/${agent.id}`;
+                        const isAgentActive = pathname === detailPath;
+                        return (
+                          <div
+                            key={agent.id}
+                            className={cn(
+                              'group flex items-center gap-0.5 rounded-xl pl-1 pr-0.5',
+                              isAgentActive
+                                ? theme === 'dark'
+                                  ? 'bg-zinc-800/80'
+                                  : 'bg-zinc-100'
+                                : '',
+                            )}
+                          >
+                            <Link
+                              href={detailPath}
+                              onClick={handleNavClick}
+                              aria-disabled={navDisabled}
+                              title={agent.label}
+                              className={cn(
+                                'min-w-0 flex-1 truncate py-1.5 px-2 text-xs font-medium transition-colors',
+                                navDisabledClass,
+                                isAgentActive
+                                  ? theme === 'dark'
+                                    ? 'text-amber-400'
+                                    : 'text-amber-700'
+                                  : theme === 'dark'
+                                    ? 'text-zinc-400 hover:text-zinc-100'
+                                    : 'text-zinc-600 hover:text-zinc-900',
+                              )}
+                            >
+                              {agent.label}
+                            </Link>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <button
+                                  type="button"
+                                  className={cn(
+                                    'shrink-0 rounded-lg p-1.5 transition-colors outline-none',
+                                    theme === 'dark'
+                                      ? 'text-zinc-500 hover:bg-zinc-700 hover:text-zinc-200'
+                                      : 'text-zinc-400 hover:bg-zinc-200 hover:text-zinc-800',
+                                  )}
+                                  aria-label={t.agentMenuAria}
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                className={cn(
+                                  'min-w-[10rem]',
+                                  theme === 'dark'
+                                    ? 'bg-zinc-900 border-zinc-700 text-zinc-100'
+                                    : 'bg-white border-zinc-200 text-zinc-900',
+                                )}
+                              >
+                                <DropdownMenuItem onSelect={() => closeRecentAgent(agent.id)}>
+                                  {t.closeSidebarAgent}
+                                </DropdownMenuItem>
+                                {isFavorite(agent.id) ? (
                                   <DropdownMenuItem onSelect={() => void removeFavorite(agent.id)}>
                                     {t.unfavoriteAgent}
                                   </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          );
-                        })}
-                      </>
-                    )}
+                                ) : (
+                                  <DropdownMenuItem onSelect={() => void addFavorite(agent.id, agent.label)}>
+                                    {t.favoriteAgent}
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
 
-                    {recentAgentsFiltered.length > 0 && (
-                      <p
-                        className={`px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wide ${
-                          theme === 'dark' ? 'text-zinc-500' : 'text-zinc-400'
-                        }`}
-                      >
-                        {t.recentAgentsSubmenu}
-                      </p>
-                    )}
-                    {recentAgentsFiltered.map((agent) => {
-                      const detailPath = `/dashboard/agents/${agent.id}`;
-                      const isAgentActive = pathname === detailPath;
-                      return (
-                        <div
-                          key={agent.id}
-                          className={`group flex items-center gap-0.5 rounded-xl pl-1 pr-0.5 ${
-                            isAgentActive
-                              ? theme === 'dark'
-                                ? 'bg-zinc-800/80'
-                                : 'bg-zinc-100'
-                              : ''
-                          }`}
-                        >
-                          <Link
-                            href={detailPath}
-                            aria-disabled={navDisabled}
-                            title={agent.label}
-                            className={`min-w-0 flex-1 truncate py-1.5 px-2 text-xs font-medium transition-colors ${navDisabledClass} ${
-                              isAgentActive
-                                ? theme === 'dark'
-                                  ? 'text-amber-400'
-                                  : 'text-amber-700'
-                                : theme === 'dark'
-                                  ? 'text-zinc-400 hover:text-zinc-100'
-                                  : 'text-zinc-600 hover:text-zinc-900'
-                            }`}
-                          >
-                            {agent.label}
-                          </Link>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <button
-                                type="button"
-                                className={`shrink-0 rounded-lg p-1.5 transition-colors outline-none ${
-                                  theme === 'dark'
-                                    ? 'text-zinc-500 hover:bg-zinc-700 hover:text-zinc-200'
-                                    : 'text-zinc-400 hover:bg-zinc-200 hover:text-zinc-800'
-                                }`}
-                                aria-label={t.agentMenuAria}
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                              </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              className={`min-w-[10rem] ${
-                                theme === 'dark'
-                                  ? 'bg-zinc-900 border-zinc-700 text-zinc-100'
-                                  : 'bg-white border-zinc-200 text-zinc-900'
-                              }`}
-                            >
-                              <DropdownMenuItem
-                                onSelect={() => closeRecentAgent(agent.id)}
-                              >
-                                {t.closeSidebarAgent}
-                              </DropdownMenuItem>
-                              {isFavorite(agent.id) ? (
-                                <DropdownMenuItem
-                                  onSelect={() => void removeFavorite(agent.id)}
-                                >
-                                  {t.unfavoriteAgent}
-                                </DropdownMenuItem>
-                              ) : (
-                                <DropdownMenuItem
-                                  onSelect={() => void addFavorite(agent.id, agent.label)}
-                                >
-                                  {t.favoriteAgent}
-                                </DropdownMenuItem>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      );
-                    })}
-                  </div>
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={handleNavClick}
+                aria-disabled={navDisabled}
+                title={!showExpanded ? t[item.labelKey] : undefined}
+                className={cn(
+                  'flex items-center py-3 rounded-2xl text-sm font-medium transition-colors',
+                  navRowLayout,
+                  navDisabledClass,
+                  isActive
+                    ? theme === 'dark'
+                      ? 'bg-zinc-800 text-amber-400'
+                      : 'bg-zinc-100 text-amber-600'
+                    : theme === 'dark'
+                      ? 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                      : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100',
                 )}
-              </div>
+              >
+                <item.icon className="h-5 w-5 shrink-0" />
+                {showExpanded && <span>{t[item.labelKey]}</span>}
+              </Link>
             );
-          }
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-disabled={navDisabled}
-              title={isCollapsed ? t[item.labelKey] : undefined}
-              className={`flex items-center py-3 rounded-2xl text-sm font-medium transition-colors ${navRowLayout} ${navDisabledClass} ${
-                isActive
-                  ? theme === 'dark'
-                    ? 'bg-zinc-800 text-amber-400'
-                    : 'bg-zinc-100 text-amber-600'
-                  : theme === 'dark'
-                    ? 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
-                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
-              }`}
-            >
-              <item.icon className="h-5 w-5 shrink-0" />
-              {!isCollapsed && <span>{t[item.labelKey]}</span>}
-            </Link>
-          );
-        })}
-      </nav>
+          })}
+        </nav>
       </div>
 
-      {/* Logout */}
       <div
-        className={`border-t ${isCollapsed ? 'p-2' : 'p-4'} ${
-          theme === 'dark' ? 'border-zinc-800' : 'border-zinc-200'
-        }`}
+        className={cn(
+          'border-t',
+          showExpanded ? 'p-4' : 'p-2',
+          theme === 'dark' ? 'border-zinc-800' : 'border-zinc-200',
+        )}
       >
         <button
           type="button"
           onClick={handleLogout}
-          title={isCollapsed ? t.logout : undefined}
-          className={`flex w-full items-center py-3 text-sm font-medium transition-colors rounded-2xl ${navRowLayout} ${
+          title={!showExpanded ? t.logout : undefined}
+          className={cn(
+            'flex w-full items-center py-3 text-sm font-medium transition-colors rounded-2xl',
+            navRowLayout,
             theme === 'dark'
               ? 'text-zinc-400 hover:text-red-400 hover:bg-zinc-800/50'
-              : 'text-zinc-600 hover:text-red-500 hover:bg-zinc-100'
-          }`}
+              : 'text-zinc-600 hover:text-red-500 hover:bg-zinc-100',
+          )}
         >
           <LogOut className="h-5 w-5 shrink-0" />
-          {!isCollapsed && <span>{t.logout}</span>}
+          {showExpanded && <span>{t.logout}</span>}
         </button>
       </div>
-    </div>
+    </aside>
   );
 }

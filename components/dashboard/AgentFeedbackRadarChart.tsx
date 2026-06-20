@@ -206,13 +206,13 @@ export function AgentFeedbackRadarChart({
         </h3>
       ) : null}
 
-      <div className="h-[360px] w-full">
+      <div className="h-[280px] w-full sm:h-[360px]">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart
             cx="50%"
             cy="50%"
-            outerRadius="86%"
-            margin={{ top: 12, right: 14, bottom: 26, left: 14 }}
+            outerRadius="78%"
+            margin={{ top: 8, right: 8, bottom: 20, left: 8 }}
             data={data}
           >
             <defs>
