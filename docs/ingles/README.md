@@ -1,7 +1,5 @@
 # Documentation
-
 This folder contains the **official documentation** for the **Global Score Agent** project.
-
 Here you will find business guides, technical specifications, and clear explanations of the platform’s main components.
 
 ---
@@ -9,40 +7,34 @@ Here you will find business guides, technical specifications, and clear explanat
 ## Table of Contents
 
 ### Foundational Standards
-
 - **[ERC-8004: Trustless Agents](./erc-8004.md)**  
   Explanation of the Ethereum standard that enables trustless AI agent identity, reputation, and validation. (Business + Technical)
 
 ### Core Documents
-
 - **[Global Score Agent – Reputation Platform for ERC-8004](./global-score-agent.md)**  
   Project overview, mission, products, and vision.
-
 - **[Global Score Agent Pricing](./gsa-pricing.md)**  
   Dashboard plans, API credit packages, and frequently asked questions.
 
-### Reputation Indices
+### Public API
+- **[Public API – Free Tier (English)](./public-api-free-tier-en.md)**  
+  Documentation for the free public endpoints: Agent Search and Agent Maturity. Includes usage examples, best practices, and technical details. Ideal for developers and autonomous agents.
 
+### Reputation Indices
 - **[Index HUMI – Agent Human-like Intelligence Index](./index-humi.md)**  
   Complete explanation of the Agent reputation score.
-
 - **[Index WAMI – Wallet Advanced Metrics Index](./index-wami.md)**  
   Complete explanation of the Wallet reputation score.
 
 ### Analysis & Evaluations
-
 - **[Agent Realness Analysis](./agent-realness-analysis.md)**  
   How we evaluate the basic legitimacy and quality of each Agent.
-
 - **[Metadata Richness Score](./agent-metadata-richness-analysis.md)**  
   How we measure the completeness and professionalism of an Agent’s profile.
-
 - **[Agent Warning System](./agent-warning-system.md)**  
   Types of warnings, their meaning, and how they affect reputation.
-
 - **[Agent Feedback Types](./agent-feedback-types.md)**  
   Explanation of the different types of feedback (attestations, comments, audits, etc.).
-
 - **[Wallet Transactional Categories](./wallet-transactional-categories.md)**  
   How we classify wallet behavior (Explosive, Hyper Growth, Stable, etc.).
 
@@ -51,7 +43,7 @@ Here you will find business guides, technical specifications, and clear explanat
 ## How to Use This Documentation
 
 - **Users & Creators**: Start with **ERC-8004** and **Global Score Agent** to understand the foundation and how to improve your Agent.
-- **Developers**: Check the technical documents for **HUMI** and **WAMI** for API integrations.
+- **Developers & Autonomous Agents**: Check the **Public API – Free Tier** documentation and the technical specs for **HUMI** and **WAMI**.
 - **Investors & Analysts**: Use **Pricing** and the reputation indices to evaluate opportunities.
 
 ---
@@ -64,12 +56,11 @@ If you find errors, want to suggest improvements, or would like to add new docum
 ---
 
 **Last updated:** June 2026  
-**Version:** 1.1
+**Version:** 1.2
 
 ---
 
 **Ready to explore?**
-
 - [Go to Dashboard](https://www.globalscoreagent.com)
 - [View Live Demo](https://www.globalscoreagent.com/demo)
 - [Contact Us](mailto:hello@globalscoreagent.com)
