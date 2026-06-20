@@ -9,7 +9,8 @@ Al **iniciar una tarea** (o si falta contexto), lee primero:
 
 1. [`docs/AGENT-RULES.md`](docs/AGENT-RULES.md) — ramas, BD, migraciones MV, HUMI/WAMI, convenciones, qué no hacer
 2. Si es **dashboard**: [`docs/dashboard-context-summary.md`](docs/dashboard-context-summary.md)
-3. Si cruzas marketing + dashboard: [`docs/BRANCHING.md`](docs/BRANCHING.md)
+3. Si es **web marketing**: [`docs/marketing-web-context-summary.md`](docs/marketing-web-context-summary.md)
+4. Si cruzas marketing + dashboard: [`docs/BRANCHING.md`](docs/BRANCHING.md)
 
 ## Antes de tocar BD o APIs
 

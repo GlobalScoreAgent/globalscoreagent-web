@@ -7,7 +7,8 @@ Documento maestro de convenciones, arquitectura y estado del proyecto.
 
 | Documento | Cuándo leerlo |
 |-----------|----------------|
-| [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) | Contexto completo del dashboard, funcionalidades, migraciones |
+| [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) | Contexto completo del dashboard, funcionalidades, migraciones, **v1 producción** |
+| [`docs/marketing-web-context-summary.md`](marketing-web-context-summary.md) | Web pública: landing, pricing, KPIs, docs, agentes públicos, **v1 producción** |
 | [`docs/BRANCHING.md`](BRANCHING.md) | Detalle de ramas, zonas y archivos compartidos |
 | [`docs/español/index-humi.md`](español/index-humi.md) | Spec de madurez HUMI y pilares |
 | [`docs/supabase-auth-setup.md`](supabase-auth-setup.md) | Auth, schemas expuestos, RLS, grants |
@@ -28,9 +29,10 @@ Antes de tocar código o BD:
 ### Prompt rápido para pegar en chat nuevo
 
 ```text
-Lee docs/AGENT-RULES.md y, si es dashboard, docs/dashboard-context-summary.md.
-Confirma la rama activa (web-page-v2 o dashboard-final) antes de editar.
-Para BD: docs/sql/ + app/api/** como fuente de verdad práctica.
+Lee docs/AGENT-RULES.md y el contexto según zona:
+- Dashboard → docs/dashboard-context-summary.md
+- Web marketing → docs/marketing-web-context-summary.md
+Producción en main (www.globalscoreagent.com). Para BD: docs/sql/ + app/api/** como fuente de verdad práctica.
 ```
 
 ---
@@ -41,9 +43,9 @@ Monorepo con **dos productos** en un solo Next.js. Detalle en [`docs/BRANCHING.m
 
 | Rama | Alcance |
 |------|---------|
-| `web-page-v2` | Landing, `/humi`, `/wami`, waitlist, APIs públicas, `components/marketing/` |
-| `dashboard-final` | `/dashboard/*`, `components/dashboard/`, `app/api/dashboard/**`, `lib/**` |
-| `main` | Integración; merges con revisión humana |
+| **`main`** | **Producción v1** — marketing + dashboard integrados |
+| `web-page-v2` | Histórico marketing (mergeado en `main`) |
+| `dashboard-final` | Histórico dashboard (mergeado en `main`) |
 
 ### Reglas de zona
 
@@ -57,7 +59,7 @@ Monorepo con **dos productos** en un solo Next.js. Detalle en [`docs/BRANCHING.m
 
 | Zona | Rutas | Schema BD típico |
 |------|-------|------------------|
-| Marketing | `app/api/web-page/`, `app/api/waitlist/` | `web_page` |
+| Marketing | `app/api/web-page/` | `web_page` |
 | Dashboard | `app/api/dashboard/**` | `web_dashboard`, imports desde `erc_8004`, `index_humi`, `index_wami` |
 
 ---
@@ -265,4 +267,4 @@ Si una regla de Cursor y este doc difieren, **priorizar la conversación actual 
 
 ---
 
-*Última revisión: mayo 2026 — actualizar este doc cuando cambien migraciones BD, ramas o convenciones acordadas con el equipo.*
+*Última revisión: junio 2026 — v1 en producción (`main`). Actualizar este doc cuando cambien migraciones BD, ramas o convenciones acordadas con el equipo.*

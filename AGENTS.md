@@ -6,12 +6,13 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Ramas y convivencia marketing + dashboard
 
-- **Web oficial:** rama `web-page-v2` — landing, HUMI público, waitlist, SEO.
-- **Dashboard:** rama `dashboard-final` — `/dashboard/*`, APIs dashboard.
+- **Producción (v1):** rama **`main`** — desplegada en `https://www.globalscoreagent.com` (Vercel).
+- **Histórico desarrollo:** `web-page-v2` (marketing), `dashboard-final` (dashboard) — mergeadas en `main` (junio 2026).
 
 Detalle de zonas compartidas y flujo de merge: [`docs/BRANCHING.md`](docs/BRANCHING.md).
 
 **Reglas generales para agentes:** [`docs/AGENT-RULES.md`](docs/AGENT-RULES.md) — ramas, BD, migraciones, HUMI/WAMI, convenciones.  
-Contexto del dashboard: [`docs/dashboard-context-summary.md`](docs/dashboard-context-summary.md).
+**Contexto dashboard:** [`docs/dashboard-context-summary.md`](docs/dashboard-context-summary.md).  
+**Contexto web pública:** [`docs/marketing-web-context-summary.md`](docs/marketing-web-context-summary.md).
 
 Reglas Cursor: `.cursor/rules/` (`agent-rules.mdc` y `branch-workflow.mdc` siempre; reglas por glob para marketing o dashboard).
