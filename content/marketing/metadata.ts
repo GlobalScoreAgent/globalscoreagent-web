@@ -4,6 +4,7 @@ import { humiCopy } from '@/content/humi/copy';
 import { wamiCopy } from '@/content/wami/copy';
 import { legalCopy } from '@/content/legal/copy';
 import { pricingCopy } from '@/content/pricing/copy';
+import { publicApiCopy } from '@/content/public-api/copy';
 import { docsHubSeo, getDocManifestEntry } from '@/content/docs/manifest';
 import { SITE_URL } from '@/lib/seo/site';
 
@@ -63,6 +64,12 @@ export const routeMetadata = {
     title: pricingCopy.seo.title,
     description: pricingCopy.seo.description,
     canonical: `${SITE_URL}/pricing`,
+    ogPath: '/opengraph-image',
+  },
+  publicApi: {
+    title: publicApiCopy.seo.title,
+    description: publicApiCopy.seo.description,
+    canonical: `${SITE_URL}/public-api`,
     ogPath: '/opengraph-image',
   },
   docs: {

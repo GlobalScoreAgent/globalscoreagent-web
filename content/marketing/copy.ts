@@ -14,6 +14,7 @@ export const marketingCopy = {
     roadmap: { es: 'Roadmap', en: 'Roadmap' } satisfies Bilingual,
     subscriptions: { es: 'Suscripciones', en: 'Subscriptions' } satisfies Bilingual,
     pricing: { es: 'Precios', en: 'Pricing' } satisfies Bilingual,
+    publicApi: { es: 'Public API', en: 'Public API' } satisfies Bilingual,
     documentation: { es: 'Documentación', en: 'Documentation' } satisfies Bilingual,
     legal: { es: 'Legal', en: 'Legal' } satisfies Bilingual,
     expandSidebar: { es: 'Expandir menú', en: 'Expand menu' } satisfies Bilingual,
@@ -210,6 +211,14 @@ export const marketingCopy = {
       description: {
         es: 'Acceso programático a índices, datos de agentes y métricas de wallets para protocolos, marketplaces y dashboards.',
         en: 'Programmatic access to indices, agent data, and wallet metrics for protocols, marketplaces, and dashboards.',
+      } satisfies Bilingual,
+      cta: { es: 'Explorar API', en: 'Explore API' } satisfies Bilingual,
+    },
+    apiKeys: {
+      title: { es: 'API Keys', en: 'API Keys' } satisfies Bilingual,
+      description: {
+        es: 'Claves de acceso autenticado para reportes detallados, análisis avanzados y endpoints de pago.',
+        en: 'Authenticated access keys for detailed reports, advanced analysis, and paid endpoints.',
       } satisfies Bilingual,
     },
   },

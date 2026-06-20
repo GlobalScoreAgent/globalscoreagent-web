@@ -26,6 +26,7 @@ export const docsCopy = {
   } satisfies Bilingual,
   categories: {
     platform: { es: 'Plataforma', en: 'Platform' } satisfies Bilingual,
+    api: { es: 'API pública', en: 'Public API' } satisfies Bilingual,
     dashboard: { es: 'Dashboard', en: 'Dashboard' } satisfies Bilingual,
     pricing: { es: 'Precios', en: 'Pricing' } satisfies Bilingual,
     humi: { es: 'Índice HUMI', en: 'HUMI Index' } satisfies Bilingual,

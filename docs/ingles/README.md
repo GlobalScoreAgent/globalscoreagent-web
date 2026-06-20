@@ -17,7 +17,7 @@ Here you will find business guides, technical specifications, and clear explanat
   Dashboard plans, API credit packages, and frequently asked questions.
 
 ### Public API
-- **[Public API – Free Tier (English)](./public-api-free-tier-en.md)**  
+- **[Public API – Free Tier](./public-api-free-tier.md)**  
   Documentation for the free public endpoints: Agent Search and Agent Maturity. Includes usage examples, best practices, and technical details. Ideal for developers and autonomous agents.
 
 ### Reputation Indices

@@ -1,6 +1,14 @@
 import type { Bilingual } from '@/content/marketing/i18n';
 
-export type DocCategory = 'platform' | 'dashboard' | 'pricing' | 'humi' | 'wami' | 'agents' | 'wallets';
+export type DocCategory =
+  | 'platform'
+  | 'api'
+  | 'dashboard'
+  | 'pricing'
+  | 'humi'
+  | 'wami'
+  | 'agents'
+  | 'wallets';
 
 export type DocManifestEntry = {
   slug: string;
@@ -49,9 +57,22 @@ export const docManifest: DocManifestEntry[] = [
     },
   },
   {
+    slug: 'public-api-free-tier',
+    category: 'api',
+    order: 3,
+    title: {
+      es: 'API pública – Free Tier',
+      en: 'Public API – Free Tier',
+    },
+    description: {
+      es: 'Endpoints públicos gratuitos: búsqueda de agentes y nivel de madurez HUMI/WAMI.',
+      en: 'Free public endpoints: agent search and HUMI/WAMI maturity level.',
+    },
+  },
+  {
     slug: 'gsa-pricing',
     category: 'pricing',
-    order: 3,
+    order: 4,
     title: {
       es: 'Precios de Global Score Agent',
       en: 'Global Score Agent Pricing',

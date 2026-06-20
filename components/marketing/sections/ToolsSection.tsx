@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { LayoutDashboard, Code2 } from 'lucide-react';
+import { LayoutDashboard, Code2, Key } from 'lucide-react';
 import { buildAuthLoginUrl } from '@/lib/auth/redirect';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { marketingCopy } from '@/content/marketing/copy';
@@ -13,6 +13,7 @@ import GlassCard from '../shared/GlassCard';
 export default function ToolsSection() {
   const { language } = useLanguage();
   const { tools } = marketingCopy;
+  const langQuery = language === 'en' ? '?lang=en' : '';
 
   return (
     <SectionSurface id="tools" tone="gold">
@@ -20,7 +21,7 @@ export default function ToolsSection() {
         <h2 className="mb-12 text-center text-3xl font-bold text-white md:text-4xl">
           {pick(language, tools.title)}
         </h2>
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <GlassCard variant="elevated">
             <LayoutDashboard className="mb-4 text-gold" size={28} />
             <h3 className="mb-3 text-xl font-semibold text-white">
@@ -43,6 +44,21 @@ export default function ToolsSection() {
             </h3>
             <p className="mb-6 text-sm leading-relaxed text-zinc-400">
               {pick(language, tools.api.description)}
+            </p>
+            <Link
+              href={`/public-api${langQuery}`}
+              className="inline-block rounded-xl bg-gradient-to-r from-amber-400 to-yellow-400 px-5 py-2 text-sm font-semibold text-black"
+            >
+              {pick(language, tools.api.cta)}
+            </Link>
+          </GlassCard>
+          <GlassCard variant="elevated">
+            <Key className="mb-4 text-gold" size={28} />
+            <h3 className="mb-3 text-xl font-semibold text-white">
+              {pick(language, tools.apiKeys.title)}
+            </h3>
+            <p className="mb-6 text-sm leading-relaxed text-zinc-400">
+              {pick(language, tools.apiKeys.description)}
             </p>
             <ComingSoonBadge />
           </GlassCard>

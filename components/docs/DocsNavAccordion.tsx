@@ -15,6 +15,7 @@ type DocsNavAccordionProps = {
 
 const categoryOrder: DocCategory[] = [
   'platform',
+  'api',
   'dashboard',
   'pricing',
   'humi',

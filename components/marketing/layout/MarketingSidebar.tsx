@@ -14,6 +14,7 @@ import {
   Scale,
   CreditCard,
   BookOpen,
+  Code2,
   Trophy,
   Map,
 } from 'lucide-react';
@@ -38,6 +39,7 @@ const navItems: NavItem[] = [
   { href: '/wami', labelKey: 'wami', icon: Wallet, external: true },
   { href: '/top-10-agents', labelKey: 'top10Agents', icon: Trophy, external: true },
   { href: '/pricing', labelKey: 'pricing', icon: CreditCard, external: true },
+  { href: '/public-api', labelKey: 'publicApi', icon: Code2, external: true },
   { href: '/docs/global-score-agent', labelKey: 'documentation', icon: BookOpen, external: true },
   { href: '/#roadmap', labelKey: 'roadmap', icon: Map },
   { href: '/#how-we-work', labelKey: 'howWeWork', icon: Cog },
