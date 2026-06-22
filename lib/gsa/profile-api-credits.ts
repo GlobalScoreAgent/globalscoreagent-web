@@ -81,7 +81,7 @@ export async function fetchProfileApiCreditsForProfile(
 ): Promise<ProfileApiCredit[]> {
   const { data, error } = await supabase
     .schema('gsa')
-    .from('profile_api_credits')
+    .from('profiles_api_credits')
     .select(CREDITS_SELECT)
     .eq('profile_id', profileId)
     .order('valid_from', { ascending: false });
