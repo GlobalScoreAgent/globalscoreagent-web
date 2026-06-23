@@ -39,10 +39,10 @@ export function AgentDetailOwnerCard({
       variant="onchain"
       accentHex="#38bdf8"
       className="w-full"
-      contentClassName="relative overflow-hidden p-8"
+      contentClassName="relative overflow-hidden p-5 sm:p-8"
     >
       {hasGovernance ? (
-        <div className="absolute right-6 top-6 z-10 max-w-[62%] text-right">
+        <div className="mb-4 sm:absolute sm:right-6 sm:top-6 sm:z-10 sm:mb-0 sm:max-w-[62%] sm:text-right">
           <span
             className={`inline-block max-w-full rounded-full border px-3 py-1 text-left text-xs font-medium leading-snug ${
               isDark
@@ -56,9 +56,7 @@ export function AgentDetailOwnerCard({
           </span>
         </div>
       ) : null}
-      <h2
-        className={`mb-6 text-2xl font-semibold ${hasGovernance ? 'pr-32 sm:pr-44' : ''}`}
-      >
+      <h2 className={`mb-6 text-xl font-semibold sm:text-2xl ${hasGovernance ? 'sm:pr-44' : ''}`}>
         {t.agentDetailOwnerCardTitle}
       </h2>
 

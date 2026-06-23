@@ -107,13 +107,10 @@ function WalletBlock({
   return (
     <div className={cn('min-w-0', alignEnd && 'text-right')}>
       <div className={`text-sm ${mutedClassName}`}>{walletLabel}</div>
-      <div
-        className={cn(
-          'mt-1 flex items-center gap-2 break-all font-mono text-sm',
-          alignEnd && 'justify-end',
-        )}
-      >
-        {walletChainRegister ?? notAvailable}
+      <div className="mt-1 flex min-w-0 items-start gap-2">
+        <span className="min-w-0 flex-1 break-all font-mono text-sm leading-relaxed">
+          {walletChainRegister ?? notAvailable}
+        </span>
         {walletChainRegister ? (
           <button
             type="button"
@@ -222,15 +219,15 @@ export function AgentDetailOnChainCard({
       variant="onchain"
       accentHex={realnessAccentColor}
       className="w-full"
-      contentClassName="p-8 pb-10"
+      contentClassName="overflow-hidden p-4 pb-8 sm:p-8 sm:pb-10"
     >
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_14rem] lg:gap-x-8">
+      <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_14rem] lg:gap-x-8">
         {/* Row 1: title (left); realness inline on mobile only */}
-        <div className="flex items-center justify-between gap-4 lg:contents">
+        <div className="flex min-w-0 flex-wrap items-start justify-between gap-4 lg:contents">
           <h2 className="text-2xl font-semibold lg:col-start-1 lg:row-start-1">
             {t.agentDetailOnChainData}
           </h2>
-          <div className="w-full max-w-[14rem] shrink-0 lg:hidden">
+          <div className="min-w-0 max-w-full sm:max-w-[14rem] lg:hidden">
             <RealnessScoreBlock {...scoreProps} />
           </div>
         </div>
@@ -247,8 +244,8 @@ export function AgentDetailOnChainCard({
         </div>
 
         {/* Wallet (mobile only, after chain) */}
-        <div className="ml-auto w-full max-w-[14rem] lg:hidden">
-          <WalletBlock {...walletProps} align="end" />
+        <div className="w-full min-w-0 lg:hidden">
+          <WalletBlock {...walletProps} align="start" />
         </div>
 
         {/* Row 3: dates + owner changes (left) */}

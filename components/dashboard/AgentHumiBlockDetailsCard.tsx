@@ -108,7 +108,42 @@ export function AgentHumiBlockDetailsCard({
             {c.blockDetailsNoItems}
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="space-y-3 p-4 md:hidden">
+              {rows.map((row, index) => (
+                <div
+                  key={`${row.item.name}-mobile-${index}`}
+                  className={cn('rounded-xl border p-4', border, rowHover)}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <p className={cn('font-medium', dashboardFormBodyClass(isDark))}>{row.item.name}</p>
+                    <p className="shrink-0 font-semibold tabular-nums" style={{ color: blockScoreColor }}>
+                      {formatPoints(row.item.points, locale, notAvailableLabel)}
+                    </p>
+                  </div>
+                  <p className={cn('mt-2 text-sm', isDark ? 'text-zinc-300' : 'text-zinc-700')}>
+                    {row.businessDescription}
+                  </p>
+                  <p className={cn('mt-2 text-sm', muted)}>{row.reasonSummary}</p>
+                  <p className={cn('mt-2 text-sm', muted)}>{row.itemDetails}</p>
+                </div>
+              ))}
+              {showTotalRow ? (
+                <div className={cn('rounded-xl border px-4 py-3 font-semibold', border, headBg, isDark ? 'text-zinc-100' : 'text-zinc-900')}>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>{c.blockDetailsTotalLabel}</span>
+                    <span className="tabular-nums" style={{ color: blockScoreColor }}>
+                      {formatPoints(blockTotalScore, locale, notAvailableLabel)}
+                      <span className="font-normal opacity-80">
+                        {' '}
+                        / {formatPoints(blockMaxScore, locale, notAvailableLabel)}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            <div className="hidden overflow-x-auto md:block">
             <table className="w-full min-w-[780px] border-collapse text-left text-sm">
               <thead>
                 <tr className={cn('border-b text-xs font-semibold uppercase tracking-wide', border, headBg, muted)}>
@@ -172,6 +207,7 @@ export function AgentHumiBlockDetailsCard({
               ) : null}
             </table>
           </div>
+          </>
         )}
       </div>
     </>

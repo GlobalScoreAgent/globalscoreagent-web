@@ -164,7 +164,7 @@ export function StackedDistributionBar({
   const chartShell =
     orientation === 'vertical'
       ? fillHeight
-        ? 'min-h-0 flex-1 w-full'
+        ? 'min-h-[9rem] flex-1 w-full'
         : 'h-40 w-full'
       : horizontalChartTall
         ? sideLegend
@@ -173,6 +173,8 @@ export function StackedDistributionBar({
         : 'h-14 w-full';
 
   const horizontalResponsiveMinHeight = sideLegend ? 112 : 96;
+  /** Vertical fillHeight uses flex-1; minHeight keeps Recharts from collapsing when parent height is flex-derived. */
+  const verticalResponsiveMinHeight = fillHeight ? 144 : undefined;
 
   const emitSegmentEnter = (dataKey: string) => {
     if (!onStackedSegmentHover) return;
@@ -261,20 +263,27 @@ export function StackedDistributionBar({
     <ResponsiveContainer
       width="100%"
       height="100%"
-      minHeight={orientation === 'horizontal' ? horizontalResponsiveMinHeight : undefined}
+      minHeight={
+        orientation === 'horizontal'
+          ? horizontalResponsiveMinHeight
+          : verticalResponsiveMinHeight
+      }
     >
       {chartInner}
     </ResponsiveContainer>
   );
 
-  const chartWithPointer =
-    onStackedSegmentHover ? (
-      <div className="h-full w-full" onPointerLeave={() => onStackedSegmentHover(null)}>
-        {chartResponsive}
-      </div>
-    ) : (
-      chartResponsive
-    );
+  const chartWithPointer = (
+    <div className="h-full min-h-0 w-full">
+      {onStackedSegmentHover ? (
+        <div className="h-full w-full" onPointerLeave={() => onStackedSegmentHover(null)}>
+          {chartResponsive}
+        </div>
+      ) : (
+        chartResponsive
+      )}
+    </div>
+  );
 
   const legendMuted = isDark ? 'text-zinc-400' : 'text-zinc-600';
   const legendValue = isDark ? 'text-zinc-200' : 'text-zinc-800';
@@ -388,7 +397,9 @@ export function StackedDistributionBar({
   const showVerticalBottomLegend = bottomLegend && orientation === 'vertical';
 
   const chartBlock = (
-    <div className={cn(chartShell, showVerticalBottomLegend && fillHeight && 'min-h-0 flex-1', !showSideLegend && useRailInwardTooltip && 'overflow-visible')}>
+    <div
+      className={cn(chartShell, !showSideLegend && useRailInwardTooltip && 'overflow-visible')}
+    >
       {chartWithPointer}
     </div>
   );
@@ -416,14 +427,20 @@ export function StackedDistributionBar({
         <div
           className={cn(
             'flex w-full gap-3 sm:gap-4',
-            orientation === 'horizontal' ? 'items-center' : 'sm:flex-row sm:items-stretch',
+            orientation === 'horizontal'
+              ? 'flex-col md:flex-row md:items-center'
+              : 'sm:flex-row sm:items-stretch',
             fillHeight && orientation === 'vertical' && 'min-h-0 flex-1',
           )}
         >
           <div className={cn(chartShell, 'min-w-0 flex-1', fillHeight && orientation === 'vertical' && 'min-h-0')}>
             {chartWithPointer}
           </div>
-          {sideLegendList}
+          {sideLegendList ? (
+            <div className={cn('w-full shrink-0 md:w-32 lg:w-44', orientation === 'horizontal' && 'md:max-w-[11rem]')}>
+              {sideLegendList}
+            </div>
+          ) : null}
         </div>
       ) : showVerticalBottomLegend ? (
         <>

@@ -9,12 +9,16 @@ import {
   type GlobalDistributionStats,
 } from '@/lib/dashboardOverviewDistribution';
 import { cn } from '@/lib/utils';
+import type { DistributionLegendPlacement } from '@/components/dashboard/DistributionCarouselPanel';
+import type { StackedBarOrientation } from '@/components/dashboard/StackedDistributionBar';
 
 type Props = {
   isDark: boolean;
   t: Translations;
   currentStats: GlobalDistributionStats;
   compact?: boolean;
+  legendPlacement?: DistributionLegendPlacement;
+  stackedBarOrientation?: StackedBarOrientation;
   className?: string;
 };
 
@@ -23,6 +27,8 @@ export function DashboardGlobalDistributionBarCard({
   t,
   currentStats,
   compact = false,
+  legendPlacement = 'side',
+  stackedBarOrientation = 'horizontal',
   className,
 }: Props) {
   const muted = isDark ? 'text-zinc-400' : 'text-zinc-600';
@@ -67,10 +73,10 @@ export function DashboardGlobalDistributionBarCard({
             prevLabel={t.chainDistributionPrev}
             nextLabel={t.chainDistributionNext}
             isDark={isDark}
-            legendPlacement="side"
+            legendPlacement={legendPlacement}
             legendDensity="default"
             chartVariant="stackedBar"
-            stackedBarOrientation="horizontal"
+            stackedBarOrientation={stackedBarOrientation}
             bordered={false}
             showPanelTitle={false}
             className="min-h-0 w-full flex-1"

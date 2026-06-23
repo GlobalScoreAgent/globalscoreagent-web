@@ -3,12 +3,14 @@
 'use client';
 
 import Link from 'next/link';
-import { User, Sun, Moon } from 'lucide-react';
+import { User, Sun, Moon, Menu } from 'lucide-react';
 import { performDashboardLogout } from '@/lib/gsa/dashboard-logout';
+import { cn } from '@/lib/utils';
 import { useLanguage } from './LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import SubscriptionStatusTags from './SubscriptionStatusTags';
 import { useDashboardTitleOverride } from './DashboardTitleOverrideContext';
+import { useDashboardMobileNav } from './DashboardMobileNavContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,12 +22,13 @@ import {
 interface Props {
   user: any;
   profile?: { display_name?: string; avatar_url?: string } | null;
-  pageTitleKey?: string;        // ← Clave de traducción
+  pageTitleKey?: string;
 }
 
 export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) {
   const { t, theme, toggleTheme } = useLanguage();
   const { titleOverride } = useDashboardTitleOverride();
+  const { openMobileNav } = useDashboardMobileNav();
 
   const handleSignOut = () => {
     void performDashboardLogout();
@@ -33,34 +36,55 @@ export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) 
 
   const displayName = profile?.display_name || user.email?.split('@')[0] || 'Usuario';
 
+  const pageTitle = titleOverride
+    ? titleOverride
+    : pageTitleKey
+      ? t[pageTitleKey as keyof typeof t]
+      : t.dashboardTitle;
+
   return (
-    <header className={`min-h-16 h-auto border-b px-8 py-2 flex items-center justify-between transition-colors ${
-      theme === 'dark' 
-        ? 'bg-zinc-900 border-zinc-800' 
-        : 'bg-white border-zinc-200 text-zinc-900'
-    }`}>
-      
-      {/* Título dinámico bilingüe */}
-      <div className="font-semibold text-2xl tracking-tight">
-        {t.platformTitle} -{' '}
-        {titleOverride
-          ? titleOverride
-          : pageTitleKey
-            ? t[pageTitleKey as keyof typeof t]
-            : t.dashboardTitle}
+    <header
+      className={cn(
+        'flex min-h-16 h-auto items-center gap-3 border-b px-4 py-2 transition-colors md:gap-4 md:px-8',
+        theme === 'dark' ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200 text-zinc-900',
+      )}
+    >
+      <button
+        type="button"
+        onClick={openMobileNav}
+        className={cn(
+          'flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl transition-colors md:hidden',
+          theme === 'dark'
+            ? 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
+            : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900',
+        )}
+        aria-label="Open navigation menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      <div className="min-w-0 flex-1 font-semibold tracking-tight">
+        <p className="truncate text-base sm:text-lg md:text-2xl">
+          <span className="hidden md:inline">{t.platformTitle} - </span>
+          {pageTitle}
+        </p>
       </div>
 
-      <div className="flex items-center gap-6">
-        <SubscriptionStatusTags />
-        <LanguageSwitcher />
+      <div className="flex shrink-0 items-center gap-2 md:gap-6">
+        <div className="hidden md:flex md:items-center md:gap-6">
+          <SubscriptionStatusTags />
+          <LanguageSwitcher />
+        </div>
 
         <button
           onClick={toggleTheme}
-          className={`w-9 h-9 flex items-center justify-center rounded-2xl transition-colors ${
-            theme === 'dark' 
-              ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' 
-              : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'
-          }`}
+          className={cn(
+            'flex h-9 w-9 items-center justify-center rounded-2xl transition-colors',
+            theme === 'dark'
+              ? 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+              : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100',
+          )}
+          aria-label="Toggle theme"
         >
           {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>
@@ -69,26 +93,28 @@ export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) 
           <DropdownMenuTrigger asChild>
             <button
               type="button"
-              className="flex items-center gap-3 rounded-2xl px-2 py-1.5 transition-colors hover:bg-zinc-800/50 focus:outline-none"
+              className={cn(
+                'flex items-center gap-2 rounded-2xl px-1 py-1 transition-colors focus:outline-none md:gap-3 md:px-2 md:py-1.5',
+                theme === 'dark' ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-100',
+              )}
             >
-              <div className="text-right">
-                <p className={`text-sm font-medium ${theme === 'dark' ? 'text-white' : 'text-zinc-900'}`}>
+              <div className="hidden text-right md:block">
+                <p className={cn('text-sm font-medium', theme === 'dark' ? 'text-white' : 'text-zinc-900')}>
                   {displayName}
                 </p>
-                <p className={`text-xs ${theme === 'dark' ? 'text-zinc-500' : 'text-zinc-500'}`}>
-                  {user.email}
-                </p>
+                <p className="text-xs text-zinc-500">{user.email}</p>
               </div>
 
-              <div className={`w-9 h-9 rounded-2xl flex items-center justify-center overflow-hidden border transition-colors ${
-                theme === 'dark'
-                  ? 'bg-zinc-700 border-amber-400/30'
-                  : 'bg-zinc-200 border-zinc-400'
-              }`}>
+              <div
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center overflow-hidden rounded-2xl border transition-colors',
+                  theme === 'dark' ? 'bg-zinc-700 border-amber-400/30' : 'bg-zinc-200 border-zinc-400',
+                )}
+              >
                 {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                  <img src={profile.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
                 ) : (
-                  <User className={`w-5 h-5 ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`} />
+                  <User className={cn('h-5 w-5', theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600')} />
                 )}
               </div>
             </button>
@@ -96,11 +122,18 @@ export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) 
 
           <DropdownMenuContent
             align="end"
-            className={`w-56 rounded-3xl p-2 ${theme === 'dark'
-              ? 'bg-zinc-900 border-zinc-700 text-white'
-              : 'bg-white border-zinc-200 text-zinc-900'
-            }`}
+            className={cn(
+              'w-56 rounded-3xl p-2',
+              theme === 'dark' ? 'bg-zinc-900 border-zinc-700 text-white' : 'bg-white border-zinc-200 text-zinc-900',
+            )}
           >
+            <div className="px-4 py-2 md:hidden">
+              <SubscriptionStatusTags />
+            </div>
+            <div className="px-4 py-2 md:hidden">
+              <LanguageSwitcher />
+            </div>
+            <DropdownMenuSeparator className="md:hidden" />
             <DropdownMenuItem asChild>
               <Link href="/dashboard/perfil" className="px-4 py-2.5">
                 {t.profile}
