@@ -141,6 +141,7 @@ Ver [`docs/español/index-humi.md`](español/index-humi.md) y [`docs/AGENT-RULES
 - **Datos sensibles vía API server** — no Supabase directo desde browser en overview
 - **Auth:** middleware protege `/dashboard` y `/api/dashboard`; callback OAuth en route handler con cookies en redirect response
 - **i18n ES/EN** + tema claro/oscuro (`LanguageContext`)
+- **Branding sidebar:** logo según tema en `DashboardSidebar` — `public/logo-gsa-dashboard-oscuro.png` (dark) / `public/logo-gsa-dashboard-claro.png` (light); marketing usa `public/logo-gsa.png` fijo
 - **Monorepo:** marketing + dashboard en `main`; desarrollo histórico en ramas `web-page-v2` / `dashboard-final` (ver [`BRANCHING.md`](BRANCHING.md))
 - **SSR:** componentes dashboard pesados con `dynamic(..., { ssr: false })` donde el árbol de client components lo exige
 
@@ -215,6 +216,7 @@ Ver [`docs/AGENT-RULES.md`](AGENT-RULES.md) y [`.cursor/rules/dashboard-branch.m
 | **Nonce** | Corrección timezone en serie 30d |
 | **Auth prod** | OAuth Google/GitHub operativo en `globalscoreagent.com` |
 | **Docs dashboard** | `docs/español/dashboard/*`, `docs/ingles/dashboard/*` |
+| **Branding** | Logos sidebar por tema (`logo-gsa-dashboard-oscuro` / `logo-gsa-dashboard-claro`) |
 
 ---
 

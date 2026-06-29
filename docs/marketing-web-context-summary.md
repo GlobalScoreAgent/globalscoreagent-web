@@ -25,6 +25,7 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 - **Footer:** QR Zoho para agendar reunión + copy bilingüe (`public/booking-qr.png`, enlace Calendly/Zoho slot booking).
 - **Auth:** login en `/auth/login`; OAuth comparte flujo con dashboard (`/auth/callback`).
 - **Agentes públicos:** perfiles SEO en `/agents/[id]` (+ `/humi`, `/wami`).
+- **Branding:** favicon en `app/favicon.ico`; logo marketing en `public/logo-gsa.png` (sidebar/footer).
 
 ---
 

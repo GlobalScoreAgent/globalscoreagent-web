@@ -67,6 +67,11 @@ export default function DashboardSidebar() {
       ? 'bg-zinc-900 border-zinc-800'
       : 'bg-white border-zinc-200 text-zinc-900';
 
+  const logoSrc =
+    theme === 'light'
+      ? '/logo-gsa-dashboard-claro.png'
+      : '/logo-gsa-dashboard-oscuro.png';
+
   return (
     <aside
       className={cn(
@@ -87,7 +92,7 @@ export default function DashboardSidebar() {
         )}
       >
         <img
-          src="/logo-gsa.png"
+          src={logoSrc}
           alt="Global Score Agent"
           className={cn(
             'transition-all object-contain object-center',
