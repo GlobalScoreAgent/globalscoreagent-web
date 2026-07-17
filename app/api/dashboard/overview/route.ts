@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { requireDashboardUser } from '@/lib/auth/require-dashboard-user';
+import { requireActiveDashboardUser } from '@/lib/auth/require-active-subscription';
 import { apiJsonResponse } from '@/lib/api/route-config';
 import { enrichTop10AgentRows } from '@/lib/dashboardAgentLookup';
 import type { DashboardChainRow } from '@/lib/dashboardChains';
@@ -33,7 +33,7 @@ async function loadOverview(db: SupabaseClient) {
 }
 
 export async function GET() {
-  const auth = await requireDashboardUser();
+  const auth = await requireActiveDashboardUser();
   if (!auth.ok) return auth.response;
 
   const { statsRes, chainsRes } = await loadOverview(auth.supabase);

@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from './LanguageContext';
 import LanguageSwitcher from './LanguageSwitcher';
 import SubscriptionStatusTags from './SubscriptionStatusTags';
+import { useDashboardLogin } from './DashboardLoginContext';
 import { useDashboardTitleOverride } from './DashboardTitleOverrideContext';
 import { useDashboardMobileNav } from './DashboardMobileNavContext';
 import {
@@ -26,7 +27,8 @@ interface Props {
 }
 
 export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) {
-  const { t, theme, toggleTheme } = useLanguage();
+  const { t, theme, toggleTheme, lang } = useLanguage();
+  const { loginReady, isSubscriptionActive, loginMessage } = useDashboardLogin();
   const { titleOverride } = useDashboardTitleOverride();
   const { openMobileNav } = useDashboardMobileNav();
 
@@ -41,6 +43,12 @@ export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) 
     : pageTitleKey
       ? t[pageTitleKey as keyof typeof t]
       : t.dashboardTitle;
+
+  const showInactiveSubscriptionBadge = loginReady && !isSubscriptionActive;
+  const inactiveSubscriptionMessage =
+    (loginMessage
+      ? (lang === 'es' ? loginMessage.es : loginMessage.en).trim()
+      : '') || t.subscriptionInactiveBadge;
 
   return (
     <header
@@ -64,10 +72,25 @@ export default function DashboardTopNav({ user, profile, pageTitleKey }: Props) 
       </button>
 
       <div className="min-w-0 flex-1 font-semibold tracking-tight">
-        <p className="truncate text-base sm:text-lg md:text-2xl">
-          <span className="hidden md:inline">{t.platformTitle} - </span>
-          {pageTitle}
-        </p>
+        {showInactiveSubscriptionBadge ? (
+          <span
+            role="status"
+            title={inactiveSubscriptionMessage}
+            className={cn(
+              'inline-flex max-w-full truncate rounded-full border px-3 py-1 text-xs font-medium sm:text-sm',
+              theme === 'dark'
+                ? 'border-red-400/40 bg-red-400/10 text-red-200'
+                : 'border-red-500/40 bg-red-50 text-red-800',
+            )}
+          >
+            {inactiveSubscriptionMessage}
+          </span>
+        ) : (
+          <p className="truncate text-base sm:text-lg md:text-2xl">
+            <span className="hidden md:inline">{t.platformTitle} - </span>
+            {pageTitle}
+          </p>
+        )}
       </div>
 
       <div className="flex shrink-0 items-center gap-2 md:gap-6">

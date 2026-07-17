@@ -3,13 +3,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Copy, ExternalLink, Mail } from 'lucide-react';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-import type { ChartLabelResolver } from '@/lib/agentDeltaSeries';
-import {
-  buildBalanceDeltaSeries,
-  buildNonceDeltaSeries,
-} from '@/lib/agentDeltaSeries';
 import {
   getAgentDetailMaturityTier,
   getHumiMaturityColor,
@@ -34,21 +29,34 @@ import {
   TOP10_AGENTS_LIST_PATH,
   type AgentRouteScope,
 } from '@/lib/dashboardAgentLookup';
-import { normalizeChainName } from '@/lib/agentChains';
-import { publicChainLogoUrl, resolveChainLogoFileName } from '@/lib/chainPublicLogo';
+import { nativeGasSymbolFromChainName, normalizeChainName } from '@/lib/agentChains';
+import { AgentsDirectorySearching } from '@/components/dashboard/AgentsDirectorySearching';
+import { publicChainLogoUrl, resolveChainLogoFileName, chainLogoUrlFromChainName } from '@/lib/chainPublicLogo';
 import { formatDashboardDateUtc } from '@/lib/formatDashboardDate';
 import { cn } from '@/lib/utils';
 import { AgentDetailCard } from '@/components/dashboard/AgentDetailCard';
-import { AgentDetailWarningsCard } from '@/components/dashboard/AgentDetailWarningsCard';
+import { AgentDetailWarningsBadges } from '@/components/dashboard/AgentDetailWarningsBadges';
+import { AgentDetailAiAnalysisCard } from '@/components/dashboard/AgentDetailAiAnalysisCard';
 import { AgentDetailIndexScoreCard } from '@/components/dashboard/AgentDetailIndexScoreCard';
 import { MetadataRichnessLayersChart } from '@/components/dashboard/MetadataRichnessLayersChart';
 import { AgentTransactionalChart } from '@/components/dashboard/AgentTransactionalChart';
+import { AgentTransactionalChainDistribution } from '@/components/dashboard/AgentTransactionalChainDistribution';
 import { metadataRichnessTier, parseMetadataRichnessInformation } from '@/lib/metadataRichness';
 import { DashboardInfoTooltip } from '@/components/dashboard/DashboardInfoTooltip';
 import { parseAgentWarnings } from '@/lib/agentWarnings';
 import { parseOwnerWalletDetails } from '@/lib/agentOwnerWalletDetails';
-import { parseTransactionalWallets } from '@/lib/agentTransactionalWallets';
+import type { TransactionalWalletRow } from '@/lib/agentTransactionalWallets';
+import { humanizeWalletCategory } from '@/lib/agentTransactionalWallets';
+import {
+  getWalletCategoryExplanation,
+} from '@/lib/walletTransactionalCategoryExplanations';
+import {
+  buildDailyValueSeries,
+  formatBalanceDisplay,
+  parseAgentWalletActivity,
+} from '@/lib/agentWalletActivity';
 import { AgentTransactionalWalletCarousel } from '@/components/dashboard/AgentTransactionalWalletCarousel';
+import { DashboardComingSoonModal } from '@/components/dashboard/DashboardComingSoonModal';
 import { AgentDetailOnChainCard } from '@/components/dashboard/AgentDetailOnChainCard';
 import { AgentDetailOwnerCard } from '@/components/dashboard/AgentDetailOwnerCard';
 import {
@@ -76,13 +84,6 @@ function jsonFieldEmpty(v: unknown): boolean {
   if (typeof v === 'object') return Object.keys(v as object).length === 0;
   if (typeof v === 'string') return !v.trim();
   return false;
-}
-
-function stripNumericBalance(v: unknown): string {
-  if (v === null || v === undefined) return '';
-  let s = String(v).trim();
-  s = s.replace(/\s*ETH\s*$/i, '').trim();
-  return s;
 }
 
 function profileLabelsFromJson(raw: unknown): string[] {
@@ -157,28 +158,14 @@ export function AgentOverviewView({ routeScope }: { routeScope: AgentRouteScope 
   const [chainLogoFailed, setChainLogoFailed] = useState(false);
 
   const [descModalOpen, setDescModalOpen] = useState(false);
+  const [comingSoonOpen, setComingSoonOpen] = useState(false);
   const [transactionalSeries, setTransactionalSeries] = useState<'nonce' | 'balance'>('nonce');
+  const [txWalletIndex, setTxWalletIndex] = useState(0);
+  const [txChainId, setTxChainId] = useState<'all' | number>('all');
 
   const [activeMetaField, setActiveMetaField] = useState<string | null>(null);
   const [activeFeedbackSummary, setActiveFeedbackSummary] = useState<string | null>(null);
   const [metadataView, setMetadataView] = useState<'analysis' | 'data'>('analysis');
-  const chartLabelOf: ChartLabelResolver = useCallback(
-    (bucket) => {
-      const map: Record<string, keyof Translations> = {
-        today: 'chartLabelToday',
-        '7d': 'chartLabel7d',
-        '15d': 'chartLabel15d',
-        '1m': 'chartLabel1m',
-        '2m': 'chartLabel2m',
-        '3m': 'chartLabel3m',
-        '6m': 'chartLabel6m',
-        '9m': 'chartLabel9m',
-        '12m': 'chartLabel12m',
-      };
-      return t[map[bucket]] as string;
-    },
-    [t]
-  );
 
   useEffect(() => {
     if (!routeId) {
@@ -331,37 +318,74 @@ export function AgentOverviewView({ routeScope }: { routeScope: AgentRouteScope 
     [agent?.owner_wallet_details],
   );
 
-  const transactionalWallets = useMemo(
-    () =>
-      parseTransactionalWallets(
-        agent?.wallet_wami_score_details,
-        agent?.transactional_wallets,
-      ),
-    [agent?.wallet_wami_score_details, agent?.transactional_wallets],
+  const walletActivity = useMemo(
+    () => parseAgentWalletActivity(agent?.wallet_activity),
+    [agent?.wallet_activity],
   );
 
-  const nonceChartData = useMemo(() => {
-    if (!agent) return [];
-    const cur =
-      agent.nonce_current !== null && agent.nonce_current !== undefined
-        ? Number(agent.nonce_current)
-        : null;
-    return buildNonceDeltaSeries(agent.nonce_history, cur, chartLabelOf);
-  }, [agent, chartLabelOf]);
+  const activityWallets = walletActivity?.transactional_wallets ?? [];
 
-  const balanceChartData = useMemo(() => {
-    if (!agent) return [];
-    const raw = agent.balance_current;
-    let cur: number | null = null;
-    if (raw !== null && raw !== undefined) {
-      const n = Number(stripNumericBalance(raw));
-      if (Number.isFinite(n)) cur = n;
+  const safeTxWalletIndex =
+    activityWallets.length > 0
+      ? ((txWalletIndex % activityWallets.length) + activityWallets.length) %
+        activityWallets.length
+      : 0;
+
+  const selectedActivityWallet =
+    activityWallets.length > 0 ? activityWallets[safeTxWalletIndex] : null;
+
+  const selectedChain =
+    selectedActivityWallet && txChainId !== 'all'
+      ? selectedActivityWallet.chains.find((c) => c.chain_id === txChainId) ?? null
+      : null;
+
+  const transactionalWallets: TransactionalWalletRow[] = useMemo(() => {
+    return activityWallets.map((w) => ({
+      address: w.wallet_address,
+      wami_score: null,
+      wallet_category: null,
+    }));
+  }, [activityWallets]);
+
+  const chartLocale = lang === 'es' ? 'es-ES' : 'en-US';
+
+  const nonceKpi =
+    selectedChain?.nonce_current ??
+    selectedActivityWallet?.general_nonce_total ??
+    walletActivity?.nonce_current ??
+    null;
+
+  const balanceKpi =
+    selectedChain != null
+      ? selectedChain.balance_current
+      : null;
+
+  const transactionalChartData = useMemo(() => {
+    if (selectedChain) {
+      const series =
+        transactionalSeries === 'nonce'
+          ? selectedChain.nonce_last_30_days
+          : selectedChain.balance_last_30_days;
+      return buildDailyValueSeries(series, chartLocale);
     }
-    return buildBalanceDeltaSeries(agent.balance_history, cur, chartLabelOf);
-  }, [agent, chartLabelOf]);
+    if (transactionalSeries === 'nonce') {
+      return buildDailyValueSeries(
+        walletActivity?.nonce_last_30_days ?? [],
+        chartLocale,
+      );
+    }
+    return [];
+  }, [selectedChain, transactionalSeries, walletActivity, chartLocale]);
 
-  const transactionalChartData =
-    transactionalSeries === 'nonce' ? nonceChartData : balanceChartData;
+  const showChainDistribution =
+    txChainId === 'all' &&
+    !!selectedActivityWallet &&
+    selectedActivityWallet.chains.length > 0;
+
+  useEffect(() => {
+    setTxWalletIndex(0);
+    setTxChainId('all');
+  }, [routeId, walletActivity?.calculated_at, activityWallets.length]);
 
   const richnessParsed = useMemo(
     () => parseMetadataRichnessInformation(agent?.metadata_richness_information),
@@ -392,10 +416,8 @@ export function AgentOverviewView({ routeScope }: { routeScope: AgentRouteScope 
 
   if (loading) {
     return (
-      <div
-        className={`flex min-h-[50vh] items-center justify-center ${isDark ? 'text-zinc-400' : 'text-zinc-600'}`}
-      >
-        <p>{t.agentDetailLoading}</p>
+      <div className="flex min-h-[50vh] items-center justify-center py-16">
+        <AgentsDirectorySearching label={t.agentDetailLoading} isDark={isDark} />
       </div>
     );
   }
@@ -453,6 +475,12 @@ export function AgentOverviewView({ routeScope }: { routeScope: AgentRouteScope 
     <div
       className={`min-h-full pb-20 ${isDark ? 'bg-zinc-950 text-zinc-100' : 'bg-zinc-100 text-zinc-900'}`}
     >
+      <DashboardComingSoonModal
+        open={comingSoonOpen}
+        onClose={() => setComingSoonOpen(false)}
+        isDark={isDark}
+        t={t}
+      />
       {descModalOpen && (
         <div
           className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${isDark ? 'bg-black/70' : 'bg-black/40'}`}
@@ -503,8 +531,8 @@ export function AgentOverviewView({ routeScope }: { routeScope: AgentRouteScope 
             ← {lang === 'es' ? 'Top 10 agentes' : 'Top 10 agents'}
           </Link>
         ) : null}
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="flex w-80 max-w-full flex-shrink-0 flex-col gap-4 mx-auto lg:mx-0">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-stretch">
+          <div className="mx-auto flex w-80 max-w-full flex-shrink-0 flex-col gap-4 lg:mx-0">
             <AgentDetailCard
               isDark={isDark}
               variant="image"
@@ -578,8 +606,8 @@ export function AgentOverviewView({ routeScope }: { routeScope: AgentRouteScope 
             ) : null}
           </div>
 
-          <div className="flex-1 pt-4 min-w-0">
-            <div className="flex flex-col gap-6 xl:grid xl:grid-cols-[minmax(0,1fr)_min(20rem,32%)] xl:items-start xl:gap-6">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col pt-4">
+            <div className="flex min-h-0 flex-1 flex-col gap-6 xl:grid xl:h-full xl:grid-cols-[minmax(0,1fr)_min(20rem,32%)] xl:items-stretch xl:gap-6">
               <div className="min-w-0">
                 <div className="flex min-w-0 flex-wrap items-center gap-3">
                   <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
@@ -638,9 +666,7 @@ export function AgentOverviewView({ routeScope }: { routeScope: AgentRouteScope 
                     filterTier={wamiTier}
                     filterLabel={wamiText}
                     accentColor={wamiColor}
-                    detailsHref={withPublicLang(
-                      agentDetailSubPagePath(routeId, 'wami', lookupBy, routeScope),
-                    )}
+                    onPlusClick={() => setComingSoonOpen(true)}
                     plusAriaLabel={t.agentDetailIndexPlusAriaLabelWami}
                     infoAriaLabel={t.agentDetailIndexInfoAriaLabel}
                     notAvailableLabel={t.notAvailable}
@@ -649,15 +675,26 @@ export function AgentOverviewView({ routeScope }: { routeScope: AgentRouteScope 
                 </div>
               </div>
 
-              <AgentDetailWarningsCard
-                warnings={agentWarnings}
-                isDark={isDark}
-                t={t}
-                className="w-full xl:sticky xl:top-8"
-              />
+              <div className="flex min-h-0 w-full flex-col xl:h-full">
+                <AgentDetailAiAnalysisCard
+                  primary={agent.ai_category_primary}
+                  secondary={agent.ai_category_secondary}
+                  confidence={agent.ai_category_confidence}
+                  purpose={agent.ai_category_purpose}
+                  isDark={isDark}
+                  t={t}
+                  className="h-full w-full"
+                />
+              </div>
             </div>
           </div>
         </div>
+
+        <AgentDetailWarningsBadges
+          warnings={agentWarnings}
+          isDark={isDark}
+          t={t}
+        />
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-12 xl:items-stretch">
           <div className="flex h-full flex-col gap-4 self-stretch xl:col-span-5">
@@ -894,7 +931,85 @@ export function AgentOverviewView({ routeScope }: { routeScope: AgentRouteScope 
               t={t}
               resetKey={routeId}
               onCopy={copyToClipboard}
+              hideWamiScore
+              hideCategoryBadge
+              controlledIndex={safeTxWalletIndex}
+              onIndexChange={(index) => {
+                setTxWalletIndex(index);
+                setTxChainId('all');
+              }}
             />
+
+            {selectedActivityWallet && selectedActivityWallet.chains.length > 0 ? (
+              <div className="mb-6 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setTxChainId('all')}
+                  className={cn(
+                    'rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                    txChainId === 'all' ? tabActive : tabIdle,
+                  )}
+                >
+                  {t.transactionalChainFilterAll}
+                </button>
+                {selectedActivityWallet.chains.map((chain) => {
+                  const logoSrc = chainLogoUrlFromChainName(chain.chain_name);
+                  const isSelected = txChainId === chain.chain_id;
+                  const category = chain.wallet_category;
+                  return (
+                    <button
+                      key={chain.chain_id}
+                      type="button"
+                      onClick={() => setTxChainId(chain.chain_id)}
+                      className={cn(
+                        'inline-flex max-w-full items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors',
+                        isSelected ? tabActive : tabIdle,
+                      )}
+                    >
+                      {logoSrc ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={logoSrc}
+                          alt=""
+                          width={14}
+                          height={14}
+                          className="h-3.5 w-3.5 shrink-0 object-contain"
+                        />
+                      ) : null}
+                      <span className="truncate">{chain.chain_name}</span>
+                      {isSelected && category ? (
+                        <span
+                          className={cn(
+                            'inline-flex max-w-[9rem] items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide',
+                            // Chip seleccionado invierte fondo (oscuro→blanco, claro→negro):
+                            // el badge sigue el contraste del chip, no el del tema global.
+                            isDark
+                              ? 'border-sky-700/40 bg-sky-100 text-sky-900'
+                              : 'border-sky-300/50 bg-sky-500/25 text-sky-100',
+                          )}
+                          onClick={(e) => e.stopPropagation()}
+                          onPointerDown={(e) => e.stopPropagation()}
+                        >
+                          <span className="truncate">{humanizeWalletCategory(category)}</span>
+                          <DashboardInfoTooltip
+                            content={
+                              getWalletCategoryExplanation(
+                                category,
+                                lang === 'es' ? 'es' : 'en',
+                              ) ?? t.agentDetailWalletCategoryExplanationFallback
+                            }
+                            ariaLabel={t.agentDetailWalletCategoryInfoAriaLabel}
+                            isDark={isDark}
+                            placement="top"
+                            tooltipClassName="max-w-[16rem] whitespace-normal normal-case"
+                          />
+                        </span>
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
 
             <div className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8">
               <button
@@ -928,9 +1043,7 @@ export function AgentOverviewView({ routeScope }: { routeScope: AgentRouteScope 
                 </div>
                 <div className="flex min-h-[4.5rem] flex-1 items-center justify-center">
                   <span className="text-center text-5xl font-bold tabular-nums">
-                    {agent.nonce_current !== null && agent.nonce_current !== undefined
-                      ? String(agent.nonce_current)
-                      : t.notAvailable}
+                    {nonceKpi !== null ? String(nonceKpi) : t.notAvailable}
                   </span>
                 </div>
               </button>
@@ -955,7 +1068,11 @@ export function AgentOverviewView({ routeScope }: { routeScope: AgentRouteScope 
                     onPointerDown={(e) => e.stopPropagation()}
                   >
                     <DashboardInfoTooltip
-                      content={t.transactionalBalanceCurrentHelp}
+                      content={
+                        selectedChain
+                          ? t.transactionalBalanceCurrentHelp
+                          : t.transactionalBalanceMultiChainHelp
+                      }
                       ariaLabel={t.transactionalBalanceInfoAriaLabel}
                       isDark={isDark}
                       placement="top"
@@ -974,26 +1091,56 @@ export function AgentOverviewView({ routeScope }: { routeScope: AgentRouteScope 
                           : 'text-emerald-600',
                     )}
                     title={
-                      stripNumericBalance(agent.balance_current)
-                        ? stripNumericBalance(agent.balance_current)
+                      balanceKpi !== null
+                        ? formatBalanceDisplay(
+                            balanceKpi,
+                            chartLocale,
+                            selectedChain
+                              ? nativeGasSymbolFromChainName(selectedChain.chain_name)
+                              : null,
+                          ) ?? undefined
                         : undefined
                     }
                   >
-                    {stripNumericBalance(agent.balance_current) || t.notAvailable}
+                    {selectedChain
+                      ? formatBalanceDisplay(
+                          balanceKpi,
+                          chartLocale,
+                          nativeGasSymbolFromChainName(selectedChain.chain_name),
+                        ) ?? t.notAvailable
+                      : t.transactionalBalanceMultiChainLabel}
                   </span>
                 </div>
               </button>
             </div>
 
             <div className={`h-80 p-4 ${cardInlay}`}>
-              <AgentTransactionalChart
-                data={transactionalChartData}
-                series={transactionalSeries}
-                isDark={isDark}
-                locale={lang === 'es' ? 'es-ES' : 'en-US'}
-                emptyMessage={t.agentDetailNoJsonToShow}
-                vsPreviousLabel={t.transactionalDeltaVsPrevious}
-              />
+              {showChainDistribution ? (
+                <AgentTransactionalChainDistribution
+                  mode={transactionalSeries}
+                  chains={selectedActivityWallet.chains}
+                  isDark={isDark}
+                  locale={chartLocale}
+                  lang={lang === 'es' ? 'es' : 'en'}
+                  t={t}
+                  emptyMessage={t.agentDetailNoJsonToShow}
+                  onSelectChain={(chainId) => setTxChainId(chainId)}
+                />
+              ) : (
+                <AgentTransactionalChart
+                  data={transactionalChartData}
+                  series={transactionalSeries}
+                  isDark={isDark}
+                  locale={chartLocale}
+                  emptyMessage={t.agentDetailNoJsonToShow}
+                  vsPreviousLabel={t.transactionalDeltaVsPrevious}
+                  valueSuffix={
+                    transactionalSeries === 'balance' && selectedChain
+                      ? nativeGasSymbolFromChainName(selectedChain.chain_name)
+                      : null
+                  }
+                />
+              )}
             </div>
           </AgentDetailCard>
 

@@ -47,14 +47,15 @@ function buildMetadataStack(dist: Record<string, number>) {
   return { row, rowKeys, total };
 }
 
-export function buildGlobalDistributionSlides(
+export type GlobalDistributionMetric = 'humi' | 'wami' | 'meta';
+
+export const GLOBAL_DISTRIBUTION_METRICS: GlobalDistributionMetric[] = ['humi', 'wami', 'meta'];
+
+export function buildGlobalDistributionSlide(
   stats: GlobalDistributionStats,
   t: Translations,
-): DistributionCarouselSlide[] {
-  const humiStack = buildMaturityStack(stats.humi_index_distribution ?? {}, 'humi');
-  const wamiStack = buildMaturityStack(stats.wami_index_distribution ?? {}, 'wami');
-  const metaStack = buildMetadataStack(stats.agent_metadata_distribution ?? {});
-
+  metric: GlobalDistributionMetric,
+): DistributionCarouselSlide | null {
   const maturityLabelForKey = (key: string) => {
     const seg = MATURITY_ORDER.find((s) => s.key === key);
     return seg ? `${seg.scoreRange} · ${t[seg.labelKey]}` : key;
@@ -71,38 +72,49 @@ export function buildGlobalDistributionSlides(
     return tkey ? METADATA_BUCKET_COLORS[tkey] ?? '#71717a' : '#71717a';
   };
 
-  const slides: DistributionCarouselSlide[] = [];
-
-  if (humiStack.total > 0) {
-    slides.push({
+  if (metric === 'humi') {
+    const humiStack = buildMaturityStack(stats.humi_index_distribution ?? {}, 'humi');
+    if (humiStack.total <= 0) return null;
+    return {
       id: 'humi',
       metricLabel: t.humiDistributionTitle,
       rowKeys: humiStack.rowKeys,
       row: humiStack.row,
       colors: maturityColor,
       labelForKey: maturityLabelForKey,
-    });
+    };
   }
-  if (wamiStack.total > 0) {
-    slides.push({
+
+  if (metric === 'wami') {
+    const wamiStack = buildMaturityStack(stats.wami_index_distribution ?? {}, 'wami');
+    if (wamiStack.total <= 0) return null;
+    return {
       id: 'wami',
       metricLabel: t.wamiDistributionTitle,
       rowKeys: wamiStack.rowKeys,
       row: wamiStack.row,
       colors: maturityColor,
       labelForKey: maturityLabelForKey,
-    });
-  }
-  if (metaStack.total > 0) {
-    slides.push({
-      id: 'meta',
-      metricLabel: t.metadataRichnessTitle,
-      rowKeys: metaStack.rowKeys,
-      row: metaStack.row,
-      colors: metaColor,
-      labelForKey: metaLabelForKey,
-    });
+    };
   }
 
-  return slides;
+  const metaStack = buildMetadataStack(stats.agent_metadata_distribution ?? {});
+  if (metaStack.total <= 0) return null;
+  return {
+    id: 'meta',
+    metricLabel: t.metadataRichnessTitle,
+    rowKeys: metaStack.rowKeys,
+    row: metaStack.row,
+    colors: metaColor,
+    labelForKey: metaLabelForKey,
+  };
+}
+
+export function buildGlobalDistributionSlides(
+  stats: GlobalDistributionStats,
+  t: Translations,
+): DistributionCarouselSlide[] {
+  return GLOBAL_DISTRIBUTION_METRICS.map((metric) =>
+    buildGlobalDistributionSlide(stats, t, metric),
+  ).filter((slide): slide is DistributionCarouselSlide => slide != null);
 }

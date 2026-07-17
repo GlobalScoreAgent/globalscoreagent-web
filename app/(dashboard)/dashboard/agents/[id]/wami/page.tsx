@@ -1,7 +1,9 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { AgentWamiDetailView } from '@/components/agents/AgentWamiDetailView';
-
-export default function AgentWamiDetailPage() {
-  return <AgentWamiDetailView routeScope="dashboard" />;
+export default function AgentWamiDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  redirect(`/dashboard/agents/${encodeURIComponent(params.id)}`);
 }

@@ -5,45 +5,85 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
-import type { DeltaChartPoint } from '@/lib/agentDeltaSeries';
+import { humanizeChainKey } from '@/lib/agentWalletActivity';
 
 type SeriesKind = 'nonce' | 'balance';
 
+export type TransactionalChartRow = {
+  label: string;
+  value?: number;
+  [key: string]: string | number | undefined;
+};
+
 export type AgentTransactionalChartProps = {
-  data: DeltaChartPoint[];
+  data: TransactionalChartRow[];
   series: SeriesKind;
   isDark: boolean;
   locale: string;
   emptyMessage: string;
-  /** Short caption for the delta badge (e.g. "vs anterior") */
+  /** Short caption for the delta badge (e.g. "vs anterior") — single-series only */
   vsPreviousLabel: string;
+  /** When set (length > 0), render multi-line chart (nonce or balance) */
+  multiSeriesKeys?: string[];
+  /** Optional display labels for multi-series keys (legend/tooltip) */
+  multiSeriesLabels?: Record<string, string>;
+  /** Appended to balance values (e.g. native gas ticker ETH) */
+  valueSuffix?: string | null;
 };
 
-function formatYTick(v: number, series: SeriesKind, locale: string): string {
+const MULTI_COLORS = [
+  '#34d399',
+  '#38bdf8',
+  '#a78bfa',
+  '#fbbf24',
+  '#f472b6',
+  '#fb923c',
+  '#2dd4bf',
+  '#818cf8',
+];
+
+function formatYTick(
+  v: number,
+  series: SeriesKind,
+  locale: string,
+  suffix?: string | null,
+): string {
   if (!Number.isFinite(v)) return '';
   if (series === 'nonce') {
     return Math.round(v).toLocaleString(locale, { maximumFractionDigits: 0 });
   }
-  return new Intl.NumberFormat(locale, {
+  const n = new Intl.NumberFormat(locale, {
     notation: 'compact',
     maximumFractionDigits: 2,
   }).format(v);
+  const s = typeof suffix === 'string' ? suffix.trim() : '';
+  return s ? `${n} ${s}` : n;
 }
 
-function formatTooltipValue(v: number, series: SeriesKind, locale: string): string {
+function formatTooltipValue(
+  v: number,
+  series: SeriesKind,
+  locale: string,
+  suffix?: string | null,
+): string {
   if (!Number.isFinite(v)) return '—';
   if (series === 'nonce') {
     return Math.round(v).toLocaleString(locale, { maximumFractionDigits: 0 });
   }
-  return new Intl.NumberFormat(locale, {
+  const n = new Intl.NumberFormat(locale, {
     maximumFractionDigits: 6,
     minimumFractionDigits: 0,
   }).format(v);
+  const s = typeof suffix === 'string' ? suffix.trim() : '';
+  return s ? `${n} ${s}` : n;
 }
 
 function formatSignedDelta(delta: number, series: SeriesKind, locale: string): string {
@@ -68,18 +108,17 @@ function ChartTooltip({
   series,
   locale,
   isDark,
+  valueSuffix,
 }: {
   active?: boolean;
   label?: string | number;
-  payload?: ReadonlyArray<{ value?: number }> | undefined;
+  payload?: ReadonlyArray<{ value?: number; name?: string; color?: string }> | undefined;
   series: SeriesKind;
   locale: string;
   isDark: boolean;
+  valueSuffix?: string | null;
 }) {
   if (!active || !payload?.length) return null;
-  const v = payload[0]?.value;
-  if (v === undefined || v === null || !Number.isFinite(Number(v))) return null;
-  const val = formatTooltipValue(Number(v), series, locale);
   const labelText =
     label !== undefined && label !== null && String(label) !== '' ? String(label) : null;
   return (
@@ -95,7 +134,30 @@ function ChartTooltip({
           {labelText}
         </div>
       ) : null}
-      <div className="font-semibold tabular-nums">{val}</div>
+      <div className="space-y-1">
+        {payload.map((entry, i) => {
+          const v = entry.value;
+          if (v === undefined || v === null || !Number.isFinite(Number(v))) return null;
+          return (
+            <div key={`${entry.name ?? i}`} className="flex items-center gap-2">
+              {entry.color ? (
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: entry.color }}
+                />
+              ) : null}
+              {entry.name && payload.length > 1 ? (
+                <span className={`text-xs ${isDark ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                  {entry.name}
+                </span>
+              ) : null}
+              <span className="font-semibold tabular-nums">
+                {formatTooltipValue(Number(v), series, locale, valueSuffix)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -107,6 +169,9 @@ export function AgentTransactionalChart({
   locale,
   emptyMessage,
   vsPreviousLabel,
+  multiSeriesKeys,
+  multiSeriesLabels,
+  valueSuffix,
 }: AgentTransactionalChartProps) {
   const gradId = useId().replace(/:/g, '');
   const lineColor = isDark ? '#34d399' : '#059669';
@@ -115,27 +180,30 @@ export function AgentTransactionalChart({
   const tickFill = isDark ? '#a1a1aa' : '#71717a';
   const gridStroke = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
 
+  const isMulti =
+    Array.isArray(multiSeriesKeys) && multiSeriesKeys.length > 0;
+
   const yTickFormatter = useMemo(
-    () => (v: number) => formatYTick(v, series, locale),
-    [series, locale]
+    () => (v: number) => formatYTick(v, series, locale, valueSuffix),
+    [series, locale, valueSuffix],
   );
 
   const deltaBadge = useMemo(() => {
-    if (data.length < 2) return null;
+    if (isMulti || data.length < 2) return null;
     const prev = data[data.length - 2]?.value;
     const curr = data[data.length - 1]?.value;
     if (
       prev === undefined ||
       curr === undefined ||
-      !Number.isFinite(prev) ||
-      !Number.isFinite(curr)
+      !Number.isFinite(Number(prev)) ||
+      !Number.isFinite(Number(curr))
     ) {
       return null;
     }
-    const delta = curr - prev;
+    const delta = Number(curr) - Number(prev);
     let pct: number | null = null;
-    if (prev !== 0) {
-      pct = (delta / Math.abs(prev)) * 100;
+    if (Number(prev) !== 0) {
+      pct = (delta / Math.abs(Number(prev))) * 100;
     }
     const deltaText = formatSignedDelta(delta, series, locale);
     const pctText =
@@ -148,7 +216,7 @@ export function AgentTransactionalChart({
         : null;
     const sign = delta === 0 ? 'flat' : delta > 0 ? 'up' : 'down';
     return { deltaText, pctText, sign };
-  }, [data, series, locale]);
+  }, [data, series, locale, isMulti]);
 
   const badgeTone = useMemo(() => {
     if (!deltaBadge) {
@@ -233,14 +301,7 @@ export function AgentTransactionalChart({
         </g>
       );
     },
-    [
-      data.length,
-      deltaBadge,
-      badgeTone,
-      lineColor,
-      isDark,
-      vsPreviousLabel,
-    ]
+    [data.length, deltaBadge, badgeTone, lineColor, isDark, vsPreviousLabel],
   );
 
   if (data.length === 0) {
@@ -253,7 +314,87 @@ export function AgentTransactionalChart({
     );
   }
 
-  const chartMarginTop = deltaBadge ? 52 : 16;
+  const chartMarginTop = !isMulti && deltaBadge ? 52 : 16;
+  const xInterval = data.length > 12 ? Math.ceil(data.length / 8) - 1 : 0;
+
+  if (isMulti && multiSeriesKeys) {
+    return (
+      <div className="h-full w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            data={data}
+            margin={{ top: 16, right: 20, left: 4, bottom: 28 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke={gridStroke}
+              strokeOpacity={1}
+            />
+            <XAxis
+              dataKey="label"
+              tick={{ fill: tickFill, fontSize: 11 }}
+              stroke={axisStroke}
+              tickLine={{ stroke: axisStroke }}
+              axisLine={{ stroke: axisStroke }}
+              interval={xInterval}
+              height={42}
+              tickMargin={6}
+            />
+            <YAxis
+              tick={{ fill: tickFill, fontSize: 11 }}
+              stroke={axisStroke}
+              tickLine={{ stroke: axisStroke }}
+              axisLine={{ stroke: axisStroke }}
+              width={52}
+              tickFormatter={yTickFormatter}
+            />
+            <Tooltip
+              cursor={{
+                stroke: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)',
+                strokeWidth: 1,
+              }}
+              content={(props) => (
+                <ChartTooltip
+                  active={props.active}
+                  label={props.label}
+                  payload={
+                    props.payload as unknown as
+                      | Array<{ value?: number; name?: string; color?: string }>
+                      | undefined
+                  }
+                  series={series}
+                  locale={locale}
+                  isDark={isDark}
+                  valueSuffix={valueSuffix}
+                />
+              )}
+            />
+            <Legend
+              wrapperStyle={{ fontSize: 11, paddingTop: 4 }}
+              formatter={(value) =>
+                multiSeriesLabels?.[String(value)] ??
+                humanizeChainKey(String(value))
+              }
+            />
+            {multiSeriesKeys.map((key, i) => (
+              <Line
+                key={key}
+                type="monotone"
+                dataKey={key}
+                name={multiSeriesLabels?.[key] ?? key}
+                stroke={MULTI_COLORS[i % MULTI_COLORS.length]}
+                strokeWidth={2}
+                dot={false}
+                connectNulls={false}
+                activeDot={{ r: 4 }}
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full w-full">
@@ -281,7 +422,7 @@ export function AgentTransactionalChart({
             stroke={axisStroke}
             tickLine={{ stroke: axisStroke }}
             axisLine={{ stroke: axisStroke }}
-            interval={0}
+            interval={xInterval}
             height={42}
             tickMargin={6}
           />
@@ -306,6 +447,7 @@ export function AgentTransactionalChart({
                 series={series}
                 locale={locale}
                 isDark={isDark}
+                valueSuffix={valueSuffix}
               />
             )}
           />
@@ -321,7 +463,6 @@ export function AgentTransactionalChart({
               strokeWidth: 2,
               fill: lineColor,
             }}
-            /* Recharts DotType includes render props; our handler matches runtime shape */
             dot={renderAreaDot as React.ComponentProps<typeof Area>['dot']}
             connectNulls={false}
           />

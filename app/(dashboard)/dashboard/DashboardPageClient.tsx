@@ -3,7 +3,9 @@
 import dynamic from 'next/dynamic';
 import { useDashboardLogin } from './components/DashboardLoginContext';
 import { useLanguage } from './components/LanguageContext';
-import { parseBest10AgentsHumi, type DashboardChainRow } from '@/lib/dashboardChains';
+import { AgentsDirectorySearching } from '@/components/dashboard/AgentsDirectorySearching';
+import { SubscriptionInactiveNotice } from '@/components/dashboard/SubscriptionInactiveNotice';
+import { parseBest10AgentsHumi } from '@/lib/dashboardChains';
 import { normalizeMetadataDistribution } from '@/lib/dashboardMetadataDistribution';
 import { handleDashboardUnauthorized } from '@/lib/auth/handle-dashboard-unauthorized';
 import { useState, useEffect, useMemo } from 'react';
@@ -17,12 +19,12 @@ type LoadState = 'loading' | 'ready' | 'error';
 
 export default function DashboardPageClient() {
   const { t, theme, lang } = useLanguage();
-  const { loginReady, isSubscriptionActive, loginMessage } = useDashboardLogin();
+  const { loginReady, isSubscriptionActive } = useDashboardLogin();
   const isDark = theme === 'dark';
 
   const [stats, setStats] = useState<Record<string, unknown> | null>(null);
-  const [dashboardChains, setDashboardChains] = useState<DashboardChainRow[]>([]);
   const [loadState, setLoadState] = useState<LoadState>('loading');
+  const [searchLoadingKey, setSearchLoadingKey] = useState(0);
 
   useEffect(() => {
     if (!loginReady || !isSubscriptionActive) {
@@ -30,6 +32,7 @@ export default function DashboardPageClient() {
     }
 
     const load = async () => {
+      setSearchLoadingKey((k) => k + 1);
       setLoadState('loading');
 
       try {
@@ -45,18 +48,15 @@ export default function DashboardPageClient() {
         if (!res.ok || !body?.success || !body.stats) {
           console.error('Error loading dashboard overview:', body?.details ?? body);
           setStats(null);
-          setDashboardChains([]);
           setLoadState('error');
           return;
         }
 
         setStats(body.stats);
-        setDashboardChains((body.chains as DashboardChainRow[]) ?? []);
         setLoadState('ready');
       } catch (err) {
         console.error('Error loading dashboard overview:', err);
         setStats(null);
-        setDashboardChains([]);
         setLoadState('error');
       }
     };
@@ -79,7 +79,8 @@ export default function DashboardPageClient() {
       owner_total: Number(stats.owner_total) || 0,
       agent_new: Number(stats.agent_new) || 0,
       feedback_new: Number(stats.feedback_new) || 0,
-      agents_with_feedback: Number(stats.agents_with_feedback) || 0,
+      agents_with_feedback:
+        Number(stats.agents_with_feedback ?? stats.total_agents_with_feedbacks) || 0,
       feedback_total: Number(stats.feedback_total) || 0,
       humi_index_distribution:
         (stats.humi_index_distribution as Record<string, number>) ?? {},
@@ -90,6 +91,7 @@ export default function DashboardPageClient() {
   }, [stats]);
 
   const retryLoad = () => {
+    setSearchLoadingKey((k) => k + 1);
     setLoadState('loading');
     void fetch('/api/dashboard/overview', { credentials: 'include' })
       .then(async (res) => {
@@ -103,37 +105,23 @@ export default function DashboardPageClient() {
           return;
         }
         setStats(body.stats);
-        setDashboardChains((body.chains as DashboardChainRow[]) ?? []);
         setLoadState('ready');
       })
       .catch(() => setLoadState('error'));
   };
 
-  const subscriptionMessage =
-    loginMessage && (lang === 'es' ? loginMessage.es : loginMessage.en);
-
   return (
     <div className={`min-h-full ${isDark ? 'bg-zinc-950' : 'bg-zinc-100'}`}>
       <div className="mx-auto max-w-screen-2xl">
-        {loginReady && !isSubscriptionActive && (
-          <div className="px-4 py-24 text-center">
-            <p
-              className={`mx-auto max-w-xl text-lg ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}
-              role="status"
-            >
-              {subscriptionMessage ||
-                (lang === 'es'
-                  ? 'El perfil no tiene una suscripción activa'
-                  : 'The profile does not have an active subscription')}
-            </p>
-          </div>
-        )}
+        {loginReady && !isSubscriptionActive && <SubscriptionInactiveNotice />}
 
         {isSubscriptionActive && loadState === 'loading' && (
-          <div className="py-24 text-center">
-            <p className={`text-lg ${isDark ? 'text-zinc-300' : 'text-zinc-700'}`}>
-              {t.dashboardDataLoading}
-            </p>
+          <div className="flex justify-center py-16">
+            <AgentsDirectorySearching
+              key={searchLoadingKey}
+              label={t.dashboardDataLoading}
+              isDark={isDark}
+            />
           </div>
         )}
 
@@ -159,7 +147,6 @@ export default function DashboardPageClient() {
         {isSubscriptionActive && loadState === 'ready' && currentStats && (
           <DashboardOverviewPanels
             stats={stats!}
-            dashboardChains={dashboardChains}
             currentStats={currentStats}
             top10Agents={top10Agents}
             isDark={isDark}

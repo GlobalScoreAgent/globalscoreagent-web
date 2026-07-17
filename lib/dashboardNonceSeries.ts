@@ -1,10 +1,10 @@
 /**
- * Build 30-day agent nonce series for dashboard charts (aligned with historical page logic).
+ * Build agent nonce series for dashboard charts from BD rows (no fixed 30-day zero-fill).
  */
 
 export type NoncePoint = {
   date: string;
-  nonces: number;
+  nonces: number | null;
   change: string;
 };
 
@@ -16,46 +16,63 @@ export function formatLocalDateKey(date: Date): string {
   return `${y}-${m}-${d}`;
 }
 
+function parseDateKeyLocal(dateKey: string): Date | null {
+  const [y, m, d] = dateKey.split('-').map((part) => Number(part));
+  if (!y || !m || !d) return null;
+  return new Date(y, m - 1, d, 12, 0, 0);
+}
+
+/**
+ * Series from first BD date → last BD date.
+ * Calendar gaps between min/max get `nonces: null` (chart line breaks; no drop to 0).
+ */
 export function buildNonceDailySeries(agentNonce: unknown): NoncePoint[] {
   if (!agentNonce || !Array.isArray(agentNonce)) return [];
 
-  const rawData = agentNonce as { date: string; total_nonce?: number }[];
   const realDataMap = new Map<string, number>();
-  rawData.forEach((item) => {
-    realDataMap.set(item.date, item.total_nonce || 0);
-  });
+  for (const item of agentNonce as { date?: unknown; total_nonce?: unknown }[]) {
+    if (!item || typeof item.date !== 'string' || !item.date.trim()) continue;
+    const dateKey = item.date.trim();
+    const raw = item.total_nonce;
+    const value = typeof raw === 'number' ? raw : Number(raw);
+    if (!Number.isFinite(value)) continue;
+    realDataMap.set(dateKey, value);
+  }
+
+  if (realDataMap.size === 0) return [];
+
+  const sortedDates = [...realDataMap.keys()].sort((a, b) => a.localeCompare(b));
+  const startKey = sortedDates[0];
+  const endKey = sortedDates[sortedDates.length - 1];
+  const start = parseDateKeyLocal(startKey);
+  const end = parseDateKeyLocal(endKey);
+  if (!start || !end) return [];
 
   const result: NoncePoint[] = [];
-  const today = new Date();
-  const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12, 0, 0);
+  let prevNonNull: number | null = null;
+  const cursor = new Date(start);
 
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date(
-      todayLocal.getFullYear(),
-      todayLocal.getMonth(),
-      todayLocal.getDate() - i,
-      12,
-      0,
-      0,
-    );
-    const dateStr = formatLocalDateKey(date);
+  while (cursor.getTime() <= end.getTime()) {
+    const dateStr = formatLocalDateKey(cursor);
+    const hasValue = realDataMap.has(dateStr);
+    const nonces = hasValue ? (realDataMap.get(dateStr) as number) : null;
 
-    const nonces = realDataMap.get(dateStr) || 0;
     let change = '0%';
-
-    if (result.length > 0) {
-      const prevNonces = result[result.length - 1].nonces;
-      if (prevNonces === 0 && nonces > 0) {
+    if (nonces != null && prevNonNull != null) {
+      if (prevNonNull === 0 && nonces > 0) {
         change = '+∞%';
-      } else if (prevNonces > 0 && nonces === 0) {
+      } else if (prevNonNull > 0 && nonces === 0) {
         change = '-100%';
-      } else if (prevNonces > 0) {
-        const percentChange = ((nonces - prevNonces) / prevNonces) * 100;
+      } else if (prevNonNull > 0) {
+        const percentChange = ((nonces - prevNonNull) / prevNonNull) * 100;
         change = (percentChange >= 0 ? '+' : '') + percentChange.toFixed(1) + '%';
       }
     }
 
     result.push({ date: dateStr, nonces, change });
+    if (nonces != null) prevNonNull = nonces;
+
+    cursor.setDate(cursor.getDate() + 1);
   }
 
   return result;
@@ -66,9 +83,13 @@ export function getLatestNonceFromRaw(agentNonce: unknown): { date: string; nonc
   if (!agentNonce || !Array.isArray(agentNonce) || agentNonce.length === 0) return null;
 
   const rows = agentNonce as { date: string; total_nonce?: number }[];
-  let latest = rows[0];
+  let latest: { date: string; total_nonce?: number } | null = null;
   for (const row of rows) {
-    if (row.date > latest.date) latest = row;
+    if (!row?.date) continue;
+    const value = typeof row.total_nonce === 'number' ? row.total_nonce : Number(row.total_nonce);
+    if (!Number.isFinite(value)) continue;
+    if (!latest || row.date > latest.date) latest = row;
   }
-  return { date: latest.date, nonces: latest.total_nonce ?? 0 };
+  if (!latest) return null;
+  return { date: latest.date, nonces: Number(latest.total_nonce) || 0 };
 }

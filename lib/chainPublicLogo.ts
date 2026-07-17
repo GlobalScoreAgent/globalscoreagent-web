@@ -19,7 +19,20 @@ const CHAIN_NAME_TO_LOGO_BASENAME: Record<string, string> = {
   polygon: 'Polygon_logo',
   'polygon mainnet': 'Polygon_logo',
   matic: 'Polygon_logo',
+  celo: 'celo_logo',
+  'celo mainnet': 'celo_logo',
+  gnosis: 'gnosis-logo',
+  'gnosis chain': 'gnosis-logo',
+  'x layer': 'xlayer_logo',
+  'x layer mainnet': 'xlayer_logo',
+  xlayer: 'xlayer_logo',
 };
+
+export function chainLogoUrlFromChainName(
+  chainName: string | null | undefined,
+): string | null {
+  return publicChainLogoUrl(resolveChainLogoFileName(null, chainName));
+}
 
 export function chainLogoBasenameFromChainName(
   chainName: string | null | undefined,

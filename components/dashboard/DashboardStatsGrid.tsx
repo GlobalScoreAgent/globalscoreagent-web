@@ -35,10 +35,22 @@ type Props = {
   currentStats: DashboardStatsSnapshot;
   isDark: boolean;
   t: Translations;
+  locale?: string;
   section?: 'top' | 'bottom' | 'all';
   compact?: boolean;
   className?: string;
 };
+
+/** Yesterday in UTC (aligns with dashboard MV “previous day” counters). */
+function formatYesterdayUtc(locale: string): string {
+  const d = new Date();
+  d.setUTCDate(d.getUTCDate() - 1);
+  return new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    month: 'short',
+    timeZone: 'UTC',
+  }).format(d);
+}
 
 function DualStatCard({
   config,
@@ -60,7 +72,7 @@ function DualStatCard({
     <div
       {...rest}
       className={cn(
-        'flex w-full flex-col items-stretch overflow-hidden border backdrop-blur-sm',
+        'flex w-full flex-row items-stretch overflow-hidden border backdrop-blur-sm',
         compact && 'h-full',
         compact ? 'rounded-md' : 'rounded-lg',
         isDark ? 'border-zinc-700/50 bg-zinc-900/80' : 'border-zinc-200/50 bg-white/80',
@@ -81,7 +93,7 @@ function DualStatCard({
           className={cn(
             'flex flex-1 flex-col items-center justify-center',
             compact ? 'gap-1 p-1.5' : 'gap-1 p-2',
-            index === 0 && 'border-b',
+            index === 0 && 'border-r',
             isDark ? 'border-zinc-700/50' : 'border-zinc-200/50',
           )}
         >
@@ -125,10 +137,12 @@ export function DashboardStatsGrid({
   currentStats,
   isDark,
   t,
+  locale = 'en-US',
   section = 'all',
   compact = false,
   className,
 }: Props) {
+  const yesterdayLabel = formatYesterdayUtc(locale);
   const dualCards: DualStatConfig[] = [
     {
       left: { key: 'total_agents', label: t.registeredAgents, color: '#facc15' },
@@ -139,8 +153,16 @@ export function DashboardStatsGrid({
       right: { key: 'wallet_monitored', label: t.monitoredWallets, color: '#a855f7' },
     },
     {
-      left: { key: 'agent_new', label: t.dashboardKpiAgentNew, color: '#f97316' },
-      right: { key: 'feedback_new', label: t.dashboardKpiFeedbackNew, color: '#ec4899' },
+      left: {
+        key: 'agent_new',
+        label: `${t.dashboardKpiAgentNew} · ${yesterdayLabel}`,
+        color: '#f97316',
+      },
+      right: {
+        key: 'feedback_new',
+        label: `${t.dashboardKpiFeedbackNew} · ${yesterdayLabel}`,
+        color: '#ec4899',
+      },
     },
     {
       left: {

@@ -60,10 +60,3 @@ export function readOAuthRedirectCookie(
     return DEFAULT_REDIRECT;
   }
 }
-
-/** @deprecated Use getOAuthCallbackUrl + setOAuthRedirectCookie for OAuth/email flows. */
-export function getCallbackUrl(redirectPath?: string): string {
-  const safe = sanitizeRedirectPath(redirectPath);
-  const params = new URLSearchParams({ redirect: safe });
-  return `${getOAuthCallbackUrl()}?${params.toString()}`;
-}

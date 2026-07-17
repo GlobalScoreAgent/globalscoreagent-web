@@ -11,6 +11,7 @@ type Theme = 'dark' | 'light';
 export interface Translations {
   // Sidebar
   home: string;
+  blockchains: string;
   agentsDirectory: string;
   humiIndex: string;
   certifications: string;
@@ -29,6 +30,7 @@ export interface Translations {
   // Top Nav
   dashboardTitle: string;
   searchPlaceholder: string;
+  searchAction: string;
   profile: string;
   subscriptions: string;
   api: string;
@@ -68,6 +70,8 @@ export interface Translations {
   subscriptionsCreatedColumn: string;
   subscriptionsActiveBadge: string;
   subscriptionsNoActive: string;
+  subscriptionInactiveBadge: string;
+  subscriptionInactiveVideoLabel: string;
   subscriptionsNoHistory: string;
   subscriptionsPlansBilling: string;
   subscriptionsLoading: string;
@@ -106,6 +110,8 @@ export interface Translations {
   dashboardKpiAgentsWithFeedback: string;
   dashboardKpiFeedbackTotal: string;
   humiDistributionTitle: string;
+  distributionDonutTotalLabel: string;
+  distributionDonutSegmentsLabel: string;
   cerowTitle: string;           // ← Nuevo
   cerexTitle: string;           // ← Nuevo
   comingSoon: string;           // ← Nuevo
@@ -128,6 +134,7 @@ export interface Translations {
   dashboardOverviewDistributionTitle: string;
   /** Overview top-10 card badge (global ecosystem) */
   dashboardOverviewTop10Badge: string;
+  monitoredChainsTitle: string;
   agentNonceTitle: string;
   /** Insight card: Agent Nonce section title including 30-day window */
   dashboardInsightNonceBadge: string;
@@ -244,6 +251,13 @@ export interface Translations {
   capabilitiesLabel: string;
   dummyLabel: string;
   duplicateLabel: string;
+  aiCategoryPrimaryLabel: string;
+  aiCategorySecondaryLabel: string;
+  aiCategoryConfidenceLabel: string;
+  aiCategoryPurposeLabel: string;
+  aiCategoryAnalyzingLabel: string;
+  agentsDirectoryAiCategoryLabel: string;
+  agentsDirectoryAiAnalysisLabel: string;
 
   // Sidebar - Recientes agentes
   recentAgentsSubmenu: string;
@@ -435,6 +449,9 @@ export interface Translations {
   transactionalBalanceCurrentHelp: string;
   transactionalNonceInfoAriaLabel: string;
   transactionalBalanceInfoAriaLabel: string;
+  transactionalChainFilterAll: string;
+  transactionalBalanceMultiChainLabel: string;
+  transactionalBalanceMultiChainHelp: string;
   metadataTabSkills: string;
   metadataTabSupportedTrust: string;
   metadataTabCapabilities: string;
@@ -568,6 +585,7 @@ export interface Translations {
   chartLabel12m: string;
   agentDetailProfilesCardTitle: string;
   agentDetailWarningsTitle: string;
+  agentDetailAiAnalysisTitle: string;
   agentDetailWarningsEmpty: string;
   agentDetailWarningInfoAriaLabel: string;
   agentDetailWarningDuplicationMetadataHelp: string;
@@ -650,6 +668,7 @@ export interface Translations {
 const translations: Record<Language, Translations> = {
   es: {
     home: 'Inicio',
+    blockchains: 'Cadenas',
     agentsDirectory: 'Directorio de Agentes',
     humiIndex: 'Índice HUMI',
     certifications: 'Certificaciones',
@@ -665,6 +684,7 @@ const translations: Record<Language, Translations> = {
     dashboardTitle: 'Dashboard',
     platformTitle: 'GSA Plataforma',
     searchPlaceholder: 'Buscar agentes...',
+    searchAction: 'Buscar',
     profile: 'Perfil',
     subscriptions: 'Subscripciones',
     api: 'API',
@@ -704,6 +724,8 @@ const translations: Record<Language, Translations> = {
     subscriptionsCreatedColumn: 'Alta',
     subscriptionsActiveBadge: 'Activa',
     subscriptionsNoActive: 'No tienes una suscripción activa.',
+    subscriptionInactiveBadge: 'El perfil no tiene una suscripción activa',
+    subscriptionInactiveVideoLabel: 'Animación de suscripción inactiva',
     subscriptionsNoHistory: 'No hay subscripciones en el historial.',
     subscriptionsPlansBilling: 'Planes y pagos',
     subscriptionsLoading: 'Cargando subscripciones...',
@@ -743,6 +765,8 @@ const translations: Record<Language, Translations> = {
     dashboardKpiAgentsWithFeedback: 'Agentes con feedback',
     dashboardKpiFeedbackTotal: 'Feedbacks totales',
     humiDistributionTitle: 'Distribución Índice HUMI',
+    distributionDonutTotalLabel: 'Total',
+    distributionDonutSegmentsLabel: 'segmentos',
     cerowTitle: 'Certificado de Owner',
     cerexTitle: 'Certificado de Existencia',
     comingSoon: 'Próximamente',
@@ -764,6 +788,7 @@ const translations: Record<Language, Translations> = {
     wamiDistributionTitle: 'Distribución Índice WAMI',
     dashboardOverviewDistributionTitle: 'Distribución global',
     dashboardOverviewTop10Badge: 'Top 10 ecosistema',
+    monitoredChainsTitle: 'Cadenas monitoreadas',
     agentNonceTitle: 'Agente Nonce',
     dashboardInsightNonceBadge: 'Agente Nonce - Últimos 30 días',
     dashboardInsightEcosystemBadge: 'Nonce diario (últimos 30 días)',
@@ -878,6 +903,13 @@ const translations: Record<Language, Translations> = {
     capabilitiesLabel: 'Capabilities',
     dummyLabel: 'Dummy',
     duplicateLabel: 'Duplicado',
+    aiCategoryPrimaryLabel: 'Categoría Principal',
+    aiCategorySecondaryLabel: 'Categoría secundaria',
+    aiCategoryConfidenceLabel: 'Confianza AI',
+    aiCategoryPurposeLabel: 'Análisis',
+    aiCategoryAnalyzingLabel: 'Analizando…',
+    agentsDirectoryAiCategoryLabel: 'GSA Análisis AI - Categoría',
+    agentsDirectoryAiAnalysisLabel: 'GSA Análisis AI - Análisis',
 
     recentAgentsSubmenu: 'Recientes',
     favoriteAgentsSubmenu: 'Favoritos',
@@ -1084,11 +1116,15 @@ const translations: Record<Language, Translations> = {
     transactionalNonceCurrentLabel: 'Nonce actual',
     transactionalBalanceCurrentLabel: 'Balance actual',
     transactionalNonceCurrentHelp:
-      'El total de nonce tomando en cuenta todas las wallets transaccionales registradas al agente.',
+      'Nonce de la wallet seleccionada (todas las chains) o de la chain filtrada.',
     transactionalBalanceCurrentHelp:
-      'El total de balance tomando en cuenta todas las wallets transaccionales registradas al agente.',
+      'Balance nativo de la chain filtrada. Con «Todas» no se suma entre chains (tokens distintos).',
     transactionalNonceInfoAriaLabel: 'Más información sobre el nonce actual',
     transactionalBalanceInfoAriaLabel: 'Más información sobre el balance actual',
+    transactionalChainFilterAll: 'Todas',
+    transactionalBalanceMultiChainLabel: 'Multi-chain',
+    transactionalBalanceMultiChainHelp:
+      'El balance no se agrega entre chains porque cada una usa su token nativo. Elige una chain o mira el gráfico multi-línea.',
     metadataTabSkills: 'Skills',
     metadataTabSupportedTrust: 'Confianza',
     metadataTabCapabilities: 'Capacidades',
@@ -1224,6 +1260,7 @@ const translations: Record<Language, Translations> = {
     chartLabel12m: '12 m',
     agentDetailProfilesCardTitle: 'Perfiles',
     agentDetailWarningsTitle: 'Advertencias',
+    agentDetailAiAnalysisTitle: 'GSA-AI Analysis',
     agentDetailWarningsEmpty: 'Sin advertencias detectadas',
     agentDetailWarningInfoAriaLabel: 'Más información sobre esta advertencia',
     agentDetailWarningDuplicationMetadataHelp:
@@ -1326,6 +1363,7 @@ const translations: Record<Language, Translations> = {
   },
   en: {
     home: 'Home',
+    blockchains: 'Blockchains',
     agentsDirectory: 'Agents Directory',
     humiIndex: 'HUMI Index',
     certifications: 'Certifications',
@@ -1341,6 +1379,7 @@ const translations: Record<Language, Translations> = {
     dashboardTitle: 'Dashboard',
     platformTitle: 'GSA Platform',
     searchPlaceholder: 'Search agents...',
+    searchAction: 'Search',
     profile: 'Profile',
     subscriptions: 'Subscriptions',
     api: 'API',
@@ -1380,6 +1419,8 @@ const translations: Record<Language, Translations> = {
     subscriptionsCreatedColumn: 'Created',
     subscriptionsActiveBadge: 'Active',
     subscriptionsNoActive: 'You do not have an active subscription.',
+    subscriptionInactiveBadge: 'The profile does not have an active subscription',
+    subscriptionInactiveVideoLabel: 'Inactive subscription animation',
     subscriptionsNoHistory: 'No subscriptions in history.',
     subscriptionsPlansBilling: 'Plans & billing',
     subscriptionsLoading: 'Loading subscriptions...',
@@ -1419,6 +1460,8 @@ const translations: Record<Language, Translations> = {
     dashboardKpiAgentsWithFeedback: 'Agents with feedback',
     dashboardKpiFeedbackTotal: 'Total feedbacks',
     humiDistributionTitle: 'HUMI Index Distribution',
+    distributionDonutTotalLabel: 'Total',
+    distributionDonutSegmentsLabel: 'segments',
     cerowTitle: 'Owner Certificate',
     cerexTitle: 'Existence Certificate',
     comingSoon: 'Coming Soon',
@@ -1440,6 +1483,7 @@ const translations: Record<Language, Translations> = {
     wamiDistributionTitle: 'WAMI Index Distribution',
     dashboardOverviewDistributionTitle: 'Global distribution',
     dashboardOverviewTop10Badge: 'Top 10 ecosystem',
+    monitoredChainsTitle: 'Monitored chains',
     agentNonceTitle: 'Agent Nonce',
     dashboardInsightNonceBadge: 'Agent Nonce - Last 30 Days',
     dashboardInsightEcosystemBadge: 'Daily Nonce (Last 30 Days)',
@@ -1554,6 +1598,13 @@ const translations: Record<Language, Translations> = {
     capabilitiesLabel: 'Capabilities',
     dummyLabel: 'Dummy',
     duplicateLabel: 'Duplicated',
+    aiCategoryPrimaryLabel: 'Main Category',
+    aiCategorySecondaryLabel: 'Secondary category',
+    aiCategoryConfidenceLabel: 'AI confidence',
+    aiCategoryPurposeLabel: 'Analysis',
+    aiCategoryAnalyzingLabel: 'Analyzing…',
+    agentsDirectoryAiCategoryLabel: 'GSA AI Analysis - Category',
+    agentsDirectoryAiAnalysisLabel: 'GSA AI Analysis - Analysis',
 
     recentAgentsSubmenu: 'Recent',
     favoriteAgentsSubmenu: 'Favorites',
@@ -1758,11 +1809,15 @@ const translations: Record<Language, Translations> = {
     transactionalNonceCurrentLabel: 'Current nonce',
     transactionalBalanceCurrentLabel: 'Current balance',
     transactionalNonceCurrentHelp:
-      'Total nonce across all transactional wallets registered for this agent.',
+      'Nonce for the selected wallet (all chains) or the filtered chain.',
     transactionalBalanceCurrentHelp:
-      'Total balance across all transactional wallets registered for this agent.',
+      'Native balance of the filtered chain. With “All”, balances are not summed across chains (different tokens).',
     transactionalNonceInfoAriaLabel: 'More information about current nonce',
     transactionalBalanceInfoAriaLabel: 'More information about current balance',
+    transactionalChainFilterAll: 'All',
+    transactionalBalanceMultiChainLabel: 'Multi-chain',
+    transactionalBalanceMultiChainHelp:
+      'Balance is not aggregated across chains because each uses its native token. Pick a chain or use the multi-line chart.',
     metadataTabSkills: 'Skills',
     metadataTabSupportedTrust: 'Supported trust',
     metadataTabCapabilities: 'Capabilities',
@@ -1898,6 +1953,7 @@ const translations: Record<Language, Translations> = {
     chartLabel12m: '12m',
     agentDetailProfilesCardTitle: 'Profiles',
     agentDetailWarningsTitle: 'Warnings',
+    agentDetailAiAnalysisTitle: 'GSA-AI Analysis',
     agentDetailWarningsEmpty: 'No warnings detected',
     agentDetailWarningInfoAriaLabel: 'More information about this warning',
     agentDetailWarningDuplicationMetadataHelp:

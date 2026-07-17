@@ -45,12 +45,7 @@ export const AGENT_DETAIL_SELECT = `
         technical_prompts,
         technical_capabilities,
         services,
-        nonce_current,
-        balance_current,
         wallet_wami_score_details,
-        transactional_wallets,
-        nonce_history,
-        balance_history,
         has_comments,
         comments_summary,
         has_attestations,
@@ -69,7 +64,11 @@ export const AGENT_DETAIL_SELECT = `
         metadata_richness_information,
         agent_warnings,
         realness_score,
-        realness_status
+        realness_status,
+        ai_category_primary,
+        ai_category_secondary,
+        ai_category_confidence,
+        ai_category_purpose
       `;
 
 export const INDEX_HUMI_SELECT = `
@@ -217,6 +216,36 @@ export async function fetchAgentDetail(
 
   const resolvedChainLogo = await resolveChainLogoForAgent(supabase, agent);
 
+  const ercAgentId =
+    agent.agent_id != null && Number.isFinite(Number(agent.agent_id))
+      ? Number(agent.agent_id)
+      : null;
+
+  let walletActivity: Record<string, unknown> | null = null;
+  if (ercAgentId != null) {
+    const { data: activityRow, error: activityError } = await supabase
+      .schema('web_dashboard')
+      .from('agent_wallet_activity')
+      .select(
+        'nonce_current, balance_data, nonce_last_30_days, balance_last_30_days, transactional_wallets, calculated_at',
+      )
+      .eq('agent_id', ercAgentId)
+      .maybeSingle();
+
+    if (activityError) {
+      return {
+        ok: false,
+        status: 500,
+        error: 'Error al consultar la base de datos',
+        details: activityError.message,
+      };
+    }
+
+    if (activityRow) {
+      walletActivity = activityRow as Record<string, unknown>;
+    }
+  }
+
   return {
     ok: true,
     data: {
@@ -226,6 +255,7 @@ export async function fetchAgentDetail(
       current_wami_score: normalizeAgentHumiScore(agent.current_wami_score),
       wami_madurity_level: normalizeAgentHumiMaturity(agent.wami_madurity_level),
       chain_logo_file_name: resolvedChainLogo,
+      wallet_activity: walletActivity,
     },
   };
 }
