@@ -15,26 +15,39 @@ import { AgentDetailCard } from '@/components/dashboard/AgentDetailCard';
 import { buildNonceDailySeries, getLatestNonceFromRaw } from '@/lib/dashboardNonceSeries';
 import { cn } from '@/lib/utils';
 
-function dayOfMonthFromDateKey(dateKey: string): string {
-  const day = dateKey.split('-')[2];
-  return day ? String(Number(day)) : dateKey;
-}
-
-function formatDateKeyLabel(dateKey: string): string {
+function formatDateKeyLabel(dateKey: string, locale?: string): string {
   const [y, m, d] = dateKey.split('-').map((part) => Number(part));
   if (!y || !m || !d) return dateKey;
-  return new Date(y, m - 1, d).toLocaleDateString(undefined, {
+  return new Date(y, m - 1, d).toLocaleDateString(locale, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   });
 }
 
-function formatNonceYAxisTick(v: number, useCompact: boolean): string {
+function formatAxisDateLabel(dateKey: string, locale?: string): string {
+  const [y, m, d] = dateKey.split('-').map((part) => Number(part));
+  if (!y || !m || !d) return dateKey;
+  return new Date(y, m - 1, d).toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'short',
+  });
+}
+
+/** Compact Y ticks for large nonce totals (prefer M over noisy k). */
+function formatNonceYAxisTick(v: number, seriesMax: number): string {
   if (!Number.isFinite(v)) return '';
-  if (useCompact && v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;
-  if (useCompact && v >= 100_000) return `${Math.round(v / 1_000)}k`;
-  return Math.round(v).toLocaleString();
+  const n = Math.round(v);
+  if (n === 0) return '0';
+  if (seriesMax >= 1_000_000) {
+    const m = n / 1_000_000;
+    return `${m >= 10 ? m.toFixed(0) : m.toFixed(1).replace(/\.0$/, '')}M`;
+  }
+  if (seriesMax >= 1_000) {
+    const k = n / 1_000;
+    return `${k >= 10 ? Math.round(k) : k.toFixed(1).replace(/\.0$/, '')}k`;
+  }
+  return n.toLocaleString();
 }
 
 type Props = {
@@ -43,9 +56,17 @@ type Props = {
   agentNonce: unknown;
   compact?: boolean;
   className?: string;
+  locale?: string;
 };
 
-export function DashboardNonceInsightCard({ isDark, t, agentNonce, compact = false, className }: Props) {
+export function DashboardNonceInsightCard({
+  isDark,
+  t,
+  agentNonce,
+  compact = false,
+  className,
+  locale,
+}: Props) {
   const gradientId = useId().replace(/:/g, '');
   const axisStroke = isDark ? '#52525b' : '#d4d4d8';
   const tickFill = isDark ? '#a1a1aa' : '#71717a';
@@ -58,12 +79,11 @@ export function DashboardNonceInsightCard({ isDark, t, agentNonce, compact = fal
     return nonceSeries.find((p) => p.date === latestNonce.date) ?? null;
   }, [latestNonce, nonceSeries]);
 
-  const nonceMax = useMemo(() => nonceSeries.reduce((m, d) => Math.max(m, d.nonces), 0), [nonceSeries]);
-  const compactNonceYTick = nonceMax >= 100_000;
-  const nonceTicks = useMemo(() => {
-    const idx = [0, 7, 14, 21, 29];
-    return idx.filter((i) => i < nonceSeries.length).map((i) => nonceSeries[i].date);
-  }, [nonceSeries]);
+  const nonceMax = useMemo(
+    () =>
+      nonceSeries.reduce((m, d) => (typeof d.nonces === 'number' ? Math.max(m, d.nonces) : m), 0),
+    [nonceSeries],
+  );
   const chartWrapRef = useRef<HTMLDivElement>(null);
 
   const titleBadgeClass = cn(
@@ -80,7 +100,7 @@ export function DashboardNonceInsightCard({ isDark, t, agentNonce, compact = fal
 
   const totalBadgeContent = latestNonce ? (
     <>
-      {t.totalLabel}: {latestNonce.nonces.toLocaleString()} {t.nonceLabel}
+      {t.totalLabel}: {latestNonce.nonces.toLocaleString(locale)} {t.nonceLabel}
       {latestSeriesPoint?.change && latestSeriesPoint.change !== '0%' ? (
         <> ({latestSeriesPoint.change})</>
       ) : null}
@@ -144,8 +164,9 @@ export function DashboardNonceInsightCard({ isDark, t, agentNonce, compact = fal
                 <XAxis
                   dataKey="date"
                   type="category"
-                  ticks={nonceTicks}
-                  tickFormatter={(d: string) => dayOfMonthFromDateKey(d)}
+                  interval="preserveStartEnd"
+                  minTickGap={28}
+                  tickFormatter={(d: string) => formatAxisDateLabel(d, locale)}
                   stroke={axisStroke}
                   tick={{ fill: tickFill, fontSize: 10 }}
                   tickLine={false}
@@ -153,10 +174,12 @@ export function DashboardNonceInsightCard({ isDark, t, agentNonce, compact = fal
                 <YAxis
                   stroke={axisStroke}
                   tick={{ fill: tickFill, fontSize: 10 }}
-                  width={32}
-                  tickMargin={2}
+                  width={54}
+                  tickMargin={4}
+                  tickCount={5}
+                  allowDecimals={false}
                   axisLine={false}
-                  tickFormatter={(v: number) => formatNonceYAxisTick(v, compactNonceYTick)}
+                  tickFormatter={(v: number) => formatNonceYAxisTick(v, nonceMax)}
                   domain={[0, (max: number) => Math.max(1, Math.ceil(max * 1.05))]}
                 />
                 <Tooltip
@@ -166,9 +189,11 @@ export function DashboardNonceInsightCard({ isDark, t, agentNonce, compact = fal
                     borderRadius: 8,
                     fontSize: 12,
                   }}
-                  labelFormatter={(label) => formatDateKeyLabel(String(label))}
+                  labelFormatter={(label) => formatDateKeyLabel(String(label), locale)}
                   formatter={(value: unknown) => [
-                    typeof value === 'number' ? value.toLocaleString() : '—',
+                    typeof value === 'number' && Number.isFinite(value)
+                      ? value.toLocaleString(locale)
+                      : '—',
                     t.nonceLabel,
                   ]}
                 />
@@ -178,6 +203,7 @@ export function DashboardNonceInsightCard({ isDark, t, agentNonce, compact = fal
                   stroke="#3b82f6"
                   strokeWidth={2}
                   fill={`url(#${gradientId})`}
+                  connectNulls={false}
                   dot={{ r: 2, fill: '#60a5fa', strokeWidth: 0 }}
                   activeDot={{ r: 4 }}
                 />

@@ -1,64 +1,63 @@
 # Estrategia de ramas — Web oficial vs Dashboard
 
-Este repositorio aloja **dos productos** en un solo monorepo Next.js. Trabajamos en ramas separadas para avanzar en paralelo sin pisarnos.
+Este repositorio aloja **dos productos** en un solo monorepo Next.js.
 
-## Ramas
+## Ramas (julio 2026)
 
-| Rama | Propósito | Quién |
+| Rama | Propósito | Estado |
 |------|-----------|--------|
-| `web-page-v2` | Landing y páginas públicas (marketing, SEO, APIs públicas) | Agente / equipo web oficial |
-| `dashboard-final` | Panel `/dashboard/*`, APIs dashboard, componentes dashboard | Agente / equipo dashboard |
-| `main` | Integración estable; merge de ambas ramas cuando estén listas | Revisión humana |
+| **`main`** | Producción — marketing + dashboard | **Activa** (Vercel: `www.globalscoreagent.com`) |
+| Feature branches | Trabajo acotado (p. ej. `dashboard-movil`) | PR → merge a `main` |
+| `web-page-v2` | Landing / marketing | Histórica (mergeada en `main`) |
+| `dashboard-final` | Dashboard pre-producción | Histórica (mergeada en `main`) |
 
-**Regla:** no mezclar commits grandes de marketing y dashboard en la misma rama salvo merges planificados hacia `main`.
+**Regla actual:** trabajar en **`main`** o en una **feature branch** corta → PR → `main`. No abrir trabajo diario nuevo en `web-page-v2` / `dashboard-final` salvo recuperación histórica.
 
 ## Zonas del código
 
-### Solo marketing (`web-page-v2`)
+### Solo marketing
 
-- `app/page.tsx`, `app/humi/`, `app/wami/`, `app/legal/`, `app/waitlist/`
-- `app/api/erc8004/`, `app/api/humi/`, `app/api/waitlist/`, `app/api/web-page/`
-- `app/components/HeaderWrapper.tsx`, `app/contexts/LanguageContext.tsx`, `components/marketing/`
-- Redirects legacy en `next.config.js`: `/about` → `/#mission`, `/certificaciones` → `/`
+- `app/page.tsx`, `app/humi/`, `app/wami/`, `app/legal/`, `app/waitlist/`, `app/pricing/`, `app/docs/`, …
+- `app/api/web-page/`
+- `components/marketing/`
+- Redirects legacy en `next.config.js` según config actual
 
-### Solo dashboard (`dashboard-final`)
+### Solo dashboard
 
 - `app/(dashboard)/dashboard/**`
-- `components/dashboard/**`, `components/ui/**`
+- `components/dashboard/**` (incl. `components/dashboard/chain/**`)
 - `app/api/dashboard/**`
-- `lib/**` (utilidades del dashboard)
+- `lib/**` orientado a dashboard (p. ej. `dashboardChainCardData.ts`, parsers HUMI/WAMI)
 
 ### Compartido (coordinación obligatoria)
 
-Cambios aquí afectan a **ambas** ramas. Antes de editar:
-
-1. Avisar en el PR o issue qué rama toca el archivo.
-2. Preferir cambios **aditivos** (nuevos exports, nuevas vars de entorno) en lugar de refactors grandes.
-3. Tras merge a `main`, la otra rama debe hacer **rebase o merge de `main`** pronto.
+Cambios aquí afectan marketing y dashboard. Preferir cambios **aditivos**.
 
 | Archivo / carpeta | Notas |
 |-------------------|--------|
-| `package.json`, `package-lock.json` | Nuevas deps: acordar; `npm install` en ambas ramas |
+| `package.json`, `package-lock.json` | Nuevas deps: acordar |
 | `utils/supabase/*` | Clientes Supabase SSR/browser |
-| `app/layout.tsx`, `app/globals.css` | Layout raíz; marketing usa `HeaderWrapper` |
+| `app/layout.tsx`, `app/globals.css` | Layout raíz |
 | `next.config.js`, `tailwind.config.js`, `tsconfig.json` | Config global |
-| `.env.example` | Documentar todas las variables; nunca commitear `.env` |
+| `.env.example` | Documentar variables; nunca commitear `.env` |
 
-## Flujo recomendado para archivos compartidos
+## Flujo recomendado
 
 ```
-web-page-v2 ──PR──► main ◄──PR── dashboard-final
-         │                    │
-         └──── merge main ────┘  (cada 2–3 días o al tocar shared)
+feature-branch ──PR──► main (producción / Vercel)
 ```
 
-1. Cambio compartido pequeño → PR a `main` → ambas ramas actualizan desde `main`.
-2. Cambio solo de marketing → PR `web-page-v2` → merge a `main` cuando esté listo.
-3. Evitar editar el mismo archivo compartido en las dos ramas el mismo día sin sincronizar.
+1. Cambio solo dashboard o solo marketing → feature branch → PR a `main`.
+2. Cambio shared pequeño → PR a `main` pronto; avisar en la descripción.
+3. Evitar editar el mismo archivo shared en dos features el mismo día sin sincronizar.
 
 ## APIs
 
-- **Públicas (marketing):** prefijo lógico `app/api/erc8004`, `humi`, `waitlist` — schema `web_page` / lectura pública.
-- **Dashboard:** `app/api/dashboard/**` — puede usar `utils/supabase/server` y schemas `erc_8004`, `index_humi`, etc.
+- **Públicas (marketing):** `app/api/web-page/**` — schema `web_page` / lectura pública.
+- **Dashboard:** `app/api/dashboard/**` — `requireDashboardUser()`, schema `web_dashboard` (+ `gsa` para suscripciones).
 
-No mover rutas de API entre zonas sin actualizar esta doc y las reglas de Cursor.
+No mover rutas de API entre zonas sin actualizar esta doc y [`docs/AGENT-RULES.md`](AGENT-RULES.md).
+
+## Responsive dashboard
+
+Corte **`md` (768px)**. Overview y chain cards tienen árboles separados móvil/desktop. Detalle: [`docs/dashboard-context-summary.md`](dashboard-context-summary.md).

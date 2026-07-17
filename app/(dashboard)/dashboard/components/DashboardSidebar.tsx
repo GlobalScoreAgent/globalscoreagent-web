@@ -5,11 +5,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import {
   LogOut,
   Home,
   Users,
+  Boxes,
   ChevronLeft,
   ChevronRight,
   MoreHorizontal,
@@ -30,6 +31,7 @@ import {
 
 const navItems = [
   { href: '/dashboard', labelKey: 'home' as const, icon: Home },
+  { href: '/dashboard/chains', labelKey: 'blockchains' as const, icon: Boxes },
   { href: '/dashboard/agents', labelKey: 'agentsDirectory' as const, icon: Users },
 ];
 
@@ -52,6 +54,10 @@ export default function DashboardSidebar() {
 
   const handleNavClick = () => {
     closeMobileNav();
+  };
+
+  const handleDisabledNavClick = (event: MouseEvent) => {
+    event.preventDefault();
   };
 
   const navDisabledClass = navDisabled
@@ -148,8 +154,15 @@ export default function DashboardSidebar() {
                 <div key={item.href} className="space-y-1">
                   <Link
                     href={item.href}
-                    onClick={handleNavClick}
+                    onClick={(event) => {
+                      if (navDisabled) {
+                        handleDisabledNavClick(event);
+                        return;
+                      }
+                      handleNavClick();
+                    }}
                     aria-disabled={navDisabled}
+                    tabIndex={navDisabled ? -1 : undefined}
                     title={!showExpanded ? t[item.labelKey] : undefined}
                     className={cn(
                       'flex items-center py-3 rounded-2xl text-sm font-medium transition-colors',
@@ -201,8 +214,15 @@ export default function DashboardSidebar() {
                               >
                                 <Link
                                   href={detailPath}
-                                  onClick={handleNavClick}
+                                  onClick={(event) => {
+                                    if (navDisabled) {
+                                      handleDisabledNavClick(event);
+                                      return;
+                                    }
+                                    handleNavClick();
+                                  }}
                                   aria-disabled={navDisabled}
+                                  tabIndex={navDisabled ? -1 : undefined}
                                   title={agent.label}
                                   className={cn(
                                     'min-w-0 flex-1 truncate py-1.5 px-2 text-xs font-medium transition-colors',
@@ -280,8 +300,15 @@ export default function DashboardSidebar() {
                           >
                             <Link
                               href={detailPath}
-                              onClick={handleNavClick}
+                              onClick={(event) => {
+                                if (navDisabled) {
+                                  handleDisabledNavClick(event);
+                                  return;
+                                }
+                                handleNavClick();
+                              }}
                               aria-disabled={navDisabled}
+                              tabIndex={navDisabled ? -1 : undefined}
                               title={agent.label}
                               className={cn(
                                 'min-w-0 flex-1 truncate py-1.5 px-2 text-xs font-medium transition-colors',
@@ -348,8 +375,15 @@ export default function DashboardSidebar() {
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={handleNavClick}
+                onClick={(event) => {
+                  if (navDisabled) {
+                    handleDisabledNavClick(event);
+                    return;
+                  }
+                  handleNavClick();
+                }}
                 aria-disabled={navDisabled}
+                tabIndex={navDisabled ? -1 : undefined}
                 title={!showExpanded ? t[item.labelKey] : undefined}
                 className={cn(
                   'flex items-center py-3 rounded-2xl text-sm font-medium transition-colors',

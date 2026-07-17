@@ -122,7 +122,7 @@ export function AgentDetailCard({
           }}
         />
       </div>
-      <div className={cn('relative z-[1]', contentClassName)}>{children}</div>
+      <div className={cn('relative z-[1] min-h-0', contentClassName)}>{children}</div>
     </div>
   );
 }

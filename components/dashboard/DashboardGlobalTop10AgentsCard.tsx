@@ -30,9 +30,9 @@ export function DashboardGlobalTop10AgentsCard({
       isDark={isDark}
       variant="metadata"
       accentHex="#a855f7"
-      className={cn('min-h-0 max-h-full w-full min-w-0 flex-1', className)}
+      className={cn('flex h-full min-h-0 w-full min-w-0 flex-col', className)}
       contentClassName={cn(
-        'flex max-h-full min-h-0 flex-col gap-1',
+        'flex h-full min-h-0 flex-1 flex-col gap-1',
         compact ? 'p-2 pt-8' : 'p-3 pt-12 sm:p-4 sm:pt-12',
       )}
     >
@@ -57,7 +57,7 @@ export function DashboardGlobalTop10AgentsCard({
         locale={locale}
         showTitle={false}
         density={compact ? 'overview' : 'default'}
-        className="min-h-0 max-h-full flex-1 overflow-hidden border-0 bg-transparent p-0"
+        className="min-h-0 flex-1 overflow-hidden border-0 bg-transparent p-0"
       />
     </AgentDetailCard>
   );

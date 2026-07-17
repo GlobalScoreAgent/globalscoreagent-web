@@ -374,18 +374,16 @@ export function StackedDistributionBar({
   const bottomLegendList =
     bottomLegend && orientation === 'vertical' ? (
       <ul
-        className="mt-1.5 max-h-[6.5rem] shrink-0 space-y-1 overflow-y-auto overscroll-contain"
+        className="mx-auto mt-1.5 flex max-h-[6.5rem] w-fit max-w-full shrink-0 flex-col items-center gap-1 overflow-y-auto overscroll-contain"
         aria-label="Chart legend"
       >
         {rowKeys.map((k) => {
           const v = Number(row[k]);
           const valueText = Number.isFinite(v) ? v.toLocaleString() : '—';
           return (
-            <li key={k} className="flex min-w-0 items-start justify-between gap-2">
-              <span className="flex min-w-0 flex-1 items-start gap-1.5">
-                {legendSwatch(k)}
-                <span className={`truncate text-[10px] leading-tight ${legendMuted}`}>{labelForKey(k)}</span>
-              </span>
+            <li key={k} className="flex w-fit max-w-full items-center gap-1.5">
+              {legendSwatch(k)}
+              <span className={`truncate text-[10px] leading-tight ${legendMuted}`}>{labelForKey(k)}</span>
               <span className={`shrink-0 text-[10px] font-semibold tabular-nums ${legendValue}`}>{valueText}</span>
             </li>
           );

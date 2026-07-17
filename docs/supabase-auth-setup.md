@@ -87,7 +87,16 @@ New dashboard API routes must call `requireDashboardUser()` at the start of the 
 
 The overview page loads data via **`GET /api/dashboard/overview`** (server-side), not from the browser Supabase client.
 
-The overview API uses **only** the authenticated user's Supabase session (JWT). It does **not** use `SUPABASE_SERVICE_ROLE_KEY` or retry with elevated privileges. If the query fails or `main_stadistics` has no row, the API returns an error and the dashboard home shows a localized message (ES/EN) instead of placeholder numbers.
+The overview API uses **only** the authenticated user's Supabase session (JWT). It does **not** use `SUPABASE_SERVICE_ROLE_KEY` or retry with elevated privileges. If the query fails or `global_stadistics` has no row, the API returns an error and the dashboard home shows a localized message (ES/EN) instead of placeholder numbers.
+
+**False positive — “no database connection” (julio 2026):** the UI string is generic. Live diagnosis showed `GET …/chains_stadistics` returning **403** with Postgres `permission denied for materialized view chains_stadistics`, while `global_stadistics` returned 200. After `REFRESH` / recreate of the MV, re-apply:
+
+```sql
+GRANT SELECT ON web_dashboard.chains_stadistics TO authenticated, anon, authenticator;
+GRANT SELECT ON web_dashboard.global_stadistics TO authenticated, anon, authenticator;
+```
+
+Check with: `SELECT has_table_privilege('authenticated', 'web_dashboard.chains_stadistics', 'SELECT');`
 
 **Important:** Users listed under **Authentication → Users** only means login works. Table access is configured separately under **Database** (schema `web_dashboard`), not under **Authentication → Policies** in the sidebar.
 
@@ -127,6 +136,11 @@ create policy "authenticated read agents"
 
 create policy "authenticated read agent_advanced_filters"
   on web_dashboard.agent_advanced_filters for select
+  to authenticated
+  using (true);
+
+create policy "authenticated read agent_ai_categories"
+  on web_dashboard.agent_ai_categories for select
   to authenticated
   using (true);
 ```

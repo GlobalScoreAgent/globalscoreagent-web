@@ -3,13 +3,15 @@
 Documento maestro de convenciones, arquitectura y estado del proyecto.  
 Úsalo al **iniciar cualquier chat nuevo** antes de implementar cambios.
 
+**Última revisión:** julio 2026 — producción en `main` + dashboard móvil mergeado.
+
 **Documentos complementarios (leer según la tarea):**
 
 | Documento | Cuándo leerlo |
 |-----------|----------------|
-| [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) | Contexto completo del dashboard, funcionalidades, migraciones, **v1 producción** |
-| [`docs/marketing-web-context-summary.md`](marketing-web-context-summary.md) | Web pública: landing, pricing, KPIs, docs, agentes públicos, **v1 producción** |
-| [`docs/BRANCHING.md`](BRANCHING.md) | Detalle de ramas, zonas y archivos compartidos |
+| [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) | Dashboard (incl. responsive móvil/desktop), APIs, MVs, grants |
+| [`docs/marketing-web-context-summary.md`](marketing-web-context-summary.md) | Web pública: landing, pricing, KPIs, docs, agentes públicos |
+| [`docs/BRANCHING.md`](BRANCHING.md) | Zonas del monorepo y archivos compartidos |
 | [`docs/español/index-humi.md`](español/index-humi.md) | Spec de madurez HUMI y pilares |
 | [`docs/supabase-auth-setup.md`](supabase-auth-setup.md) | Auth, schemas expuestos, RLS, grants |
 
@@ -19,11 +21,11 @@ Documento maestro de convenciones, arquitectura y estado del proyecto.
 
 Antes de tocar código o BD:
 
-1. **Identificar la zona:** ¿marketing (`web-page-v2`) o dashboard (`dashboard-final`)?
+1. **Identificar la zona:** ¿marketing o dashboard? (trabajo diario en **`main`** o feature branch → PR → `main`)
 2. **Leer** [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) si el trabajo es del dashboard.
 3. **Confirmar en código** qué tablas/vistas usa hoy la API: `app/api/dashboard/**` o `app/api/web-page/**`.
 4. **Buscar definición SQL** en `docs/sql/` si hay migración o duda de columnas.
-5. **No asumir** que el SQL del repo coincide 1:1 con Supabase (nombres pueden diferir, p. ej. `chains_stadistics` vs `chains`).
+5. **No asumir** que el SQL del repo coincide 1:1 con Supabase (nombres pueden diferir, p. ej. `chains_stadistics`).
 6. **Diff mínimo:** solo el alcance pedido; no refactorizar código ajeno.
 
 ### Prompt rápido para pegar en chat nuevo
@@ -32,7 +34,11 @@ Antes de tocar código o BD:
 Lee docs/AGENT-RULES.md y el contexto según zona:
 - Dashboard → docs/dashboard-context-summary.md
 - Web marketing → docs/marketing-web-context-summary.md
-Producción en main (www.globalscoreagent.com). Para BD: docs/sql/ + app/api/** como fuente de verdad práctica.
+Producción en main (www.globalscoreagent.com). Feature → PR → main.
+BD: docs/sql/ + app/api/** como fuente práctica (Supabase puede diferir).
+Dashboard responsive: corte md (768px); overview y chains tienen UI móvil vs desktop.
+Overview usa JWT authenticated (no service_role). Si la UI dice "sin conexión",
+revisar 403/GRANT en chains_stadistics antes de asumir caída de BD.
 ```
 
 ---
@@ -43,9 +49,9 @@ Monorepo con **dos productos** en un solo Next.js. Detalle en [`docs/BRANCHING.m
 
 | Rama | Alcance |
 |------|---------|
-| **`main`** | **Producción v1** — marketing + dashboard integrados |
-| `web-page-v2` | Histórico marketing (mergeado en `main`) |
-| `dashboard-final` | Histórico dashboard (mergeado en `main`) |
+| **`main`** | **Producción** — marketing + dashboard (incl. UX móvil) |
+| `web-page-v2` | Histórico marketing (mergeado) |
+| `dashboard-final` / `dashboard-movil` | Histórico / feature mergeadas; no usar como default |
 
 ### Reglas de zona
 
@@ -53,7 +59,7 @@ Monorepo con **dos productos** en un solo Next.js. Detalle en [`docs/BRANCHING.m
 - **Dashboard:** no modificar `app/page.tsx`, `app/humi/`, `app/wami/`, etc., salvo petición explícita.
 - **Compartido** (coordinar antes de cambios grandes): `package.json`, `utils/supabase/*`, `app/layout.tsx`, `app/globals.css`, `next.config.js`, `tailwind.config.js`, `.env.example`.
   - Cambios **aditivos**; no eliminar código ajeno.
-  - Tras tocar shared: indicar que la otra rama debe mergear `main`.
+  - Tras tocar shared: PR a `main`; otras features deben actualizarse desde `main`.
 
 ### APIs por zona
 
@@ -77,7 +83,7 @@ No hay un único `schema.sql`. La estructura se reparte así:
 
 ### El agente no tiene acceso automático a Supabase live
 
-- Requiere `.env.local` y pruebas locales o SQL Editor del usuario.
+- Requiere `.env.local` y pruebas locales o SQL Editor / MCP del usuario.
 - Validar permisos: **Project Settings → API → Exposed schemas** debe incluir `web_dashboard` (y `web_page` / `gsa` según caso).
 
 ### Estado de migraciones (tablas → vistas materializadas)
@@ -97,6 +103,16 @@ No hay un único `schema.sql`. La estructura se reparte así:
 | `chains` | `chains_stadistics` | `/api/dashboard/overview` | PK `id` → mapear a `chain_id` en respuesta |
 | `chains` | `chains_stadistics` | `/api/dashboard/agents/[id]` | **Pendiente migrar** |
 
+### Grants tras REFRESH (crítico)
+
+Overview carga **en paralelo** `global_stadistics` + `chains_stadistics` con el JWT `authenticated`.  
+Si `chains_stadistics` pierde `GRANT SELECT` (p. ej. tras recreate MV), PostgREST responde **403** y la UI muestra «sin conexión» (falso positivo).
+
+```sql
+GRANT SELECT ON web_dashboard.chains_stadistics TO authenticated, anon, authenticator;
+-- Verificar también global_stadistics
+```
+
 ### Archivos SQL frecuentes
 
 | Tarea | Archivo |
@@ -104,7 +120,7 @@ No hay un único `schema.sql`. La estructura se reparte así:
 | Stats globales dashboard | `docs/sql/web_dashboard_global_stadistics.sql` |
 | Stats por cadena | `docs/sql/web_dashboard_chains.sql` |
 | KPIs marketing | `docs/sql/web_page_global_score_agent_summary.sql` |
-| Import agentes / HUMI / WAMI | `docs/sql/web_dashboard_agents_import_data.sql`, `web_dashboard_index_humi_import_data.sql`, etc. |
+| Import agentes / HUMI / WAMI | `docs/sql/web_dashboard_agents_import_data.sql`, etc. |
 | Proceso diario | `docs/sql/web_dashboard_daily_process.sql` |
 
 ---
@@ -152,16 +168,26 @@ No hay un único `schema.sql`. La estructura se reparte así:
 | `/dashboard/agents/[id]` | `GET /api/dashboard/agents/[id]` |
 | `/dashboard/agents/[id]/humi` | `GET /api/dashboard/agents/[id]/humi` → `web_dashboard.index_humi` |
 
+### Responsive (julio 2026)
+
+Corte **`md` = 768px**. Detalle completo en `dashboard-context-summary.md` §4.
+
+- **Shell:** `DashboardMobileNavContext` + drawer en sidebar &lt; md.
+- **Overview:** `DashboardOverviewPanels` — árbol `md:hidden` (KPI → Top10 → Nonce → Distribución vertical) vs grid desktop.
+- **Chains:** `DashboardChainCards` — móvil: `ChainSelector` + `ChainCardsStack` (Top10 primero); desktop: `ChainDesktopCard` + dots.
+- Datos chain compartidos: `lib/dashboardChainCardData.ts`.
+
 ### Componentes clave
 
 - `AgentDetailCard` — shell de cards con variantes/accent
-- `DashboardChainCards` — carrusel por cadena
-- `AgentHumiPillar*` — pilares HUMI (history, usage, measure, information)
+- `DashboardChainCards` + `components/dashboard/chain/*` — chains dual móvil/desktop
+- `StackedDistributionBar` — `orientation` vertical/horizontal; vertical+`fillHeight` necesita `minHeight`
+- `AgentHumiPillar*` — pilares HUMI
 - `LanguageContext` — i18n ES/EN + tema dark/light
 
 ### Parsers en `lib/`
 
-La lógica de presentación vive en `lib/` (`dashboardChains.ts`, `indexHumi.ts`, `agentHumiDisplay.ts`, series, warnings, metadata). El **cálculo de scores** está en PostgreSQL, no en frontend.
+La lógica de presentación vive en `lib/` (`dashboardChains.ts`, `dashboardChainCardData.ts`, `indexHumi.ts`, `agentHumiDisplay.ts`, series, warnings, metadata). El **cálculo de scores** está en PostgreSQL, no en frontend.
 
 ---
 
@@ -219,26 +245,26 @@ Spec: [`docs/español/index-humi.md`](español/index-humi.md).
 
 ## 8. Tareas pendientes conocidas
 
-Prioridad sugerida (ver también sección 8 de `dashboard-context-summary.md`):
+Prioridad sugerida (ver también §8 de `dashboard-context-summary.md`):
 
 1. Migrar `app/api/dashboard/agents/[id]/route.ts`: `chains` → `chains_stadistics` (`id` → `chain_id`)
-2. Ejecutar índices: `db/indexes_web_dashboard_agents_humi_madurity_level.sql`
-3. REFRESH + GRANT de MVs en Supabase
-4. Actualizar `ChainTopAgentsList` a madurez nueva (no `humiFilterFromNumericScore`)
-5. Sincronizar ramas tras cambios en archivos shared
+2. Tras REFRESH de MVs: reaplicar GRANT `authenticated` en `chains_stadistics` / `global_stadistics`
+3. Alinear API agents con columnas reales (p. ej. errores `nonce_current`)
+4. Ejecutar índices: `db/indexes_web_dashboard_agents_humi_madurity_level.sql`
+5. Actualizar `ChainTopAgentsList` a madurez nueva (no `humiFilterFromNumericScore`)
 6. Tests automatizados (no existen hoy para APIs dashboard)
 
 ---
 
 ## 9. Qué no hacer
 
-- Mezclar cambios grandes de marketing y dashboard en la misma rama sin plan
+- Mezclar cambios grandes de marketing y dashboard en la misma PR sin plan
 - Consultar tablas legacy ya migradas (`web_page_statistics`, `main_stadistics`, `chains` donde ya hay MV)
 - Commitear `.env` o secrets
 - Inventar columnas o shapes de BD sin revisar `docs/sql/` y las APIs
 - Refactors amplios no solicitados
 - Editar el plan file (`.cursor/plans/`) salvo que el usuario pida iterar el plan en modo Plan
-- Crear documentación nueva no solicitada (este doc y `dashboard-context-summary` son la excepción acordada)
+- Asumir “sin conexión a BD” sin mirar `details` / logs PostgREST (403 grants vs downtime)
 
 ---
 
@@ -246,8 +272,8 @@ Prioridad sugerida (ver también sección 8 de `dashboard-context-summary.md`):
 
 Además de este documento, el IDE carga:
 
-- `.cursor/rules/agent-rules.mdc` — **siempre activa**; puntero a este doc y checklist de inicio
-- `.cursor/rules/branch-workflow.mdc` — siempre activa; ramas y shared
+- `.cursor/rules/agent-rules.mdc` — **siempre activa**; puntero a este doc
+- `.cursor/rules/branch-workflow.mdc` — siempre activa; zonas y shared
 - `.cursor/rules/marketing-web-v2.mdc` — globs marketing
 - `.cursor/rules/dashboard-branch.mdc` — globs dashboard
 - [`AGENTS.md`](../AGENTS.md) — puntero Next.js + ramas
@@ -256,15 +282,14 @@ Si una regla de Cursor y este doc difieren, **priorizar la conversación actual 
 
 ---
 
-## 11. Resumen de decisiones de esta iteración de trabajo
+## 11. Resumen de decisiones recientes
 
-- Overview dashboard lee MVs, no tablas deprecated.
+- Overview dashboard lee MVs, no tablas deprecated; JWT `authenticated` only.
 - Marketing statistics lee `global_score_agent_summary` (una fila latest).
-- APIs legacy `erc8004` y `market-index` eliminadas del código.
-- `DashboardLayoutClient` ya no depende de `/api/erc8004/chains`.
 - Madurez HUMI unificada en directorio, detalle agente y detalle HUMI.
-- Handoff documentado en `dashboard-context-summary.md` + este archivo.
+- Dashboard móvil: shell drawer, overview dual, chains dual (`ChainModuleCards` / `ChainDesktopCard`), distribuciones verticales en móvil.
+- Handoff: `dashboard-context-summary.md` + este archivo.
 
 ---
 
-*Última revisión: junio 2026 — v1 en producción (`main`). Actualizar este doc cuando cambien migraciones BD, ramas o convenciones acordadas con el equipo.*
+*Última revisión: julio 2026 — v1 + dashboard móvil en `main`. Actualizar cuando cambien migraciones BD, grants, ramas o convenciones.*

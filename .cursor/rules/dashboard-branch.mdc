@@ -1,26 +1,34 @@
 ---
-description: Dashboard ERC-8004 / HUMI (rama dashboard-final)
+description: Dashboard ERC-8004 / HUMI (zona dashboard en main)
 globs: app/(dashboard)/**,components/dashboard/**,components/ui/**,app/api/dashboard/**,lib/**
 alwaysApply: false
 ---
 
-# Dashboard — dashboard-final
+# Dashboard — zona en `main`
 
 ## Alcance
 
-Rutas bajo `/dashboard`, componentes `components/dashboard`, APIs `app/api/dashboard`, utilidades `lib/`.
+Rutas bajo `/dashboard`, componentes `components/dashboard` (incl. `chain/`), APIs `app/api/dashboard`, utilidades `lib/` de dashboard.
+
+Leer [`docs/dashboard-context-summary.md`](docs/dashboard-context-summary.md) al iniciar tareas no triviales.
+
+## Responsive
+
+- Corte `md` (768px): overview y chains tienen UI móvil vs desktop.
+- Móvil chains: `ChainSelector` + `ChainCardsStack`; desktop: `ChainDesktopCard`.
+- Datos compartidos: `lib/dashboardChainCardData.ts`.
 
 ## Convenciones
 
 - Cliente Supabase: `@/utils/supabase/server` (server) y `client.ts` (browser).
-- Mantener `HeaderWrapper` ocultando el Header marketing en `/dashboard`.
+- Auth API: `requireDashboardUser()`; overview = JWT authenticated (no service_role).
 - Animaciones: `framer-motion` ya en el proyecto; no añadir deps pesadas sin necesidad.
-- Filtros y tipos: reutilizar `lib/dashboardFilters.ts` y patrones existentes en `agents/route.ts`.
+- Filtros y tipos: reutilizar helpers existentes en `lib/` y patrones de `agents/route.ts`.
 
 ## Compartido
 
-Si necesitas cambiar `package.json`, `utils/supabase/*` o `app/layout.tsx`, documenta el impacto en marketing (`web-page-v2`).
+Si necesitas cambiar `package.json`, `utils/supabase/*` o `app/layout.tsx`, documenta el impacto en marketing.
 
 ## Prohibido sin acuerdo
 
-Refactor masivo de `app/page.tsx`, landing, o APIs públicas `erc8004` / `humi` / `waitlist`.
+Refactor masivo de `app/page.tsx`, landing, o APIs públicas de marketing.

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireDashboardUser } from '@/lib/auth/require-dashboard-user';
+import { requireActiveDashboardUser } from '@/lib/auth/require-active-subscription';
 import { fetchAgentDetail } from '@/lib/agents/agentDetailFetch';
 import { parseAgentRouteLookupBy } from '@/lib/dashboardAgentLookup';
 
@@ -8,7 +8,7 @@ export async function GET(
   context: { params: { id: string } },
 ) {
   try {
-    const auth = await requireDashboardUser();
+    const auth = await requireActiveDashboardUser();
     if (!auth.ok) return auth.response;
 
     const idParam = context.params.id;

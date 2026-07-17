@@ -1,22 +1,24 @@
 ---
-description: Ramas web-page-v2 vs dashboard-final y archivos compartidos
+description: Ramas main + feature; zonas marketing vs dashboard y archivos compartidos
 alwaysApply: true
 ---
 
 # Ramas y archivos compartidos
 
-Lee `docs/BRANCHING.md` antes de cambios que crucen marketing y dashboard.
+Lee `docs/BRANCHING.md` antes de cambios que cruzan marketing y dashboard.
 
 ## Rama activa
 
-- **Marketing / web oficial:** trabajar en `web-page-v2`. No modificar `app/(dashboard)/**` ni `components/dashboard/**`.
-- **Dashboard:** trabajar en `dashboard-final`. No modificar landing (`app/page.tsx`, `app/humi/`, etc.) salvo que el usuario lo pida.
+- **Producción / trabajo diario:** `main` (o feature branch → PR → `main`).
+- **Marketing / web oficial:** no modificar `app/(dashboard)/**` ni `components/dashboard/**`.
+- **Dashboard:** no modificar landing (`app/page.tsx`, `app/humi/`, etc.) salvo que el usuario lo pida.
+- Ramas `web-page-v2` / `dashboard-final` son históricas (mergeadas); no usarlas como default.
 
 ## Compartido — pedir confirmación si el cambio es grande
 
 `package.json`, `utils/supabase/*`, `app/layout.tsx`, `app/globals.css`, `next.config.js`, `tailwind.config.js`, `.env.example`
 
-Reglas: cambios aditivos; no eliminar código ajeno; tras tocar shared, indicar que la otra rama debe mergear `main`.
+Reglas: cambios aditivos; no eliminar código ajeno; tras tocar shared, integrar vía `main`.
 
 ## Estilo de código
 

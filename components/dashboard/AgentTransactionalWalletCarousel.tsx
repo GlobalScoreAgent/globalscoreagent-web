@@ -24,6 +24,10 @@ type Props = {
   onCopy: (text: string) => void;
   sectionTitle?: string | null;
   hideSectionTitle?: boolean;
+  /** Hide WAMI score block (overview transactional card). */
+  hideWamiScore?: boolean;
+  /** Hide category badge (overview: category is per-chain, not per-wallet). */
+  hideCategoryBadge?: boolean;
   badgeMode?: BadgeMode;
   controlledIndex?: number;
   onIndexChange?: (index: number) => void;
@@ -39,6 +43,8 @@ export function AgentTransactionalWalletCarousel({
   onCopy,
   sectionTitle,
   hideSectionTitle = false,
+  hideWamiScore = false,
+  hideCategoryBadge = false,
   badgeMode = 'category',
   controlledIndex,
   onIndexChange,
@@ -180,14 +186,17 @@ export function AgentTransactionalWalletCarousel({
             </button>
           </div>
 
-          <div className="mt-4 text-center">
-            <p className={`text-xs ${muted}`}>{t.agentDetailTransactionalWalletWamiLabel}</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums">
-              {activeRow.wami_score !== null ? String(activeRow.wami_score) : t.notAvailable}
-            </p>
-          </div>
+          {!hideWamiScore ? (
+            <div className="mt-4 text-center">
+              <p className={`text-xs ${muted}`}>{t.agentDetailTransactionalWalletWamiLabel}</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums">
+                {activeRow.wami_score !== null ? String(activeRow.wami_score) : t.notAvailable}
+              </p>
+            </div>
+          ) : null}
 
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5">
+          {!(hideCategoryBadge && badgeMode === 'category') ? (
+          <div className={cn('flex flex-wrap items-center justify-center gap-1.5', 'mt-4')}>
             <span className={`text-xs ${muted}`}>{badgeLabel}:</span>
             {badgeMode === 'maturity' ? (
               maturityLabel ? (
@@ -230,6 +239,7 @@ export function AgentTransactionalWalletCarousel({
               </span>
             )}
           </div>
+          ) : null}
         </div>
 
         {canNavigate ? (

@@ -1,7 +1,7 @@
 # Resumen de Contexto del Proyecto — Dashboard
 
 Documento de handoff para continuar el desarrollo del dashboard en un chat nuevo de Cursor.  
-**Última actualización:** junio 2026 — **versión inicial en producción** (`main`).
+**Última actualización:** julio 2026 — **v1 en producción** (`main`) + UX móvil mergeada (`dashboard-movil`).
 
 ---
 
@@ -9,29 +9,34 @@ Documento de handoff para continuar el desarrollo del dashboard en un chat nuevo
 
 | Aspecto | Detalle |
 |---------|---------|
-| **Rama de producción** | `main` (merge `dashboard-final` → `main`, commit `aff1172`) |
-| **URL pública** | `https://www.globalscoreagent.com` (Vercel; apex redirige a `www`) |
-| **Deploy** | Vercel — auto-deploy desde `main` |
-| **Auth** | Supabase OAuth (Google/GitHub) + email/password; callback en `/auth/callback` |
-| **Acceso dashboard** | `/dashboard/*` — requiere login + suscripción activa (trial o plan de pago) |
-| **Versión** | **v1 inicial** — overview, directorio, detalle agente, HUMI/WAMI, perfil, suscripciones, feedbacks |
+| **Rama de producción** | `main` (auto-deploy Vercel) |
+| **URL pública** | `https://www.globalscoreagent.com` (apex → `www`) |
+| **Deploy** | Vercel desde `main` |
+| **Auth** | Supabase OAuth (Google/GitHub) + email/password; callback `/auth/callback` |
+| **Acceso dashboard** | `/dashboard/*` — login + suscripción activa |
+| **Versión** | **v1** — overview, directorio, detalle agente, HUMI/WAMI, perfil, suscripciones, feedbacks, **responsive móvil** |
 
-### Fixes recientes en producción (junio 2026)
+### Changelog relevante (junio–julio 2026)
 
-- **OAuth:** `redirectTo` limpio (`/auth/callback` sin query); cookie `gsa_oauth_redirect`; cookies de sesión en la respuesta del callback; middleware reenvía `?code=` huérfano.
-- **Dominio:** sin redirect `www → apex` en app (Vercel ya canonicaliza `www`); evitar bucles 308.
-- **SSR dashboard:** layouts/páginas críticas con `dynamic(..., { ssr: false })` donde hace falta (p. ej. `Element type is invalid`).
-- **Nonce chart:** fechas en timezone local (`formatLocalDateKey`) para alinear eje con datos DB.
+- **OAuth / dominio / SSR** — redirects limpios, cookies en callback, `dynamic(..., { ssr: false })` donde hace falta.
+- **Nonce chart** — fechas timezone local.
+- **Branding sidebar** — logos por tema (`logo-gsa-dashboard-oscuro` / `logo-gsa-dashboard-claro`).
+- **Dashboard móvil** (`dashboard-movil` → `main`, jul 2026):
+  - Shell: drawer off-canvas (`DashboardMobileNavContext`), sidebar + topnav responsive.
+  - Overview dual: columna móvil (`md:hidden`) vs grid desktop (`hidden md:flex`).
+  - Chains: cards modulares en móvil + card monolítica desktop (`ChainDesktopCard`).
+  - Distribuciones stacked **verticales** en móvil; horizontales en desktop overview.
+  - Fixes: overflow wallet on-chain, badges Nonce sin solape, Recharts `minHeight` en barras verticales.
 
 ---
 
 ## 1. Visión General del Proyecto
 
 - **Nombre del proyecto:** `globalscoreagent-web` (Global Score Agent)
-- **Objetivo del dashboard:** Panel autenticado (`/dashboard/*`) para explorar, filtrar y analizar agentes **ERC-8004**, con métricas **HUMI** (agente) y **WAMI** (wallet), estadísticas globales y por cadena, y vistas de detalle (pilares, warnings, on-chain, metadata, etc.).
-- **Estado actual:** **~85%** del core funcional en producción v1.
-  - **En producción:** overview, directorio + filtros, detalle agente, HUMI/WAMI por agente, perfil, suscripciones, feedbacks, APIs server-side con auth, pagos NOWPayments (webhook).
-  - **Parcial / pendiente:** migración `chains` → `chains_stadistics` en `agents/[id]`, tests automatizados, páginas `uso`/`api` del menú, limpieza helpers legacy HUMI.
+- **Objetivo del dashboard:** Panel autenticado (`/dashboard/*`) para explorar, filtrar y analizar agentes **ERC-8004**, con métricas **HUMI** (agente) y **WAMI** (wallet), estadísticas globales y por cadena, y vistas de detalle.
+- **Estado actual:** core funcional en producción v1 + UX usable en móvil.
+  - **En producción:** overview, directorio + filtros, detalle agente, HUMI/WAMI, perfil, suscripciones, feedbacks, shell responsive, chain dual móvil/desktop.
+  - **Parcial / pendiente:** migración `chains` → `chains_stadistics` en `agents/[id]`, tests automatizados, páginas `uso`/`api` del menú, limpiar helpers legacy HUMI; vigilar **GRANT** tras REFRESH de MVs.
 
 ---
 
@@ -41,8 +46,8 @@ Documento de handoff para continuar el desarrollo del dashboard en un chat nuevo
 - **Base de datos:** **Supabase (PostgreSQL)** — `@supabase/supabase-js`, `@supabase/ssr`; sin ORM
 - **UI:** Tailwind CSS 3.4, Recharts, Framer Motion, Lucide, Radix UI
 - **Auth:** Supabase Auth + `requireDashboardUser()` en `app/api/dashboard/**`
-- **Pagos:** NOWPayments (Edge Function `gsa_nowpayments_webhook`, creación de invoice en suscripciones)
-- **Deployment:** **Vercel** (`next build` / `next start`)
+- **Pagos:** NOWPayments (Edge Function `gsa_nowpayments_webhook`)
+- **Deployment:** **Vercel**
 
 ---
 
@@ -52,85 +57,100 @@ Documento de handoff para continuar el desarrollo del dashboard en un chat nuevo
 globalscoreagent-web/
 ├── app/
 │   ├── (dashboard)/dashboard/          # UI dashboard
-│   │   ├── page.tsx                    # Home (overview) — DashboardPageClient
+│   │   ├── page.tsx                    # Home — DashboardPageClient
 │   │   ├── agents/                     # Directorio + [id] + humi/wami
-│   │   ├── humi/, wami/                # Redirect / query agentId
-│   │   ├── perfil/, subscripciones/, feedbacks/
-│   │   ├── uso/, api/                  # Placeholder / parcial
-│   │   └── components/                 # Layout, i18n, sidebar, login gate
-│   ├── auth/login/, auth/callback/     # Login público + OAuth callback
-│   └── api/dashboard/                  # APIs autenticadas
+│   │   ├── components/                 # Layout, i18n, sidebar, mobile nav, overview panels
+│   │   │   ├── DashboardLayoutClient.tsx
+│   │   │   ├── DashboardMobileNavContext.tsx   # Drawer móvil
+│   │   │   ├── DashboardOverviewPanels.tsx     # Layout dual móvil / desktop
+│   │   │   ├── DashboardSidebar.tsx
+│   │   │   └── DashboardTopNav.tsx
+│   └── api/dashboard/
 │       ├── overview/                   # global_stadistics + chains_stadistics
 │       ├── agents/, agents/[id]/, humi/, wami/
-│       ├── profile/, subscriptions/, subscription-summary/
-│       ├── api-credits/, redeem-promotional-code/, feedbacks/, news/
-├── components/dashboard/               # Cards, charts, chain carousel, pilares
-├── lib/                                # Parsers, auth redirect, pricing, series
-├── content/                            # Copy dashboard (parcial) + docs manifest
-├── docs/
-│   ├── dashboard-context-summary.md    # Este archivo
-│   ├── marketing-web-context-summary.md
-│   ├── AGENT-RULES.md
-│   └── sql/                            # MVs, funciones, imports (referencia)
-└── utils/supabase/                     # Clientes SSR/browser (compartido)
+│       ├── profile/, subscriptions/, …
+├── components/dashboard/
+│   ├── chain/
+│   │   ├── ChainSelector.tsx           # Tabs sticky (móvil)
+│   │   ├── ChainModuleCards.tsx        # Stack modular (móvil)
+│   │   └── ChainDesktopCard.tsx        # Card única + rail (desktop ≥md)
+│   ├── DashboardChainCards.tsx         # Orquestador: móvil vs desktop
+│   ├── DashboardNonceInsightCard.tsx
+│   ├── StackedDistributionBar.tsx
+│   └── …
+├── lib/
+│   ├── dashboardChainCardData.ts       # Parsing compartido chain cards
+│   ├── dashboardChains.ts
+│   └── …
+└── docs/
+    ├── dashboard-context-summary.md    # Este archivo
+    ├── AGENT-RULES.md
+    └── supabase-auth-setup.md
 ```
 
 **Rutas dashboard principales**
 
 | Ruta | Descripción |
 |------|-------------|
-| `/dashboard` | Overview KPIs, nonce, distribuciones, carrusel por chain |
-| `/dashboard/agents` | Directorio con filtros avanzados e infinite scroll |
+| `/dashboard` | Overview KPIs, nonce, distribuciones, chains |
+| `/dashboard/agents` | Directorio + filtros + infinite scroll |
 | `/dashboard/agents/[id]` | Detalle agente |
-| `/dashboard/agents/[id]/humi` | Índice HUMI del agente |
-| `/dashboard/agents/[id]/wami` | Índice WAMI del agente |
-| `/dashboard/perfil` | Cuenta, idioma, tema, favoritos |
-| `/dashboard/subscripciones` | Planes, checkout, más detalles pricing |
+| `/dashboard/agents/[id]/humi` | Índice HUMI |
+| `/dashboard/agents/[id]/wami` | Índice WAMI |
+| `/dashboard/perfil` | Cuenta, idioma, tema |
+| `/dashboard/subscripciones` | Planes / checkout |
 | `/dashboard/feedbacks` | Comentarios / tickets |
 
 ---
 
 ## 4. Funcionalidades Implementadas (v1)
 
-### Overview (`/dashboard`)
+### Overview (`/dashboard`) — layout responsive
 
-- KPIs globales: agentes, activos, feedback, wallets
-- Card **nonce** (30 días) — `agent_nonce`, fechas locales
-- Distribuciones HUMI / WAMI / metadata richness
-- **DashboardChainCards:** stats agentes, owners, 30d, on-chain, madurez técnica (x402/MCP), top 10 HUMI, warnings, series mensuales, distribuciones HUMI/WAMI/metadata por chain
+Corte Tailwind **`md` (768px)** en [`DashboardOverviewPanels.tsx`](../app/(dashboard)/dashboard/components/DashboardOverviewPanels.tsx):
 
-### Directorio (`/dashboard/agents`)
+| Viewport | Orden / layout |
+|----------|----------------|
+| **Móvil** (`md:hidden`) | 1. KPI (`DashboardStatsGrid` `section="all"`) → 2. Top 10 HUMI → 3. Daily Nonce → 4. Distribución global (barras **verticales**, leyenda bottom) → luego Chain cards |
+| **Desktop** (`hidden md:flex`) | Grid 12 cols compact: KPIs + Nonce/Top10 en fila; KPIs bottom + distribución **horizontal** / leyenda side |
 
-- Búsqueda, filtros avanzados, cadena, tags, skills
-- Filtro HUMI por `humi_madurity_level` (Unstable → Elite + Not Calculated)
-- Sort, paginación infinita, ribbon madurez en cards
+### Chain cards (`DashboardChainCards`)
 
-### Detalle agente e índices
+| Viewport | UI |
+|----------|-----|
+| **Móvil** (`md:hidden`) | `ChainSelector` (tabs sticky) + `ChainCardsStack` modular |
+| **Desktop** (`hidden md:flex`) | `ChainDesktopCard` (una card + mini-shells + rail distribución) + selector por puntos |
 
-- Detalle completo con warnings, wallets, on-chain, feedback
-- HUMI: 4 pilares, tendencias, resúmenes JSON
-- WAMI: página dedicada por agente (`/dashboard/agents/[id]/wami`)
+**Orden del stack móvil** (`ChainCardsStack`):
 
-### Cuenta y suscripción
+1. Top 10 HUMI  
+2. Summary (logo/nombre)  
+3. Agent stats / Owners / Technical maturity  
+4. Activity 30d / Warnings  
+5. Monthly trend  
+6. Distribution  
 
-- Perfil, suscripciones, resumen de plan, créditos API
-- Gate de login + suscripción activa (`DashboardLoginContext`)
-- Detalle pricing reutiliza `lib/gsa/subscription-pricing-details.ts` (alineado con `/pricing` y docs)
+Datos: `lib/dashboardChainCardData.ts` → `buildChainCardData()` (compartido móvil/desktop).
 
-### Perfiles públicos (relacionado, fuera del dashboard auth)
+### Directorio, detalle, cuenta
 
-- Rutas públicas `/agents/[id]` (+ humi/wami) — APIs `app/api/web-page/agents/**` (sin login)
+- Sin cambio de modelo respecto a v1: filtros avanzados, HUMI/WAMI, perfil, suscripciones, gate login.
+- Detalle agente: cards on-chain / owner con wrap de wallets en móvil (`min-w-0`, `break-all`).
+
+### Perfiles públicos (fuera del dashboard auth)
+
+- `/agents/[id]` (+ humi/wami) — `app/api/web-page/agents/**`
 
 ---
 
 ## 5. Lógica de Scoring (HUMI y WAMI)
 
-Sin cambios de modelo respecto a la spec:
+Sin cambios de modelo:
 
-- **Cálculo en PostgreSQL** (`index_humi`, `index_wami`, MVs en `docs/sql/`)
-- **4 pilares HUMI** × 25 pts; madurez Unstable → Elite + Not Calculated
-- Frontend: presentación en `lib/agentHumiDisplay.ts`, `lib/indexHumi.ts`, `lib/dashboardChains.ts`
-- Filtro NULL: `.is('humi_madurity_level', null)`; sort DESC con `nullsFirst: false`
+- Cálculo en PostgreSQL (`index_humi`, `index_wami`)
+- 4 pilares HUMI × 25 pts; madurez Unstable → Elite + Not Calculated
+- Frontend: `lib/agentHumiDisplay.ts`, `lib/indexHumi.ts`, `lib/dashboardChains.ts`
+- Not Calculated: `.is('humi_madurity_level', null)`
 
 Ver [`docs/español/index-humi.md`](español/index-humi.md) y [`docs/AGENT-RULES.md`](AGENT-RULES.md) §6.
 
@@ -138,12 +158,13 @@ Ver [`docs/español/index-humi.md`](español/index-humi.md) y [`docs/AGENT-RULES
 
 ## 6. Decisiones de Diseño y Arquitectura
 
-- **Datos sensibles vía API server** — no Supabase directo desde browser en overview
-- **Auth:** middleware protege `/dashboard` y `/api/dashboard`; callback OAuth en route handler con cookies en redirect response
-- **i18n ES/EN** + tema claro/oscuro (`LanguageContext`)
-- **Branding sidebar:** logo según tema en `DashboardSidebar` — `public/logo-gsa-dashboard-oscuro.png` (dark) / `public/logo-gsa-dashboard-claro.png` (light); marketing usa `public/logo-gsa.png` fijo
-- **Monorepo:** marketing + dashboard en `main`; desarrollo histórico en ramas `web-page-v2` / `dashboard-final` (ver [`BRANCHING.md`](BRANCHING.md))
-- **SSR:** componentes dashboard pesados con `dynamic(..., { ssr: false })` donde el árbol de client components lo exige
+- **Datos sensibles vía API server** — overview no usa Supabase desde browser
+- **Auth:** middleware `/dashboard` + `/api/dashboard`; overview = JWT `authenticated` (**no** `service_role`)
+- **i18n ES/EN** + tema claro/oscuro
+- **Responsive:** dos árboles de componentes en overview y chains (mismo patrón que `md:hidden` / `hidden md:flex`)
+- **Recharts vertical + `fillHeight`:** necesita `minHeight` / shell `min-h-[9rem]` o el chart colapsa (leyenda visible, área vacía)
+- **Monorepo:** trabajo diario en **`main`** o feature branch → PR → `main`
+- **SSR:** `dynamic(..., { ssr: false })` donde el árbol client lo exige
 
 ---
 
@@ -158,7 +179,7 @@ Ver [`docs/español/index-humi.md`](español/index-humi.md) y [`docs/AGENT-RULES
 | `agents` | Directorio y detalle |
 | `agent_advanced_filters` | Filtros avanzados UI |
 | `index_humi` | Detalle HUMI por agente |
-| `gsa.*` | Suscripciones, pagos, créditos API (ver Edge Functions) |
+| `gsa.*` | Suscripciones, pagos, créditos API |
 
 ### Flujo overview
 
@@ -168,9 +189,28 @@ Ver [`docs/español/index-humi.md`](español/index-humi.md) y [`docs/AGENT-RULES
   → web_dashboard.chains_stadistics (+ enrich top 10 agents)
 ```
 
-### Pendiente conocido
+Si **cualquiera** de las dos queries falla → UI muestra `dashboardDataLoadError`  
+(ES: «No hay conexión con la base de datos…») — **mensaje genérico**.
 
-- `app/api/dashboard/agents/[id]/route.ts` — aún puede usar `.from('chains')` legacy para logos; migrar a `chains_stadistics`
+### Diagnóstico típico (julio 2026)
+
+| Síntoma | Causa real observada |
+|---------|----------------------|
+| Overview error “sin conexión” | `chains_stadistics` **403** / `permission denied for materialized view` — falta `GRANT SELECT … TO authenticated` tras REFRESH/recreate |
+| `/dashboard/agents` 400 | Columna `agents.nonce_current` inexistente (API desalineada con BD) |
+
+Tras recrear/refrescar MVs, reaplicar:
+
+```sql
+GRANT SELECT ON web_dashboard.chains_stadistics TO authenticated, anon, authenticator;
+-- global_stadistics ya suele tener authenticated=r; verificar con has_table_privilege(...)
+```
+
+Schema expuesto: **API → Exposed schemas** incluye `web_dashboard`. Detalle: [`docs/supabase-auth-setup.md`](supabase-auth-setup.md).
+
+### Pendiente conocido (código)
+
+- `app/api/dashboard/agents/[id]/route.ts` — aún puede usar `.from('chains')` legacy; migrar a `chains_stadistics`
 
 ---
 
@@ -179,60 +219,59 @@ Ver [`docs/español/index-humi.md`](español/index-humi.md) y [`docs/AGENT-RULES
 ### Prioridad alta
 
 1. Migrar `agents/[id]/route.ts`: `chains` → `chains_stadistics`
-2. Confirmar REFRESH + GRANT de MVs en Supabase producción
-3. Índices: `db/indexes_web_dashboard_agents_humi_madurity_level.sql` si no aplicados
+2. Tras cada REFRESH de MVs: verificar GRANT `authenticated` en `global_stadistics` y `chains_stadistics`
+3. Alinear API agents con columnas reales (p. ej. `nonce_current` si se eliminó)
 
 ### Prioridad media
 
-4. Limpiar `humiFilterFromNumericScore` legacy en `ChainTopAgentsList`
-5. Descarga markdown resumen por chain (propuesta documentada en conversaciones)
-6. Tests API dashboard
+4. Limpiar `humiFilterFromNumericScore` legacy
+5. Tests API dashboard
+6. Índices `db/indexes_web_dashboard_agents_humi_madurity_level.sql` si no aplicados
 
 ### Prioridad baja
 
 7. Completar páginas `uso`, `api` del menú
-8. Sincronizar docs SQL eliminados del repo con copia externa si hace falta
 
 ---
 
 ## 9. Reglas y Preferencias
 
-Ver [`docs/AGENT-RULES.md`](AGENT-RULES.md) y [`.cursor/rules/dashboard-branch.mdc`](../.cursor/rules/dashboard-branch.mdc).
+Ver [`docs/AGENT-RULES.md`](AGENT-RULES.md) y [`.cursor/rules/`](../.cursor/rules/).
 
-- Trabajar en **`main`** para fixes de producción (o rama feature → PR → `main`)
-- No tocar marketing (`app/page.tsx`, `components/marketing/**`) salvo shared acordado
+- Trabajar en **`main`** o feature → PR → `main`
+- No tocar marketing salvo shared acordado
 - Diff mínimo; no commits/push salvo petición explícita
 
 ---
 
-## 10. Contexto Adicional — changelog v1 (merge → producción)
+## 10. Contexto Adicional — changelog v1
 
 | Área | Cambio |
 |------|--------|
-| **Merge** | `dashboard-final` integrado en `main` (`aff1172`, `b93ac55`) |
-| **WAMI** | Páginas dashboard y públicas WAMI por agente |
-| **Agentes públicos** | `/agents/[id]`, APIs `web-page/agents` |
-| **SSR** | Fixes dynamic import en layout/página dashboard |
-| **Nonce** | Corrección timezone en serie 30d |
-| **Auth prod** | OAuth Google/GitHub operativo en `globalscoreagent.com` |
-| **Docs dashboard** | `docs/español/dashboard/*`, `docs/ingles/dashboard/*` |
-| **Branding** | Logos sidebar por tema (`logo-gsa-dashboard-oscuro` / `logo-gsa-dashboard-claro`) |
+| **Merge inicial** | `dashboard-final` → `main` (jun 2026) |
+| **Móvil** | `dashboard-movil` → `main` (jul 2026): shell, overview dual, chains dual, distribuciones verticales |
+| **WAMI / agentes públicos** | Páginas dedicadas + APIs `web-page` |
+| **Auth prod** | OAuth en `globalscoreagent.com` |
+| **Branding** | Logos sidebar por tema |
 
 ---
 
 ## 11. Instrucciones para agentes Cursor (handoff)
 
 **Reglas generales:** [`docs/AGENT-RULES.md`](AGENT-RULES.md)  
-**Web pública (marketing):** [`docs/marketing-web-context-summary.md`](marketing-web-context-summary.md)
+**Web pública:** [`docs/marketing-web-context-summary.md`](marketing-web-context-summary.md)
 
 ### Prompt sugerido — dashboard
 
 ```text
 Lee docs/AGENT-RULES.md y docs/dashboard-context-summary.md.
-Producción en main (globalscoreagent.com). Rama feature → PR → main.
-BD: docs/sql/ + app/api/dashboard/** como fuente práctica.
-Auth: requireDashboardUser(); OAuth vía /auth/callback.
+Producción en main (www.globalscoreagent.com). Feature branch → PR → main.
+BD: docs/sql/ + app/api/dashboard/** (Supabase puede diferir).
+Auth: requireDashboardUser(); overview usa JWT authenticated (no service_role).
+Responsive: md=768 — overview y chains tienen árboles móvil vs desktop.
+Si overview dice "sin conexión", revisar 403/GRANT en chains_stadistics, no asumir caída de BD.
 No modifiques marketing salvo shared acordado.
+Tarea: [DESCRIBE]
 ```
 
 ### Archivos SQL frecuentes
@@ -240,10 +279,10 @@ No modifiques marketing salvo shared acordado.
 | Tarea | Archivo en `docs/sql/` |
 |-------|-------------------------|
 | Stats globales | `web_dashboard_global_stadistics.sql` |
-| Stats por cadena | `web_dashboard_chains.sql` / `chains_stadistics` en BD |
+| Stats por cadena | `web_dashboard_chains.sql` / MV `chains_stadistics` en BD |
 | Import agentes / HUMI / WAMI | `web_dashboard_*_import_data.sql` |
 | Proceso diario | `web_dashboard_daily_process.sql` |
 
 ---
 
-*Última revisión: junio 2026 — v1 en producción. Actualizar tras migraciones BD, nuevas rutas dashboard o cambios de auth/deploy.*
+*Última revisión: julio 2026 — v1 + dashboard móvil en `main`. Actualizar tras migraciones BD, cambios de grants o nuevas rutas responsive.*

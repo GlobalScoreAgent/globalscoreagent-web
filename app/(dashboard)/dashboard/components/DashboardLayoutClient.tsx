@@ -29,6 +29,10 @@ function getPageTitleKey(pathname: string): string {
     return 'agentOverviewTitle';
   }
 
+  if (pathname === '/dashboard/chains' || pathname === '/dashboard/chains/') {
+    return 'blockchains';
+  }
+
   if (pathname === '/dashboard/perfil' || pathname === '/dashboard/perfil/') {
     return 'profile';
   }

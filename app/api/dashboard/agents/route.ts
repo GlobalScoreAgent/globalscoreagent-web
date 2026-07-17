@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireDashboardUser } from '@/lib/auth/require-dashboard-user';
-import { isSimpleFilterValues } from '@/lib/dashboardFilters';
+import { requireActiveDashboardUser } from '@/lib/auth/require-active-subscription';
+import { isSimpleFilterValues, mergeAiCategoriesFilter } from '@/lib/dashboardFilters';
 import {
   applyNotCalculatedMaturityFilter,
   isNotCalculateFilterValue,
@@ -29,7 +29,7 @@ interface FilterParams {
   advancedFilterKey?: string;
   advancedFilterValue?: string;
   advancedFilterTagRawValues?: string[];
-  sortBy?: 'on_chain_created_at' | 'name' | 'nonce_current' | 'balance_current' | 'current_humi_score';
+  sortBy?: 'on_chain_created_at' | 'created_at' | 'name' | 'nonce_current' | 'balance_current' | 'current_humi_score';
   sortDirection?: 'asc' | 'desc';
   page?: number;
   limit?: number;
@@ -64,7 +64,7 @@ function jsonbContainsStringArrayPayload(rawValue: string): string {
 
 export async function GET(request: NextRequest) {
   try {
-    const auth = await requireDashboardUser();
+    const auth = await requireActiveDashboardUser();
     if (!auth.ok) return auth.response;
     const supabase = auth.supabase;
 
@@ -102,25 +102,44 @@ export async function GET(request: NextRequest) {
     // Ya no se usan RPC functions - método directo
 
     // Cargar filtros avanzados para determinar parámetros dinámicos
-    const { data: advancedFiltersData, error: advancedFiltersError } = await supabase
-      .schema('web_dashboard')
-      .from('agent_advanced_filters')
-      .select('filter, values, filter_key');
+    const [{ data: advancedFiltersData, error: advancedFiltersError }, { data: aiCategoriesData }] =
+      await Promise.all([
+        supabase
+          .schema('web_dashboard')
+          .from('agent_advanced_filters')
+          .select('filter, values, filter_key'),
+        supabase
+          .schema('web_dashboard')
+          .from('agent_ai_categories')
+          .select('category_name')
+          .eq('is_active', true)
+          .order('category_name', { ascending: true }),
+      ]);
 
     let advancedFilters: Record<string, any> = {};
     if (!advancedFiltersError && advancedFiltersData) {
+      const filters: Record<string, any> = {};
+      const filterKeys: Record<string, string> = {};
       advancedFiltersData.forEach((item: any) => {
-        advancedFilters[item.filter] = Array.isArray(item.values) ? item.values : [];
-        advancedFilters._filterKeys = advancedFilters._filterKeys || {};
-        advancedFilters._filterKeys[item.filter] = item.filter_key;
+        filters[item.filter] = Array.isArray(item.values) ? item.values : [];
+        filterKeys[item.filter] = item.filter_key;
       });
+
+      const categoryNames = (aiCategoriesData || [])
+        .map((row: { category_name?: string | null }) => row.category_name)
+        .filter((name: unknown): name is string => typeof name === 'string' && name.trim().length > 0);
+
+      const merged = mergeAiCategoriesFilter(filters, filterKeys, categoryNames);
+      advancedFilters = { ...merged.filters, _filterKeys: merged.filterKeys };
     }
 
     let query = supabase
       .schema('web_dashboard')
       .from('agents')
-      .select(`
+      .select(
+        `
         id,
+        agent_id,
         chain_name,
         name,
         description,
@@ -130,7 +149,6 @@ export async function GET(request: NextRequest) {
         on_chain_id,
         wallet_chain_register,
         owner_wallet,
-        nonce_current,
         skills,
         capabilites,
         skills_filters,
@@ -139,8 +157,12 @@ export async function GET(request: NextRequest) {
         oasf_domains_filters,
         agent_warnings,
         current_humi_score,
-        balance_current
-      `);
+        ai_category_primary,
+        ai_category_purpose,
+        realness_status
+      `,
+        { count: 'exact' },
+      );
 
     // No aplicar filtros de calidad - mostrar todos los agentes
 
@@ -266,17 +288,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Aplicar ordenamiento
+    // nonce_current / balance_current ya no existen en web_dashboard.agents — fallback a HUMI
     const sortDirection = filters.sortDirection === 'asc';
     switch (filters.sortBy) {
       case 'name':
         query = query.order('name', { ascending: sortDirection });
         break;
       case 'nonce_current':
-        query = query.order('nonce_current', { ascending: sortDirection });
-        break;
       case 'balance_current':
-        query = query.order('balance_current', { ascending: sortDirection });
-        break;
       case 'current_humi_score':
         query = query.order('current_humi_score', {
           ascending: sortDirection,
@@ -284,6 +303,7 @@ export async function GET(request: NextRequest) {
         });
         break;
       case 'on_chain_created_at':
+      case 'created_at':
       default:
         query = query.order('on_chain_created_at', { ascending: sortDirection });
         break;
@@ -330,18 +350,21 @@ export async function GET(request: NextRequest) {
       has_duplicate_agent: hasDuplicateWarning,
       current_humi_score: normalizeAgentHumiScore(agent.current_humi_score),
       humi_madurity_level: normalizeAgentHumiMaturity(agent.humi_madurity_level),
-      nonce_current: agent.nonce_current,
-      balance_current: agent.balance_current
+      ai_category_primary: agent.ai_category_primary ?? null,
+      ai_category_purpose: agent.ai_category_purpose ?? null,
+      realness_status: agent.realness_status ?? null,
+      // Columnas eliminadas del esquema agents; UI muestra N/A hasta reintroducir fuente
+      nonce_current: null,
+      balance_current: null,
     };
     });
 
-    // Usar totalAgents del cliente si está disponible, sino usar count de la consulta
-    const totalCount = filters.totalAgents || count || 0;
+    const totalCount = count ?? 0;
 
     return NextResponse.json({
       data: mappedAgents,
-      count: count || 0,
-      totalCount: totalCount,
+      count: totalCount,
+      totalCount,
       page: page,
       limit: limit,
       totalPages: Math.ceil(totalCount / limit)

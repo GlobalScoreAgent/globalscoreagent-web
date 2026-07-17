@@ -70,7 +70,7 @@ export function parseHumiLast30Days(
     }
   }
 
-  return [...byDay.entries()]
+  return Array.from(byDay.entries())
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([dayKey, point]) => ({
       sortKey: dayKey,

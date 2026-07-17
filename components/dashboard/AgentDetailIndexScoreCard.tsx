@@ -14,6 +14,8 @@ type Props = {
   accentColor: string;
   plusAriaLabel?: string;
   detailsHref?: string;
+  /** When set, «+» runs this instead of navigating via detailsHref. */
+  onPlusClick?: () => void;
   infoAriaLabel?: string;
   notAvailableLabel: string;
   isDark: boolean;
@@ -82,6 +84,7 @@ export function AgentDetailIndexScoreCard({
   accentColor,
   plusAriaLabel = '',
   detailsHref,
+  onPlusClick,
   infoAriaLabel = '',
   notAvailableLabel,
   isDark,
@@ -103,14 +106,22 @@ export function AgentDetailIndexScoreCard({
   const formattedScore = formatScore(score);
   const hasScore = formattedScore !== null;
   const muted = isDark ? 'text-zinc-400' : 'text-zinc-600';
-  const plusEnabled = Boolean(detailsHref);
   const showCalculatedAt = Boolean(calculatedAtLabel && formatDate);
   const compact = density === 'compact';
   const alignEnd = align === 'end';
 
-  const plusControl = plusEnabled ? (
+  const plusControl = onPlusClick ? (
+    <button
+      type="button"
+      onClick={onPlusClick}
+      className={cn(plusBtnClass, 'opacity-90 hover:opacity-100')}
+      aria-label={plusAriaLabel}
+    >
+      <Plus className="h-4 w-4" strokeWidth={2.5} />
+    </button>
+  ) : detailsHref ? (
     <Link
-      href={detailsHref!}
+      href={detailsHref}
       className={cn(plusBtnClass, 'opacity-90 hover:opacity-100')}
       aria-label={plusAriaLabel}
     >

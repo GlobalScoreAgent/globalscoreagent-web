@@ -1,5 +1,8 @@
 export type FilterOption = { key: string; label: string };
 
+export const AI_CATEGORIES_FILTER_NAME = 'AI Categories';
+export const AI_CATEGORIES_FILTER_KEY = 'ai_category_primary';
+
 const FRONTEND_TO_DB_FILTER: Record<string, string> = {
   searchOasfDomains: 'OASF Domains',
   searchTags: 'Tags',
@@ -9,6 +12,32 @@ const FRONTEND_TO_DB_FILTER: Record<string, string> = {
 
 export function mapFrontendFilterToDb(filterType: string): string {
   return FRONTEND_TO_DB_FILTER[filterType] || filterType.replace('search', '');
+}
+
+/** Merge AI Categories catalog into the advanced-filters map used by UI + API. */
+export function mergeAiCategoriesFilter(
+  filters: Record<string, any>,
+  filterKeys: Record<string, string>,
+  categoryNames: string[],
+): { filters: Record<string, any>; filterKeys: Record<string, string> } {
+  const names = categoryNames
+    .map((name) => (typeof name === 'string' ? name.trim() : ''))
+    .filter(Boolean);
+
+  if (names.length === 0) {
+    return { filters, filterKeys };
+  }
+
+  return {
+    filters: {
+      ...filters,
+      [AI_CATEGORIES_FILTER_NAME]: names,
+    },
+    filterKeys: {
+      ...filterKeys,
+      [AI_CATEGORIES_FILTER_NAME]: AI_CATEGORIES_FILTER_KEY,
+    },
+  };
 }
 
 export function isComplexFilter(filterType: string, advancedFilters: Record<string, any>): boolean {

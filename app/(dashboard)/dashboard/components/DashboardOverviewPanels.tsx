@@ -1,16 +1,20 @@
 'use client';
 
-import { DashboardChainCards } from '@/components/dashboard/DashboardChainCards';
+import { useMemo } from 'react';
 import { DashboardGlobalDistributionBarCard } from '@/components/dashboard/DashboardGlobalDistributionBarCard';
 import { DashboardGlobalTop10AgentsCard } from '@/components/dashboard/DashboardGlobalTop10AgentsCard';
+import {
+  DashboardMonitoredChainsRow,
+  parseMonitoredChains,
+} from '@/components/dashboard/DashboardMonitoredChainsRow';
 import { DashboardNonceInsightCard } from '@/components/dashboard/DashboardNonceInsightCard';
 import { DashboardStatsGrid } from '@/components/dashboard/DashboardStatsGrid';
-import { parseBest10AgentsHumi, type DashboardChainRow } from '@/lib/dashboardChains';
+import { GLOBAL_DISTRIBUTION_METRICS } from '@/lib/dashboardOverviewDistribution';
+import { parseBest10AgentsHumi } from '@/lib/dashboardChains';
 import type { Translations } from './LanguageContext';
 
 export type DashboardOverviewPanelsProps = {
   stats: Record<string, unknown>;
-  dashboardChains: DashboardChainRow[];
   currentStats: {
     total_agents: number;
     total_agents_active: number;
@@ -38,7 +42,6 @@ const distributionStatsPick = (currentStats: DashboardOverviewPanelsProps['curre
 
 export default function DashboardOverviewPanels({
   stats,
-  dashboardChains,
   currentStats,
   top10Agents,
   isDark,
@@ -46,81 +49,90 @@ export default function DashboardOverviewPanels({
   lang,
 }: DashboardOverviewPanelsProps) {
   const distributionStats = distributionStatsPick(currentStats);
+  const monitoredChains = useMemo(
+    () => parseMonitoredChains(stats?.monitored_chains),
+    [stats?.monitored_chains],
+  );
+  const locale = lang === 'es' ? 'es-ES' : 'en-US';
 
   return (
     <>
-      <div className="mb-16 flex flex-col gap-4 md:hidden">
-        <DashboardStatsGrid section="all" currentStats={currentStats} isDark={isDark} t={t} />
+      <div className="mb-8 flex flex-col gap-4 md:hidden">
+        <DashboardStatsGrid
+          section="all"
+          currentStats={currentStats}
+          isDark={isDark}
+          t={t}
+          locale={locale}
+        />
         <DashboardGlobalTop10AgentsCard isDark={isDark} t={t} lang={lang} agents={top10Agents} className="w-full" />
         <DashboardNonceInsightCard
           isDark={isDark}
           t={t}
           agentNonce={stats?.agent_nonce}
           className="min-h-[220px] w-full"
+          locale={locale}
         />
-        <DashboardGlobalDistributionBarCard
-          isDark={isDark}
-          t={t}
-          currentStats={distributionStats}
-          stackedBarOrientation="vertical"
-          legendPlacement="bottom"
-          className="w-full min-h-[280px]"
-        />
+        {GLOBAL_DISTRIBUTION_METRICS.map((metric) => (
+          <DashboardGlobalDistributionBarCard
+            key={metric}
+            metric={metric}
+            isDark={isDark}
+            t={t}
+            currentStats={distributionStats}
+            locale={locale}
+            className="w-full min-h-[320px]"
+          />
+        ))}
+        <DashboardMonitoredChainsRow chains={monitoredChains} isDark={isDark} t={t} className="mt-2" />
       </div>
 
-      <div className="mb-16 hidden flex-col gap-2 md:flex">
-        <div className="grid grid-cols-1 gap-2 lg:grid-cols-12 lg:h-[15rem] lg:items-stretch lg:gap-2">
+      <div className="mb-8 hidden flex-col gap-2 md:flex">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-12 md:h-[16rem] md:items-stretch md:gap-2">
           <DashboardStatsGrid
             compact
-            section="top"
+            section="all"
             currentStats={currentStats}
             isDark={isDark}
             t={t}
-            className="h-full min-h-0 lg:col-span-5 lg:col-start-1"
+            locale={locale}
+            className="h-full min-h-0 md:col-span-8"
           />
-          <div className="flex min-h-0 flex-col gap-2 lg:col-span-7 lg:col-start-6 lg:flex-row lg:overflow-hidden">
-            <DashboardNonceInsightCard
-              compact
-              isDark={isDark}
-              t={t}
-              agentNonce={stats?.agent_nonce}
-              className="h-full min-h-0 w-full min-w-0 flex-1"
-            />
-            <DashboardGlobalTop10AgentsCard
-              compact
-              isDark={isDark}
-              t={t}
-              lang={lang}
-              agents={top10Agents}
-              className="h-full min-h-0 w-full min-w-0 flex-1"
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-1 gap-2 lg:grid-cols-12 lg:h-[16rem] lg:items-stretch lg:gap-2">
-          <DashboardStatsGrid
+          <DashboardNonceInsightCard
             compact
-            section="bottom"
-            currentStats={currentStats}
             isDark={isDark}
             t={t}
-            className="h-full min-h-0 lg:col-span-5 lg:col-start-1"
+            agentNonce={stats?.agent_nonce}
+            className="h-full min-h-0 w-full min-w-0 md:col-span-4"
+            locale={locale}
           />
-          <div className="min-h-0 overflow-hidden lg:col-span-7 lg:col-start-6">
-            <DashboardGlobalDistributionBarCard
-              compact
-              isDark={isDark}
-              t={t}
-              currentStats={distributionStats}
-              stackedBarOrientation="horizontal"
-              legendPlacement="side"
-              className="h-full min-h-0 w-full"
-            />
-          </div>
         </div>
-      </div>
 
-      <div className="mb-16">
-        <DashboardChainCards chains={dashboardChains} isDark={isDark} t={t} lang={lang} />
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-12 md:h-[24rem] md:items-stretch md:gap-2">
+          <div className="grid min-h-0 grid-cols-1 gap-2 md:col-span-8 md:grid-cols-3">
+            {GLOBAL_DISTRIBUTION_METRICS.map((metric) => (
+              <DashboardGlobalDistributionBarCard
+                key={metric}
+                metric={metric}
+                compact
+                isDark={isDark}
+                t={t}
+                currentStats={distributionStats}
+                locale={locale}
+                className="h-full min-h-0 w-full"
+              />
+            ))}
+          </div>
+          <DashboardGlobalTop10AgentsCard
+            isDark={isDark}
+            t={t}
+            lang={lang}
+            agents={top10Agents}
+            className="h-full min-h-0 w-full min-w-0 md:col-span-4"
+          />
+        </div>
+
+        <DashboardMonitoredChainsRow chains={monitoredChains} isDark={isDark} t={t} className="mt-4 mb-8" />
       </div>
     </>
   );

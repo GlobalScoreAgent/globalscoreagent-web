@@ -137,7 +137,7 @@ export function parseTransactionalWallets(
     }
   }
 
-  const rows = [...byKey.values()];
+  const rows = Array.from(byKey.values());
   rows.sort((a, b) => {
     const sa = a.wami_score ?? -1;
     const sb = b.wami_score ?? -1;

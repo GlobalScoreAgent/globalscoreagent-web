@@ -13,6 +13,7 @@ import {
 import { AgentHumiPillarDetailsCard } from '@/components/dashboard/AgentHumiPillarDetailsCard';
 import { AgentHumiPillarSummaryCard } from '@/components/dashboard/AgentHumiPillarSummaryCard';
 import { AgentHumiTrendCard } from '@/components/dashboard/AgentHumiTrendCard';
+import { AgentsDirectorySearching } from '@/components/dashboard/AgentsDirectorySearching';
 import { useDashboardTitleOverride } from '@/app/(dashboard)/dashboard/components/DashboardTitleOverrideContext';
 import { useLanguage } from '@/app/(dashboard)/dashboard/components/LanguageContext';
 import {
@@ -414,8 +415,8 @@ export function AgentHumiDetailView({ routeScope }: { routeScope: AgentRouteScop
 
   if (loading) {
     return (
-      <div className={cn('flex min-h-[50vh] items-center justify-center', muted)}>
-        <p>{t.agentDetailLoading}</p>
+      <div className="flex min-h-[50vh] items-center justify-center py-16">
+        <AgentsDirectorySearching label={t.agentDetailLoading} isDark={isDark} />
       </div>
     );
   }
