@@ -52,8 +52,8 @@ export const humiCopy = {
       en: 'Agents are autonomous entities whose credibility impacts adoption, governance, staking, and marketplaces. HUMI acts as the primary trust layer for the agent itself.',
     } satisfies Bilingual,
     daily: {
-      es: 'Se recalcula diariamente consultando el Graph oficial de Ormi Labs en: BSC, Base, Polygon, BNB Chain, Arbitrum y Solana.',
-      en: 'Recalculated daily using the official Ormi Labs Graph across BSC, Base, Polygon, BNB Chain, Arbitrum, and Solana.',
+      es: 'Se recalcula diariamente con el Graph oficial de Ormi Labs y la actividad de wallets transaccionales en las chains indexadas. Nonce, balance y deltas se calculan por wallet y chain, y luego se agregan por agente.',
+      en: 'Recalculated daily using the official Ormi Labs Graph and transactional-wallet activity across indexed chains. Nonce, balance, and deltas are calculated per wallet and chain, then aggregated by agent.',
     } satisfies Bilingual,
     universal: {
       es: 'Aplica a todos los agentes — nuevos o antiguos, alta o baja actividad — con score justo y actualizado.',
@@ -171,8 +171,8 @@ export const humiCopy = {
         scoreRange: { es: 'Variable', en: 'Varies' } satisfies Bilingual,
         dataUsed: { es: 'Actividad por protocolo', en: 'Protocol-specific activity' } satisfies Bilingual,
         advantage: {
-          es: 'HUMI evalúa el ciclo de vida completo del agente en todas las chains',
-          en: 'HUMI evaluates full Agent lifecycle across all chains',
+          es: 'HUMI evalúa el ciclo de vida completo del agente con presencia multichain de calidad',
+          en: 'HUMI evaluates the full Agent lifecycle with meaningful multichain presence',
         } satisfies Bilingual,
       },
       {
@@ -226,7 +226,10 @@ export const humiCopy = {
     evaluated: [
       { es: 'Agentes nuevos y antiguos', en: 'New and established agents' },
       { es: 'Alta y baja actividad', en: 'High and low activity' },
-      { es: 'Todas las cadenas monitorizadas', en: 'All monitored chains' },
+      {
+        es: 'Actividad consolidada de wallets transaccionales válidas en las chains indexadas',
+        en: 'Consolidated activity from valid transactional wallets across indexed chains',
+      },
     ] as Bilingual[],
     refreshedTitle: {
       es: 'Qué se actualiza cada día',
@@ -234,12 +237,12 @@ export const humiCopy = {
     } satisfies Bilingual,
     refreshed: [
       {
-        es: 'Nonce y balance de wallets asociadas (owner y registro).',
-        en: 'Nonce and balance of associated wallets (owner and registration).',
+        es: 'Nonce, balance y deltas por wallet transaccional y chain, agregados luego por agente.',
+        en: 'Nonce, balance, and deltas per transactional wallet and chain, then aggregated by agent.',
       },
       {
-        es: 'Actividad on-chain y registros en las 6 cadenas monitorizadas.',
-        en: 'On-chain activity and registration data across six monitored chains.',
+        es: 'Actividad on-chain y registros ERC-8004 en las chains indexadas (calidad de presencia, no solo cantidad de chains).',
+        en: 'On-chain activity and ERC-8004 registrations across indexed chains (presence quality, not just chain count).',
       },
       {
         es: 'Punteros off-chain en registros ERC-8004: metadata URIs, DID y feedback de 21+ entidades externas.',
@@ -256,8 +259,8 @@ export const humiCopy = {
         en: 'Maximum freshness and universal agent coverage.',
       },
       {
-        es: 'Profundidad: Graph on-chain + metadata off-chain importada.',
-        en: 'Depth: on-chain Graph plus imported off-chain metadata.',
+        es: 'Profundidad: Graph on-chain + metadata off-chain + agregación multichain de wallets válidas.',
+        en: 'Depth: on-chain Graph plus imported off-chain metadata and multichain aggregation of valid wallets.',
       },
       {
         es: 'Escala: filtrado inteligente evita recomputación innecesaria.',
@@ -361,37 +364,37 @@ export const humiCopy = {
         id: 'measure',
         title: { es: 'Medida (M)', en: 'Measure (M)' } satisfies Bilingual,
         summary: {
-          es: 'Validación externa, riqueza de metadata y análisis especializado.',
-          en: 'External validation, metadata richness, and specialized analysis.',
+          es: 'Representación creíble, validación externa y calidad de presencia multichain.',
+          en: 'Credible representation, external validation, and multichain presence quality.',
         } satisfies Bilingual,
         criteria: [
           {
             label: {
-              es: 'Riqueza y completitud de metadata',
-              en: 'Metadata richness and completeness',
+              es: 'Metadata y existencia operativa (nonce, atestaciones, ejecuciones o feedback)',
+              en: 'Metadata and operational existence (nonce, attestations, executions, or feedback)',
             },
-            points: 8,
+            points: 10,
           },
           {
             label: {
-              es: 'Auditorías externas y actividad de protocolo',
-              en: 'External audits and protocol activity',
+              es: 'Validación externa, identidad y calidad de protocolos',
+              en: 'External validation, identity, and protocol quality',
             },
-            points: 7,
+            points: 8.5,
           },
           {
             label: {
-              es: 'Análisis de identidad y evaluaciones especializadas',
-              en: 'Identity analysis and specialized evaluations',
+              es: 'Calidad de Presencia Multichain (profundidad en chains valiosas)',
+              en: 'Multichain Presence Quality (depth in valuable chains)',
             },
-            points: 5,
+            points: 2.5,
           },
           {
             label: {
-              es: 'Señales de calidad con ajustes por duplicidad y penalizaciones',
-              en: 'Quality signals with duplication and penalty adjustments',
+              es: 'Penalizaciones por advertencias del agente',
+              en: 'Penalties from agent warnings',
             },
-            points: 5,
+            points: 4,
           },
         ],
       },
@@ -399,37 +402,37 @@ export const humiCopy = {
         id: 'usage',
         title: { es: 'Uso (U)', en: 'Usage (U)' } satisfies Bilingual,
         summary: {
-          es: 'Actividad on-chain real y nivel de engagement del agente.',
-          en: "The agent's real on-chain activity and engagement level.",
+          es: 'Adopción operativa reciente, uso valioso multichain y consistencia de alto valor.',
+          en: 'Recent operational adoption, valuable multichain usage, and high-value consistency.',
         } satisfies Bilingual,
         criteria: [
           {
             label: {
-              es: 'Actividad reciente natural y consistente (wallet + on-chain)',
-              en: 'Natural, consistent recent activity (wallet + on-chain)',
+              es: 'Actividad reciente agregada de wallets transaccionales válidas',
+              en: 'Recent aggregated activity from valid transactional wallets',
             },
             points: 10,
           },
           {
             label: {
-              es: 'Volumen y calidad de attestations, comentarios y ejecuciones',
-              en: 'Volume and quality of attestations, comments, and executions',
+              es: 'Calidad de canales on-chain, comentarios y uso pagado de protocolos',
+              en: 'On-chain channel quality, comments, and paid protocol usage',
             },
-            points: 6,
+            points: 9,
           },
           {
             label: {
-              es: 'Patrones avanzados: pagos y uso de protocolos',
-              en: 'Advanced patterns: payments and protocol usage',
-            },
-            points: 5,
-          },
-          {
-            label: {
-              es: 'Ausencia de patrones sospechosos o penalizaciones',
-              en: 'Absence of suspicious patterns or penalties',
+              es: 'Uso Valioso Multichain y Consistencia Multichain de Alto Valor',
+              en: 'Multichain Valuable Usage and Multichain High Value Consistency',
             },
             points: 4,
+          },
+          {
+            label: {
+              es: 'Penalizaciones por revocaciones recientes',
+              en: 'Penalties from recent revocations',
+            },
+            points: 2,
           },
         ],
       },

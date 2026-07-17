@@ -1,7 +1,7 @@
 # Index HUMI – Agent Human-like Intelligence Index
 
-**Version 1.0**  
-**Date:** May 19, 2026 (Updated with Maturity Levels)  
+**Version 1.1**  
+**Date:** July 17, 2026  
 **Designed for:** GlobalScoreAgent Ecosystem (ERC-8004)
 
 ---
@@ -41,7 +41,7 @@ The HUMI score (0–100) is translated into **5 clear maturity/confidence levels
 
 In the ERC-8004 ecosystem, Agents are autonomous entities that interact with users, protocols, and each other. Their credibility is critical for adoption, governance, staking, and marketplace listings.
 
-Index HUMI acts as the **primary trust layer for Agents**, evaluating not just technical features but the full picture of legitimacy and real activity. It is calculated **daily** by querying the official Graph from Ormi Labs across the six main chains we monitor: **BSC, Base, Polygon, BNB Chain, Arbitrum, and Solana**.
+Index HUMI acts as the **primary trust layer for Agents**, evaluating not just technical features but the full picture of legitimacy and real activity. It is calculated **daily** using the official Graph from Ormi Labs together with transactional-wallet activity across the indexed chains. Nonce, balance, and deltas are calculated per wallet and chain, then aggregated by agent.
 
 HUMI applies to **all Agents** — new or ancient, high-activity or low-activity — ensuring every registered Agent receives a fair, up-to-date reputation score.
 
@@ -89,7 +89,7 @@ This combination creates the most robust reputation system in the ERC-8004 ecosy
 | **Nansen / Arkham Agent Scores**| Nansen / Arkham   | Wallet & entity labeling       | 0–100       | Off-chain + on-chain analytics| HUMI is purpose-built for ERC-8004 Agents                 |
 | **Chainalysis / TRM Labs**      | Chainalysis/TRM   | Risk & compliance scoring      | Risk tiers  | On-chain + off-chain intel    | HUMI is public, transparent, and Agent-specific           |
 | **Dune / Community Dashboards** | Open-source       | Custom on-chain metrics        | Varies      | On-chain queries              | HUMI is standardized, real-time, and integrated with GSA  |
-| **EigenLayer / DeFi Reputation**| Various DeFi      | Staking & protocol reputation  | Varies      | Protocol-specific activity    | HUMI evaluates full Agent lifecycle across all chains     |
+| **EigenLayer / DeFi Reputation**| Various DeFi      | Staking & protocol reputation  | Varies      | Protocol-specific activity    | HUMI evaluates the full Agent lifecycle with meaningful multichain presence |
 | **General AI Agent Scores**     | Various startups  | Off-chain AI metrics           | Varies      | API + metadata                | HUMI is fully on-chain and tied to ERC-8004 registrations |
 
 **Why HUMI stands out:**
@@ -102,19 +102,19 @@ This combination creates the most robust reputation system in the ERC-8004 ecosy
 
 ## Data Freshness and Agent Evaluation Strategy
 
-Index HUMI is engineered for both **accuracy** and **efficiency**. It is **recalculated daily** using the official Graph provided by Ormi Labs, ensuring every Agent has fresh, reliable data.
+Index HUMI is engineered for both **accuracy** and **efficiency**. It is **recalculated daily** using the official Graph provided by Ormi Labs together with transactional-wallet activity, ensuring every Agent has fresh, reliable data.
 
 ### Which Agents are evaluated?
 HUMI evaluates **all Agents** in the ecosystem without exception:
 - New Agents and ancient Agents
 - High-activity Agents and low-activity Agents
-- Agents across all monitored chains
+- Agents whose transactional activity is consolidated across valid wallets and indexed chains
 
 This universal approach guarantees that every registered Agent receives a fair and current reputation score.
 
 ### What data is refreshed daily?
-- **Nonce and balance** of **all wallets** associated with Agents (owner wallets and registration wallets).
-- **On-chain activity** and registration data from the six chains we monitor daily: **BSC, Base, Polygon, BNB Chain, Arbitrum, and Solana**.
+- **Nonce, balance, and deltas** calculated per transactional wallet and chain, then aggregated by agent.
+- **On-chain activity** and registration data across the indexed chains, with emphasis on presence quality rather than simply counting how many chains an agent appears on.
 - **Off-chain pointers** found directly in ERC-8004 records, including:
   - Metadata URIs and DID documents
   - Feedbacks from more than **21 external entities** (processed automatically)
@@ -124,8 +124,8 @@ The system intelligently decides which modules need updating based on the latest
 ### Benefits of this approach
 - **Maximum freshness:** Scores are never more than 24 hours old.
 - **Complete coverage:** Every Agent — regardless of age or activity level — is included.
-- **Rich data depth:** Combines on-chain Graph data with imported off-chain metadata and external feedbacks.
-- **Scalability:** Daily processing across six major chains remains efficient thanks to intelligent filtering.
+- **Rich data depth:** Combines on-chain Graph data with imported off-chain metadata, external feedbacks, and multichain aggregation of valid transactional wallets.
+- **Scalability:** Daily processing across indexed chains remains efficient thanks to intelligent filtering.
 - **Trust at ecosystem scale:** Users and platforms always see the most current and comprehensive view of Agent quality.
 
 This strategy ensures Index HUMI remains both accurate and performant at ecosystem scale.
@@ -134,7 +134,7 @@ This strategy ensures Index HUMI remains both accurate and performant at ecosyst
 
 ## Pillars of the Index HUMI
 
-Each pillar is worth exactly **25 points**. Below are the specific aspects analyzed and the maximum points each aspect can contribute.
+Each pillar is designed around a nominal maximum of **25 points**. Below are the specific aspects analyzed and how they contribute to the score.
 
 ### 1. Pillar History (25 points)
 Evaluates the Agent’s ownership stability and historical reputation.
@@ -151,18 +151,24 @@ Measures the richness, professionalism, and completeness of the Agent’s public
 - Advanced technical maturity (supported trust, verification methods, skills, etc.): **5 points**
 
 ### 3. Pillar Measure (25 points)
-Assesses external validation, metadata richness, and specialized analysis of the Agent.
-- Metadata richness and completeness: **8 points**
-- Existence of external audits and protocol activity: **7 points**
-- Identity analysis and specialized evaluations: **5 points**
-- Overall quality signals with duplication and penalty adjustments: **5 points**
+Evaluates whether an agent is credibly represented, externally validated, and operationally present.
+- Metadata richness and operational existence (aggregated nonce, attestations, executions, or feedback)
+- External validation, identity analysis, and protocol quality
+- **Multichain Presence Quality** — meaningful depth in valuable and high-value chains, not superficial presence on more chains
+- Warning penalties from agent alerts
+
+Transactional wallet volume still contributes, but with reduced direct weight; quality of multichain presence is now an explicit scoring dimension.
 
 ### 4. Pillar Usage (25 points)
-Analyzes the Agent’s real on-chain activity and engagement level.
-- Natural and consistent recent activity (wallet + on-chain): **10 points**
-- Volume and quality of attestations, comments, and executions: **6 points**
-- Advanced activity patterns with payments and protocol usage: **5 points**
-- Absence of suspicious patterns or penalties: **4 points**
+Evaluates recent operational adoption across wallets and chains.
+- Recent aggregated wallet activity from all valid transactional wallets
+- On-chain channel quality (attestations, executions, feedbacks, protocol activity)
+- Comments and paid protocol usage
+- **Multichain Valuable Usage** — meaningful activity across valuable chains
+- **Multichain High Value Consistency** — presence in high-value chains without extreme concentration on a single chain
+- Revocation penalties for recent revoked activity
+
+Appearing on more chains by itself is not rewarded. Usage rewards valuable multichain activity and penalizes shallow spread or extreme primary-chain concentration.
 
 ---
 

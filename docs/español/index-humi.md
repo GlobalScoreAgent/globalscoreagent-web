@@ -1,7 +1,7 @@
 # Índice HUMI – Agent Human-like Intelligence Index
 
-**Versión 1.0**  
-**Fecha:** 19 de mayo de 2026 (Actualizado con Niveles de Madurez)  
+**Versión 1.1**  
+**Fecha:** 17 de julio de 2026  
 **Diseñado para:** Ecosistema GlobalScoreAgent (ERC-8004)
 
 ---
@@ -41,7 +41,7 @@ El puntaje HUMI (0–100) se traduce en **5 claros niveles de madurez/confianza*
 
 En el ecosistema ERC-8004, los Agentes son entidades autónomas que interactúan con usuarios, protocolos y entre sí. Su credibilidad es crítica para la adopción, gobernanza, staking y listados en marketplaces.
 
-El Índice HUMI actúa como la **capa principal de confianza para los Agentes**, evaluando no solo características técnicas, sino el panorama completo de legitimidad y actividad real. Se calcula **diariamente** consultando el Graph oficial de Ormi Labs en las seis cadenas principales que monitoreamos: **BSC, Base, Polygon, BNB Chain, Arbitrum y Solana**.
+El Índice HUMI actúa como la **capa principal de confianza para los Agentes**, evaluando no solo características técnicas, sino el panorama completo de legitimidad y actividad real. Se calcula **diariamente** con el Graph oficial de Ormi Labs junto con la actividad de wallets transaccionales en las chains indexadas. Nonce, balance y deltas se calculan por wallet y chain, y luego se agregan por agente.
 
 HUMI se aplica a **todos los Agentes** — nuevos o antiguos, de alta o baja actividad — garantizando que cada Agente registrado reciba un puntaje de reputación justo y actualizado.
 
@@ -89,7 +89,7 @@ Esta combinación crea el sistema de reputación más robusto del ecosistema ERC
 | **Nansen / Arkham Agent Scores**| Nansen / Arkham   | Etiquetado de wallets y entidades | 0–100            | Off-chain + on-chain analytics| HUMI está diseñado específicamente para Agentes ERC-8004 |
 | **Chainalysis / TRM Labs**      | Chainalysis/TRM   | Scoring de riesgo y cumplimiento | Niveles de riesgo | On-chain + inteligencia off-chain | HUMI es público, transparente y específico para Agentes |
 | **Dune / Dashboards Comunitarios** | Open-source    | Métricas on-chain personalizadas | Variable         | Consultas on-chain            | HUMI es estandarizado, en tiempo real e integrado con GSA |
-| **EigenLayer / Reputación DeFi**| Varios DeFi       | Reputación de staking y protocolos | Variable         | Actividad específica de protocolo | HUMI evalúa el ciclo de vida completo del Agente en todas las cadenas |
+| **EigenLayer / Reputación DeFi**| Varios DeFi       | Reputación de staking y protocolos | Variable         | Actividad específica de protocolo | HUMI evalúa el ciclo de vida completo del Agente con presencia multichain significativa |
 | **General AI Agent Scores**     | Varias startups   | Métricas off-chain de IA       | Variable         | API + metadatos               | HUMI es completamente on-chain y ligado a registros ERC-8004 |
 
 **Por qué HUMI destaca:**
@@ -102,19 +102,19 @@ Esta combinación crea el sistema de reputación más robusto del ecosistema ERC
 
 ## Frescura de Datos y Estrategia de Evaluación de Agentes
 
-El Índice HUMI está diseñado tanto para **precisión** como para **eficiencia**. Se **recalcula diariamente** utilizando el Graph oficial proporcionado por Ormi Labs, asegurando que cada Agente tenga datos frescos y confiables.
+El Índice HUMI está diseñado tanto para **precisión** como para **eficiencia**. Se **recalcula diariamente** utilizando el Graph oficial proporcionado por Ormi Labs junto con la actividad de wallets transaccionales, asegurando que cada Agente tenga datos frescos y confiables.
 
 ### ¿Qué Agentes se evalúan?
 HUMI evalúa **todos los Agentes** del ecosistema sin excepción:
 - Agentes nuevos y antiguos
 - Agentes de alta y baja actividad
-- Agentes en todas las cadenas monitoreadas
+- Agentes cuya actividad transaccional se consolida a través de wallets válidas y chains indexadas
 
 Este enfoque universal garantiza que cada Agente registrado reciba un puntaje de reputación justo y actualizado.
 
 ### ¿Qué datos se actualizan diariamente?
-- **Nonce y balance** de **todas las wallets** asociadas a Agentes (wallets de owner y de registro).
-- **Actividad on-chain** y datos de registro de las seis cadenas que monitoreamos diariamente: **BSC, Base, Polygon, BNB Chain, Arbitrum y Solana**.
+- **Nonce, balance y deltas** calculados por wallet transaccional y chain, y luego agregados por agente.
+- **Actividad on-chain** y datos de registro en las chains indexadas, con énfasis en la calidad de presencia y no simplemente en contar en cuántas chains aparece un agente.
 - **Punteros off-chain** encontrados directamente en los registros ERC-8004, incluyendo:
   - URIs de metadatos y documentos DID
   - Feedbacks de más de **21 entidades externas** (procesados automáticamente)
@@ -124,8 +124,8 @@ El sistema decide inteligentemente qué módulos necesitan actualizarse según l
 ### Beneficios de este enfoque
 - **Máxima frescura:** Los puntajes nunca tienen más de 24 horas de antigüedad.
 - **Cobertura completa:** Todos los Agentes — independientemente de su antigüedad o nivel de actividad — están incluidos.
-- **Profundidad de datos rica:** Combina datos on-chain del Graph con metadatos off-chain importados y feedbacks externos.
-- **Escalabilidad:** El procesamiento diario en seis cadenas principales se mantiene eficiente gracias al filtrado inteligente.
+- **Profundidad de datos rica:** Combina datos on-chain del Graph con metadatos off-chain importados, feedbacks externos y agregación multichain de wallets transaccionales válidas.
+- **Escalabilidad:** El procesamiento diario en las chains indexadas se mantiene eficiente gracias al filtrado inteligente.
 - **Confianza a escala del ecosistema:** Usuarios y plataformas siempre ven la visión más actual y completa de la calidad de los Agentes.
 
 Esta estrategia asegura que el Índice HUMI sea preciso y de alto rendimiento a escala del ecosistema.
@@ -134,7 +134,7 @@ Esta estrategia asegura que el Índice HUMI sea preciso y de alto rendimiento a 
 
 ## Pilares del Índice HUMI
 
-Cada pilar vale exactamente **25 puntos**. A continuación se detallan los aspectos específicos analizados y los puntos máximos que cada uno puede contribuir.
+Cada pilar está diseñado en torno a un máximo nominal de **25 puntos**. A continuación se detallan los aspectos específicos analizados y cómo contribuyen al puntaje.
 
 ### 1. Pilar Historia (25 puntos)
 Evalúa la estabilidad de la propiedad y la reputación histórica del Agente.
@@ -151,18 +151,24 @@ Mide la riqueza, profesionalismo y completitud de la identidad pública y los me
 - Madurez técnica avanzada (supported trust, verification methods, skills, etc.): **5 puntos**
 
 ### 3. Pilar Measure (25 puntos)
-Evalúa la validación externa, la riqueza de metadatos y el análisis especializado del Agente.
-- Riqueza y completitud de metadatos: **8 puntos**
-- Existencia de auditorías externas y actividad de protocolo: **7 puntos**
-- Análisis de identidad y evaluaciones especializadas: **5 puntos**
-- Señales generales de calidad con ajustes por duplicación y penalizaciones: **5 puntos**
+Evalúa si un agente está representado de forma creíble, validado externamente y presente de forma operativa.
+- Riqueza de metadatos y existencia operativa (nonce agregado, atestaciones, ejecuciones o feedback)
+- Validación externa, análisis de identidad y calidad de protocolos
+- **Calidad de Presencia Multichain** — profundidad significativa en chains valiosas y de alto valor, no presencia superficial en más chains
+- Penalizaciones por advertencias del agente
+
+El volumen de wallets transaccionales sigue contribuyendo, pero con menor peso directo; la calidad de la presencia multichain es ahora una dimensión explícita del scoring.
 
 ### 4. Pilar Usage (25 puntos)
-Analiza la actividad real on-chain y el nivel de engagement del Agente.
-- Actividad reciente natural y consistente (wallet + on-chain): **10 puntos**
-- Volumen y calidad de atestaciones, comentarios y ejecuciones: **6 puntos**
-- Patrones de actividad avanzada con pagos y uso de protocolos: **5 puntos**
-- Ausencia de patrones sospechosos o penalizaciones: **4 puntos**
+Evalúa la adopción operativa reciente a través de wallets y chains.
+- Actividad reciente agregada de todas las wallets transaccionales válidas
+- Calidad de canales on-chain (atestaciones, ejecuciones, feedbacks, actividad de protocolo)
+- Comentarios y uso pagado de protocolos
+- **Uso Valioso Multichain** — actividad significativa a través de chains valiosas
+- **Consistencia Multichain de Alto Valor** — presencia en chains de alto valor sin concentración extrema en una sola chain
+- Penalizaciones por revocaciones de actividad reciente
+
+Aparecer en más chains por sí solo no se recompensa. Usage recompensa la actividad multichain valiosa y penaliza la dispersión superficial o la concentración extrema en la chain primaria.
 
 ---
 
