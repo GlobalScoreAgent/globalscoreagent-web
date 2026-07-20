@@ -17,12 +17,14 @@ import {
 import { normalizeChainName, getChainColor } from '@/lib/agentChains';
 import { AgentsDirectorySearching } from '@/components/dashboard/AgentsDirectorySearching';
 import { DashboardSubscriptionGate } from '@/components/dashboard/DashboardSubscriptionGate';
+import { SubscriptionInactiveNotice } from '@/components/dashboard/SubscriptionInactiveNotice';
 import { getHumiMaturityColor } from '@/lib/agentHumiDisplay';
 import {
   getRealnessStatusColor,
   getRealnessStatusLabel,
   parseRealnessStatus,
 } from '@/lib/agentRealnessDisplay';
+import { handleDashboardUnauthorized } from '@/lib/auth/handle-dashboard-unauthorized';
 
 function formatAgentHumiScore(score: unknown): string {
   const n = score != null && Number.isFinite(Number(score)) ? Number(score) : 0;
@@ -96,7 +98,7 @@ type AppliedSearchQuery = {
 const DEFAULT_APPLIED_QUERY: AppliedSearchQuery = {
   searchTerm: '',
   selectedOpenFilter: 'searchGeneral',
-  selectedSpecificFilter: 'searchNetwork',
+  selectedSpecificFilter: 'searchChains',
   selectedCategory: 'all',
   selectedSubFilter: 'all',
 };
@@ -114,7 +116,7 @@ function AgentsDirectoryPageInner() {
   const { t, theme } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOpenFilter, setSelectedOpenFilter] = useState('searchGeneral');
-  const [selectedSpecificFilter, setSelectedSpecificFilter] = useState('searchNetwork');
+  const [selectedSpecificFilter, setSelectedSpecificFilter] = useState('searchChains');
   const [selectedSubFilter, setSelectedSubFilter] = useState('all');
   const [subFilterSearch, setSubFilterSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -131,8 +133,14 @@ function AgentsDirectoryPageInner() {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const didRunInitialHydrationRef = useRef(false);
   const agentsFetchAbortRef = useRef<AbortController | null>(null);
+  const appendFetchAbortRef = useRef<AbortController | null>(null);
   const agentsFetchRequestIdRef = useRef(0);
-  const skipSortEffectOnceRef = useRef(true);
+  const skipSortEffectOnceRef = useRef(false);
+  const loadingRef = useRef(false);
+  const loadingMoreRef = useRef(false);
+  const listFetchSettledRef = useRef(false);
+  const agentsCountRef = useRef(0);
+  const hasMoreRef = useRef(true);
   const [filtersConfigLoaded, setFiltersConfigLoaded] = useState(false);
   const [listStateReady, setListStateReady] = useState(false);
   const [appliedQuery, setAppliedQuery] = useState<AppliedSearchQuery>(DEFAULT_APPLIED_QUERY);
@@ -200,8 +208,18 @@ function AgentsDirectoryPageInner() {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  /** True only after the latest non-append fetch settles (success or error). Prevents empty-state flash. */
+  const [listFetchSettled, setListFetchSettled] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [searchLoadingKey, setSearchLoadingKey] = useState(0);
+  const [subscriptionInactive, setSubscriptionInactive] = useState(false);
+
+  loadingRef.current = loading;
+  loadingMoreRef.current = loadingMore;
+  listFetchSettledRef.current = listFetchSettled;
+  agentsCountRef.current = agents.length;
+  hasMoreRef.current = hasMore;
 
   // Función para obtener agentes desde la API
   const fetchAgents = async (filters: {
@@ -227,17 +245,37 @@ function AgentsDirectoryPageInner() {
     };
   }) => {
     const append = options?.append || false;
-    const requestId = ++agentsFetchRequestIdRef.current;
-    agentsFetchAbortRef.current?.abort();
+
+    if (append) {
+      // Never append while a primary fetch is in flight or the list is empty/unsettled.
+      if (loadingRef.current || !listFetchSettledRef.current || agentsCountRef.current === 0) {
+        return;
+      }
+      appendFetchAbortRef.current?.abort();
+    } else {
+      agentsFetchAbortRef.current?.abort();
+      appendFetchAbortRef.current?.abort();
+    }
+
+    // Append must not bump the primary requestId (or primary success gets discarded).
+    const requestId = append ? agentsFetchRequestIdRef.current : ++agentsFetchRequestIdRef.current;
     const controller = new AbortController();
-    agentsFetchAbortRef.current = controller;
+    if (append) {
+      appendFetchAbortRef.current = controller;
+    } else {
+      agentsFetchAbortRef.current = controller;
+    }
 
     try {
       if (!append) {
-        setAgents([]);
-        setTotalCount(0);
+        // Keep prior agents until the response arrives so we never flash the empty state.
         setSearchLoadingKey((k) => k + 1);
+        setListFetchSettled(false);
         setLoading(true);
+        setLoadingMore(false);
+        setSubscriptionInactive(false);
+      } else {
+        setLoadingMore(true);
       }
       setError(null);
 
@@ -276,7 +314,14 @@ function AgentsDirectoryPageInner() {
           )
         : [];
 
-      if (selectedFilterName && selectedFilterKey) {
+      const hasAdvancedValue =
+        (complexFilter && tagRawValues.length > 0) ||
+        (!complexFilter && selSub !== 'all');
+
+      // Only send advanced filter params when a real selection is applied.
+      // Sending key-only (e.g. restored Skills/Chains with sub=all) still hits the
+      // unfiltered 330k-row path and was timing out on cold entry.
+      if (hasAdvancedValue && selectedFilterName && selectedFilterKey) {
         params.set('advancedFilterName', selectedFilterName);
         params.set('advancedFilterKey', selectedFilterKey);
       }
@@ -288,38 +333,80 @@ function AgentsDirectoryPageInner() {
       }
 
       const url = `/api/dashboard/agents?${params}`;
-      const response = await fetch(url, { signal: controller.signal });
-      const data = await response.json();
+      const response = await fetch(url, { signal: controller.signal, credentials: 'include' });
+      const data = await response.json().catch(() => ({}));
 
-      if (requestId !== agentsFetchRequestIdRef.current) return;
+      if (!append && requestId !== agentsFetchRequestIdRef.current) return;
+      if (append && appendFetchAbortRef.current !== controller) return;
+
+      if (response.status === 401) {
+        await handleDashboardUnauthorized('/dashboard/agents');
+        return;
+      }
+
+      if (response.status === 403 && data?.error === 'subscription_inactive') {
+        setSubscriptionInactive(true);
+        setAgents([]);
+        setTotalCount(0);
+        setHasMore(false);
+        if (!append) setListFetchSettled(true);
+        return;
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || 'Error al cargar agentes');
+        const code = typeof data?.error === 'string' ? data.error : '';
+        if (response.status >= 500) {
+          throw new Error(t.searchLoadErrorServer);
+        }
+        throw new Error(code || t.searchLoadErrorGeneric);
       }
 
       const incomingAgents = data.data || [];
+      const incomingTotal =
+        typeof data.totalCount === 'number' && Number.isFinite(data.totalCount)
+          ? data.totalCount
+          : null;
+
       setAgents((prev) => {
         if (!append) return incomingAgents;
         const seen = new Set(prev.map((agent: any) => agent.id));
         const uniqueIncoming = incomingAgents.filter((agent: any) => !seen.has(agent.id));
         return [...prev, ...uniqueIncoming];
       });
-      setTotalCount((prev) => {
-        const next = data.totalCount;
-        if (typeof next === 'number' && Number.isFinite(next)) return next;
-        return append ? prev : 0;
-      });
-      setHasMore(incomingAgents.length === filters.limit);
+
+      if (incomingTotal != null) {
+        setTotalCount(incomingTotal);
+      } else if (!append) {
+        setTotalCount(0);
+      }
+      // Length-based hasMore is resilient to estimated counts and avoids early stop.
+      setHasMore(incomingAgents.length >= filters.limit);
+      if (!append) setListFetchSettled(true);
     } catch (error) {
-      if (controller.signal.aborted || requestId !== agentsFetchRequestIdRef.current) {
+      if (
+        controller.signal.aborted ||
+        (!append && requestId !== agentsFetchRequestIdRef.current) ||
+        (append && appendFetchAbortRef.current !== controller)
+      ) {
         return;
       }
       console.error('Error fetching agents:', error);
-      setError(error instanceof Error ? error.message : 'Error al cargar agentes');
+      setError(error instanceof Error ? error.message : t.searchLoadErrorGeneric);
+      if (!append) {
+        setAgents([]);
+        setTotalCount(0);
+        setListFetchSettled(true);
+        setHasMore(false);
+      }
       if (append) setHasMore(false);
     } finally {
-      if (requestId === agentsFetchRequestIdRef.current) {
+      if (append) {
+        if (appendFetchAbortRef.current === controller) {
+          setLoadingMore(false);
+        }
+      } else if (requestId === agentsFetchRequestIdRef.current) {
         setLoading(false);
+        setLoadingMore(false);
       }
     }
   };
@@ -442,6 +529,24 @@ function AgentsDirectoryPageInner() {
             }
           });
 
+          // Canonicalize Chains catalog values to match agents.chain_name casing
+          if (Array.isArray(filters.Chains)) {
+            filters.Chains = filters.Chains.map((value: unknown) => {
+              if (typeof value !== 'string') return value;
+              const trimmed = value.trim();
+              if (trimmed.toLowerCase() === 'arbitrum') return 'arbitrum';
+              return trimmed;
+            });
+          }
+
+          // Drop filters without a usable DB column key
+          for (const key of Object.keys(filterKeys)) {
+            if (!filterKeys[key]) {
+              delete filterKeys[key];
+              delete filters[key];
+            }
+          }
+
           if (aiCategoriesError) {
             console.error('Error loading AI categories:', aiCategoriesError);
           }
@@ -470,10 +575,9 @@ function AgentsDirectoryPageInner() {
 
     const keys = Object.keys(advancedFilters).filter((k) => !k.startsWith('_'));
     const fallbackSpecific =
-      keys.length > 0 ? `search${keys[0]}` : 'searchNetwork';
+      keys.includes('Chains') ? 'searchChains' : keys.length > 0 ? `search${keys[0]}` : 'searchChains';
 
     const validSpecificKeys = new Set(keys.map((k) => `search${k}`));
-    validSpecificKeys.add('searchNetwork');
 
     let snapshot: AgentsListFiltersSnapshot | null = null;
     try {
@@ -488,17 +592,43 @@ function AgentsDirectoryPageInner() {
       /* ignore */
     }
 
+    const restoredSpecific = snapshot?.selectedSpecificFilter ?? '';
+    const specificOk = validSpecificKeys.has(restoredSpecific)
+      ? restoredSpecific
+      : fallbackSpecific;
+
+    const categoryOptions = getAdvancedFilterOptions(specificOk, advancedFilters);
+    const validCategoryKeys = new Set(categoryOptions.map((o) => o.key));
+    let restoredCategory = snapshot?.selectedCategory ?? 'all';
+    if (restoredCategory !== 'all' && !validCategoryKeys.has(restoredCategory)) {
+      restoredCategory = 'all';
+    }
+
+    const subOptions = getSubCategoryOptions(specificOk, restoredCategory, advancedFilters);
+    const validSubKeys = new Set(subOptions.map((o) => o.key));
+    // Simple filters store the selection in selectedSubFilter using category keys
+    const simpleOptions = !isComplexFilter(specificOk, advancedFilters) ? categoryOptions : [];
+    const validSimpleKeys = new Set(simpleOptions.map((o) => o.key));
+    let restoredSub = snapshot?.selectedSubFilter ?? 'all';
+    if (
+      restoredSub !== 'all' &&
+      !validSubKeys.has(restoredSub) &&
+      !validSimpleKeys.has(restoredSub)
+    ) {
+      restoredSub = 'all';
+    }
+    if (restoredCategory === 'all' && isComplexFilter(specificOk, advancedFilters)) {
+      restoredSub = 'all';
+    }
+
     const restored = snapshot
       ? {
           searchTerm: snapshot.searchTerm ?? '',
           selectedOpenFilter: snapshot.selectedOpenFilter ?? 'searchGeneral',
-          selectedSpecificFilter:
-            validSpecificKeys.has(snapshot.selectedSpecificFilter ?? '')
-              ? snapshot.selectedSpecificFilter!
-              : fallbackSpecific,
-          selectedSubFilter: snapshot.selectedSubFilter ?? 'all',
+          selectedSpecificFilter: specificOk,
+          selectedSubFilter: restoredSub,
           subFilterSearch: snapshot.subFilterSearch ?? '',
-          selectedCategory: snapshot.selectedCategory ?? 'all',
+          selectedCategory: restoredCategory,
           categorySearch: snapshot.categorySearch ?? '',
           selectedSort: snapshot.selectedSort ?? 'current_humi_score',
           sortDirection:
@@ -508,6 +638,7 @@ function AgentsDirectoryPageInner() {
       : null;
 
     if (restored) {
+      // Skip the sort effect once so restore + initial fetch don't double-request.
       skipSortEffectOnceRef.current = true;
       const nextApplied: AppliedSearchQuery = {
         searchTerm: restored.searchTerm,
@@ -615,6 +746,7 @@ function AgentsDirectoryPageInner() {
 
   useEffect(() => {
     if (currentPage <= 1 || !hasMore) return;
+    if (loading || loadingMore || !listFetchSettled || agents.length === 0) return;
 
     void fetchAgents(
       buildListFetchArgs(appliedQuery, selectedSort, sortDirection, currentPage),
@@ -631,21 +763,29 @@ function AgentsDirectoryPageInner() {
   }, [currentPage]);
 
   useEffect(() => {
-    if (!loadMoreRef.current || loading || !hasMore) return;
+    if (!loadMoreRef.current || !hasMore) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
-        if (entry.isIntersecting) {
-          setCurrentPage((prev) => prev + 1);
+        if (!entry.isIntersecting) return;
+        if (
+          loadingRef.current ||
+          loadingMoreRef.current ||
+          !hasMoreRef.current ||
+          !listFetchSettledRef.current ||
+          agentsCountRef.current === 0
+        ) {
+          return;
         }
+        setCurrentPage((prev) => prev + 1);
       },
       { threshold: 0.1 }
     );
 
     observer.observe(loadMoreRef.current);
     return () => observer.disconnect();
-  }, [loading, hasMore]);
+  }, [hasMore, listFetchSettled, agents.length]);
 
   // Opciones de búsqueda abierta (solo texto)
   const openSearchOptions = [
@@ -658,10 +798,13 @@ function AgentsDirectoryPageInner() {
 
   // Opciones de filtros específicos (con sub-dropdown) - dinámico desde DB
   const specificFilterOptions = Object.keys(advancedFilters)
-    .filter(filterKey => !filterKey.startsWith('_'))
-    .map(filterKey => ({
+    .filter(
+      (filterKey) =>
+        !filterKey.startsWith('_') && Boolean(advancedFilters._filterKeys?.[filterKey]),
+    )
+    .map((filterKey) => ({
       key: `search${filterKey}`,
-      label: filterKey
+      label: filterKey === 'Chains' ? t.searchNetwork : filterKey,
     }));
 
   const paginatedAgents = agents;
@@ -724,7 +867,7 @@ function AgentsDirectoryPageInner() {
   };
 
   const clearAllFilters = () => {
-    const fallbackSpecific = specificFilterOptions[0]?.key || 'searchNetwork';
+    const fallbackSpecific = specificFilterOptions[0]?.key || 'searchChains';
     setSearchTerm('');
     setSelectedOpenFilter('searchGeneral');
     setSelectedSpecificFilter(fallbackSpecific);
@@ -772,6 +915,10 @@ function AgentsDirectoryPageInner() {
 
   return (
     <div className="space-y-6">
+      {subscriptionInactive ? (
+        <SubscriptionInactiveNotice />
+      ) : (
+      <>
       <div className={`p-5 rounded-2xl space-y-4 ${theme === 'dark' ? 'bg-zinc-900' : 'bg-white border border-zinc-200'}`}>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <div className="relative w-full sm:w-auto sm:min-w-[190px]" onMouseEnter={() => clearDropdownTimer('open')} onMouseLeave={() => startDropdownTimer('open')}>
@@ -1121,7 +1268,7 @@ function AgentsDirectoryPageInner() {
       )}
 
       {/* Mostrar mensaje cuando no hay agentes */}
-      {!loading && !error && agents.length === 0 && (
+      {!loading && !loadingMore && !error && listFetchSettled && agents.length === 0 && (
         <div className="text-center py-12">
           <div className={`text-lg ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>
             {t.noAgentsFound}
@@ -1315,7 +1462,17 @@ function AgentsDirectoryPageInner() {
         </div>
       )}
 
+      {loadingMore && (
+        <div className="flex justify-center py-4">
+          <p className={`text-sm ${theme === 'dark' ? 'text-zinc-400' : 'text-zinc-600'}`}>
+            {t.searchUpdatingResults}
+          </p>
+        </div>
+      )}
+
       <div ref={loadMoreRef} className="h-10" />
+      </>
+      )}
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { normalizeChainName } from '@/lib/agentChains';
+
 export type FilterOption = { key: string; label: string };
 
 export const AI_CATEGORIES_FILTER_NAME = 'AI Categories';
@@ -58,7 +60,10 @@ export function getAdvancedFilterOptions(
   const values = advancedFilters[dbFilterType] || [];
 
   if (isSimpleFilterValues(values)) {
-    return values.map((value: string) => ({ key: value, label: value }));
+    return values.map((value: string) => ({
+      key: value,
+      label: dbFilterType === 'Chains' ? normalizeChainName(value) : value,
+    }));
   }
 
   if (Array.isArray(values) && values.length > 0 && typeof values[0] === 'object') {

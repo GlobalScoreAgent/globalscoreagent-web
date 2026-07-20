@@ -226,6 +226,8 @@ export interface Translations {
   clearFiltersTooltip: string;
   searchLoadingAgents: string;
   searchUpdatingResults: string;
+  searchLoadErrorGeneric: string;
+  searchLoadErrorServer: string;
   searchRetry: string;
   hideAdvancedFilter: string;
   addFilter: string;
@@ -878,6 +880,8 @@ const translations: Record<Language, Translations> = {
     clearFiltersTooltip: 'Limpiar filtros específicos',
     searchLoadingAgents: 'Consultando base de datos...',
     searchUpdatingResults: 'Actualizando resultados...',
+    searchLoadErrorGeneric: 'No se pudieron cargar los agentes. Inténtalo de nuevo.',
+    searchLoadErrorServer: 'Error del servidor al cargar agentes. Inténtalo más tarde.',
     searchRetry: 'Reintentar',
     hideAdvancedFilter: 'Ocultar filtro avanzado',
     addFilter: 'Agregar filtro',
@@ -1573,6 +1577,8 @@ const translations: Record<Language, Translations> = {
     clearFiltersTooltip: 'Clear specific filters',
     searchLoadingAgents: 'Querying database...',
     searchUpdatingResults: 'Updating results...',
+    searchLoadErrorGeneric: 'Could not load agents. Please try again.',
+    searchLoadErrorServer: 'Server error while loading agents. Please try again later.',
     searchRetry: 'Retry',
     hideAdvancedFilter: 'Hide advanced filter',
     addFilter: 'Add filter',

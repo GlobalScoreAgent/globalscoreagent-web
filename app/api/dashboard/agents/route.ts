@@ -8,6 +8,7 @@ import {
   normalizeAgentHumiScore,
 } from '@/lib/agentHumiDisplay';
 import { parseAgentWarnings } from '@/lib/agentWarnings';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 
 // Función para determinar si es filtro simple
 function isSimpleFilter(values: any): boolean {
@@ -82,9 +83,16 @@ export async function GET(request: NextRequest) {
       advancedFilterName: searchParams.get('advancedFilterName') || undefined,
       advancedFilterKey: searchParams.get('advancedFilterKey') || undefined,
       advancedFilterValue: searchParams.get('advancedFilterValue') || undefined,
-      advancedFilterTagRawValues: searchParams.get('advancedFilterTagRawValues')
-        ? JSON.parse(searchParams.get('advancedFilterTagRawValues') || '[]')
-        : undefined,
+      advancedFilterTagRawValues: (() => {
+        const raw = searchParams.get('advancedFilterTagRawValues');
+        if (!raw) return undefined;
+        try {
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : undefined;
+        } catch {
+          return undefined;
+        }
+      })(),
       sortBy: searchParams.get('sortBy') as FilterParams['sortBy'] || 'current_humi_score',
       sortDirection: searchParams.get('sortDirection') as FilterParams['sortDirection'] || 'desc',
       page: parseInt(searchParams.get('page') || '1'),
@@ -133,6 +141,20 @@ export async function GET(request: NextRequest) {
       advancedFilters = { ...merged.filters, _filterKeys: merged.filterKeys };
     }
 
+    const hasTagRawValuesEarly =
+      Array.isArray(filters.advancedFilterTagRawValues) &&
+      filters.advancedFilterTagRawValues.length > 0;
+    const hasSimpleValueEarly =
+      !!filters.advancedFilterValue && filters.advancedFilterValue !== 'all';
+    const hasSearchTerm = !!(filters.searchTerm && filters.searchTerm.trim());
+    const hasChainIdFilter = filters.chainId !== null && filters.chainId !== undefined;
+    const hasAdvancedSelection =
+      !!(filters.advancedFilterName && filters.advancedFilterKey) &&
+      (hasTagRawValuesEarly || hasSimpleValueEarly);
+    // Unfiltered 330k-row exact counts + sort often hit statement_timeout under load.
+    const countMode: 'exact' | 'estimated' =
+      hasSearchTerm || hasChainIdFilter || hasAdvancedSelection ? 'exact' : 'estimated';
+
     let query = supabase
       .schema('web_dashboard')
       .from('agents')
@@ -161,7 +183,7 @@ export async function GET(request: NextRequest) {
         ai_category_purpose,
         realness_status
       `,
-        { count: 'exact' },
+        { count: countMode },
       );
 
     // No aplicar filtros de calidad - mostrar todos los agentes
@@ -220,6 +242,29 @@ export async function GET(request: NextRequest) {
           // IS NULL only — btree skips NULLs; .or() forces seq scan + sort on ~165k rows.
           // Partial indexes: db/indexes_web_dashboard_agents_humi_madurity_level.sql
           query = applyNotCalculatedMaturityFilter(query);
+        } else if (columnName === 'chain_name') {
+          // Prefer chain_id (btree idx_agents_chain_name) over chain_name ILIKE/eq:
+          // filtering 330k+ rows by chain_name + exact count times out (~8s statement limit).
+          // erc_8004.chains is only granted to service_role today — use admin for the tiny lookup.
+          const needle = trimmedValue.toLowerCase();
+          const chainsClient = getSupabaseAdmin() ?? supabase;
+          const { data: chainRows } = await chainsClient
+            .schema('erc_8004')
+            .from('chains')
+            .select('id, short_name, name');
+
+          const matched = (chainRows || []).find((row: { id?: number; short_name?: string | null; name?: string | null }) => {
+            const short = (row.short_name || '').trim().toLowerCase();
+            const name = (row.name || '').trim().toLowerCase();
+            return short === needle || name === needle;
+          });
+
+          if (matched?.id != null) {
+            query = query.eq('chain_id', matched.id);
+          } else {
+            // Fallback: exact match only (still may be slow without index; avoid ILIKE).
+            query = query.eq(columnName, trimmedValue);
+          }
         } else {
           query = query.eq(columnName, trimmedValue);
         }
@@ -248,14 +293,15 @@ export async function GET(request: NextRequest) {
           }
           break;
         case 'searchGeneral':
-        default:
+        default: {
+          const escaped = escapeLike(searchTerm);
           // Búsqueda general: combinar resultados de múltiples consultas
           // Primero buscar en name y description
           const textQuery = supabase
             .schema('web_dashboard')
             .from('agents')
             .select('id')
-            .or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`)
+            .or(`name.ilike.%${escaped}%,description.ilike.%${escaped}%`)
             .limit(1000);
 
           // Luego buscar en searchable_metadata (JSONB)
@@ -263,7 +309,7 @@ export async function GET(request: NextRequest) {
             .schema('web_dashboard')
             .from('agents')
             .select('id')
-            .ilike('searchable_metadata::text', `%${searchTerm}%`)
+            .ilike('searchable_metadata::text', `%${escaped}%`)
             .limit(1000);
 
           // Ejecutar ambas consultas para obtener IDs
@@ -284,6 +330,7 @@ export async function GET(request: NextRequest) {
             query = query.eq('id', -1);
           }
           break;
+        }
       }
     }
 
@@ -365,6 +412,7 @@ export async function GET(request: NextRequest) {
       data: mappedAgents,
       count: totalCount,
       totalCount,
+      countMode,
       page: page,
       limit: limit,
       totalPages: Math.ceil(totalCount / limit)

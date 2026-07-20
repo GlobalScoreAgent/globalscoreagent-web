@@ -37,6 +37,8 @@ export function AgentsDirectorySearching({ label, isDark, className }: Props) {
         isDark ? 'border-zinc-700 bg-zinc-900/80' : 'border-zinc-200 bg-white/90',
         className,
       )}
+      aria-live="polite"
+      aria-busy="true"
     >
       {useFallback ? (
         <div className="relative flex min-h-[14rem] flex-col items-center justify-center gap-3 px-6 py-8">
@@ -82,6 +84,13 @@ export function AgentsDirectorySearching({ label, isDark, className }: Props) {
             onError={() => setVideoFailed(true)}
             aria-hidden
           />
+          <p
+            className={cn(
+              'absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 pb-3 pt-8 text-center text-sm font-medium text-zinc-100',
+            )}
+          >
+            {label}
+          </p>
         </div>
       )}
     </div>
