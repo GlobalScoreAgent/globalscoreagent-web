@@ -10,7 +10,7 @@ Fuente de verdad de producto: bóveda Obsidian `GlobalScoreAgent` (Google Drive)
 - Este repo: **globalscoreagent-web**
 - Vault: `01 - Aplicación`
 - Docs técnicos: `docs/`
-- Skill onboarding app: `.cursor/skills/gsa-aplicacion/`
+- Skill onboarding app: `gsa-aplicacion` (`~/.cursor/skills/gsa-aplicacion/`)
 - Canónico org: `10 - Agents/AGENTS.md` (stub raíz: `AGENTS.md`)
 
 Reglas: consultar Core antes de afirmar GSA/HUMI/WAMI/Walcert; no inventar; proponer documentar en vault + `docs/`; español; opiniones honestas.

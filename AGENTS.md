@@ -5,7 +5,7 @@ Fuente de verdad de producto/GSA: bóveda Obsidian (`GlobalScoreAgent` en Google
 
 - Carpeta vault de este repo: **01 - Aplicación**
 - Docs técnicos de este repo: **`docs/`**
-- Skill onboarding: **`.cursor/skills/gsa-aplicacion/`**
+- Skill onboarding: **`gsa-aplicacion`** (`~/.cursor/skills/gsa-aplicacion/`)
 - Decisiones cross-repo: vault **08 - Decisiones**
 - Guía canónica: `10 - Agents/AGENTS.md` (stub raíz: `AGENTS.md`)
 
@@ -29,6 +29,6 @@ Detalle de zonas compartidas y flujo de merge: [`docs/BRANCHING.md`](docs/BRANCH
 **Reglas generales para agentes:** [`docs/AGENT-RULES.md`](docs/AGENT-RULES.md) — ramas, BD, migraciones, HUMI/WAMI, convenciones, responsive.
 **Contexto dashboard:** [`docs/dashboard-context-summary.md`](docs/dashboard-context-summary.md).
 **Contexto web pública:** [`docs/marketing-web-context-summary.md`](docs/marketing-web-context-summary.md).
-**Skill onboarding app:** [`.cursor/skills/gsa-aplicacion/`](.cursor/skills/gsa-aplicacion/SKILL.md) — checklist marketing/dashboard + mapa vault.
+**Skill onboarding app:** `gsa-aplicacion` (personal: `~/.cursor/skills/gsa-aplicacion/`) — checklist marketing/dashboard + mapa vault.
 
 Reglas Cursor: `.cursor/rules/` (`agent-rules.mdc` y `branch-workflow.mdc` siempre; reglas por glob para marketing o dashboard).

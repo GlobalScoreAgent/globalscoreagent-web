@@ -9,7 +9,7 @@ Documento maestro de convenciones, arquitectura y estado del proyecto.
 
 | Documento | Cuándo leerlo |
 |-----------|----------------|
-| Skill [`.cursor/skills/gsa-aplicacion/`](.cursor/skills/gsa-aplicacion/SKILL.md) | Onboarding marketing/dashboard (checklist + vault `01 - Aplicación`) |
+| Skill **`gsa-aplicacion`** (personal: `~/.cursor/skills/gsa-aplicacion/`) | Onboarding marketing/dashboard (checklist + vault `01 - Aplicación`) |
 | [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) | Dashboard (incl. responsive móvil/desktop), APIs, MVs, grants |
 | [`docs/marketing-web-context-summary.md`](marketing-web-context-summary.md) | Web pública: landing, pricing, KPIs, docs, agentes públicos |
 | [`docs/BRANCHING.md`](BRANCHING.md) | Zonas del monorepo y archivos compartidos |
@@ -23,7 +23,7 @@ Documento maestro de convenciones, arquitectura y estado del proyecto.
 Antes de tocar código o BD:
 
 1. **Identificar la zona:** ¿marketing o dashboard? (trabajo diario en **`main`** o feature branch → PR → `main`)
-2. **Aplicar skill `gsa-aplicacion`** (o seguir su checklist) si el trabajo es UI/API de marketing o dashboard.
+2. **Aplicar skill `gsa-aplicacion`** (local en `~/.cursor/skills/gsa-aplicacion/`) si el trabajo es UI/API de marketing o dashboard.
 3. **Leer** [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) si el trabajo es del dashboard.
 4. **Confirmar en código** qué tablas/vistas usa hoy la API: `app/api/dashboard/**` o `app/api/web-page/**`.
 5. **Buscar definición SQL** en `docs/sql/` si hay migración o duda de columnas.

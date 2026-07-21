@@ -7,7 +7,7 @@ alwaysApply: true
 
 Al **iniciar una tarea** (o si falta contexto), lee primero:
 
-1. Skill [`.cursor/skills/gsa-aplicacion/`](.cursor/skills/gsa-aplicacion/SKILL.md) si es marketing o dashboard (checklist + vault)
+1. Skill **`gsa-aplicacion`** (`~/.cursor/skills/gsa-aplicacion/`) si es marketing o dashboard (checklist + vault)
 2. [`docs/AGENT-RULES.md`](docs/AGENT-RULES.md) — ramas, BD, migraciones MV, HUMI/WAMI, convenciones, qué no hacer
 3. Si es **dashboard**: [`docs/dashboard-context-summary.md`](docs/dashboard-context-summary.md) (incluye UX móvil julio 2026)
 4. Si es **web marketing**: [`docs/marketing-web-context-summary.md`](docs/marketing-web-context-summary.md)
