@@ -1,13 +1,17 @@
-# Cloudflare Worker — moved
+# Cloudflare Worker — moved (do not edit here)
 
-El código del router público (`gsa-api-router` / `api.globalscoreagent.com`) vive en:
+El código canónico del router público (`gsa-api-router` / `api.globalscoreagent.com`) vive **solo** en:
 
 **https://github.com/GlobalScoreAgent/public-api**
 
-Ahí están `src/index.js`, `wrangler.toml` y el checklist de deploy (incluye ruta `/v1/agents/humi`).
+Ahí: `src/index.js`, `wrangler.toml`, `docs/ARCHITECTURE.md`, `docs/ENDPOINTS.md`, deploy HUMI.
 
-Contrato de producto / Edge Function (HUMI demo) sigue documentado en este monorepo:
+**No** añadir ni restaurar `api-router-worker.js` en este monorepo. Cambios de rutas/rate limit → PR en `public-api`.
 
-- `docs/español/public-api-humi-demo.md`
-- `docs/ingles/public-api-humi-demo.md`
+Contratos de producto / Edge demo HUMI (aún versionados aquí para `/docs` y deploy Edge):
+
+- `docs/español/public-api-free-tier.md` / `docs/ingles/…`
+- `docs/español/public-api-humi-demo.md` / `docs/ingles/…`
 - `docs/supabase/functions/api-demo-agent-humi/`
+
+Vault: `01 - Aplicación/Public API/`.

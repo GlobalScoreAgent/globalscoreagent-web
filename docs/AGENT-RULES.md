@@ -66,10 +66,13 @@ Monorepo con **dos productos** en un solo Next.js. Detalle en [`docs/BRANCHING.m
 
 ### APIs por zona
 
-| Zona | Rutas | Schema BD típico |
-|------|-------|------------------|
-| Marketing | `app/api/web-page/` | `web_page` |
-| Dashboard | `app/api/dashboard/**` | `web_dashboard`, imports desde `erc_8004`, `index_humi`, `index_wami` |
+| Zona | Rutas | Schema / repo |
+|------|-------|---------------|
+| Marketing | `app/api/web-page/` | `web_page` — este monorepo |
+| Dashboard | `app/api/dashboard/**` | `web_dashboard` (+ `erc_8004`, índices) — este monorepo |
+| **Public API externa** | `https://api.globalscoreagent.com/v1/**` | Worker en repo **[public-api](https://github.com/GlobalScoreAgent/public-api)** → Edge Functions. Free: `/agents/search`, `/agents/maturity`. Demo: `/agents/humi` (Bearer). Contratos MD en `docs/español\|ingles/public-api-*.md`; ops en vault `01 - Aplicación/Public API/`. |
+
+No editar el Worker en este monorepo (`docs/cloudflare/` es solo puntero).
 
 ---
 

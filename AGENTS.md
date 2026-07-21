@@ -5,6 +5,7 @@ Fuente de verdad de producto/GSA: bóveda Obsidian (`GlobalScoreAgent` en Google
 
 - Carpeta vault de este repo: **01 - Aplicación**
 - Docs técnicos de este repo: **`docs/`**
+- Public API infra (Worker): repo **[public-api](https://github.com/GlobalScoreAgent/public-api)** — vault **01 - Aplicación/Public API/**
 - Skill onboarding: **`gsa-aplicacion`** (`~/.cursor/skills/gsa-aplicacion/`)
 - Decisiones cross-repo: vault **08 - Decisiones**
 - Guía canónica: `10 - Agents/AGENTS.md` (stub raíz: `AGENTS.md`)

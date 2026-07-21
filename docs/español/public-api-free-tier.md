@@ -251,7 +251,13 @@ except Exception as e:
 | **Objetivo**              | Facilitar descubrimiento y evaluación rápida         |
 | **Público objetivo**      | Agentes autónomos, developers, explorers             |
 | **Estrategia**            | Freemium                                             |
-| **Próximos endpoints**    | Reportes detallados (Básico, Análisis, GSA Index)    |
+| **Próximos endpoints**    | API de pago con créditos (Básico / Análisis / GSA Index). Demo HUMI live: `GET /v1/agents/humi` (Bearer; ver `public-api-humi-demo.md`) |
+
+---
+
+## 8. Infraestructura
+
+El host `api.globalscoreagent.com` lo sirve el Worker **`gsa-api-router`**, versionado y desplegado desde el repo **[GlobalScoreAgent/public-api](https://github.com/GlobalScoreAgent/public-api)** (Cloudflare Workers Builds). Este monorepo no contiene el código del Worker (solo un puntero en `docs/cloudflare/README.md`).
 
 ---
 

@@ -251,7 +251,13 @@ except Exception as e:
 | **Objective**             | Facilitate discovery and quick evaluation           |
 | **Target Audience**       | Autonomous agents, developers, explorers            |
 | **Strategy**              | Freemium                                            |
-| **Upcoming Endpoints**    | Detailed reports (Basic, Analysis, GSA Index)       |
+| **Upcoming Endpoints**    | Paid API with credits (Basic / Analysis / GSA Index). HUMI demo live: `GET /v1/agents/humi` (Bearer; see `public-api-humi-demo.md`) |
+
+---
+
+## 8. Infrastructure
+
+Host `api.globalscoreagent.com` is served by Worker **`gsa-api-router`**, versioned and deployed from **[GlobalScoreAgent/public-api](https://github.com/GlobalScoreAgent/public-api)** (Cloudflare Workers Builds). This monorepo does not contain the Worker source (pointer only: `docs/cloudflare/README.md`).
 
 ---
 

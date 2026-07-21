@@ -1,7 +1,7 @@
 # Resumen de Contexto del Proyecto — Web pública (Marketing)
 
 Documento de handoff para continuar el desarrollo de la **web oficial** en un chat nuevo de Cursor.  
-**Última actualización:** julio 2026 — Public API Free Tier (`/public-api`) + Walcert marketing/dashboard en `main`.
+**Última actualización:** julio 2026 — Public API Free Tier + repo **`public-api`** (Worker) + demo HUMI `/v1/agents/humi` + Walcert marketing/dashboard.
 
 Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) (panel autenticado) y [`docs/AGENT-RULES.md`](AGENT-RULES.md) (reglas globales).
 
@@ -19,6 +19,8 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 
 ### Cambios recientes (julio 2026)
 
+- **Repo Public API:** infraestructura de `api.globalscoreagent.com` (Worker `gsa-api-router`, Workers Builds) vive en [GlobalScoreAgent/public-api](https://github.com/GlobalScoreAgent/public-api). Este monorepo solo retiene landing/playgrounds, proxy y contratos MD en `/docs`. Puntero: `docs/cloudflare/README.md`.
+- **Demo HUMI API:** `GET /v1/agents/humi` (Bearer `GSA_HUMI_DEMO_SECRET`, sin créditos). Contrato: `docs/español|ingles/public-api-humi-demo.md`.
 - **Public API Free Tier:** landing `/public-api` (resumen + playgrounds search/maturity); docs `/docs/public-api-free-tier`; API `https://api.globalscoreagent.com` (`/v1/agents/search`, `/v1/agents/maturity`); proxy same-origin `GET /api/web-page/public-api-proxy`; home Tools CTA “Explorar API” + card **API Keys** Próximamente; nav sidebar Public API. Copy: `content/public-api/`.
 - **Walcert:** páginas marketing `/walcert` (negocio) y `/walcert/developers` (HTTP/x402); nav sidebar + card en home; dashboard humano `/dashboard/walcert`. `GET https://walcert.globalscoreagent.com/` = **agent card JSON** (discovery; no UI). Identidad canónica web: agentId **9699** (Celo). Copy en `content/walcert/`.
 - **No reabrir** `/certificaciones` (sigue redirect → `/`); URL canónica del producto es `/walcert`.
@@ -167,7 +169,7 @@ lib/seo/                      # site URL, JSON-LD, agent metadata pública
 | `GET /api/web-page/public-api-proxy` | Proxy playgrounds → `api.globalscoreagent.com` |
 | `GET /api/web-page/roadmap` | Roadmap (si se usa en UI) |
 
-**API externa Free Tier:** `https://api.globalscoreagent.com/v1/agents/search`, `/v1/agents/maturity` (20 req/min/IP).
+**API externa Free Tier:** `https://api.globalscoreagent.com/v1/agents/search`, `/v1/agents/maturity` (20 req/min/IP). Infra Worker: repo **public-api**. Demo HUMI: `/v1/agents/humi` (Bearer).
 
 **Eliminadas:** `/api/waitlist`, APIs legacy `erc8004`, `humi/market-index`.
 
