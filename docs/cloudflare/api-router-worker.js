@@ -5,6 +5,14 @@
  * Rutas:
  *   GET /v1/agents/search      → api-search-agent
  *   GET /v1/agents/maturity*   → api-agent-basic-data
+ *   GET /v1/agents/humi*       → api-demo-agent-humi (Bearer demo secret; no credits)
+ *
+ * Deploy checklist (manual):
+ * 1. Pegar este archivo en Workers → gsa-api-router (o wrangler deploy).
+ * 2. Si usás routes por path: añadir api.globalscoreagent.com/v1/agents/humi*
+ *    en zone globalscoreagent.com.
+ * 3. Reutilizar RATE_LIMIT_KV. El secreto GSA_HUMI_DEMO_SECRET vive en Supabase Edge, no en CF.
+ * 4. Orden: Edge Function + secret primero; luego este Worker; luego curl E2E.
  */
 
 const SUPABASE_FUNCTIONS_BASE =
@@ -26,6 +34,13 @@ const ROUTES = [
       pathname === "/v1/agents/maturity" ||
       pathname.startsWith("/v1/agents/maturity/"),
     functionName: "api-agent-basic-data",
+  },
+  {
+    id: "humi",
+    match: (pathname) =>
+      pathname === "/v1/agents/humi" ||
+      pathname.startsWith("/v1/agents/humi/"),
+    functionName: "api-demo-agent-humi",
   },
 ];
 

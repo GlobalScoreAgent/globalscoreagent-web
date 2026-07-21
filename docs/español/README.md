@@ -18,6 +18,8 @@ Aquí encontrarás guías de negocio, especificaciones técnicas y explicaciones
 ### API Pública
 - **[API Pública – Free Tier](./public-api-free-tier.md)**  
   Documentación de los endpoints públicos gratuitos: Búsqueda de Agentes y Nivel de Madurez. Incluye ejemplos de uso, buenas prácticas y detalles técnicos. Ideal para desarrolladores y agentes autónomos.
+- **[API Pública – HUMI Demo (Hackathon)](./public-api-humi-demo.md)**  
+  Endpoint demo de análisis HUMI completo (`/v1/agents/humi`) con Bearer secreto, sin créditos.
 
 ### Índices de Reputación
 - **[Índice HUMI – Agent Human-like Intelligence Index](./index-humi.md)**  

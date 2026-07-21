@@ -11,6 +11,10 @@ zone_name = "globalscoreagent.com"
 pattern = "api.globalscoreagent.com/v1/agents/maturity*"
 zone_name = "globalscoreagent.com"
 
+[[routes]]
+pattern = "api.globalscoreagent.com/v1/agents/humi*"
+zone_name = "globalscoreagent.com"
+
 # KV para rate limit (crear: wrangler kv namespace create RATE_LIMIT_KV)
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
