@@ -116,13 +116,12 @@ curl -sS "https://mezqyworblseixaypftg.supabase.co/functions/v1/api-demo-agent-h
 
 ## 5. Deploy Cloudflare (checklist)
 
-Fuente en repo: `docs/cloudflare/api-router-worker.js` + `wrangler.toml.example`.
+El Worker vive en el repo **[public-api](https://github.com/GlobalScoreAgent/public-api)** (`gsa-api-router`).
 
 1. Edge Function `api-demo-agent-humi` desplegada + secret `GSA_HUMI_DEMO_SECRET` en Supabase.
-2. Actualizar Worker `gsa-api-router` con la ruta `humi` → `api-demo-agent-humi`.
-3. Si usás routes por path: `api.globalscoreagent.com/v1/agents/humi*` (zone `globalscoreagent.com`).
-4. Deploy Worker (Dashboard o `wrangler deploy`).
-5. Curl E2E al host público.
+2. En `public-api`: ruta `humi` en `src/index.js` + pattern en `wrangler.toml`.
+3. Conectar el repo a Workers Builds (recomendado) o `wrangler deploy`.
+4. Curl E2E al host público (ver `docs/DEPLOY-HUMI-DEMO.md` en `public-api`).
 
 ---
 
