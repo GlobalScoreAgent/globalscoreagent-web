@@ -13,6 +13,7 @@ export interface Translations {
   home: string;
   blockchains: string;
   agentsDirectory: string;
+  walcert: string;
   humiIndex: string;
   certifications: string;
   roadMap: string;
@@ -672,6 +673,7 @@ const translations: Record<Language, Translations> = {
     home: 'Inicio',
     blockchains: 'Cadenas',
     agentsDirectory: 'Directorio de Agentes',
+    walcert: 'Agent Walcert',
     humiIndex: 'Índice HUMI',
     certifications: 'Certificaciones',
     roadMap: 'Próximas Funcionalidades',
@@ -1369,6 +1371,7 @@ const translations: Record<Language, Translations> = {
     home: 'Home',
     blockchains: 'Blockchains',
     agentsDirectory: 'Agents Directory',
+    walcert: 'Agent Walcert',
     humiIndex: 'HUMI Index',
     certifications: 'Certifications',
     roadMap: 'Road Map',

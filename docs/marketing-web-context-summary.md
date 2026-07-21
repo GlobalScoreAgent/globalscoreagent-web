@@ -1,7 +1,7 @@
 # Resumen de Contexto del Proyecto — Web pública (Marketing)
 
 Documento de handoff para continuar el desarrollo de la **web oficial** en un chat nuevo de Cursor.  
-**Última actualización:** julio 2026 — Public API Free Tier (`/public-api`) en producción.
+**Última actualización:** julio 2026 — Public API Free Tier (`/public-api`) + Walcert marketing/dashboard en `main`.
 
 Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) (panel autenticado) y [`docs/AGENT-RULES.md`](AGENT-RULES.md) (reglas globales).
 
@@ -15,11 +15,13 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 | **URL canónica** | `https://www.globalscoreagent.com` (Vercel; apex → `www`) |
 | **Site URL SEO** | `https://globalscoreagent.com` (`lib/seo/site.ts`, metadataBase) |
 | **Deploy** | Vercel — auto-deploy desde `main` |
-| **Versión** | **v1** — landing, HUMI/WAMI, **Public API Free Tier**, pricing, docs, agentes públicos, Top 10 |
+| **Versión** | **v1** — landing, HUMI/WAMI, **Walcert**, **Public API Free Tier**, pricing, docs, agentes públicos, Top 10 |
 
 ### Cambios recientes (julio 2026)
 
 - **Public API Free Tier:** landing `/public-api` (resumen + playgrounds search/maturity); docs `/docs/public-api-free-tier`; API `https://api.globalscoreagent.com` (`/v1/agents/search`, `/v1/agents/maturity`); proxy same-origin `GET /api/web-page/public-api-proxy`; home Tools CTA “Explorar API” + card **API Keys** Próximamente; nav sidebar Public API. Copy: `content/public-api/`.
+- **Walcert:** páginas marketing `/walcert` (negocio) y `/walcert/developers` (HTTP/x402); nav sidebar + card en home; dashboard humano `/dashboard/walcert`. `GET https://walcert.globalscoreagent.com/` = **agent card JSON** (discovery; no UI). Identidad canónica web: agentId **9699** (Celo). Copy en `content/walcert/`.
+- **No reabrir** `/certificaciones` (sigue redirect → `/`); URL canónica del producto es `/walcert`.
 
 ### Cambios recientes en producción (junio 2026)
 
@@ -45,7 +47,7 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 
 - **Next.js 14** App Router — ver `node_modules/next/dist/docs/` ante dudas de API
 - **Tailwind** — paleta `zinc-950` + acento `gold`
-- **i18n:** `LanguageContext` (ES/EN); copy en `content/marketing/`, `content/pricing/`, `content/humi/`, `content/wami/`, `content/public-api/`
+- **i18n:** `LanguageContext` (ES/EN); copy en `content/marketing/`, `content/pricing/`, `content/humi/`, `content/wami/`, `content/walcert/`, `content/public-api/`
 - **Patrón copy:** objetos `{ es: '...', en: '...' }` + helper `pick(lang, obj)`
 - **Supabase:** schema `web_page` en APIs; `NEXT_PUBLIC_SUPABASE_*` + service role en server routes
 - **SEO:** `lib/seo/site.ts`, `metadata.ts`, JSON-LD, sitemap, `public/llms.txt`
@@ -59,6 +61,8 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 | `/` | Landing — hero, KPIs live, productos, misión, suscripciones teaser |
 | `/humi` | Página índice HUMI marketing + KPI overlay |
 | `/wami` | Página índice WAMI marketing + KPI overlay |
+| `/walcert` | Walcert Agent — negocio / producto (certificados A–F) |
+| `/walcert/developers` | Walcert — referencia técnica HTTP / x402 |
 | `/public-api` | Public API Free Tier — resumen + playgrounds search/maturity |
 | `/pricing` | Planes dashboard, API de pago (preview muted), más detalles, CTA registro |
 | `/top-10-agents` | Ranking público Top 10 |
@@ -76,7 +80,7 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 
 ```
 app/
-├── page.tsx, humi/, wami/, public-api/, pricing/, legal/, top-10-agents/
+├── page.tsx, humi/, wami/, walcert/, walcert/developers/, public-api/, pricing/, legal/, top-10-agents/
 ├── agents/[id]/              # Perfiles públicos
 ├── docs/                     # Render MD (loadDoc.ts)
 ├── auth/login/               # Login compartido con dashboard
@@ -89,9 +93,11 @@ app/
 
 components/marketing/         # Secciones, layout, KPI overlays, footer
 components/public-api/        # Landing Free Tier + playgrounds
+components/walcert/           # Secciones negocio + developers
 components/pricing/           # Grids pricing, ReportTypePricingMatrix, etc.
 content/marketing/copy.ts     # Copy landing + footer + nav
 content/public-api/copy.ts    # Copy /public-api
+content/walcert/              # Copy /walcert + /walcert/developers
 content/pricing/copy.ts       # Copy /pricing
 content/docs/manifest.ts      # Slugs (/docs/public-api-free-tier, /docs/gsa-pricing, …)
 lib/public-api/               # constants + fetchPublicApi (client → proxy)
@@ -231,4 +237,4 @@ No commits/push salvo petición explícita.
 
 ---
 
-*Última revisión: julio 2026 — Public API Free Tier en producción. Actualizar tras cambios de pricing, KPIs, rutas públicas o deploy.*
+*Última revisión: julio 2026 — Public API Free Tier + Walcert (marketing + dashboard) en `main`. Actualizar tras cambios de pricing, KPIs, rutas públicas o deploy.*

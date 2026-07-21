@@ -39,6 +39,14 @@ Hub: https://globalscoreagent.com/docs/global-score-agent
   - ES: https://globalscoreagent.com/docs/index-wami-technical-spec
   - EN: https://globalscoreagent.com/docs/index-wami-technical-spec?lang=en
 
+## Walcert Agent
+
+- Product (business): https://globalscoreagent.com/walcert
+- Developer reference (HTTP / x402): https://globalscoreagent.com/walcert/developers
+- GSA dashboard (human UI): https://globalscoreagent.com/dashboard/walcert
+- Agent card (JSON) / API — GET /: https://walcert.globalscoreagent.com/
+- Agent directory (Celo agentId 9699): https://erc-8004.quicknode.com/agents/celo-mainnet/9699
+
 ## Agents
 
 - agent-realness-analysis — Agent legitimacy and basic quality evaluation

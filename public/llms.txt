@@ -6,12 +6,17 @@
 
 - HUMI Index: 0–100 reputation score for autonomous agents (ERC-8004).
 - WAMI Index: 0–100 reputation score for owner wallets linked to agents.
+- Walcert Agent: autonomous ERC-8004 agent on Celo (agentId 9699) issuing A–F wallet maturity certificates (origins, activity, multichain, portfolio) via HTTP JSON + x402.
 
 ## Canonical URLs
 
 - Portal (ERC-8004 ecosystem stats): https://globalscoreagent.com/
 - HUMI Index: https://globalscoreagent.com/humi
 - WAMI Index: https://globalscoreagent.com/wami
+- Walcert Agent (product): https://globalscoreagent.com/walcert
+- Walcert developer reference: https://globalscoreagent.com/walcert/developers
+- Walcert agent card (JSON) / API: https://walcert.globalscoreagent.com/
+- Walcert GSA dashboard (human): https://globalscoreagent.com/dashboard/walcert
 - Pricing: https://globalscoreagent.com/pricing
 - Documentation (hub): https://globalscoreagent.com/docs/global-score-agent
 - Legal: https://globalscoreagent.com/legal

@@ -7,6 +7,7 @@ import { pick } from '@/content/marketing/i18n';
 import { TOP10_AGENTS_LIST_PATH, appendPublicLangParam } from '@/lib/dashboardAgentLookup';
 import SectionSurface from '../shared/SectionSurface';
 import IndexProductCard from './IndexProductCard';
+import WalcertProductCard from './WalcertProductCard';
 
 export default function ProductsSection() {
   const { language } = useLanguage();
@@ -23,6 +24,9 @@ export default function ProductsSection() {
         <div className="mb-10 grid gap-8 lg:grid-cols-2 lg:gap-6">
           <IndexProductCard variant="humi" />
           <IndexProductCard variant="wami" />
+        </div>
+        <div className="mb-10 mx-auto max-w-xl">
+          <WalcertProductCard />
         </div>
         <p className="rounded-2xl border border-gold/30 bg-gold/10 px-6 py-4 text-center text-lg font-medium text-amber-200 shadow-[0_0_30px_-10px_rgba(212,175,55,0.4)]">
           {pick(language, products.synergy)}

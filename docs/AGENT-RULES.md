@@ -58,7 +58,8 @@ Monorepo con **dos productos** en un solo Next.js. Detalle en [`docs/BRANCHING.m
 ### Reglas de zona
 
 - **Marketing:** no modificar `app/(dashboard)/**` ni `components/dashboard/**`.
-- **Dashboard:** no modificar `app/page.tsx`, `app/humi/`, `app/wami/`, etc., salvo petición explícita.
+- **Dashboard:** no modificar `app/page.tsx`, `app/humi/`, `app/wami/`, `app/walcert/`, etc., salvo petición explícita.
+- **Walcert (julio 2026):** marketing `/walcert` + `/walcert/developers`; dashboard `/dashboard/walcert` + proxy `POST /api/dashboard/walcert/preview`. Agent card JSON en `https://walcert.globalscoreagent.com/` (no es UI humana). Identidad web: agentId **9699**. Env opcional: `WALCERT_BASE_URL`.
 - **Compartido** (coordinar antes de cambios grandes): `package.json`, `utils/supabase/*`, `app/layout.tsx`, `app/globals.css`, `next.config.js`, `tailwind.config.js`, `.env.example`.
   - Cambios **aditivos**; no eliminar código ajeno.
   - Tras tocar shared: PR a `main`; otras features deben actualizarse desde `main`.
@@ -169,6 +170,7 @@ GRANT SELECT ON web_dashboard.chains_stadistics TO authenticated, anon, authenti
 | `/dashboard/agents` | `GET /api/dashboard/agents` + filtros `agent_advanced_filters` |
 | `/dashboard/agents/[id]` | `GET /api/dashboard/agents/[id]` |
 | `/dashboard/agents/[id]/humi` | `GET /api/dashboard/agents/[id]/humi` → `web_dashboard.index_humi` |
+| `/dashboard/walcert` | Preview live + ejemplos; API `POST /api/dashboard/walcert/preview` → agente `/v1/preview/{type}` (origins/activity) |
 
 ### Responsive (julio 2026)
 

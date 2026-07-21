@@ -17,6 +17,7 @@ import {
   Code2,
   Trophy,
   Map,
+  BadgeCheck,
 } from 'lucide-react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { marketingCopy } from '@/content/marketing/copy';
@@ -37,6 +38,7 @@ const navItems: NavItem[] = [
   { href: '/#products', labelKey: 'products', icon: Package },
   { href: '/humi', labelKey: 'humi', icon: BarChart3, external: true },
   { href: '/wami', labelKey: 'wami', icon: Wallet, external: true },
+  { href: '/walcert', labelKey: 'walcert', icon: BadgeCheck, external: true },
   { href: '/top-10-agents', labelKey: 'top10Agents', icon: Trophy, external: true },
   { href: '/pricing', labelKey: 'pricing', icon: CreditCard, external: true },
   { href: '/public-api', labelKey: 'publicApi', icon: Code2, external: true },
