@@ -9,6 +9,7 @@ Documento maestro de convenciones, arquitectura y estado del proyecto.
 
 | Documento | Cuándo leerlo |
 |-----------|----------------|
+| Skill [`.cursor/skills/gsa-aplicacion/`](.cursor/skills/gsa-aplicacion/SKILL.md) | Onboarding marketing/dashboard (checklist + vault `01 - Aplicación`) |
 | [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) | Dashboard (incl. responsive móvil/desktop), APIs, MVs, grants |
 | [`docs/marketing-web-context-summary.md`](marketing-web-context-summary.md) | Web pública: landing, pricing, KPIs, docs, agentes públicos |
 | [`docs/BRANCHING.md`](BRANCHING.md) | Zonas del monorepo y archivos compartidos |
@@ -22,16 +23,17 @@ Documento maestro de convenciones, arquitectura y estado del proyecto.
 Antes de tocar código o BD:
 
 1. **Identificar la zona:** ¿marketing o dashboard? (trabajo diario en **`main`** o feature branch → PR → `main`)
-2. **Leer** [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) si el trabajo es del dashboard.
-3. **Confirmar en código** qué tablas/vistas usa hoy la API: `app/api/dashboard/**` o `app/api/web-page/**`.
-4. **Buscar definición SQL** en `docs/sql/` si hay migración o duda de columnas.
-5. **No asumir** que el SQL del repo coincide 1:1 con Supabase (nombres pueden diferir, p. ej. `chains_stadistics`).
-6. **Diff mínimo:** solo el alcance pedido; no refactorizar código ajeno.
+2. **Aplicar skill `gsa-aplicacion`** (o seguir su checklist) si el trabajo es UI/API de marketing o dashboard.
+3. **Leer** [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) si el trabajo es del dashboard.
+4. **Confirmar en código** qué tablas/vistas usa hoy la API: `app/api/dashboard/**` o `app/api/web-page/**`.
+5. **Buscar definición SQL** en `docs/sql/` si hay migración o duda de columnas.
+6. **No asumir** que el SQL del repo coincide 1:1 con Supabase (nombres pueden diferir, p. ej. `chains_stadistics`).
+7. **Diff mínimo:** solo el alcance pedido; no refactorizar código ajeno.
 
 ### Prompt rápido para pegar en chat nuevo
 
 ```text
-Lee docs/AGENT-RULES.md y el contexto según zona:
+Usa la skill gsa-aplicacion. Lee docs/AGENT-RULES.md y el contexto según zona:
 - Dashboard → docs/dashboard-context-summary.md
 - Web marketing → docs/marketing-web-context-summary.md
 Producción en main (www.globalscoreagent.com). Feature → PR → main.

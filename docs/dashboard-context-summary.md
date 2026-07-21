@@ -264,7 +264,7 @@ Ver [`docs/AGENT-RULES.md`](AGENT-RULES.md) y [`.cursor/rules/`](../.cursor/rule
 ### Prompt sugerido — dashboard
 
 ```text
-Lee docs/AGENT-RULES.md y docs/dashboard-context-summary.md.
+Usa la skill gsa-aplicacion. Lee docs/AGENT-RULES.md y docs/dashboard-context-summary.md.
 Producción en main (www.globalscoreagent.com). Feature branch → PR → main.
 BD: docs/sql/ + app/api/dashboard/** (Supabase puede diferir).
 Auth: requireDashboardUser(); overview usa JWT authenticated (no service_role).

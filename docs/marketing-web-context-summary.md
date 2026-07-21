@@ -190,7 +190,7 @@ Ver [`docs/supabase-auth-setup.md`](supabase-auth-setup.md).
 ## 11. Prompt sugerido — web marketing
 
 ```text
-Lee docs/AGENT-RULES.md y docs/marketing-web-context-summary.md.
+Usa la skill gsa-aplicacion. Lee docs/AGENT-RULES.md y docs/marketing-web-context-summary.md.
 Producción en main (www.globalscoreagent.com). No toques dashboard salvo shared.
 Copy bilingüe en content/; KPIs vía /api/web-page/statistics.
 Docs pricing: docs/español/gsa-pricing.md (no docs/gsa-pricing.md raíz).
