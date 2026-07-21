@@ -33,6 +33,10 @@ function getPageTitleKey(pathname: string): string {
     return 'blockchains';
   }
 
+  if (pathname === '/dashboard/walcert' || pathname === '/dashboard/walcert/') {
+    return 'walcert';
+  }
+
   if (pathname === '/dashboard/perfil' || pathname === '/dashboard/perfil/') {
     return 'profile';
   }

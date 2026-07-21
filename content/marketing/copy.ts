@@ -9,6 +9,7 @@ export const marketingCopy = {
     products: { es: 'Productos', en: 'Products' } satisfies Bilingual,
     humi: { es: 'Índice HUMI', en: 'HUMI Index' } satisfies Bilingual,
     wami: { es: 'Índice WAMI', en: 'WAMI Index' } satisfies Bilingual,
+    walcert: { es: 'Walcert Agent', en: 'Walcert Agent' } satisfies Bilingual,
     top10Agents: { es: 'Top 10 agentes', en: 'Top 10 agents' } satisfies Bilingual,
     howWeWork: { es: 'Cómo operamos', en: 'How we work' } satisfies Bilingual,
     roadmap: { es: 'Roadmap', en: 'Roadmap' } satisfies Bilingual,
@@ -164,12 +165,12 @@ export const marketingCopy = {
   },
   products: {
     title: {
-      es: 'Dos índices, una visión completa de confianza',
-      en: 'Two indices, one complete view of trust',
+      es: 'Índices y agentes: reputación medible en ERC-8004',
+      en: 'Indices and agents: measurable reputation on ERC-8004',
     } satisfies Bilingual,
     synergy: {
-      es: 'HUMI + WAMI: la vista más completa de confianza — el agente y quien lo controla.',
-      en: 'HUMI + WAMI deliver the most complete view of trust — both the agent and its owner.',
+      es: 'HUMI + WAMI miden reputación diaria; Walcert emite certificados A–F de madurez de wallet en tiempo real.',
+      en: 'HUMI + WAMI measure daily reputation; Walcert issues real-time A–F wallet maturity certificates.',
     } satisfies Bilingual,
     humi: {
       name: { es: 'Index HUMI', en: 'Index HUMI' } satisfies Bilingual,

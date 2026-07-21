@@ -5,6 +5,8 @@ import { wamiCopy } from '@/content/wami/copy';
 import { legalCopy } from '@/content/legal/copy';
 import { pricingCopy } from '@/content/pricing/copy';
 import { publicApiCopy } from '@/content/public-api/copy';
+import { walcertCopy } from '@/content/walcert/copy';
+import { walcertDevelopersCopy } from '@/content/walcert/developers-copy';
 import { docsHubSeo, getDocManifestEntry } from '@/content/docs/manifest';
 import { SITE_URL } from '@/lib/seo/site';
 
@@ -89,6 +91,18 @@ export const routeMetadata = {
     } satisfies Bilingual,
     canonical: `${SITE_URL}/top-10-agents`,
     ogPath: '/top-10-agents/opengraph-image',
+  },
+  walcert: {
+    title: walcertCopy.seo.title,
+    description: walcertCopy.seo.description,
+    canonical: `${SITE_URL}/walcert`,
+    ogPath: '/walcert/opengraph-image',
+  },
+  walcertDevelopers: {
+    title: walcertDevelopersCopy.seo.title,
+    description: walcertDevelopersCopy.seo.description,
+    canonical: `${SITE_URL}/walcert/developers`,
+    ogPath: '/walcert/opengraph-image',
   },
 } as const satisfies Record<string, RouteMetaEntry>;
 

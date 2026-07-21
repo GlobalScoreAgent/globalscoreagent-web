@@ -11,6 +11,7 @@ import {
   Home,
   Users,
   Boxes,
+  BadgeCheck,
   ChevronLeft,
   ChevronRight,
   MoreHorizontal,
@@ -33,6 +34,7 @@ const navItems = [
   { href: '/dashboard', labelKey: 'home' as const, icon: Home },
   { href: '/dashboard/chains', labelKey: 'blockchains' as const, icon: Boxes },
   { href: '/dashboard/agents', labelKey: 'agentsDirectory' as const, icon: Users },
+  { href: '/dashboard/walcert', labelKey: 'walcert' as const, icon: BadgeCheck },
 ];
 
 export default function DashboardSidebar() {

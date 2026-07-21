@@ -1,6 +1,7 @@
 import type { SeoLang } from '@/content/marketing/metadata';
 import { humiCopy } from '@/content/humi/copy';
 import { wamiCopy } from '@/content/wami/copy';
+import { walcertCopy } from '@/content/walcert/copy';
 import type { PublicTop10AgentRow } from '@/lib/web-page/top-agents';
 import { organizationSameAs, SITE_URL } from '@/lib/seo/site';
 
@@ -49,6 +50,19 @@ export const wamiProductJsonLd = {
   '@type': 'Product',
   name: 'WAMI Index',
   description: `${wamiCopy.seo.description.es} Consulta el Top 10 público de agentes ERC-8004.`,
+  brand: {
+    '@type': 'Brand',
+    name: 'Global Score Agent',
+  },
+  provider: organizationJsonLd,
+};
+
+export const walcertProductJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: 'Walcert Agent',
+  description: walcertCopy.seo.description.es,
+  url: `${SITE_URL}/walcert`,
   brand: {
     '@type': 'Brand',
     name: 'Global Score Agent',
