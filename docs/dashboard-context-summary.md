@@ -1,7 +1,7 @@
 # Resumen de Contexto del Proyecto — Dashboard
 
 Documento de handoff para continuar el desarrollo del dashboard en un chat nuevo de Cursor.  
-**Última actualización:** julio 2026 — Walcert en dashboard (`/dashboard/walcert`: preview live + ejemplos).
+**Última actualización:** julio 2026 — Walcert en dashboard (`/dashboard/walcert`: preview live + verificación por tx_hash + ejemplos).
 
 ---
 
@@ -14,11 +14,11 @@ Documento de handoff para continuar el desarrollo del dashboard en un chat nuevo
 | **Deploy** | Vercel desde `main` |
 | **Auth** | Supabase OAuth (Google/GitHub) + email/password; callback `/auth/callback` |
 | **Acceso dashboard** | `/dashboard/*` — login + suscripción activa |
-| **Versión** | **v1** — overview, directorio, detalle agente, HUMI/WAMI, **Walcert** (preview + ejemplos), perfil, suscripciones, feedbacks, responsive móvil |
+| **Versión** | **v1** — overview, directorio, detalle agente, HUMI/WAMI, **Walcert** (preview + verify + ejemplos), perfil, suscripciones, feedbacks, responsive móvil |
 
 ### Changelog (julio 2026)
 
-- **Walcert dashboard** (`/dashboard/walcert`): preview live vía proxy `POST /api/dashboard/walcert/preview` → agente `/v1/preview/{type}` **solo origins/activity** (Alchemy); rate limit 8/IP/15min (proxy reenvía IP del cliente); 4 reportes de ejemplo; sin x402 en UI. Env: `WALCERT_BASE_URL` (default `https://walcert.globalscoreagent.com`).
+- **Walcert dashboard** (`/dashboard/walcert`): preview live vía proxy `POST /api/dashboard/walcert/preview` → agente `/v1/preview/{type}` **solo origins/activity** (Alchemy); rate limit 8/IP/15min (proxy reenvía IP del cliente); **verificar certificado** vía `POST /api/dashboard/walcert/verify` → agente `/v1/verify` (tx_hash; sin Celo en el front); 4 reportes de ejemplo; sin x402 en UI. Env: `WALCERT_BASE_URL` (default `https://walcert.globalscoreagent.com`).
 - UI: `grade_label` / `note` del agente son bilingües `{eng,esp}` — siempre vía `pickAgentLang`.
 - Link secundario a **agent card** (JSON) + marketing CTAs → login con `redirect=/dashboard/walcert`.
 - Identidad canónica web: agentId **9699** (no copiar `9696` del agent card en VPS si aparece).
@@ -66,7 +66,7 @@ globalscoreagent-web/
 │   ├── (dashboard)/dashboard/          # UI dashboard
 │   │   ├── page.tsx                    # Home — DashboardPageClient
 │   │   ├── agents/                     # Directorio + [id] + humi/wami
-│   │   ├── walcert/                    # Preview live + ejemplos A–F
+│   │   ├── walcert/                    # Preview live + verify tx_hash + ejemplos A–F
 │   │   ├── components/                 # Layout, i18n, sidebar, mobile nav, overview panels
 │   │   │   ├── DashboardLayoutClient.tsx
 │   │   │   ├── DashboardMobileNavContext.tsx   # Drawer móvil
@@ -77,9 +77,10 @@ globalscoreagent-web/
 │       ├── overview/                   # global_stadistics + chains_stadistics
 │       ├── agents/, agents/[id]/, humi/, wami/
 │       ├── walcert/preview/            # Proxy a Walcert Agent /v1/preview
+│       ├── walcert/verify/             # Proxy a Walcert Agent /v1/verify
 │       ├── profile/, subscriptions/, …
 ├── components/dashboard/
-│   ├── walcert/                        # Live preview + ejemplos
+│   ├── walcert/                        # Live preview + verify + ejemplos
 │   ├── chain/
 │   │   ├── ChainSelector.tsx           # Tabs sticky (móvil)
 │   │   ├── ChainModuleCards.tsx        # Stack modular (móvil)

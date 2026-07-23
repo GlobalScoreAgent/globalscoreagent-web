@@ -11,8 +11,8 @@ export const walcertDevelopersCopy = {
       en: 'Walcert — Developer reference',
     } satisfies Bilingual,
     description: {
-      es: 'Agent card JSON, preview gratis (origins/activity), certificados x402 y verificabilidad. Base URL walcert.globalscoreagent.com.',
-      en: 'Agent card JSON, free preview (origins/activity), x402 certificates, and verifiability. Base URL walcert.globalscoreagent.com.',
+      es: 'Agent card JSON, preview gratis, certificados x402, POST /v1/verify y verificabilidad on-chain. Base URL walcert.globalscoreagent.com.',
+      en: 'Agent card JSON, free preview, x402 certificates, POST /v1/verify, and on-chain verifiability. Base URL walcert.globalscoreagent.com.',
     } satisfies Bilingual,
   },
   hero: {
@@ -98,6 +98,15 @@ export const walcertDevelopersCopy = {
           en: 'Full certificate + signature + on-chain',
         },
       },
+      {
+        method: 'POST',
+        path: '/v1/verify',
+        auth: { es: 'Ninguna', en: 'None' },
+        delivers: {
+          es: 'Verifica por tx_hash (BD + Celo + EIP-712); sin x402',
+          en: 'Verify by tx_hash (DB + Celo + EIP-712); no x402',
+        },
+      },
     ] as {
       method: string;
       path: string;
@@ -113,6 +122,13 @@ export const walcertDevelopersCopy = {
     } satisfies Bilingual,
     example: `{
   "wallet_address": "0x..."
+}`,
+    verifyIntro: {
+      es: 'Verificación pública (`POST /v1/verify`) — solo hace falta el tx_hash del anclaje:',
+      en: 'Public verification (`POST /v1/verify`) — only the anchor tx_hash is required:',
+    } satisfies Bilingual,
+    verifyExample: `{
+  "tx_hash": "0x..."
 }`,
   },
   x402: {
@@ -162,6 +178,10 @@ export const walcertDevelopersCopy = {
         es: 'onchain — anclaje giveFeedback en el Reputation Registry (Celo).',
         en: 'onchain — giveFeedback anchor on the Reputation Registry (Celo).',
       },
+      {
+        es: 'Verificable después con POST /v1/verify (tx_hash) o en el dashboard GSA.',
+        en: 'Verifiable afterwards via POST /v1/verify (tx_hash) or the GSA dashboard.',
+      },
     ] as Bilingual[],
   },
   links: {
@@ -199,8 +219,8 @@ export const walcertDevelopersCopy = {
       en: 'Ready to integrate',
     } satisfies Bilingual,
     description: {
-      es: 'Empezá con GET / (agent card), /health y un preview; para el certificado completo seguí el flujo x402.',
-      en: 'Start with GET / (agent card), /health and a preview; for the full certificate follow the x402 flow.',
+      es: 'Empezá con GET / (agent card), un preview o POST /v1/verify; para el certificado completo seguí el flujo x402.',
+      en: 'Start with GET / (agent card), a preview, or POST /v1/verify; for the full certificate follow the x402 flow.',
     } satisfies Bilingual,
     openAgent: {
       es: 'Probar en el dashboard',

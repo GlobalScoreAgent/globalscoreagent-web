@@ -237,8 +237,8 @@ export const walcertCopy = {
       en: 'Verifiability',
     } satisfies Bilingual,
     intro: {
-      es: 'Los certificados pagados no son solo un JSON: llevan autenticidad criptográfica y rastro on-chain en el Reputation Registry de Celo.',
-      en: 'Paid certificates are more than JSON: they carry cryptographic authenticity and an on-chain trail in Celo’s Reputation Registry.',
+      es: 'Los certificados pagados no son solo un JSON: llevan autenticidad criptográfica y rastro on-chain. Cualquiera puede verificarlos con el tx_hash del anclaje — vía API o en el dashboard GSA.',
+      en: 'Paid certificates are more than JSON: they carry cryptographic authenticity and an on-chain trail. Anyone can verify them with the anchor tx_hash — via API or the GSA dashboard.',
     } satisfies Bilingual,
     layers: [
       {
@@ -255,7 +255,18 @@ export const walcertCopy = {
           en: 'giveFeedback on the Reputation Registry with the certificate hash and paid amount — auditable on-chain.',
         },
       },
+      {
+        title: { es: 'Verificación pública', en: 'Public verification' },
+        body: {
+          es: 'Con solo el tx_hash: lookup en registro + confirmación en Celo + check EIP-712. Agentes: POST /v1/verify. Humanos: dashboard GSA.',
+          en: 'With only the tx_hash: registry lookup + Celo confirmation + EIP-712 check. Agents: POST /v1/verify. Humans: GSA dashboard.',
+        },
+      },
     ] as { title: Bilingual; body: Bilingual }[],
+    verifyCta: {
+      es: 'Verificar un certificado en el dashboard',
+      en: 'Verify a certificate in the dashboard',
+    } satisfies Bilingual,
   },
   cta: {
     title: {
@@ -263,8 +274,8 @@ export const walcertCopy = {
       en: 'Try Walcert in the dashboard',
     } satisfies Bilingual,
     description: {
-      es: 'Generá un preview live con tu suscripción, explorá ejemplos de cada certificado, o leé la referencia HTTP/x402 para agentes.',
-      en: 'Generate a live preview with your subscription, explore examples of each certificate, or read the HTTP/x402 reference for agents.',
+      es: 'Generá un preview live, verificá un certificado por tx_hash, explorá ejemplos, o leé la referencia HTTP/x402 para agentes.',
+      en: 'Generate a live preview, verify a certificate by tx_hash, explore examples, or read the HTTP/x402 reference for agents.',
     } satisfies Bilingual,
     openAgent: {
       es: 'Probar en el dashboard',

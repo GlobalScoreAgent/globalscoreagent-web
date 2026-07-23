@@ -16,8 +16,12 @@ export default function WalcertDevBodySection() {
           {pick(language, body.title)}
         </h2>
         <p className="mb-6 text-zinc-400">{pick(language, body.intro)}</p>
-        <pre className="overflow-x-auto rounded-2xl border border-zinc-800 bg-black/50 p-5 font-mono text-sm text-amber-100/90">
+        <pre className="mb-10 overflow-x-auto rounded-2xl border border-zinc-800 bg-black/50 p-5 font-mono text-sm text-amber-100/90">
           <code>{body.example}</code>
+        </pre>
+        <p className="mb-6 text-zinc-400">{pick(language, body.verifyIntro)}</p>
+        <pre className="overflow-x-auto rounded-2xl border border-zinc-800 bg-black/50 p-5 font-mono text-sm text-amber-100/90">
+          <code>{body.verifyExample}</code>
         </pre>
       </div>
     </SectionSurface>
