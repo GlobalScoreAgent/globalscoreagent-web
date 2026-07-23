@@ -1,17 +1,20 @@
 'use client';
 
-import { Link2, PenLine } from 'lucide-react';
+import Link from 'next/link';
+import { Link2, PenLine, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { walcertCopy } from '@/content/walcert/copy';
 import { pick } from '@/content/marketing/i18n';
+import { buildAuthLoginUrl } from '@/lib/auth/redirect';
 import SectionSurface from '@/components/marketing/shared/SectionSurface';
 import GlassCard from '@/components/marketing/shared/GlassCard';
 
-const layerIcons = [PenLine, Link2];
+const layerIcons = [PenLine, Link2, ShieldCheck];
 
 export default function WalcertVerifiabilitySection() {
   const { language } = useLanguage();
   const { verifiability } = walcertCopy;
+  const dashboardHref = buildAuthLoginUrl('/dashboard/walcert');
 
   return (
     <SectionSurface id="verifiability" tone="dark">
@@ -22,7 +25,7 @@ export default function WalcertVerifiabilitySection() {
         <p className="mx-auto mb-12 max-w-2xl text-center text-base text-zinc-400">
           {pick(language, verifiability.intro)}
         </p>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-3">
           {verifiability.layers.map((layer, i) => {
             const Icon = layerIcons[i] ?? PenLine;
             return (
@@ -37,6 +40,14 @@ export default function WalcertVerifiabilitySection() {
               </GlassCard>
             );
           })}
+        </div>
+        <div className="mt-10 text-center">
+          <Link
+            href={dashboardHref}
+            className="inline-flex text-sm font-medium text-gold transition-colors hover:text-amber-300"
+          >
+            {pick(language, verifiability.verifyCta)} →
+          </Link>
         </div>
       </div>
     </SectionSurface>

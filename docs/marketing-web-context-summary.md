@@ -20,7 +20,7 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 ### Cambios recientes (julio 2026)
 
 - **Public API Free Tier:** landing `/public-api` (resumen + playgrounds search/maturity); docs `/docs/public-api-free-tier`; API `https://api.globalscoreagent.com` (`/v1/agents/search`, `/v1/agents/maturity`); proxy same-origin `GET /api/web-page/public-api-proxy`; home Tools CTA “Explorar API” + card **API Keys** Próximamente; nav sidebar Public API. Copy: `content/public-api/`.
-- **Walcert:** páginas marketing `/walcert` (negocio) y `/walcert/developers` (HTTP/x402); nav sidebar + card en home; dashboard humano `/dashboard/walcert`. `GET https://walcert.globalscoreagent.com/` = **agent card JSON** (discovery; no UI). Identidad canónica web: agentId **9699** (Celo). Copy en `content/walcert/`.
+- **Walcert:** páginas marketing `/walcert` (negocio + verificabilidad / verify por tx_hash) y `/walcert/developers` (HTTP/x402 + `POST /v1/verify`); nav sidebar + card en home; dashboard humano `/dashboard/walcert` (preview + verify + ejemplos). `GET https://walcert.globalscoreagent.com/` = **agent card JSON** (discovery; no UI). Identidad canónica web: agentId **9699** (Celo). Copy en `content/walcert/`.
 - **No reabrir** `/certificaciones` (sigue redirect → `/`); URL canónica del producto es `/walcert`.
 
 ### Cambios recientes en producción (junio 2026)
@@ -61,8 +61,8 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 | `/` | Landing — hero, KPIs live, productos, misión, suscripciones teaser |
 | `/humi` | Página índice HUMI marketing + KPI overlay |
 | `/wami` | Página índice WAMI marketing + KPI overlay |
-| `/walcert` | Walcert Agent — negocio / producto (certificados A–F) |
-| `/walcert/developers` | Walcert — referencia técnica HTTP / x402 |
+| `/walcert` | Walcert Agent — negocio / producto (certificados A–F + verify público) |
+| `/walcert/developers` | Walcert — referencia técnica HTTP / x402 / `/v1/verify` |
 | `/public-api` | Public API Free Tier — resumen + playgrounds search/maturity |
 | `/pricing` | Planes dashboard, API de pago (preview muted), más detalles, CTA registro |
 | `/top-10-agents` | Ranking público Top 10 |

@@ -7,6 +7,7 @@ import { walcertDashboardCopy } from '@/content/dashboard/walcert-examples';
 import { WALCERT_LIVE_URL } from '@/content/walcert/copy';
 import { pick } from '@/content/marketing/i18n';
 import WalcertLivePreviewPanel from '@/components/dashboard/walcert/WalcertLivePreviewPanel';
+import WalcertVerifyPanel from '@/components/dashboard/walcert/WalcertVerifyPanel';
 import WalcertExamplesPanel from '@/components/dashboard/walcert/WalcertExamplesPanel';
 
 export default function WalcertDashboardView() {
@@ -46,6 +47,7 @@ export default function WalcertDashboardView() {
         </header>
 
         <WalcertLivePreviewPanel lang={lang} isDark={isDark} />
+        <WalcertVerifyPanel lang={lang} isDark={isDark} />
         <WalcertExamplesPanel lang={lang} isDark={isDark} />
       </div>
     </DashboardSubscriptionGate>

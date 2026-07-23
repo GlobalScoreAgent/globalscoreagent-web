@@ -60,8 +60,8 @@ export function pickAgentLang(
 export const walcertDashboardCopy = {
   title: { es: 'Walcert Agent', en: 'Walcert Agent' } satisfies Bilingual,
   subtitle: {
-    es: 'Este es el dashboard humano de GSA. La URL pública del agente (walcert.globalscoreagent.com) es el agent card JSON / API HTTP — no una UI. Acá podés probar un preview live o explorar ejemplos.',
-    en: 'This is the GSA human dashboard. The agent’s public URL (walcert.globalscoreagent.com) is the agent card JSON / HTTP API — not a UI. Here you can try a live preview or explore examples.',
+    es: 'Este es el dashboard humano de GSA. La URL pública del agente (walcert.globalscoreagent.com) es el agent card JSON / API HTTP — no una UI. Acá podés probar un preview live, verificar un certificado por tx_hash u explorar ejemplos.',
+    en: 'This is the GSA human dashboard. The agent’s public URL (walcert.globalscoreagent.com) is the agent card JSON / HTTP API — not a UI. Here you can try a live preview, verify a certificate by tx_hash, or explore examples.',
   } satisfies Bilingual,
   agentId: {
     es: 'Celo · agentId 9699',
