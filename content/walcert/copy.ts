@@ -51,8 +51,8 @@ export const walcertCopy = {
       en: 'Wallet maturity without friction between agents',
     } satisfies Bilingual,
     intro: {
-      es: 'Antes de interactuar, un agente necesita señales claras sobre la wallet: origen de fondos, actividad reciente, presencia multi-chain y composición del portfolio. Walcert convierte ese análisis en certificados estandarizados A–F, consumibles por HTTP JSON.',
-      en: 'Before interacting, an agent needs clear signals about a wallet: funding origins, recent activity, multi-chain presence, and portfolio composition. Walcert turns that analysis into standardized A–F certificates, consumable over HTTP JSON.',
+      es: 'Antes de interactuar, un agente necesita señales claras sobre la wallet: origen de fondos, actividad reciente (ventana de 15 días), footprint multi-chain y composición del portfolio. Walcert convierte ese análisis en certificados estandarizados A–F, consumibles por HTTP JSON.',
+      en: 'Before interacting, an agent needs clear signals about a wallet: funding origins, recent activity (15-day window), multi-chain footprint, and portfolio composition. Walcert turns that analysis into standardized A–F certificates, consumable over HTTP JSON.',
     } satisfies Bilingual,
     points: [
       {
@@ -83,26 +83,32 @@ export const walcertCopy = {
         id: 'origins',
         title: { es: 'Origins', en: 'Origins' },
         summary: {
-          es: 'Origen de fondos (CEX, bridges, mixers, OFAC) y riesgo de mixing.',
-          en: 'Funding origins (CEX, bridges, mixers, OFAC) and mixing risk.',
+          es: 'Fondeo multi-chain con señales ORIGO: CEX, bridges, mixers, OFAC, concentración (HHI) y riesgo de mixing — scoring A–F explicable.',
+          en: 'Multi-chain funding with ORIGO signals: CEX, bridges, mixers, OFAC, concentration (HHI), and mixing risk — explainable A–F scoring.',
         },
-        dataSource: { es: 'Alchemy + labels GSA', en: 'Alchemy + GSA labels' },
+        dataSource: {
+          es: 'Alchemy + DefiLlama + labels GSA',
+          en: 'Alchemy + DefiLlama + GSA labels',
+        },
       },
       {
         id: 'activity',
         title: { es: 'Activity', en: 'Activity' },
         summary: {
-          es: 'Actividad reciente (~7 días), contrapartes y patrones wash / circular.',
-          en: 'Recent activity (~7 days), counterparties, and wash / circular patterns.',
+          es: 'Actividad en ventana de 15 días: contrapartes, HHI, wash / bot-like, reciprocity y velocity.',
+          en: 'Activity over a 15-day window: counterparties, HHI, wash / bot-like, reciprocity, and velocity.',
         },
-        dataSource: { es: 'Alchemy + labels GSA', en: 'Alchemy + GSA labels' },
+        dataSource: {
+          es: 'Alchemy + DefiLlama + labels GSA',
+          en: 'Alchemy + DefiLlama + GSA labels',
+        },
       },
       {
         id: 'multichain',
         title: { es: 'Multichain', en: 'Multichain' },
         summary: {
-          es: 'Presencia multi-red, consistencia y longevidad across chains.',
-          en: 'Multi-network presence, consistency, and longevity across chains.',
+          es: 'Footprint y longevidad multi-red: recencia, consistencia, ecosistemas core y span — sin intensidad de txs/volumen.',
+          en: 'Multi-network footprint and longevity: recency, consistency, core ecosystems, and span — no tx/volume intensity.',
         },
         dataSource: { es: 'Moralis (+ Celo merge)', en: 'Moralis (+ Celo merge)' },
       },
@@ -110,8 +116,8 @@ export const walcertCopy = {
         id: 'portfolio',
         title: { es: 'Portfolio', en: 'Portfolio' },
         summary: {
-          es: 'Composición, liquidez y concentración (HHI).',
-          en: 'Composition, liquidity, and concentration (HHI).',
+          es: 'Composición, liquidez y concentración; calidad por tiers; filtrado spam/dust (totales usable vs credible).',
+          en: 'Composition, liquidity, and concentration; tier quality; spam/dust filtering (usable vs credible totals).',
         },
         dataSource: { es: 'Zerion', en: 'Zerion' },
       },

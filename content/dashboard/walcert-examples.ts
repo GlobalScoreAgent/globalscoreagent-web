@@ -120,8 +120,8 @@ export const walcertDashboardCopy = {
     en: 'Examples by type',
   } satisfies Bilingual,
   examplesIntro: {
-    es: 'Reportes de demostración con el nivel de detalle del certificado completo (incluye multichain y portfolio). No son análisis de una wallet real.',
-    en: 'Demo reports matching the depth of a full certificate (includes multichain and portfolio). Not analyses of a real wallet.',
+    es: 'Reportes de demostración con el nivel de detalle del certificado completo v2 (Origins/Activity 15d, Multichain footprint, Portfolio usable/credible). Incluye multichain y portfolio. No son análisis de una wallet real.',
+    en: 'Demo reports matching full certificate v2 depth (Origins/Activity 15d, Multichain footprint, Portfolio usable/credible). Includes multichain and portfolio. Not analyses of a real wallet.',
   } satisfies Bilingual,
   grade: { es: 'Nota', en: 'Grade' } satisfies Bilingual,
   summary: { es: 'Resumen', en: 'Summary' } satisfies Bilingual,
@@ -174,8 +174,8 @@ export const walcertExampleReports: WalcertExampleReport[] = [
     grade: 'B',
     grade_label: { eng: 'Good', esp: 'Bueno' },
     summary: {
-      eng: 'Primary funding from labeled CEX with moderate sender diversity and low mixing signals.',
-      esp: 'Fondeo principal desde CEX etiquetado, diversidad moderada de senders y señales bajas de mixing.',
+      eng: 'Primary origin type is labeled CEX (argmax of category %). Moderate priced concentration and low mixing risk across chains.',
+      esp: 'Origen principal = CEX etiquetado (argmax de category %). Concentración priced moderada y riesgo de mixing bajo across chains.',
     },
     strengths: [
       {
@@ -183,18 +183,18 @@ export const walcertExampleReports: WalcertExampleReport[] = [
         esp: 'Primer fondeo trazado a un CEX mayor (Binance).',
       },
       {
-        eng: 'Mixing risk classified as low across analyzed chains.',
-        esp: 'Riesgo de mixing clasificado como bajo en las chains analizadas.',
+        eng: 'Mixing risk classified as low; OFAC overlap not detected in traced inflows.',
+        esp: 'Riesgo de mixing bajo; sin overlap OFAC en inflows trazados.',
       },
     ],
     concerns: [
       {
-        eng: 'Notable CEX dependency (~68% of traced inflows).',
-        esp: 'Dependencia notable de CEX (~68% de inflows trazados).',
+        eng: 'Notable CEX dependency (~68% of priced inflows).',
+        esp: 'Dependencia notable de CEX (~68% de inflows priced).',
       },
       {
-        eng: 'Limited history of non-CEX counterparties.',
-        esp: 'Historial limitado de contrapartes no-CEX.',
+        eng: 'Priced HHI mid-range — concentration blocks an A grade.',
+        esp: 'HHI priced en rango medio — la concentración bloquea nota A.',
       },
     ],
     highlights: [
@@ -203,8 +203,12 @@ export const walcertExampleReports: WalcertExampleReport[] = [
         value: 'CEX',
       },
       {
-        label: { eng: 'CEX share', esp: 'Share CEX' },
+        label: { eng: 'CEX share (priced)', esp: 'Share CEX (priced)' },
         value: '68.5%',
+      },
+      {
+        label: { eng: 'Priced HHI', esp: 'HHI priced' },
+        value: '0.42',
       },
       {
         label: { eng: 'Mixing risk', esp: 'Riesgo mixing' },
@@ -217,23 +221,23 @@ export const walcertExampleReports: WalcertExampleReport[] = [
     grade: 'C',
     grade_label: { eng: 'Acceptable', esp: 'Aceptable' },
     summary: {
-      eng: 'Light activity in the last 7 days with few counterparties and no strong wash/circular signals.',
-      esp: 'Actividad liviana en los últimos 7 días, pocas contrapartes y sin señales fuertes de wash/circular.',
+      eng: 'Light activity in the last 15 days with few counterparties and no strong wash or bot-like signals.',
+      esp: 'Actividad liviana en los últimos 15 días, pocas contrapartes y sin señales fuertes de wash o bot-like.',
     },
     strengths: [
       {
-        eng: 'No circular patterns or bot-like burst detected.',
-        esp: 'Sin patrones circulares ni ráfagas bot-like detectadas.',
+        eng: 'No circular patterns or bot-like burst detected in the window.',
+        esp: 'Sin patrones circulares ni ráfagas bot-like en la ventana.',
       },
       {
-        eng: 'Wash trading risk rated low.',
-        esp: 'Riesgo de wash trading calificado como bajo.',
+        eng: 'Wash trading risk rated low; reciprocity not elevated.',
+        esp: 'Riesgo de wash trading bajo; reciprocity no elevada.',
       },
     ],
     concerns: [
       {
-        eng: 'Very low counterparty diversity in the window.',
-        esp: 'Diversidad de contrapartes muy baja en la ventana.',
+        eng: 'Very low counterparty diversity in the 15-day window.',
+        esp: 'Diversidad de contrapartes muy baja en la ventana de 15 días.',
       },
       {
         eng: 'Sparse flow makes maturity hard to assert from activity alone.',
@@ -243,7 +247,7 @@ export const walcertExampleReports: WalcertExampleReport[] = [
     highlights: [
       {
         label: { eng: 'Window', esp: 'Ventana' },
-        value: '7 days',
+        value: '15 days',
       },
       {
         label: { eng: 'Transfers', esp: 'Transfers' },
@@ -253,6 +257,10 @@ export const walcertExampleReports: WalcertExampleReport[] = [
         label: { eng: 'Counterparties', esp: 'Contrapartes' },
         value: '3',
       },
+      {
+        label: { eng: 'Activity HHI', esp: 'HHI activity' },
+        value: '0.58',
+      },
     ],
   },
   {
@@ -260,17 +268,17 @@ export const walcertExampleReports: WalcertExampleReport[] = [
     grade: 'A',
     grade_label: { eng: 'Excellent', esp: 'Excelente' },
     summary: {
-      eng: 'Active on multiple networks with a long activity span and consistent presence.',
-      esp: 'Activa en varias redes, con span largo de actividad y presencia consistente.',
+      eng: 'Strong multi-chain footprint: active across core ecosystems with high consistency and long longevity span (no tx-intensity scoring).',
+      esp: 'Footprint multi-chain sólido: activo en ecosistemas core, alta consistencia y span de longevidad largo (sin scoring de intensidad de txs).',
     },
     strengths: [
       {
-        eng: 'Six chains with recorded activity including Base and BSC.',
-        esp: 'Seis chains con actividad registrada, incluidas Base y BSC.',
+        eng: 'Six chains with recorded footprint including Base and BSC.',
+        esp: 'Seis chains con footprint registrado, incluidas Base y BSC.',
       },
       {
-        eng: 'Longevity score high (~980+ activity span days).',
-        esp: 'Score de longevidad alto (~980+ días de span).',
+        eng: 'Longevity score high (~980+ activity span days); strong recency on core ecosystems.',
+        esp: 'Score de longevidad alto (~980+ días de span); buena recencia en ecosistemas core.',
       },
     ],
     concerns: [
@@ -292,6 +300,10 @@ export const walcertExampleReports: WalcertExampleReport[] = [
         label: { eng: 'Consistency', esp: 'Consistencia' },
         value: 'high',
       },
+      {
+        label: { eng: 'Core ecosystems', esp: 'Ecosistemas core' },
+        value: '4',
+      },
     ],
   },
   {
@@ -299,37 +311,41 @@ export const walcertExampleReports: WalcertExampleReport[] = [
     grade: 'D',
     grade_label: { eng: 'Weak', esp: 'Débil' },
     summary: {
-      eng: 'Small liquid portfolio with high concentration and limited diversification.',
-      esp: 'Portfolio líquido pequeño, alta concentración y poca diversificación.',
+      eng: 'Small usable portfolio after dust/spam filter; high concentration and limited tier diversification.',
+      esp: 'Portfolio usable pequeño tras filtro dust/spam; alta concentración y poca diversificación por tiers.',
     },
     strengths: [
       {
-        eng: 'Positions are liquid (no locked share).',
-        esp: 'Posiciones líquidas (sin share locked).',
+        eng: 'Positions are liquid (no locked share); spam_ratio low after filter.',
+        esp: 'Posiciones líquidas (sin share locked); spam_ratio bajo tras filtro.',
       },
     ],
     concerns: [
       {
-        eng: 'Very low total value USD — weak size signal.',
-        esp: 'Valor total USD muy bajo — señal de tamaño débil.',
+        eng: 'Very low usable total value USD — weak size signal.',
+        esp: 'Valor usable USD muy bajo — señal de tamaño débil.',
       },
       {
-        eng: 'Concentration (HHI) implies single-asset exposure.',
-        esp: 'Concentración (HHI) implica exposición a un solo activo.',
+        eng: 'Concentration (HHI) implies single-asset exposure; no bluechip/stable buffer.',
+        esp: 'Concentración (HHI) implica exposición a un solo activo; sin buffer bluechip/stable.',
       },
     ],
     highlights: [
       {
-        label: { eng: 'Total value', esp: 'Valor total' },
+        label: { eng: 'Usable value', esp: 'Valor usable' },
         value: '~$0.81',
       },
       {
-        label: { eng: 'Liquid ratio', esp: 'Ratio líquido' },
-        value: '100%',
+        label: { eng: 'Credible value', esp: 'Valor credible' },
+        value: '~$0.81',
       },
       {
-        label: { eng: 'Positions', esp: 'Posiciones' },
+        label: { eng: 'Effective positions', esp: 'Posiciones efectivas' },
         value: '1',
+      },
+      {
+        label: { eng: 'HHI', esp: 'HHI' },
+        value: '1.00',
       },
     ],
   },
