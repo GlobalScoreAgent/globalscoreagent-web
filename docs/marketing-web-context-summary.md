@@ -1,7 +1,7 @@
 # Resumen de Contexto del Proyecto — Web pública (Marketing)
 
 Documento de handoff para continuar el desarrollo de la **web oficial** en un chat nuevo de Cursor.  
-**Última actualización:** julio 2026 — Public API Free Tier (`/public-api`) + Walcert marketing/dashboard en `main`.
+**Última actualización:** agosto 2026 — página `/about` (Nosotros) + Public API Free Tier + Walcert marketing/dashboard en `main`.
 
 Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) (panel autenticado) y [`docs/AGENT-RULES.md`](AGENT-RULES.md) (reglas globales).
 
@@ -15,7 +15,11 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 | **URL canónica** | `https://www.globalscoreagent.com` (Vercel; apex → `www`) |
 | **Site URL SEO** | `https://globalscoreagent.com` (`lib/seo/site.ts`, metadataBase) |
 | **Deploy** | Vercel — auto-deploy desde `main` |
-| **Versión** | **v1** — landing, HUMI/WAMI, **Walcert**, **Public API Free Tier**, pricing, docs, agentes públicos, Top 10 |
+| **Versión** | **v1** — landing, HUMI/WAMI, **Walcert**, **Public API Free Tier**, **About/Nosotros**, pricing, docs, agentes públicos, Top 10 |
+
+### Cambios recientes (agosto 2026)
+
+- **About / Nosotros (`/about`):** página bilingüe con producto, founder card (Ibzan Jair Valenzuela Suarez + LinkedIn/X), reconocimiento unificado hackathon ETH UY + pitch BSG 2026 (GlassCard elevated, lightbox de imágenes, links GitHub / Blockchain Summit / DoraHacks). Nav + footer. Se eliminó el redirect legacy `/about` → `/#mission` en `next.config.js`. Copy: `content/about/`. Assets: `public/hackaton_eth_2026.jpg`, `hackaton_eth_2026_2.jpg`, `hackaton_2026_premiacion.jpg`, `blockchain_summit_2026.png`.
 
 ### Cambios recientes (julio 2026)
 
@@ -47,7 +51,7 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 
 - **Next.js 14** App Router — ver `node_modules/next/dist/docs/` ante dudas de API
 - **Tailwind** — paleta `zinc-950` + acento `gold`
-- **i18n:** `LanguageContext` (ES/EN); copy en `content/marketing/`, `content/pricing/`, `content/humi/`, `content/wami/`, `content/walcert/`, `content/public-api/`
+- **i18n:** `LanguageContext` (ES/EN); copy en `content/marketing/`, `content/pricing/`, `content/humi/`, `content/wami/`, `content/walcert/`, `content/public-api/`, `content/about/`
 - **Patrón copy:** objetos `{ es: '...', en: '...' }` + helper `pick(lang, obj)`
 - **Supabase:** schema `web_page` en APIs; `NEXT_PUBLIC_SUPABASE_*` + service role en server routes
 - **SEO:** `lib/seo/site.ts`, `metadata.ts`, JSON-LD, sitemap, `public/llms.txt`
@@ -65,6 +69,7 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 | `/walcert/developers` | Walcert — referencia técnica HTTP / x402 / `/v1/verify` |
 | `/public-api` | Public API Free Tier — resumen + playgrounds search/maturity |
 | `/pricing` | Planes dashboard, API de pago (preview muted), más detalles, CTA registro |
+| `/about` | Nosotros / About — producto, fundador (Ibzan Jair Valenzuela Suarez), reconocimientos 2026 |
 | `/top-10-agents` | Ranking público Top 10 |
 | `/agents/[id]` | Perfil público agente (SEO) |
 | `/agents/[id]/humi`, `/wami` | Subpáginas índice públicas |
@@ -80,7 +85,7 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 
 ```
 app/
-├── page.tsx, humi/, wami/, walcert/, walcert/developers/, public-api/, pricing/, legal/, top-10-agents/
+├── page.tsx, humi/, wami/, walcert/, walcert/developers/, public-api/, pricing/, about/, legal/, top-10-agents/
 ├── agents/[id]/              # Perfiles públicos
 ├── docs/                     # Render MD (loadDoc.ts)
 ├── auth/login/               # Login compartido con dashboard
@@ -96,9 +101,11 @@ components/public-api/        # Landing Free Tier + playgrounds
 components/walcert/           # Secciones negocio + developers
 components/pricing/           # Grids pricing, ReportTypePricingMatrix, etc.
 content/marketing/copy.ts     # Copy landing + footer + nav
+content/about/copy.ts         # Copy /about (Nosotros)
 content/public-api/copy.ts    # Copy /public-api
 content/walcert/              # Copy /walcert + /walcert/developers
 content/pricing/copy.ts       # Copy /pricing
+components/about/             # AboutPageClient
 content/docs/manifest.ts      # Slugs (/docs/public-api-free-tier, /docs/gsa-pricing, …)
 lib/public-api/               # constants + fetchPublicApi (client → proxy)
 lib/api/

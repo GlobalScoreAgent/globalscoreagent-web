@@ -7,11 +7,6 @@ const nextConfig = {
         destination: '/',
         permanent: true,
       },
-      {
-        source: '/about',
-        destination: '/#mission',
-        permanent: false,
-      },
     ];
   },
   experimental: {

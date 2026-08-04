@@ -3,6 +3,7 @@ import type { Bilingual } from '@/content/marketing/i18n';
 import { humiCopy } from '@/content/humi/copy';
 import { wamiCopy } from '@/content/wami/copy';
 import { legalCopy } from '@/content/legal/copy';
+import { aboutCopy } from '@/content/about/copy';
 import { pricingCopy } from '@/content/pricing/copy';
 import { publicApiCopy } from '@/content/public-api/copy';
 import { walcertCopy } from '@/content/walcert/copy';
@@ -60,6 +61,12 @@ export const routeMetadata = {
     title: legalCopy.seo.title,
     description: legalCopy.seo.description,
     canonical: `${SITE_URL}/legal`,
+    ogPath: '/opengraph-image',
+  },
+  about: {
+    title: aboutCopy.seo.title,
+    description: aboutCopy.seo.description,
+    canonical: `${SITE_URL}/about`,
     ogPath: '/opengraph-image',
   },
   pricing: {

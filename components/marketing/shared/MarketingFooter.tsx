@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useLanguage } from '@/app/contexts/LanguageContext';
+import { aboutCopy } from '@/content/about/copy';
 import { marketingCopy } from '@/content/marketing/copy';
 import { pick } from '@/content/marketing/i18n';
 import ContactSocialIcon from './ContactSocialIcon';
@@ -91,7 +92,15 @@ export default function MarketingFooter() {
           </div>
         </div>
 
-        <p className="mt-10 text-center text-xs text-zinc-600">
+        <p className="mt-8 text-center text-xs text-zinc-500">
+          <Link href="/about" className="transition-colors hover:text-zinc-300">
+            {pick(language, marketingCopy.footer.aboutLink)}
+          </Link>
+          <span className="mx-2 text-zinc-700">·</span>
+          {pick(language, aboutCopy.footerBlurb)}
+        </p>
+
+        <p className="mt-4 text-center text-xs text-zinc-600">
           <Link href="/docs/global-score-agent" className="text-zinc-500 transition-colors hover:text-zinc-400">
             {pick(language, marketingCopy.footer.docsLink)}
           </Link>

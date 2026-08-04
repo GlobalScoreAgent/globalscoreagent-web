@@ -18,6 +18,7 @@ import {
   Trophy,
   Map,
   BadgeCheck,
+  Users,
 } from 'lucide-react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { marketingCopy } from '@/content/marketing/copy';
@@ -45,6 +46,7 @@ const navItems: NavItem[] = [
   { href: '/docs/global-score-agent', labelKey: 'documentation', icon: BookOpen, external: true },
   { href: '/#roadmap', labelKey: 'roadmap', icon: Map },
   { href: '/#how-we-work', labelKey: 'howWeWork', icon: Cog },
+  { href: '/about', labelKey: 'about', icon: Users, external: true },
   { href: '/legal', labelKey: 'legal', icon: Scale, external: true },
 ];
 

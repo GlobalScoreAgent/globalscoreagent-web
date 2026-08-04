@@ -18,6 +18,7 @@
 - Walcert agent card (JSON) / API: https://walcert.globalscoreagent.com/
 - Walcert GSA dashboard (human): https://globalscoreagent.com/dashboard/walcert
 - Pricing: https://globalscoreagent.com/pricing
+- About: https://globalscoreagent.com/about
 - Documentation (hub): https://globalscoreagent.com/docs/global-score-agent
 - Legal: https://globalscoreagent.com/legal
 

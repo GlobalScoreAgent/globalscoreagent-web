@@ -17,6 +17,7 @@ export const marketingCopy = {
     pricing: { es: 'Precios', en: 'Pricing' } satisfies Bilingual,
     publicApi: { es: 'Public API', en: 'Public API' } satisfies Bilingual,
     documentation: { es: 'Documentación', en: 'Documentation' } satisfies Bilingual,
+    about: { es: 'Nosotros', en: 'About' } satisfies Bilingual,
     legal: { es: 'Legal', en: 'Legal' } satisfies Bilingual,
     expandSidebar: { es: 'Expandir menú', en: 'Expand menu' } satisfies Bilingual,
     collapseSidebar: { es: 'Contraer menú', en: 'Collapse menu' } satisfies Bilingual,
@@ -508,6 +509,7 @@ export const marketingCopy = {
     } satisfies Bilingual,
     pricingLink: { es: 'Precios', en: 'Pricing' } satisfies Bilingual,
     docsLink: { es: 'Documentación', en: 'Documentation' } satisfies Bilingual,
+    aboutLink: { es: 'Nosotros', en: 'About' } satisfies Bilingual,
     links: {
       x: { label: '@ibzjairvalenz', href: 'https://x.com/ibzjairvalenz' },
       email: { label: 'hello@globalscoreagent.com', href: 'mailto:hello@globalscoreagent.com' },
