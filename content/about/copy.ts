@@ -165,7 +165,7 @@ export const aboutCopy = {
               es: 'DoraHacks · Urugwei 2026',
               en: 'DoraHacks · Urugwei 2026',
             },
-            href: 'https://dorahacks.io/hackathon/urugwei-2026/hackers',
+            href: 'https://dorahacks.io/hackathon/urugwei-2026/report',
           },
         ],
       },
