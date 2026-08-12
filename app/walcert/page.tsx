@@ -5,6 +5,7 @@ import WalcertProblemSection from '@/components/walcert/sections/WalcertProblemS
 import WalcertCertificatesSection from '@/components/walcert/sections/WalcertCertificatesSection';
 import WalcertPreviewVsPaidSection from '@/components/walcert/sections/WalcertPreviewVsPaidSection';
 import WalcertIdentitySection from '@/components/walcert/sections/WalcertIdentitySection';
+import WalcertPresenceSection from '@/components/walcert/sections/WalcertPresenceSection';
 import WalcertVerifiabilitySection from '@/components/walcert/sections/WalcertVerifiabilitySection';
 import WalcertCtaSection from '@/components/walcert/sections/WalcertCtaSection';
 
@@ -24,6 +25,7 @@ export default function WalcertPage() {
       <WalcertCertificatesSection />
       <WalcertPreviewVsPaidSection />
       <WalcertIdentitySection />
+      <WalcertPresenceSection />
       <WalcertVerifiabilitySection />
       <WalcertCtaSection />
     </main>

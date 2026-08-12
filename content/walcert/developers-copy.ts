@@ -2,6 +2,9 @@ import type { Bilingual } from '@/content/marketing/i18n';
 import {
   WALCERT_LIVE_URL,
   WALCERT_REPO_URL,
+  WALCERT_AGENT_CARD_CONCORDIUM_URL,
+  WALCERT_CONCORDIUM_REGISTRY_URL,
+  WALCERT_VIRTUALS_ACP_AGENT_URL,
 } from '@/content/walcert/copy';
 
 export const walcertDevelopersCopy = {
@@ -11,8 +14,8 @@ export const walcertDevelopersCopy = {
       en: 'Walcert — Developer reference',
     } satisfies Bilingual,
     description: {
-      es: 'Agent card JSON, preview gratis, certificados x402, POST /v1/verify y verificabilidad on-chain. Base URL walcert.globalscoreagent.com.',
-      en: 'Agent card JSON, free preview, x402 certificates, POST /v1/verify, and on-chain verifiability. Base URL walcert.globalscoreagent.com.',
+      es: 'Agent card JSON (Celo discovery + Concordium CIS-8004), preview gratis, certificados x402, POST /v1/verify y ficha Virtuals ACP. Base URL walcert.globalscoreagent.com.',
+      en: 'Agent card JSON (Celo discovery + Concordium CIS-8004), free preview, x402 certificates, POST /v1/verify, and Virtuals ACP listing. Base URL walcert.globalscoreagent.com.',
     } satisfies Bilingual,
   },
   hero: {
@@ -61,8 +64,17 @@ export const walcertDevelopersCopy = {
         path: '/',
         auth: { es: 'Ninguna', en: 'None' },
         delivers: {
-          es: 'Agent card JSON bilingüe (discovery)',
-          en: 'Bilingual agent card JSON (discovery)',
+          es: 'Agent card JSON bilingüe (discovery ERC-8004)',
+          en: 'Bilingual agent card JSON (ERC-8004 discovery)',
+        },
+      },
+      {
+        method: 'GET',
+        path: '/agent-card.json',
+        auth: { es: 'Ninguna', en: 'None' },
+        delivers: {
+          es: 'Agent Card Concordium CIS-8004 (External Agent #1686)',
+          en: 'Concordium CIS-8004 Agent Card (External Agent #1686)',
         },
       },
       {
@@ -194,6 +206,41 @@ export const walcertDevelopersCopy = {
       {
         label: { es: 'README del agente', en: 'Agent README' },
         href: `${WALCERT_REPO_URL}/blob/main/README.md`,
+      },
+      {
+        label: {
+          es: 'Agent Card Concordium (JSON)',
+          en: 'Concordium Agent Card (JSON)',
+        },
+        href: WALCERT_AGENT_CARD_CONCORDIUM_URL,
+      },
+      {
+        label: {
+          es: 'Concordium Agent Registry',
+          en: 'Concordium Agent Registry',
+        },
+        href: WALCERT_CONCORDIUM_REGISTRY_URL,
+      },
+      {
+        label: {
+          es: 'Virtuals ACP — ficha Walcert',
+          en: 'Virtuals ACP — Walcert listing',
+        },
+        href: WALCERT_VIRTUALS_ACP_AGENT_URL,
+      },
+      {
+        label: {
+          es: 'Docs Concordium CIS-8004 (repo)',
+          en: 'Concordium CIS-8004 docs (repo)',
+        },
+        href: `${WALCERT_REPO_URL}/blob/main/docs/concordium-cis8004.md`,
+      },
+      {
+        label: {
+          es: 'Docs Virtuals ACP (repo)',
+          en: 'Virtuals ACP docs (repo)',
+        },
+        href: `${WALCERT_REPO_URL}/blob/main/docs/virtuals-acp.md`,
       },
       {
         label: { es: 'Certificados (ES)', en: 'Certificates (ES)' },
