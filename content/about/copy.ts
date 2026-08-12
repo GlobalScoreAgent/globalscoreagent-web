@@ -182,11 +182,6 @@ export const aboutCopy = {
         href: '/walcert',
       },
       {
-        label: { es: 'Demo pública BSG2026', en: 'BSG2026 public demo' },
-        href: 'https://bsg2026.globalscoreagent.com',
-        external: true,
-      },
-      {
         label: { es: 'Acceder al Dashboard', en: 'Access the Dashboard' },
         href: '/auth/login',
       },
