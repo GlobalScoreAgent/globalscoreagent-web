@@ -2,6 +2,8 @@
 
 This page shows the complete breakdown of an agent’s **HUMI Index**. It is designed so you can analyze in detail how the agent’s reputation score is calculated across its four pillars.
 
+The score and breakdowns on this page reflect the **latest index calculation** (when the daily recalc finishes, ~18:00 UTC). The agents directory may still show the overnight export until those scalars sync.
+
 ## 1. Index Score
 
 Displays the overall **HUMI Index** score of the agent (from 0 to 100) along with its maturity category (e.g., Developing, Stable, Unstable, etc.).
@@ -105,4 +107,4 @@ This table is very useful when you need to understand exactly which factors are 
 
 ---
 
-*Last updated: June 2026*
+*Last updated: August 2026*

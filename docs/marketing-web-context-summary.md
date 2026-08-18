@@ -1,7 +1,7 @@
 # Resumen de Contexto del Proyecto — Web pública (Marketing)
 
 Documento de handoff para continuar el desarrollo de la **web oficial** en un chat nuevo de Cursor.  
-**Última actualización:** agosto 2026 — página `/about` (Nosotros) + Public API Free Tier + Walcert marketing/dashboard en `main`.
+**Última actualización:** agosto 2026 — Walcert `/walcert` identidad 5 registros + marketplaces (Agent.family, Agent City, CDP Bazaar) + x402 dual; About/Nosotros + Public API Free Tier.
 
 Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) (panel autenticado) y [`docs/AGENT-RULES.md`](AGENT-RULES.md) (reglas globales).
 
@@ -19,13 +19,14 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 
 ### Cambios recientes (agosto 2026)
 
+- **Walcert (`/walcert` + `/walcert/developers`):** identidad on-chain de **cinco registros** — Celo 9699 · Base 59768 · Eth 50032 · BNB 265982 · Concordium #1686. Presencia: Virtuals ACP, Agent.family (TermiX), Agent City, CDP Bazaar / agentic.market, Concordium. Logos: `public/agent-family-logo.png`, `agent-city-logo.png`, `agentic-market-logo.png` (+ Virtuals/Concordium). x402 dual **Celo y Base** ($0.05 USDC); anclaje `giveFeedback` sigue en Celo. Developers: tools ERC-8257 (Base 485–488 · Eth 163–166) + listings. Copy: `content/walcert/`. **No** afirmar featured en Bazaar. Dashboard `/dashboard/walcert` sin cambio en este corte. Identidad canónica de emisión: Celo **9699**. `GET https://walcert.globalscoreagent.com/` = **agent card JSON** (no UI humana).
+- **HUMI perfil público:** `/agents/[id]/humi` y `GET /api/web-page/agents/[id]/humi` leen `web_dashboard.index_humi_live` (mismo `fetchAgentHumiIndex` que el dashboard). El directorio sigue en escalares de `agents`.
 - **About / Nosotros (`/about`):** página bilingüe con producto, founder card (Ibzan Jair Valenzuela Suarez + LinkedIn/X), reconocimiento unificado hackathon ETH UY + pitch BSG 2026 (GlassCard elevated, lightbox de imágenes, links GitHub / Blockchain Summit / DoraHacks). Nav + footer. Se eliminó el redirect legacy `/about` → `/#mission` en `next.config.js`. Copy: `content/about/`. Assets: `public/hackaton_eth_2026.jpg`, `hackaton_eth_2026_2.jpg`, `hackaton_2026_premiacion.jpg`, `blockchain_summit_2026.png`.
 
 ### Cambios recientes (julio 2026)
 
 - **Public API Free Tier:** landing `/public-api` (resumen + playgrounds search/maturity); docs `/docs/public-api-free-tier`; API `https://api.globalscoreagent.com` (`/v1/agents/search`, `/v1/agents/maturity`); proxy same-origin `GET /api/web-page/public-api-proxy`; home Tools CTA “Explorar API” + card **API Keys** Próximamente; nav sidebar Public API. Copy: `content/public-api/`.
-- **Walcert:** páginas marketing `/walcert` (negocio + identidad Celo 9699 + Concordium CIS-8004 #1686 + presencia Virtuals ACP / Concordium + verificabilidad / verify por tx_hash) y `/walcert/developers` (HTTP/x402 + `/agent-card.json` + `POST /v1/verify`); nav sidebar + card en home; dashboard humano `/dashboard/walcert` (preview + verify + ejemplos). `GET https://walcert.globalscoreagent.com/` = **agent card JSON** (discovery; no UI). Identidad canónica web Celo: agentId **9699**. Copy en `content/walcert/`.
-- **No reabrir** `/certificaciones` (sigue redirect → `/`); URL canónica del producto es `/walcert`.
+- **Walcert (julio 2026, base):** nav sidebar + card en home; dashboard humano `/dashboard/walcert` (preview + verify + ejemplos). **No reabrir** `/certificaciones` (sigue redirect → `/`); URL canónica del producto es `/walcert`.
 
 ### Cambios recientes en producción (junio 2026)
 
@@ -65,8 +66,8 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 | `/` | Landing — hero, KPIs live, productos, misión, suscripciones teaser |
 | `/humi` | Página índice HUMI marketing + KPI overlay |
 | `/wami` | Página índice WAMI marketing + KPI overlay |
-| `/walcert` | Walcert Agent — producto (certificados A–F, identidad Celo + Concordium, presencia ACP, verify) |
-| `/walcert/developers` | Walcert — referencia técnica HTTP / x402 / `/v1/verify` |
+| `/walcert` | Walcert Agent — producto (certificados A–F, identidad Celo/Base/Eth/BNB + Concordium, marketplaces, x402 dual, verify) |
+| `/walcert/developers` | Walcert — referencia técnica HTTP / x402 dual Celo+Base / ERC-8257 / `/v1/verify` |
 | `/public-api` | Public API Free Tier — resumen + playgrounds search/maturity |
 | `/pricing` | Planes dashboard, API de pago (preview muted), más detalles, CTA registro |
 | `/about` | Nosotros / About — producto, fundador (Ibzan Jair Valenzuela Suarez), reconocimientos 2026 |
@@ -161,6 +162,13 @@ lib/seo/                      # site URL, JSON-LD, agent metadata pública
 - APIs: `/api/web-page/top-agents`, `/api/web-page/agents/[id]`, humi, wami
 - SEO: `resolvePublicAgentMetadata`, sitemap, Open Graph por ruta
 
+### Walcert (`/walcert`, `/walcert/developers`)
+
+- Identidad: Celo 9699 (emisión + x402 Celo) · Base 59768 (ACP + x402 Base) · Eth 50032 (Agent City + ERC-8257) · BNB 265982 (Agent.family) · Concordium #1686
+- Presencia: Virtuals ACP, Agent.family, Agent City, CDP Bazaar (`agentic.market`; no featured), Concordium
+- Developers: x402 dual $0.05 USDC Celo/Base; tools ERC-8257 Base 485–488 / Eth 163–166; listings
+- Copy: `content/walcert/copy.ts`, `developers-copy.ts`
+
 ---
 
 ## 6. APIs marketing (`web_page`)
@@ -244,4 +252,4 @@ No commits/push salvo petición explícita.
 
 ---
 
-*Última revisión: julio 2026 — Public API Free Tier + Walcert (marketing + dashboard) en `main`. Actualizar tras cambios de pricing, KPIs, rutas públicas o deploy.*
+*Última revisión: agosto 2026 — Walcert marketplaces + multi-registro + x402 dual. Actualizar tras cambios de pricing, KPIs, rutas públicas o deploy.*

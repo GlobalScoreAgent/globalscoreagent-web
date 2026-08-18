@@ -20,6 +20,25 @@ export const WALCERT_BASE_ERC8004_AGENT_ID = '59768';
 export const WALCERT_BASE_CHAIN = 'Base mainnet (eip155:8453)';
 export const WALCERT_BASE_EXPLORER_URL =
   'https://erc-8004.quicknode.com/agents/base-mainnet/59768';
+export const WALCERT_ETH_ERC8004_AGENT_ID = '50032';
+export const WALCERT_ETH_CHAIN = 'Ethereum mainnet';
+export const WALCERT_ETH_IDENTITY_TX_URL =
+  'https://etherscan.io/tx/0x203de8fe65db17faaf7b210fe1e9022ec089d123e43a81e1dfc02a77ad2887a7';
+export const WALCERT_AGENT_CITY_URL = 'https://agentcity.freaks.one/';
+export const WALCERT_AGENT_CITY_ABOUT_URL = 'https://agentcity.freaks.one/how';
+export const WALCERT_BNB_ERC8004_AGENT_ID = '265982';
+export const WALCERT_BNB_CHAIN = 'BNB Smart Chain';
+export const WALCERT_AGENT_FAMILY_LISTING_URL =
+  'https://www.agent.family/listing?id=cmsr131ybcoo6v001vdkw7any';
+export const WALCERT_AGENT_FAMILY_ABOUT_URL = 'https://www.agent.family/';
+export const WALCERT_BNB_MINT_TX_URL =
+  'https://bscscan.com/tx/0xa5a93ab7bc18e36a94a371f71200d15c6b1d5e1fe28a98735c65ab9c8f901fa8';
+export const WALCERT_CDP_BAZAAR_URL =
+  'https://agentic.market/services/walcert-globalscoreagent-com';
+export const WALCERT_CDP_BAZAAR_ABOUT_URL = 'https://agentic.market';
+export const WALCERT_ERC8257_TOOLS_BASE = '485–488';
+export const WALCERT_ERC8257_TOOLS_ETH = '163–166';
+export const WALCERT_ERC8257_MANIFEST_ORIGINS_URL = `${WALCERT_LIVE_URL}/.well-known/ai-tool/walcert-origins.json`;
 
 export type WalcertCertificateType = {
   id: 'origins' | 'activity' | 'multichain' | 'portfolio';
@@ -35,8 +54,8 @@ export const walcertCopy = {
       en: 'Walcert Agent — Wallet maturity certificates',
     } satisfies Bilingual,
     description: {
-      es: 'Agente ERC-8004 en Celo (9699) y Base (59768), más CIS-8004 en Concordium (#1686). Certificados A–F; Provider en Virtuals ACP; preview gratis; anclaje x402 en Celo.',
-      en: 'ERC-8004 agent on Celo (9699) and Base (59768), plus CIS-8004 on Concordium (#1686). A–F certificates; Virtuals ACP Provider; free preview; x402 anchor on Celo.',
+      es: 'Agente ERC-8004 en Celo (9699), Base (59768), Ethereum (50032) y BNB (265982), más CIS-8004 en Concordium (#1686). Certificados A–F; x402 en Celo y Base; Virtuals ACP, Agent.family, Agent City y CDP Bazaar.',
+      en: 'ERC-8004 agent on Celo (9699), Base (59768), Ethereum (50032), and BNB (265982), plus CIS-8004 on Concordium (#1686). A–F certificates; x402 on Celo and Base; Virtuals ACP, Agent.family, Agent City, and CDP Bazaar.',
     } satisfies Bilingual,
   },
   hero: {
@@ -46,8 +65,8 @@ export const walcertCopy = {
       en: 'Wallet maturity certificates graded A–F, built for agent-to-agent consumption.',
     } satisfies Bilingual,
     badge: {
-      es: 'Celo 9699 · Base 59768 · Concordium #1686 · En producción',
-      en: 'Celo 9699 · Base 59768 · Concordium #1686 · Live in production',
+      es: 'Celo 9699 · Base 59768 · Eth 50032 · BNB 265982 · Concordium #1686 · En producción',
+      en: 'Celo 9699 · Base 59768 · Eth 50032 · BNB 265982 · Concordium #1686 · Live in production',
     } satisfies Bilingual,
     openAgent: {
       es: 'Probar en el dashboard',
@@ -74,8 +93,8 @@ export const walcertCopy = {
         en: 'Real-time hot-analysis — not a daily aggregated score like HUMI/WAMI.',
       },
       {
-        es: 'Diseñado para agent-to-agent: preview gratis, certificado vía x402, y offerings en Virtuals ACP.',
-        en: 'Built for agent-to-agent: free preview, certificate via x402, and offerings on Virtuals ACP.',
+        es: 'Diseñado para agent-to-agent: preview gratis, certificado vía x402 en Celo y Base, y presencia en marketplaces de agentes.',
+        en: 'Built for agent-to-agent: free preview, certificate via x402 on Celo and Base, and presence on agent marketplaces.',
       },
       {
         es: 'Parte del ecosistema Global Score Agent — powered by GSA.',
@@ -166,7 +185,10 @@ export const walcertCopy = {
           es: 'Gratis (8 req/IP / 15 min)',
           en: 'Free (8 req/IP / 15 min)',
         },
-        paid: { es: '$0.05 USDC (x402)', en: '$0.05 USDC (x402)' },
+        paid: {
+          es: '$0.05 USDC (x402 · Celo o Base)',
+          en: '$0.05 USDC (x402 · Celo or Base)',
+        },
       },
       {
         feature: { es: 'Nota A–F', en: 'A–F grade' },
@@ -201,8 +223,8 @@ export const walcertCopy = {
       en: 'On-chain identity',
     } satisfies Bilingual,
     intro: {
-      es: 'Walcert tiene tres registros complementarios: ERC-8004 en Celo (certificados + x402), ERC-8004 en Base (Virtuals ACP) y CIS-8004 en Concordium (accountability ID-backed). No se reemplazan entre sí.',
-      en: 'Walcert has three complementary registrations: ERC-8004 on Celo (certificates + x402), ERC-8004 on Base (Virtuals ACP), and CIS-8004 on Concordium (ID-backed accountability). They do not replace each other.',
+      es: 'Walcert tiene cinco registros complementarios: ERC-8004 en Celo, Base, Ethereum y BNB, más CIS-8004 en Concordium. No se reemplazan entre sí.',
+      en: 'Walcert has five complementary registrations: ERC-8004 on Celo, Base, Ethereum, and BNB, plus CIS-8004 on Concordium. They do not replace each other.',
     } satisfies Bilingual,
     groups: [
       {
@@ -218,6 +240,13 @@ export const walcertCopy = {
           {
             label: { es: 'agentId', en: 'agentId' },
             value: { es: WALCERT_AGENT_ID, en: WALCERT_AGENT_ID },
+          },
+          {
+            label: { es: 'Uso', en: 'Role' },
+            value: {
+              es: 'Emisión de certificados + x402 Celo',
+              en: 'Certificate issuance + x402 on Celo',
+            },
           },
           {
             label: { es: 'Discovery / API', en: 'Discovery / API' },
@@ -267,8 +296,8 @@ export const walcertCopy = {
           {
             label: { es: 'Uso', en: 'Role' },
             value: {
-              es: 'Identidad ERC-8004 para Virtuals ACP',
-              en: 'ERC-8004 identity for Virtuals ACP',
+              es: 'Identidad Virtuals ACP + x402 Base',
+              en: 'Virtuals ACP identity + x402 on Base',
             },
           },
           {
@@ -287,6 +316,92 @@ export const walcertCopy = {
               en: 'erc-8004.quicknode.com · Base · 59768',
             },
             href: WALCERT_BASE_EXPLORER_URL,
+          },
+        ],
+      },
+      {
+        title: {
+          es: 'Ethereum · ERC-8004',
+          en: 'Ethereum · ERC-8004',
+        } satisfies Bilingual,
+        rows: [
+          {
+            label: { es: 'Chain', en: 'Chain' },
+            value: { es: WALCERT_ETH_CHAIN, en: WALCERT_ETH_CHAIN },
+          },
+          {
+            label: { es: 'agentId', en: 'agentId' },
+            value: {
+              es: WALCERT_ETH_ERC8004_AGENT_ID,
+              en: WALCERT_ETH_ERC8004_AGENT_ID,
+            },
+          },
+          {
+            label: { es: 'Uso', en: 'Role' },
+            value: {
+              es: 'Agent City + tools ERC-8257',
+              en: 'Agent City + ERC-8257 tools',
+            },
+          },
+          {
+            label: { es: 'Agent City', en: 'Agent City' },
+            value: {
+              es: 'agentcity.freaks.one',
+              en: 'agentcity.freaks.one',
+            },
+            href: WALCERT_AGENT_CITY_URL,
+            external: true,
+          },
+          {
+            label: { es: 'Identity tx', en: 'Identity tx' },
+            value: {
+              es: 'etherscan.io · register 50032',
+              en: 'etherscan.io · register 50032',
+            },
+            href: WALCERT_ETH_IDENTITY_TX_URL,
+          },
+        ],
+      },
+      {
+        title: {
+          es: 'BNB · ERC-8004',
+          en: 'BNB · ERC-8004',
+        } satisfies Bilingual,
+        rows: [
+          {
+            label: { es: 'Chain', en: 'Chain' },
+            value: { es: WALCERT_BNB_CHAIN, en: WALCERT_BNB_CHAIN },
+          },
+          {
+            label: { es: 'agentId', en: 'agentId' },
+            value: {
+              es: WALCERT_BNB_ERC8004_AGENT_ID,
+              en: WALCERT_BNB_ERC8004_AGENT_ID,
+            },
+          },
+          {
+            label: { es: 'Uso', en: 'Role' },
+            value: {
+              es: 'Agent.family Instant-buyable',
+              en: 'Agent.family Instant-buyable',
+            },
+          },
+          {
+            label: { es: 'Listing', en: 'Listing' },
+            value: {
+              es: 'agent.family/listing',
+              en: 'agent.family/listing',
+            },
+            href: WALCERT_AGENT_FAMILY_LISTING_URL,
+            external: true,
+          },
+          {
+            label: { es: 'Identity tx', en: 'Identity tx' },
+            value: {
+              es: 'bscscan.com · mint 265982',
+              en: 'bscscan.com · mint 265982',
+            },
+            href: WALCERT_BNB_MINT_TX_URL,
           },
         ],
       },
@@ -341,8 +456,8 @@ export const walcertCopy = {
       }[];
     }[],
     footnote: {
-      es: 'Los certificados firmados y los pagos x402 siguen anclados en Celo (agentId 9699). Base (59768) es la identidad ERC-8004 usada por Virtuals ACP. Concordium aporta accountability ID-backed vía CIS-8 + CIS-8004.',
-      en: 'Signed certificates and x402 payments remain anchored on Celo (agentId 9699). Base (59768) is the ERC-8004 identity used by Virtuals ACP. Concordium adds ID-backed accountability via CIS-8 + CIS-8004.',
+      es: 'Los certificados firmados y el anclaje giveFeedback siguen en Celo (agentId 9699). Los pagos x402 son $0.05 USDC en Celo y en Base — Base 59768 no es solo identidad ACP. Eth 50032 sirve Agent City y tools ERC-8257; BNB 265982, Agent.family. Concordium aporta accountability ID-backed vía CIS-8 + CIS-8004.',
+      en: 'Signed certificates and the giveFeedback anchor remain on Celo (agentId 9699). x402 payments are $0.05 USDC on Celo and Base — Base 59768 is not ACP identity only. Eth 50032 serves Agent City and ERC-8257 tools; BNB 265982, Agent.family. Concordium adds ID-backed accountability via CIS-8 + CIS-8004.',
     } satisfies Bilingual,
     hackathon: {
       es: 'Hackathon Celo Agentic Payments & DeFAI — Track 2 (Most x402 Payments).',
@@ -355,8 +470,8 @@ export const walcertCopy = {
       en: 'Ecosystem presence',
     } satisfies Bilingual,
     intro: {
-      es: 'Además de la identidad on-chain, Walcert está disponible donde los agentes ya contratan servicios — y donde la accountability ID-backed suma legitimidad.',
-      en: 'Beyond on-chain identity, Walcert is available where agents already hire services — and where ID-backed accountability adds legitimacy.',
+      es: 'Además de la identidad on-chain, Walcert está donde los agentes descubren y contratan servicios — marketplaces, discovery x402 y accountability ID-backed.',
+      en: 'Beyond on-chain identity, Walcert is where agents discover and hire services — marketplaces, x402 discovery, and ID-backed accountability.',
     } satisfies Bilingual,
     items: [
       {
@@ -406,6 +521,156 @@ export const walcertCopy = {
               en: 'Walcert ACP listing',
             },
             href: WALCERT_VIRTUALS_ACP_AGENT_URL,
+          },
+        ],
+      },
+      {
+        id: 'agent-family',
+        date: { es: '13 ago 2026', en: 'Aug 13, 2026' },
+        title: {
+          es: 'Live en Agent.family (TermiX)',
+          en: 'Live on Agent.family (TermiX)',
+        },
+        logo: {
+          src: '/agent-family-logo.png',
+          alt: { es: 'Agent.family', en: 'Agent.family' },
+        },
+        about: {
+          title: { es: 'Qué es Agent.family', en: 'What is Agent.family' },
+          body: {
+            es: 'Agent.family (TermiX) es un marketplace de servicios de agentes con listing Instant-buyable. Complementa Virtuals ACP: aquí la superficie es UI; la capa AACP corre por debajo.',
+            en: 'Agent.family (TermiX) is an agent-services marketplace with Instant-buyable listings. It complements Virtuals ACP: the surface is UI; the AACP layer runs underneath.',
+          },
+          href: WALCERT_AGENT_FAMILY_ABOUT_URL,
+          linkLabel: {
+            es: 'Sitio de Agent.family',
+            en: 'Agent.family website',
+          },
+        },
+        body: {
+          es: 'Walcert está listado Instant-buyable en BNB (agentId 265982). El emisor de cada certificado sigue siendo el agente Celo 9699.',
+          en: 'Walcert is listed Instant-buyable on BNB (agentId 265982). Each certificate is still issued by the Celo 9699 agent.',
+        },
+        facts: [
+          {
+            label: { es: 'ERC-8004 BNB', en: 'ERC-8004 BNB' },
+            value: {
+              es: `agentId ${WALCERT_BNB_ERC8004_AGENT_ID}`,
+              en: `agentId ${WALCERT_BNB_ERC8004_AGENT_ID}`,
+            },
+          },
+          {
+            label: { es: 'Listing', en: 'Listing' },
+            value: { es: 'Instant-buyable', en: 'Instant-buyable' },
+          },
+        ],
+        links: [
+          {
+            label: {
+              es: 'Listing Walcert en Agent.family',
+              en: 'Walcert listing on Agent.family',
+            },
+            href: WALCERT_AGENT_FAMILY_LISTING_URL,
+          },
+        ],
+      },
+      {
+        id: 'agent-city',
+        date: { es: '16 ago 2026', en: 'Aug 16, 2026' },
+        title: {
+          es: 'Live en Agent City',
+          en: 'Live on Agent City',
+        },
+        logo: {
+          src: '/agent-city-logo.png',
+          alt: { es: 'Agent City', en: 'Agent City' },
+        },
+        about: {
+          title: { es: 'Qué es Agent City', en: 'What is Agent City' },
+          body: {
+            es: 'Agent City es un espacio on-chain en Ethereum donde agentes ERC-8004 se registran como ciudadanos y exponen tools en el shop.',
+            en: 'Agent City is an on-chain space on Ethereum where ERC-8004 agents register as citizens and expose tools in the shop.',
+          },
+          href: WALCERT_AGENT_CITY_ABOUT_URL,
+          linkLabel: {
+            es: 'Cómo funciona Agent City',
+            en: 'How Agent City works',
+          },
+        },
+        body: {
+          es: 'Walcert está live como ciudadano con lote: agentId 50032 y tools ERC-8257 163–166 (Origins, Activity, Multichain, Portfolio).',
+          en: 'Walcert is live as a citizen with a land lot: agentId 50032 and ERC-8257 tools 163–166 (Origins, Activity, Multichain, Portfolio).',
+        },
+        facts: [
+          {
+            label: { es: 'ERC-8004 Eth', en: 'ERC-8004 Eth' },
+            value: {
+              es: `agentId ${WALCERT_ETH_ERC8004_AGENT_ID}`,
+              en: `agentId ${WALCERT_ETH_ERC8004_AGENT_ID}`,
+            },
+          },
+          {
+            label: { es: 'Tools ERC-8257', en: 'ERC-8257 tools' },
+            value: {
+              es: `Eth ${WALCERT_ERC8257_TOOLS_ETH}`,
+              en: `Eth ${WALCERT_ERC8257_TOOLS_ETH}`,
+            },
+          },
+        ],
+        links: [
+          {
+            label: {
+              es: 'Agent City',
+              en: 'Agent City',
+            },
+            href: WALCERT_AGENT_CITY_URL,
+          },
+        ],
+      },
+      {
+        id: 'cdp-bazaar',
+        date: { es: '17 ago 2026', en: 'Aug 17, 2026' },
+        title: {
+          es: 'Indexado en CDP Bazaar',
+          en: 'Indexed on CDP Bazaar',
+        },
+        logo: {
+          src: '/agentic-market-logo.png',
+          alt: { es: 'agentic.market', en: 'agentic.market' },
+        },
+        about: {
+          title: { es: 'Qué es CDP Bazaar', en: 'What is CDP Bazaar' },
+          body: {
+            es: 'CDP Bazaar (agentic.market) es el catálogo de discovery x402 de Coinbase/CDP. Indexa rutas pagadas en Base; no es un marketplace con escrow.',
+            en: 'CDP Bazaar (agentic.market) is the Coinbase/CDP x402 discovery catalog. It indexes paid routes on Base; it is not an escrow marketplace.',
+          },
+          href: WALCERT_CDP_BAZAAR_ABOUT_URL,
+          linkLabel: {
+            es: 'Sitio de agentic.market',
+            en: 'agentic.market website',
+          },
+        },
+        body: {
+          es: 'Las cuatro rutas de certificados (Origins, Activity, Multichain, Portfolio) están en la ficha pública a $0.05 USDC en Base. Un settle Celo no indexa ni mantiene el listing.',
+          en: 'All four certificate routes (Origins, Activity, Multichain, Portfolio) are on the public listing at $0.05 USDC on Base. A Celo settlement does not index or keep the listing.',
+        },
+        facts: [
+          {
+            label: { es: 'Rutas', en: 'Routes' },
+            value: { es: '4 certificados A–F', en: '4 A–F certificates' },
+          },
+          {
+            label: { es: 'Pago', en: 'Payment' },
+            value: { es: '$0.05 USDC · Base', en: '$0.05 USDC · Base' },
+          },
+        ],
+        links: [
+          {
+            label: {
+              es: 'Ficha Walcert en agentic.market',
+              en: 'Walcert listing on agentic.market',
+            },
+            href: WALCERT_CDP_BAZAAR_URL,
           },
         ],
       },
@@ -470,7 +735,7 @@ export const walcertCopy = {
       id: string;
       date: Bilingual;
       title: Bilingual;
-      logo: { src: string; alt: Bilingual };
+      logo?: { src: string; alt: Bilingual };
       about: {
         title: Bilingual;
         body: Bilingual;
@@ -546,8 +811,8 @@ export const walcertCopy = {
       en: 'A–F certificates · Wallets · Autonomous agent',
     } satisfies Bilingual,
     description: {
-      es: 'Agente ERC-8004 en Celo (9699) y Base (59768), más CIS-8004 en Concordium (#1686). Certificados A–F; Provider en Virtuals ACP. Preview gratis; certificado firmado vía x402.',
-      en: 'ERC-8004 on Celo (9699) and Base (59768), plus CIS-8004 on Concordium (#1686). A–F certificates; Virtuals ACP Provider. Free preview; signed certificate via x402.',
+      es: 'Agente ERC-8004 en Celo (9699), Base (59768), Ethereum (50032) y BNB (265982), más CIS-8004 en Concordium (#1686). Certificados A–F; x402 en Celo y Base.',
+      en: 'ERC-8004 on Celo (9699), Base (59768), Ethereum (50032), and BNB (265982), plus CIS-8004 on Concordium (#1686). A–F certificates; x402 on Celo and Base.',
     } satisfies Bilingual,
     question: {
       es: '¿Qué tan madura y legítima es esta wallet antes de interactuar?',

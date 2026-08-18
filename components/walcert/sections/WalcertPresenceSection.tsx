@@ -26,13 +26,15 @@ export default function WalcertPresenceSection() {
             <GlassCard key={item.id} variant="elevated" className="space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
-                  <Image
-                    src={item.logo.src}
-                    alt={pick(language, item.logo.alt)}
-                    width={120}
-                    height={36}
-                    className="h-8 w-auto max-w-[140px] object-contain object-left sm:h-9"
-                  />
+                  {item.logo ? (
+                    <Image
+                      src={item.logo.src}
+                      alt={pick(language, item.logo.alt)}
+                      width={120}
+                      height={36}
+                      className="h-8 w-auto max-w-[140px] object-contain object-left sm:h-9"
+                    />
+                  ) : null}
                   <h3 className="text-lg font-semibold text-white">
                     {pick(language, item.title)}
                   </h3>

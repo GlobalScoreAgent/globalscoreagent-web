@@ -276,7 +276,7 @@ export async function fetchAgentHumiIndex(
 
   const { data, error } = await supabase
     .schema('web_dashboard')
-    .from('index_humi')
+    .from('index_humi_live')
     .select(INDEX_HUMI_SELECT)
     .eq('agent_id', webAgentId)
     .maybeSingle();

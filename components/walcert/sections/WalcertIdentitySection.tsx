@@ -14,14 +14,14 @@ export default function WalcertIdentitySection() {
 
   return (
     <SectionSurface id="identity" tone="darker">
-      <div className="mx-auto max-w-3xl px-6">
+      <div className="mx-auto max-w-5xl px-6">
         <h2 className="mb-4 text-center text-3xl font-bold text-white md:text-4xl">
           {pick(language, identity.title)}
         </h2>
         <p className="mb-10 text-center text-base text-zinc-400">
           {pick(language, identity.intro)}
         </p>
-        <div className="space-y-6">
+        <div className="grid gap-6 md:grid-cols-2">
           {identity.groups.map((group) => (
             <GlassCard key={pick(language, group.title)} variant="elevated" className="space-y-4">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-gold">

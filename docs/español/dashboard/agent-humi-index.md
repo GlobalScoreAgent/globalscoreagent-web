@@ -2,6 +2,8 @@
 
 Esta página muestra el desglose completo del **Índice HUMI** de un agente específico. Está diseñada para que puedas analizar en detalle cómo se calcula el puntaje de reputación del agente a través de sus cuatro pilares.
 
+El puntaje y los desgloses de esta ficha corresponden al **último cálculo del índice** (cuando termina el recálculo diario, ~18:00 UTC). El listado del directorio puede mostrar el score del export nocturno hasta que se sincronicen los escalares.
+
 ## 1. Puntaje del Índice
 
 Muestra el puntaje general del **Índice HUMI** del agente (de 0 a 100) junto con su categoría de madurez (por ejemplo: En desarrollo, Estable, Inestable, etc.).
@@ -105,4 +107,4 @@ Esta tabla es muy útil para entender con precisión qué factores están influy
 
 ---
 
-*Última actualización: Junio 2026*
+*Última actualización: Agosto 2026*

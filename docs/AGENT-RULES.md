@@ -69,7 +69,7 @@ Monorepo con **dos productos** en un solo Next.js. Detalle en [`docs/BRANCHING.m
 | Zona | Rutas | Schema BD típico |
 |------|-------|------------------|
 | Marketing | `app/api/web-page/` | `web_page` |
-| Dashboard | `app/api/dashboard/**` | `web_dashboard`, imports desde `erc_8004`, `index_humi`, `index_wami` |
+| Dashboard | `app/api/dashboard/**` | `web_dashboard`, imports desde `erc_8004`, `index_humi_live` / `index_wami` |
 
 ---
 
@@ -169,7 +169,7 @@ GRANT SELECT ON web_dashboard.chains_stadistics TO authenticated, anon, authenti
 | `/dashboard` | `GET /api/dashboard/overview` → `global_stadistics` + `chains_stadistics` |
 | `/dashboard/agents` | `GET /api/dashboard/agents` + filtros `agent_advanced_filters` |
 | `/dashboard/agents/[id]` | `GET /api/dashboard/agents/[id]` |
-| `/dashboard/agents/[id]/humi` | `GET /api/dashboard/agents/[id]/humi` → `web_dashboard.index_humi` |
+| `/dashboard/agents/[id]/humi` | `GET /api/dashboard/agents/[id]/humi` → `web_dashboard.index_humi_live` |
 | `/dashboard/walcert` | Preview live + verify + ejemplos; APIs `POST .../preview` y `POST .../verify` → agente `/v1/preview/{type}` y `/v1/verify` |
 
 ### Responsive (julio 2026)
@@ -214,7 +214,7 @@ Spec: [`docs/español/index-humi.md`](español/index-humi.md).
 
 - Directorio: `humi_madurity_level`, `current_humi_score`
 - Detalle: `wami_madurity_level`, `current_wami_score`
-- `index_humi`: `madurity_level`
+- `index_humi_live`: `madurity_level` (detalle HUMI; no pedir `id`)
 
 ### Helpers (`lib/agentHumiDisplay.ts`)
 
@@ -293,7 +293,9 @@ Si una regla de Cursor y este doc difieren, **priorizar la conversación actual 
 - Madurez HUMI unificada en directorio, detalle agente y detalle HUMI.
 - Dashboard móvil: shell drawer, overview dual, chains dual (`ChainModuleCards` / `ChainDesktopCard`), distribuciones verticales en móvil.
 - Handoff: `dashboard-context-summary.md` + este archivo.
+- Detalle HUMI (Fase 2, ago 2026): `fetchAgentHumiIndex` → `web_dashboard.index_humi_live`. Directorio sigue en escalares de `agents`. DROP tabla-copia = Fase 3 (otra ADR).
+- Walcert marketing (ago 2026): identidad 5 registros + marketplaces (Agent.family, Agent City, CDP Bazaar) + x402 dual Celo/Base.
 
 ---
 
-*Última revisión: julio 2026 — v1 + dashboard móvil en `main`. Actualizar cuando cambien migraciones BD, grants, ramas o convenciones.*
+*Última revisión: agosto 2026 — Walcert marketplaces + HUMI `index_humi_live` en `main`. Actualizar cuando cambien migraciones BD, grants, ramas o convenciones.*

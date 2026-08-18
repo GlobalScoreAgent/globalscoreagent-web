@@ -1,7 +1,7 @@
 # Resumen de Contexto del Proyecto — Dashboard
 
 Documento de handoff para continuar el desarrollo del dashboard en un chat nuevo de Cursor.  
-**Última actualización:** julio 2026 — Walcert en dashboard (`/dashboard/walcert`: preview live + verificación por tx_hash + ejemplos).
+**Última actualización:** agosto 2026 — detalle HUMI lee `web_dashboard.index_humi_live` (Fase 2).
 
 ---
 
@@ -15,6 +15,10 @@ Documento de handoff para continuar el desarrollo del dashboard en un chat nuevo
 | **Auth** | Supabase OAuth (Google/GitHub) + email/password; callback `/auth/callback` |
 | **Acceso dashboard** | `/dashboard/*` — login + suscripción activa |
 | **Versión** | **v1** — overview, directorio, detalle agente, HUMI/WAMI, **Walcert** (preview + verify + ejemplos), perfil, suscripciones, feedbacks, responsive móvil |
+
+### Changelog (agosto 2026)
+
+- **Detalle HUMI (Fase 2):** `fetchAgentHumiIndex` lee `web_dashboard.index_humi_live` (VIEW) en vez de la tabla-copia `index_humi`. Mismo `INDEX_HUMI_SELECT` + filtro `agent_id`. Dashboard auth y perfil público SEO. Directorio **no** cambia (escalares en `agents`). DROP de la tabla = Fase 3 (ADR aparte; no aplicada).
 
 ### Changelog (julio 2026)
 
@@ -189,7 +193,8 @@ Ver [`docs/español/index-humi.md`](español/index-humi.md) y [`docs/AGENT-RULES
 | `chains_stadistics` (MV) | Stats por cadena; PK `id` → `chain_id` en API |
 | `agents` | Directorio y detalle |
 | `agent_advanced_filters` | Filtros avanzados UI |
-| `index_humi` | Detalle HUMI por agente |
+| `index_humi_live` (VIEW) | Detalle HUMI por agente (`fetchAgentHumiIndex`) |
+| `index_humi` (tabla-copia) | Snapshot 00:00 UTC; **no** la lee el detalle tras Fase 2. DROP = Fase 3 |
 | `gsa.*` | Suscripciones, pagos, créditos API |
 
 ### Flujo overview

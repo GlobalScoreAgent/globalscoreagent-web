@@ -4,6 +4,7 @@ import WalcertDevHero from '@/components/walcert/developers/WalcertDevHero';
 import WalcertDevEndpointsSection from '@/components/walcert/developers/WalcertDevEndpointsSection';
 import WalcertDevBodySection from '@/components/walcert/developers/WalcertDevBodySection';
 import WalcertDevX402Section from '@/components/walcert/developers/WalcertDevX402Section';
+import WalcertDevErc8257Section from '@/components/walcert/developers/WalcertDevErc8257Section';
 import WalcertDevPaidPayloadSection from '@/components/walcert/developers/WalcertDevPaidPayloadSection';
 import WalcertDevLinksSection from '@/components/walcert/developers/WalcertDevLinksSection';
 
@@ -22,6 +23,7 @@ export default function WalcertDevelopersPage() {
       <WalcertDevEndpointsSection />
       <WalcertDevBodySection />
       <WalcertDevX402Section />
+      <WalcertDevErc8257Section />
       <WalcertDevPaidPayloadSection />
       <WalcertDevLinksSection />
     </main>
