@@ -43,9 +43,14 @@ export function isInsightsArticlePath(
   return pathname.startsWith('/insights/') && pathname.length > '/insights/'.length;
 }
 
+/** Static public assets must not be rewritten to `/insights/...` on the Insights host. */
+const INSIGHTS_STATIC_ASSET_EXT =
+  /\.(?:avif|css|gif|ico|jpe?g|js|json|map|mp4|otf|pdf|png|svg|ttf|txt|webm|webp|woff2?|xml)$/i;
+
 export function shouldRewriteInsightsPath(pathname: string): boolean {
   if (pathname.startsWith('/_next')) return false;
   if (pathname.startsWith('/api')) return false;
+  if (INSIGHTS_STATIC_ASSET_EXT.test(pathname)) return false;
   if (
     pathname === '/sitemap.xml' ||
     pathname === '/robots.txt' ||
