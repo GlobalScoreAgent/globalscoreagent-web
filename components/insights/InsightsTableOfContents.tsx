@@ -17,9 +17,10 @@ export default function InsightsTableOfContents({
   lang,
 }: InsightsTableOfContentsProps) {
   const items = headings.filter((heading) => heading.level === 2 || heading.level === 3);
-  if (items.length === 0) return null;
 
   useEffect(() => {
+    if (items.length === 0) return;
+
     const hash = window.location.hash.replace(/^#/, '');
     if (!hash) return;
 
@@ -28,7 +29,9 @@ export default function InsightsTableOfContents({
     }, 50);
 
     return () => window.clearTimeout(timer);
-  }, [headings]);
+  }, [headings, items.length]);
+
+  if (items.length === 0) return null;
 
   return (
     <nav
