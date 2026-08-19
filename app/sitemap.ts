@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getAllDocSlugs } from '@/content/docs/manifest';
 import { getAllInsightsSlugs, getInsightsEntry } from '@/content/insights/manifest';
+import { INSIGHTS_SITE_URL } from '@/lib/insights/site';
 import { SITE_URL } from '@/lib/seo/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -83,7 +84,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.5,
     },
     {
-      url: `${baseUrl}/insights`,
+      url: INSIGHTS_SITE_URL,
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.85,
@@ -91,7 +92,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...getAllInsightsSlugs().map((slug) => {
       const entry = getInsightsEntry(slug);
       return {
-        url: `${baseUrl}/insights/${slug}`,
+        url: `${INSIGHTS_SITE_URL}/${slug}`,
         lastModified: entry ? new Date(`${entry.date}T00:00:00.000Z`) : now,
         changeFrequency: 'monthly' as const,
         priority: entry?.status === 'published' ? 0.8 : 0.65,

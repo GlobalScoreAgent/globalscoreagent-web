@@ -1,11 +1,29 @@
-import { SITE_URL } from '@/lib/seo/site';
-
 export const INSIGHTS_SITE_HOST = 'insights.globalscoreagent.com';
 export const INSIGHTS_SITE_URL = `https://${INSIGHTS_SITE_HOST}`;
+
+const PRODUCTION_MAIN_HOSTS = new Set(['www.globalscoreagent.com', 'globalscoreagent.com']);
 
 export function isInsightsHostname(host: string | null | undefined): boolean {
   const hostname = (host ?? '').split(':')[0].toLowerCase();
   return hostname === INSIGHTS_SITE_HOST || hostname.startsWith('insights.');
+}
+
+/** Apex/www only — never localhost or Vercel previews. */
+export function shouldRedirectMainSiteInsightsToSubdomain(
+  host: string | null | undefined,
+  pathname: string,
+): boolean {
+  if (!(pathname === '/insights' || pathname.startsWith('/insights/'))) return false;
+  if (isInsightsHostname(host)) return false;
+  const hostname = (host ?? '').split(':')[0].toLowerCase();
+  return PRODUCTION_MAIN_HOSTS.has(hostname);
+}
+
+/** Map `/insights` → `/` and `/insights/slug` → `/slug` on the Insights host. */
+export function insightsSubdomainPathFromMainPath(pathname: string): string {
+  if (pathname === '/insights' || pathname === '/insights/') return '/';
+  const rest = pathname.slice('/insights'.length);
+  return rest.startsWith('/') ? rest : `/${rest}`;
 }
 
 export function insightsAppPath(slug?: string): string {
@@ -25,11 +43,9 @@ export function withInsightsLang(href: string, lang: 'es' | 'en'): string {
   return `${href}${join}lang=es`;
 }
 
-export function insightsCanonicalUrl(host: string | null | undefined, slug?: string): string {
-  if (isInsightsHostname(host)) {
-    return slug ? `${INSIGHTS_SITE_URL}/${slug}` : INSIGHTS_SITE_URL;
-  }
-  return slug ? `${SITE_URL}/insights/${slug}` : `${SITE_URL}/insights`;
+/** Canonical URLs always prefer the Insights subdomain. */
+export function insightsCanonicalUrl(_host?: string | null, slug?: string): string {
+  return slug ? `${INSIGHTS_SITE_URL}/${slug}` : INSIGHTS_SITE_URL;
 }
 
 export function isInsightsArticlePath(

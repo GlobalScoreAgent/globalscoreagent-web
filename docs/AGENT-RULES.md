@@ -12,7 +12,7 @@ Documento maestro de convenciones, arquitectura y estado del proyecto.
 | Skill **`gsa-aplicacion`** (personal: `~/.cursor/skills/gsa-aplicacion/`) | Onboarding marketing/dashboard (checklist + vault `01 - Aplicación`) |
 | [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) | Dashboard (incl. responsive móvil/desktop), APIs, MVs, grants |
 | [`docs/marketing-web-context-summary.md`](marketing-web-context-summary.md) | Web pública: landing, pricing, KPIs, docs, agentes públicos |
-| [`docs/insights-context-summary.md`](insights-context-summary.md) | GSA Insights: blog ERC-8004, SEO, pipeline vault → repo |
+| [`docs/insights-context-summary.md`](insights-context-summary.md) | GSA Insights: canónica `insights.globalscoreagent.com`, SEO, pipeline vault → repo |
 | [`docs/BRANCHING.md`](BRANCHING.md) | Zonas del monorepo y archivos compartidos |
 | [`docs/español/index-humi.md`](español/index-humi.md) | Spec de madurez HUMI y pilares |
 | [`docs/supabase-auth-setup.md`](supabase-auth-setup.md) | Auth, schemas expuestos, RLS, grants |

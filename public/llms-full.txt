@@ -17,11 +17,11 @@ Hub: https://globalscoreagent.com/docs/global-score-agent
 
 ## GSA Insights (ERC-8004 research)
 
-Hub: https://globalscoreagent.com/insights
+Hub: https://insights.globalscoreagent.com
 
 - erc-8004-eight-months-on-mainnet — Eight months of ERC-8004 on mainnet: identity vs reputation adoption, chains, registries (Aug 2026 snapshot)
-  - EN: https://globalscoreagent.com/insights/erc-8004-eight-months-on-mainnet
-  - ES: https://globalscoreagent.com/insights/erc-8004-eight-months-on-mainnet?lang=es
+  - EN: https://insights.globalscoreagent.com/erc-8004-eight-months-on-mainnet
+  - ES: https://insights.globalscoreagent.com/erc-8004-eight-months-on-mainnet?lang=es
 
 ## Pricing
 

@@ -1,7 +1,7 @@
 # Resumen de contexto — GSA Insights
 
 Handoff para continuar el **blog de análisis ERC-8004** en un chat nuevo.  
-**Última actualización:** 19 agosto 2026 — primera pieza publicada, SEO ERC-8004, shell hub editorial.
+**Última actualización:** 19 agosto 2026 — subdominio live, primera pieza, SEO ERC-8004, fix video estático.
 
 Complementa [`docs/marketing-web-context-summary.md`](marketing-web-context-summary.md) (web pública) y [`docs/AGENT-RULES.md`](AGENT-RULES.md).
 
@@ -13,9 +13,9 @@ Complementa [`docs/marketing-web-context-summary.md`](marketing-web-context-summ
 
 | Superficie | URL |
 |------------|-----|
-| Fallback v1 (live) | `https://www.globalscoreagent.com/insights` |
-| Canónica deseada | `https://insights.globalscoreagent.com` (DNS/SSL pendiente en Vercel) |
-| Primera pieza | `/insights/erc-8004-eight-months-on-mainnet` |
+| **Canónica (live)** | `https://insights.globalscoreagent.com` |
+| Redirect 301 | `www` / apex `/insights` y `/insights/*` → subdominio (paths limpios: `/slug`) |
+| Primera pieza | `https://insights.globalscoreagent.com/erc-8004-eight-months-on-mainnet` |
 
 **Vault:** [[04 - Growth/Insights]] · ADR [[08 - Decisiones/2026-08-18 - Insights propio origen de análisis ERC-8004]]  
 **Pipeline:** Data Insights (brief EN) → editorial ES/EN → repo MD → redes (`shared_on.blog`).
@@ -49,9 +49,10 @@ La confusión habitual: el brief **landscape** y la ficha **blog** tratan el mis
 | Posts MD | `content/insights/posts/{en,es}/{slug}.md` |
 | Pipeline editorial | `content/insights/upcoming.ts` |
 | SEO | `lib/insights/metadata.ts`, `lib/insights/json-ld.ts`, `lib/insights/seo-keywords.ts` |
-| Sitemap | `app/sitemap.ts` (índice + slugs) |
-| LLMs | `public/llms.txt`, `public/llms-full.txt` |
-| Host rewrite | `middleware.ts` + `lib/insights/site.ts` |
+| Sitemap | `app/sitemap.ts` (Insights bajo `INSIGHTS_SITE_URL`) |
+| LLMs | `public/llms.txt`, `public/llms-full.txt` (URLs Insights en el subdominio) |
+| Host rewrite | `middleware.ts` + `lib/insights/site.ts` (rewrite subdominio + 301 desde www/apex) |
+| Video fondo | `public/blog_background.mp4` |
 
 ---
 
@@ -62,6 +63,7 @@ La confusión habitual: el brief **landscape** y la ficha **blog** tratan el mis
 - **Open Graph / Twitter** con cover `public/blog/nota_1.png` en la primera pieza.
 - **hreflang** EN default + `?lang=es`.
 - **robots** index/follow explícito.
+- **Canonical por host:** `insightsCanonicalUrl()` usa el subdominio si `Host` es `insights.*`; en www sigue `/insights/...`.
 
 Al publicar una pieza nueva: ampliar `seoKeywords` en manifest, verificar sitemap y añadir entrada en `llms-full.txt`.
 
@@ -91,7 +93,7 @@ Header sticky en artículos:
 1. Brief en vault `04 - Growth/Data Insights/` + fila en su índice.
 2. Cuerpos EN/ES en `content/insights/posts/`.
 3. Entrada en `content/insights/manifest.ts`.
-4. Ficha única en `04 - Growth/blog/` (sin `.es.md` separado).
+4. Ficha única en `04 - Growth/blog/` (sin `.es.md` separado); URLs canónicas en el subdominio.
 5. Fila en `04 - Growth/blog/Índice.md`.
 6. Marcar `shared_on.blog` en el brief de Data Insights.
 7. Actualizar `public/llms-full.txt` si es pieza destacada.
@@ -102,8 +104,10 @@ Header sticky en artículos:
 ## 7. Pitfalls
 
 - **Strict Mode + IDs de headings:** IDs de TOC deben derivarse de `extractHeadings` por línea AST (`InsightsMarkdown`), no contador en render.
+- **Hooks TOC:** no poner `useEffect` después de un `return null` (`InsightsTableOfContents`).
 - **Idioma SSR:** `LanguageContext` arranca en `en`; `?lang=es` se aplica en cliente — metadata SEO acepta `?lang=es` en `generateMetadata`.
-- **Dos hosts:** `insights.globalscoreagent.com` rewrite vs `/insights` en www — URLs en `lib/insights/site.ts`.
+- **Dos hosts:** rewrite en `insights.*`. En **www/apex de producción**, `/insights` y `/insights/*` hacen **301** al subdominio (paths limpios). Localhost y previews Vercel **no** redirigen.
+- **Estáticos en el subdominio:** el matcher de middleware **debe** excluir `.mp4` (y otros assets). Si no, `/blog_background.mp4` se reescribe a `/insights/[slug]` y da **404**. `shouldRewriteInsightsPath` también excluye extensiones estáticas.
 - **No duplicar** artículo completo en vault blog; repo es canónico.
 
 ---

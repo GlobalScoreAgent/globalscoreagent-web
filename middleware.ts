@@ -1,6 +1,12 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { API_NO_STORE_HEADERS } from '@/lib/api/route-config';
-import { isInsightsHostname, shouldRewriteInsightsPath } from '@/lib/insights/site';
+import {
+  INSIGHTS_SITE_URL,
+  insightsSubdomainPathFromMainPath,
+  isInsightsHostname,
+  shouldRedirectMainSiteInsightsToSubdomain,
+  shouldRewriteInsightsPath,
+} from '@/lib/insights/site';
 import { updateSession } from '@/utils/supabase/middleware';
 
 export async function middleware(request: NextRequest) {
@@ -12,6 +18,13 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = '/auth/callback';
     return NextResponse.redirect(url);
+  }
+
+  if (shouldRedirectMainSiteInsightsToSubdomain(host, pathname)) {
+    const dest = new URL(INSIGHTS_SITE_URL);
+    dest.pathname = insightsSubdomainPathFromMainPath(pathname);
+    dest.search = request.nextUrl.search;
+    return NextResponse.redirect(dest, 301);
   }
 
   if (isInsightsHostname(host) && shouldRewriteInsightsPath(pathname)) {
