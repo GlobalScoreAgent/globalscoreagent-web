@@ -1,22 +1,14 @@
+import { createHeadingIdAssigner } from '@/lib/docs/headingSlug';
+
 export type DocHeading = {
   id: string;
   text: string;
   level: 2 | 3;
 };
 
-function slugifyHeading(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-');
-}
-
 export function extractHeadings(markdown: string): DocHeading[] {
   const headings: DocHeading[] = [];
-  const seen = new Map<string, number>();
+  const assignId = createHeadingIdAssigner();
 
   for (const line of markdown.split('\n')) {
     const match = /^(#{2,3})\s+(.+)$/.exec(line.trim());
@@ -24,15 +16,29 @@ export function extractHeadings(markdown: string): DocHeading[] {
 
     const level = match[1].length as 2 | 3;
     const text = match[2].replace(/\*\*/g, '').trim();
-    let id = slugifyHeading(text);
-    const count = seen.get(id) ?? 0;
-    if (count > 0) id = `${id}-${count + 1}`;
-    seen.set(slugifyHeading(text), count + 1);
+    const id = assignId(text);
 
     headings.push({ id, text, level });
   }
 
   return headings;
+}
+
+/** Maps 1-based markdown line numbers (mdast position.start.line) to heading ids. */
+export function buildHeadingIdsByLine(markdown: string): Map<number, string> {
+  const idsByLine = new Map<number, string>();
+  const assignId = createHeadingIdAssigner();
+  const lines = markdown.split('\n');
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const match = /^(#{2,3})\s+(.+)$/.exec(lines[index].trim());
+    if (!match) continue;
+
+    const text = match[2].replace(/\*\*/g, '').trim();
+    idsByLine.set(index + 1, assignId(text));
+  }
+
+  return idsByLine;
 }
 
 export function extractTitle(markdown: string): string | null {

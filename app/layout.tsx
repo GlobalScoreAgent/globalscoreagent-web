@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
 import './globals.css';
 import { LanguageProvider } from './contexts/LanguageContext';
-import HeaderWrapper from './components/HeaderWrapper';
+import AppShell from './components/AppShell';
 import JsonLdScript from '@/components/marketing/seo/JsonLdScript';
 import { organizationJsonLd } from '@/lib/seo/json-ld';
 import { SITE_URL } from '@/lib/seo/site';
@@ -43,7 +43,7 @@ export default function RootLayout({
       <body className="bg-zinc-950 text-white antialiased">
         <JsonLdScript data={organizationJsonLd} />
         <LanguageProvider>
-          <HeaderWrapper>{children}</HeaderWrapper>
+          <AppShell>{children}</AppShell>
         </LanguageProvider>
       </body>
     </html>

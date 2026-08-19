@@ -15,6 +15,14 @@ Hub: https://globalscoreagent.com/docs/global-score-agent
   - ES: https://globalscoreagent.com/docs/erc-8004?lang=es
   - EN: https://globalscoreagent.com/docs/erc-8004
 
+## GSA Insights (ERC-8004 research)
+
+Hub: https://globalscoreagent.com/insights
+
+- erc-8004-eight-months-on-mainnet — Eight months of ERC-8004 on mainnet: identity vs reputation adoption, chains, registries (Aug 2026 snapshot)
+  - EN: https://globalscoreagent.com/insights/erc-8004-eight-months-on-mainnet
+  - ES: https://globalscoreagent.com/insights/erc-8004-eight-months-on-mainnet?lang=es
+
 ## Pricing
 
 - gsa-pricing — Dashboard plans, API credits, pay-per-use

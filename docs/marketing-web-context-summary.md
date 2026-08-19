@@ -38,6 +38,14 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 - **Agentes públicos:** perfiles SEO en `/agents/[id]` (+ `/humi`, `/wami`).
 - **Branding:** favicon en `app/favicon.ico`; logo marketing en `public/logo-gsa.png` (sidebar/footer).
 
+### Cambios recientes (agosto 2026 — GSA Insights)
+
+- **GSA Insights (`/insights`):** hub editorial de análisis **ERC-8004** — shell propio (`InsightsShell`), video fondo, hub con featured + KPIs + listado + Próximas notas + tags. **No** usa `MarketingShell`.
+- **Primera pieza publicada:** `/insights/erc-8004-eight-months-on-mainnet` (EN default; `?lang=es`). Fuente: brief Data Insights *landscape* → voz editorial bilingüe.
+- **SEO ERC-8004:** keywords, JSON-LD (`Blog` / `BlogPosting`), sitemap, entradas en `public/llms.txt` y `llms-full.txt`. Detalle: [`docs/insights-context-summary.md`](insights-context-summary.md).
+- **Subdominio canónico deseado:** `insights.globalscoreagent.com` (middleware listo; DNS/SSL pendiente). Fallback: `www.globalscoreagent.com/insights`.
+- **Copy/posts:** `content/insights/` + MD en `content/insights/posts/{en,es}/`. Sin CMS.
+
 ---
 
 ## 1. Visión General
@@ -75,6 +83,7 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 | `/agents/[id]` | Perfil público agente (SEO) |
 | `/agents/[id]/humi`, `/wami` | Subpáginas índice públicas |
 | `/docs`, `/docs/[...slug]` | Documentación MD bilingüe desde `docs/español/` y `docs/ingles/` |
+| `/insights`, `/insights/[slug]` | **GSA Insights** — análisis ERC-8004 (shell lectura; bilingüe ES/EN). Ver [`docs/insights-context-summary.md`](insights-context-summary.md) |
 | `/legal` | Legal / privacidad |
 | `/auth/login` | Login/registro (sin footer marketing shell en dashboard paths) |
 

@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { getAllDocSlugs } from '@/content/docs/manifest';
+import { getAllInsightsSlugs, getInsightsEntry } from '@/content/insights/manifest';
 import { SITE_URL } from '@/lib/seo/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -81,5 +82,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.5,
     },
+    {
+      url: `${baseUrl}/insights`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    ...getAllInsightsSlugs().map((slug) => {
+      const entry = getInsightsEntry(slug);
+      return {
+        url: `${baseUrl}/insights/${slug}`,
+        lastModified: entry ? new Date(`${entry.date}T00:00:00.000Z`) : now,
+        changeFrequency: 'monthly' as const,
+        priority: entry?.status === 'published' ? 0.8 : 0.65,
+      };
+    }),
   ];
 }

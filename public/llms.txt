@@ -20,7 +20,16 @@
 - Pricing: https://globalscoreagent.com/pricing
 - About: https://globalscoreagent.com/about
 - Documentation (hub): https://globalscoreagent.com/docs/global-score-agent
+- GSA Insights (ERC-8004 research blog): https://globalscoreagent.com/insights
 - Legal: https://globalscoreagent.com/legal
+
+## GSA Insights (ERC-8004 research)
+
+Editorial analysis and indexed on-chain data about the ERC-8004 agent ecosystem (identity, reputation, validation registries).
+
+- Insights hub: https://globalscoreagent.com/insights
+- Eight months of ERC-8004 on mainnet (Aug 2026): https://globalscoreagent.com/insights/erc-8004-eight-months-on-mainnet
+  - ES: https://globalscoreagent.com/insights/erc-8004-eight-months-on-mainnet?lang=es
 
 ## Documentation
 
