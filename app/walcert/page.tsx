@@ -7,6 +7,7 @@ import WalcertPreviewVsPaidSection from '@/components/walcert/sections/WalcertPr
 import WalcertIdentitySection from '@/components/walcert/sections/WalcertIdentitySection';
 import WalcertPresenceSection from '@/components/walcert/sections/WalcertPresenceSection';
 import WalcertVerifiabilitySection from '@/components/walcert/sections/WalcertVerifiabilitySection';
+import WalcertAgentFactsSection from '@/components/walcert/sections/WalcertAgentFactsSection';
 import WalcertCtaSection from '@/components/walcert/sections/WalcertCtaSection';
 
 type PageProps = {
@@ -27,6 +28,7 @@ export default function WalcertPage() {
       <WalcertIdentitySection />
       <WalcertPresenceSection />
       <WalcertVerifiabilitySection />
+      <WalcertAgentFactsSection />
       <WalcertCtaSection />
     </main>
   );

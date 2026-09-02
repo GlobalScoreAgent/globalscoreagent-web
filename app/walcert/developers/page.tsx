@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { buildRouteMetadata, parseSeoLang } from '@/content/marketing/metadata';
+import JsonLdScript from '@/components/marketing/seo/JsonLdScript';
+import { walcertDevelopersJsonLd } from '@/lib/seo/json-ld';
 import WalcertDevHero from '@/components/walcert/developers/WalcertDevHero';
 import WalcertDevEndpointsSection from '@/components/walcert/developers/WalcertDevEndpointsSection';
 import WalcertDevBodySection from '@/components/walcert/developers/WalcertDevBodySection';
@@ -19,6 +21,7 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 export default function WalcertDevelopersPage() {
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
+      <JsonLdScript data={walcertDevelopersJsonLd} />
       <WalcertDevHero />
       <WalcertDevEndpointsSection />
       <WalcertDevBodySection />

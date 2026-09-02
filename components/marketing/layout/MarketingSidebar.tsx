@@ -18,11 +18,13 @@ import {
   Trophy,
   Map,
   BadgeCheck,
+  Newspaper,
   Users,
 } from 'lucide-react';
 import { useLanguage } from '@/app/contexts/LanguageContext';
 import { marketingCopy } from '@/content/marketing/copy';
 import { pick } from '@/content/marketing/i18n';
+import { insightsAppPath } from '@/lib/insights/site';
 
 type NavItem = {
   href: string;
@@ -40,6 +42,7 @@ const navItems: NavItem[] = [
   { href: '/humi', labelKey: 'humi', icon: BarChart3, external: true },
   { href: '/wami', labelKey: 'wami', icon: Wallet, external: true },
   { href: '/walcert', labelKey: 'walcert', icon: BadgeCheck, external: true },
+  { href: insightsAppPath(), labelKey: 'insights', icon: Newspaper, external: true },
   { href: '/top-10-agents', labelKey: 'top10Agents', icon: Trophy, external: true },
   { href: '/pricing', labelKey: 'pricing', icon: CreditCard, external: true },
   { href: '/public-api', labelKey: 'publicApi', icon: Code2, external: true },

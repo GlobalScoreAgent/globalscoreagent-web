@@ -6,7 +6,7 @@
 
 - HUMI Index: 0–100 reputation score for autonomous agents (ERC-8004).
 - WAMI Index: 0–100 reputation score for owner wallets linked to agents.
-- Walcert Agent: autonomous ERC-8004 agent on Celo (agentId 9699) issuing A–F wallet maturity certificates (origins, activity, multichain, portfolio) via HTTP JSON + x402.
+- Walcert Agent: autonomous ERC-8004 agent issuing A–F wallet maturity certificates (origins, activity, multichain, portfolio) via HTTP JSON + x402. Live identities: Celo 9699 (issuance + Aigora), Base 59768, Ethereum 50032, BNB 265982, Concordium CIS-8004 #1686. Payments: $0.05 USDC on Celo, Base, and BNB (Permit2 + soulbound NFT receipt). Multichain provider: GoldRush v2.1. Presence: Virtuals ACP, Agent.family, Agent City, CDP Bazaar, Aigora.
 
 ## Canonical URLs
 
@@ -22,6 +22,18 @@
 - Documentation (hub): https://globalscoreagent.com/docs/global-score-agent
 - GSA Insights (ERC-8004 research blog): https://insights.globalscoreagent.com
 - Legal: https://globalscoreagent.com/legal
+
+## Walcert — agent discovery (quick facts)
+
+- API base / agent card: https://walcert.globalscoreagent.com/ (GET / = bilingual agent card JSON)
+- Free preview: POST /v1/preview/{origins|activity} (rate limit 8 req/IP / 15 min)
+- Paid certificate: POST /v1/certificates/{origins|activity|multichain|portfolio} — x402 $0.05 USDC on Celo, Base, or BNB
+- Verify: POST /v1/verify with giveFeedback tx_hash (Celo anchor remains canonical)
+- Multichain scoring: GoldRush (Covalent) formula multichain-v2.1 — not Moralis
+- BNB receipt NFT (claim by payer): https://bscscan.com/address/0x4e430fB5A5f26ED08eC123373Cd8AD3cE15C24c7
+- Aigora profile (same Celo 9699): https://aigora.org/services/42220_0x8004a169fb4a3325136eb29fa0ceb6d2e539a432_9699
+- Public repo: https://github.com/MichBarbarian/walcert-agent
+- Full facts: https://globalscoreagent.com/llms-full.txt
 
 ## GSA Insights (ERC-8004 research)
 
@@ -57,7 +69,7 @@ Official product documentation (Spanish default; append `?lang=en` for English):
 
 ## API and dashboard
 
-The wallet/agent lookup dashboard is available at https://globalscoreagent.com/auth/login. The public API is coming soon.
+The wallet/agent lookup dashboard is available at https://globalscoreagent.com/auth/login. Public Free Tier API: https://api.globalscoreagent.com (see https://globalscoreagent.com/public-api).
 
 ## Sitemap
 

@@ -8,11 +8,13 @@ import {
   WALCERT_AGENT_FAMILY_LISTING_URL,
   WALCERT_AGENT_CITY_URL,
   WALCERT_CDP_BAZAAR_URL,
+  WALCERT_AIGORA_PROFILE_URL,
+  WALCERT_BNB_X402_DOCS_URL,
+  WALCERT_BNB_RECEIPT_CONTRACT_URL,
   WALCERT_ERC8257_TOOLS_BASE,
   WALCERT_ERC8257_TOOLS_ETH,
   WALCERT_ERC8257_MANIFEST_ORIGINS_URL,
 } from '@/content/walcert/copy';
-
 export const walcertDevelopersCopy = {
   seo: {
     title: {
@@ -20,9 +22,21 @@ export const walcertDevelopersCopy = {
       en: 'Walcert — Developer reference',
     } satisfies Bilingual,
     description: {
-      es: 'Agent card JSON, preview gratis, certificados x402 en Celo y Base, POST /v1/verify, tools ERC-8257 y listings (Virtuals ACP, Agent.family, Agent City, CDP Bazaar). Base URL walcert.globalscoreagent.com.',
-      en: 'Agent card JSON, free preview, x402 certificates on Celo and Base, POST /v1/verify, ERC-8257 tools, and listings (Virtuals ACP, Agent.family, Agent City, CDP Bazaar). Base URL walcert.globalscoreagent.com.',
+      es: 'Agent card JSON, preview gratis, certificados x402 en Celo, Base y BNB, POST /v1/verify, tools ERC-8257 y listings (Virtuals ACP, Agent.family, Agent City, CDP Bazaar, Aigora). Base URL walcert.globalscoreagent.com.',
+      en: 'Agent card JSON, free preview, x402 certificates on Celo, Base, and BNB, POST /v1/verify, ERC-8257 tools, and listings (Virtuals ACP, Agent.family, Agent City, CDP Bazaar, Aigora). Base URL walcert.globalscoreagent.com.',
     } satisfies Bilingual,
+    keywords: [
+      'Walcert API',
+      'x402',
+      'ERC-8004',
+      'ERC-8257',
+      'Permit2',
+      'BNB receipt NFT',
+      'agent card',
+      'POST /v1/certificates',
+      'POST /v1/verify',
+      'walcert.globalscoreagent.com',
+    ],
   },
   hero: {
     title: {
@@ -112,8 +126,8 @@ export const walcertDevelopersCopy = {
         path: '/v1/certificates/{type}',
         auth: { es: 'x402', en: 'x402' },
         delivers: {
-          es: 'Certificado completo + firma + on-chain (x402 Celo o Base)',
-          en: 'Full certificate + signature + on-chain (x402 Celo or Base)',
+          es: 'Certificado completo + firma + on-chain (x402 Celo, Base o BNB)',
+          en: 'Full certificate + signature + on-chain (x402 Celo, Base, or BNB)',
         },
       },
       {
@@ -161,26 +175,26 @@ export const walcertDevelopersCopy = {
   x402: {
     title: { es: 'Flujo de pago x402', en: 'x402 payment flow' } satisfies Bilingual,
     intro: {
-      es: 'Certificados completos usan el paywall x402 a $0.05 USDC (scheme exact). El cliente elige red en el 402: Celo o Base.',
-      en: 'Full certificates use the x402 paywall at $0.05 USDC (exact scheme). The client picks the network in the 402: Celo or Base.',
+      es: 'Certificados completos usan el paywall x402 a $0.05 USDC (scheme exact). El cliente elige red en el 402: Celo, Base o BNB.',
+      en: 'Full certificates use the x402 paywall at $0.05 USDC (exact scheme). The client picks the network in the 402: Celo, Base, or BNB.',
     } satisfies Bilingual,
     steps: [
       {
-        es: 'POST /v1/certificates/{type} sin pago → 402 con options (accepts[0] Base / CDP cuando está activo; accepts[1] Celo).',
-        en: 'POST /v1/certificates/{type} without payment → 402 with options (accepts[0] Base / CDP when enabled; accepts[1] Celo).',
+        es: 'POST /v1/certificates/{type} sin pago → 402 con options (accepts[0] Base / CDP; accepts[1] Celo; accepts[2] BNB eip155:56 Permit2 / Dexter).',
+        en: 'POST /v1/certificates/{type} without payment → 402 with options (accepts[0] Base / CDP; accepts[1] Celo; accepts[2] BNB eip155:56 Permit2 / Dexter).',
       },
       {
-        es: 'El cliente firma la autorización EIP-3009 en una red y reintenta con header PAYMENT-SIGNATURE / X-PAYMENT.',
-        en: 'Client signs the EIP-3009 authorization on one network and retries with PAYMENT-SIGNATURE / X-PAYMENT.',
+        es: 'El cliente firma en una red (EIP-3009 en Celo/Base, o Permit2 en BNB) y reintenta con header PAYMENT-SIGNATURE / X-PAYMENT.',
+        en: 'Client signs on one network (EIP-3009 on Celo/Base, or Permit2 on BNB) and retries with PAYMENT-SIGNATURE / X-PAYMENT.',
       },
       {
-        es: 'El agente verifica y liquida vía el facilitador de esa red → 200 + certificado. El anclaje giveFeedback sigue en Celo.',
-        en: 'Agent verifies and settles via that network facilitator → 200 + certificate. The giveFeedback anchor remains on Celo.',
+        es: 'El agente verifica y liquida vía el facilitador de esa red → 200 + certificado. El anclaje giveFeedback sigue en Celo. En BNB el JSON puede incluir voucher certificate.receipt para claim del NFT soulbound.',
+        en: 'Agent verifies and settles via that network facilitator → 200 + certificate. The giveFeedback anchor remains on Celo. On BNB the JSON may include a certificate.receipt voucher for the soulbound NFT claim.',
       },
     ] as Bilingual[],
     note: {
-      es: 'Preview (/v1/preview/{type}): solo origins/activity, gratis, 8 req/IP / 15 min. Facilitadores: api.x402.celo.org (Celo) y CDP (Base). Un settle Celo no indexa CDP Bazaar.',
-      en: 'Preview (/v1/preview/{type}): origins/activity only, free, 8 req/IP / 15 min. Facilitators: api.x402.celo.org (Celo) and CDP (Base). A Celo settlement does not index CDP Bazaar.',
+      es: 'Preview (/v1/preview/{type}): solo origins/activity, gratis, 8 req/IP / 15 min. Facilitadores: api.x402.celo.org (Celo), CDP (Base), Dexter (BNB). Un settle Celo no indexa CDP Bazaar. El recibo NFT no reemplaza el anclaje Celo.',
+      en: 'Preview (/v1/preview/{type}): origins/activity only, free, 8 req/IP / 15 min. Facilitators: api.x402.celo.org (Celo), CDP (Base), Dexter (BNB). A Celo settlement does not index CDP Bazaar. The NFT receipt does not replace the Celo anchor.',
     } satisfies Bilingual,
   },
   erc8257: {
@@ -256,6 +270,10 @@ export const walcertDevelopersCopy = {
         en: 'onchain — giveFeedback anchor on the Reputation Registry (Celo).',
       },
       {
+        es: 'Si el pago fue en BNB: certificate.receipt (voucher) para claim del NFT soulbound en BSC — no es el certificado ni sustituye el anclaje Celo.',
+        en: 'If paid on BNB: certificate.receipt (voucher) for claiming the soulbound NFT on BSC — not the certificate and does not replace the Celo anchor.',
+      },
+      {
         es: 'Verificable después con POST /v1/verify (tx_hash) o en el dashboard GSA.',
         en: 'Verifiable afterwards via POST /v1/verify (tx_hash) or the GSA dashboard.',
       },
@@ -313,6 +331,27 @@ export const walcertDevelopersCopy = {
           en: 'CDP Bazaar — agentic.market listing',
         },
         href: WALCERT_CDP_BAZAAR_URL,
+      },
+      {
+        label: {
+          es: 'Aigora — perfil Celo 9699',
+          en: 'Aigora — Celo 9699 profile',
+        },
+        href: WALCERT_AIGORA_PROFILE_URL,
+      },
+      {
+        label: {
+          es: 'Docs x402 BNB + recibo NFT (repo)',
+          en: 'BNB x402 + NFT receipt docs (repo)',
+        },
+        href: WALCERT_BNB_X402_DOCS_URL,
+      },
+      {
+        label: {
+          es: 'Contrato recibo NFT (BscScan)',
+          en: 'NFT receipt contract (BscScan)',
+        },
+        href: WALCERT_BNB_RECEIPT_CONTRACT_URL,
       },
       {
         label: {

@@ -42,6 +42,7 @@ type RouteMetaEntry = {
   description: Bilingual;
   canonical: string;
   ogPath: string;
+  keywords?: readonly string[];
 };
 
 export const routeMetadata = {
@@ -104,12 +105,14 @@ export const routeMetadata = {
     description: walcertCopy.seo.description,
     canonical: `${SITE_URL}/walcert`,
     ogPath: '/walcert/opengraph-image',
+    keywords: walcertCopy.seo.keywords,
   },
   walcertDevelopers: {
     title: walcertDevelopersCopy.seo.title,
     description: walcertDevelopersCopy.seo.description,
     canonical: `${SITE_URL}/walcert/developers`,
     ogPath: '/walcert/opengraph-image',
+    keywords: walcertDevelopersCopy.seo.keywords,
   },
 } as const satisfies Record<string, RouteMetaEntry>;
 
@@ -142,7 +145,7 @@ function localizedPageUrl(canonical: string, lang: SeoLang): string {
 }
 
 export function buildRouteMetadata(route: RouteMetadataKey, lang: SeoLang = 'en'): Metadata {
-  const { title, description, canonical, ogPath } = routeMetadata[route];
+  const { title, description, canonical, ogPath, keywords } = routeMetadata[route];
   const titleText = pickBilingual(title, lang);
   const descriptionText = pickBilingual(description, lang);
   const ogLocale = lang === 'en' ? 'en_US' : 'es_ES';
@@ -152,6 +155,7 @@ export function buildRouteMetadata(route: RouteMetadataKey, lang: SeoLang = 'en'
   return {
     title: titleText,
     description: descriptionText,
+    ...(keywords?.length ? { keywords: [...keywords] } : {}),
     openGraph: {
       title: titleText,
       description: descriptionText,

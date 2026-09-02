@@ -10,6 +10,7 @@ export const marketingCopy = {
     humi: { es: 'Índice HUMI', en: 'HUMI Index' } satisfies Bilingual,
     wami: { es: 'Índice WAMI', en: 'WAMI Index' } satisfies Bilingual,
     walcert: { es: 'Walcert Agent', en: 'Walcert Agent' } satisfies Bilingual,
+    insights: { es: 'GSA Insights', en: 'GSA Insights' } satisfies Bilingual,
     top10Agents: { es: 'Top 10 agentes', en: 'Top 10 agents' } satisfies Bilingual,
     howWeWork: { es: 'Cómo operamos', en: 'How we work' } satisfies Bilingual,
     roadmap: { es: 'Roadmap', en: 'Roadmap' } satisfies Bilingual,

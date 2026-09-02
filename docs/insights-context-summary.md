@@ -1,7 +1,7 @@
 # Resumen de contexto — GSA Insights
 
 Handoff para continuar el **blog de análisis ERC-8004** en un chat nuevo.  
-**Última actualización:** 19 agosto 2026 — subdominio live, primera pieza, SEO ERC-8004, fix video estático.
+**Última actualización:** 2 septiembre 2026 — link Insights en sidebar marketing (`/insights`, ambiente-aware).
 
 Complementa [`docs/marketing-web-context-summary.md`](marketing-web-context-summary.md) (web pública) y [`docs/AGENT-RULES.md`](AGENT-RULES.md).
 
@@ -15,7 +15,8 @@ Complementa [`docs/marketing-web-context-summary.md`](marketing-web-context-summ
 |------------|-----|
 | **Canónica (live)** | `https://insights.globalscoreagent.com` |
 | Redirect 301 | `www` / apex `/insights` y `/insights/*` → subdominio (paths limpios: `/slug`) |
-| Primera pieza | `https://insights.globalscoreagent.com/erc-8004-eight-months-on-mainnet` |
+| Pieza 1 | `https://insights.globalscoreagent.com/erc-8004-eight-months-on-mainnet` |
+| Nav marketing | Sidebar → `GSA Insights` → `/insights` (local/preview); en www/apex prod el middleware hace 301 al subdominio |
 
 **Vault:** [[04 - Growth/Insights]] · ADR [[08 - Decisiones/2026-08-18 - Insights propio origen de análisis ERC-8004]]  
 **Pipeline:** Data Insights (brief EN) → editorial ES/EN → repo MD → redes (`shared_on.blog`).

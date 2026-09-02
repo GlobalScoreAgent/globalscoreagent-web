@@ -3,7 +3,7 @@
 Documento maestro de convenciones, arquitectura y estado del proyecto.  
 Úsalo al **iniciar cualquier chat nuevo** antes de implementar cambios.
 
-**Última revisión:** julio 2026 — producción en `main` + dashboard móvil mergeado.
+**Última revisión:** septiembre 2026 — Walcert sync (BNB/GoldRush/Aigora/SEO) + nav Insights en sidebar.
 
 **Documentos complementarios (leer según la tarea):**
 
@@ -295,8 +295,9 @@ Si una regla de Cursor y este doc difieren, **priorizar la conversación actual 
 - Dashboard móvil: shell drawer, overview dual, chains dual (`ChainModuleCards` / `ChainDesktopCard`), distribuciones verticales en móvil.
 - Handoff: `dashboard-context-summary.md` + este archivo.
 - Detalle HUMI (Fase 2, ago 2026): `fetchAgentHumiIndex` → `web_dashboard.index_humi_live`. Directorio sigue en escalares de `agents`. DROP tabla-copia = Fase 3 (otra ADR).
-- Walcert marketing (ago 2026): identidad 5 registros + marketplaces (Agent.family, Agent City, CDP Bazaar) + x402 dual Celo/Base.
+- Walcert marketing (sep 2026): identidad 5 registros + marketplaces (Agent.family, Agent City, CDP Bazaar, Aigora) + x402 Celo/Base/BNB + GoldRush Multichain; repo `MichBarbarian/walcert-agent`; SEO JSON-LD + `#agent-facts`.
+- Sidebar marketing: link **GSA Insights** → `/insights` (ambiente-aware; 301 a subdominio solo en www/apex prod).
 
 ---
 
-*Última revisión: agosto 2026 — Walcert marketplaces + HUMI `index_humi_live` en `main`. Actualizar cuando cambien migraciones BD, grants, ramas o convenciones.*
+*Última revisión: septiembre 2026 — Walcert sync + nav Insights. Actualizar cuando cambien migraciones BD, grants, ramas o convenciones.*

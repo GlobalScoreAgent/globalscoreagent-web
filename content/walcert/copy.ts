@@ -7,7 +7,7 @@ export const WALCERT_EXPLORER_URL =
   'https://erc-8004.quicknode.com/agents/celo-mainnet/9699';
 export const WALCERT_AGENT_ID = '9699';
 export const WALCERT_CHAIN = 'Celo mainnet (eip155:42220)';
-export const WALCERT_REPO_URL = 'https://github.com/GlobalScoreAgent/walcert-agent';
+export const WALCERT_REPO_URL = 'https://github.com/MichBarbarian/walcert-agent';
 export const WALCERT_CONCORDIUM_TOKEN_ID = '1686';
 export const WALCERT_CONCORDIUM_REGISTRY_URL =
   'https://agent-registry.concordium.com/';
@@ -33,9 +33,16 @@ export const WALCERT_AGENT_FAMILY_LISTING_URL =
 export const WALCERT_AGENT_FAMILY_ABOUT_URL = 'https://www.agent.family/';
 export const WALCERT_BNB_MINT_TX_URL =
   'https://bscscan.com/tx/0xa5a93ab7bc18e36a94a371f71200d15c6b1d5e1fe28a98735c65ab9c8f901fa8';
+export const WALCERT_BNB_RECEIPT_CONTRACT =
+  '0x4e430fB5A5f26ED08eC123373Cd8AD3cE15C24c7';
+export const WALCERT_BNB_RECEIPT_CONTRACT_URL = `https://bscscan.com/address/${WALCERT_BNB_RECEIPT_CONTRACT}`;
+export const WALCERT_BNB_X402_DOCS_URL = `${WALCERT_REPO_URL}/blob/main/docs/bnb-x402-receipt.md`;
 export const WALCERT_CDP_BAZAAR_URL =
   'https://agentic.market/services/walcert-globalscoreagent-com';
 export const WALCERT_CDP_BAZAAR_ABOUT_URL = 'https://agentic.market';
+export const WALCERT_AIGORA_ABOUT_URL = 'https://aigora.org';
+export const WALCERT_AIGORA_PROFILE_URL =
+  'https://aigora.org/services/42220_0x8004a169fb4a3325136eb29fa0ceb6d2e539a432_9699';
 export const WALCERT_ERC8257_TOOLS_BASE = '485–488';
 export const WALCERT_ERC8257_TOOLS_ETH = '163–166';
 export const WALCERT_ERC8257_MANIFEST_ORIGINS_URL = `${WALCERT_LIVE_URL}/.well-known/ai-tool/walcert-origins.json`;
@@ -54,9 +61,23 @@ export const walcertCopy = {
       en: 'Walcert Agent — Wallet maturity certificates',
     } satisfies Bilingual,
     description: {
-      es: 'Agente ERC-8004 en Celo (9699), Base (59768), Ethereum (50032) y BNB (265982), más CIS-8004 en Concordium (#1686). Certificados A–F; x402 en Celo y Base; Virtuals ACP, Agent.family, Agent City y CDP Bazaar.',
-      en: 'ERC-8004 agent on Celo (9699), Base (59768), Ethereum (50032), and BNB (265982), plus CIS-8004 on Concordium (#1686). A–F certificates; x402 on Celo and Base; Virtuals ACP, Agent.family, Agent City, and CDP Bazaar.',
+      es: 'Agente ERC-8004 en Celo (9699), Base (59768), Ethereum (50032) y BNB (265982), más CIS-8004 en Concordium (#1686). Certificados A–F; x402 en Celo, Base y BNB; Virtuals ACP, Agent.family, Agent City, CDP Bazaar y Aigora.',
+      en: 'ERC-8004 agent on Celo (9699), Base (59768), Ethereum (50032), and BNB (265982), plus CIS-8004 on Concordium (#1686). A–F certificates; x402 on Celo, Base, and BNB; Virtuals ACP, Agent.family, Agent City, CDP Bazaar, and Aigora.',
     } satisfies Bilingual,
+    keywords: [
+      'Walcert',
+      'ERC-8004',
+      'wallet maturity',
+      'x402',
+      'Celo 9699',
+      'Base 59768',
+      'BNB 265982',
+      'Aigora',
+      'GoldRush',
+      'HUMI',
+      'Global Score Agent',
+      'agent certificates',
+    ],
   },
   hero: {
     title: { es: 'Walcert Agent', en: 'Walcert Agent' } satisfies Bilingual,
@@ -93,8 +114,8 @@ export const walcertCopy = {
         en: 'Real-time hot-analysis — not a daily aggregated score like HUMI/WAMI.',
       },
       {
-        es: 'Diseñado para agent-to-agent: preview gratis, certificado vía x402 en Celo y Base, y presencia en marketplaces de agentes.',
-        en: 'Built for agent-to-agent: free preview, certificate via x402 on Celo and Base, and presence on agent marketplaces.',
+        es: 'Diseñado para agent-to-agent: preview gratis, certificado vía x402 en Celo, Base y BNB, y presencia en marketplaces de agentes.',
+        en: 'Built for agent-to-agent: free preview, certificate via x402 on Celo, Base, and BNB, and presence on agent marketplaces.',
       },
       {
         es: 'Parte del ecosistema Global Score Agent — powered by GSA.',
@@ -140,10 +161,10 @@ export const walcertCopy = {
         id: 'multichain',
         title: { es: 'Multichain', en: 'Multichain' },
         summary: {
-          es: 'Footprint y longevidad multi-red: recencia, consistencia, ecosistemas core y span — sin intensidad de txs/volumen.',
-          en: 'Multi-network footprint and longevity: recency, consistency, core ecosystems, and span — no tx/volume intensity.',
+          es: 'Footprint y longevidad multi-red (GoldRush v2.1): recencia, consistencia, ecosistemas core, span e intensidad — sin depender de Moralis.',
+          en: 'Multi-network footprint and longevity (GoldRush v2.1): recency, consistency, core ecosystems, span, and intensity — no Moralis dependency.',
         },
-        dataSource: { es: 'Moralis (+ Celo merge)', en: 'Moralis (+ Celo merge)' },
+        dataSource: { es: 'GoldRush (Covalent)', en: 'GoldRush (Covalent)' },
       },
       {
         id: 'portfolio',
@@ -186,8 +207,8 @@ export const walcertCopy = {
           en: 'Free (8 req/IP / 15 min)',
         },
         paid: {
-          es: '$0.05 USDC (x402 · Celo o Base)',
-          en: '$0.05 USDC (x402 · Celo or Base)',
+          es: '$0.05 USDC (x402 · Celo, Base o BNB)',
+          en: '$0.05 USDC (x402 · Celo, Base, or BNB)',
         },
       },
       {
@@ -244,8 +265,8 @@ export const walcertCopy = {
           {
             label: { es: 'Uso', en: 'Role' },
             value: {
-              es: 'Emisión de certificados + x402 Celo',
-              en: 'Certificate issuance + x402 on Celo',
+              es: 'Emisión de certificados + x402 Celo + Aigora',
+              en: 'Certificate issuance + x402 on Celo + Aigora',
             },
           },
           {
@@ -255,6 +276,15 @@ export const walcertCopy = {
               en: 'walcert.globalscoreagent.com (JSON)',
             },
             href: WALCERT_LIVE_URL,
+            external: true,
+          },
+          {
+            label: { es: 'Aigora', en: 'Aigora' },
+            value: {
+              es: 'aigora.org · Celo · 9699',
+              en: 'aigora.org · Celo · 9699',
+            },
+            href: WALCERT_AIGORA_PROFILE_URL,
             external: true,
           },
           {
@@ -382,8 +412,8 @@ export const walcertCopy = {
           {
             label: { es: 'Uso', en: 'Role' },
             value: {
-              es: 'Agent.family Instant-buyable',
-              en: 'Agent.family Instant-buyable',
+              es: 'Agent.family + x402 Permit2 + recibo NFT',
+              en: 'Agent.family + x402 Permit2 + NFT receipt',
             },
           },
           {
@@ -394,6 +424,14 @@ export const walcertCopy = {
             },
             href: WALCERT_AGENT_FAMILY_LISTING_URL,
             external: true,
+          },
+          {
+            label: { es: 'Recibo NFT', en: 'NFT receipt' },
+            value: {
+              es: 'BscScan · claim del pagador',
+              en: 'BscScan · payer claim',
+            },
+            href: WALCERT_BNB_RECEIPT_CONTRACT_URL,
           },
           {
             label: { es: 'Identity tx', en: 'Identity tx' },
@@ -456,8 +494,8 @@ export const walcertCopy = {
       }[];
     }[],
     footnote: {
-      es: 'Los certificados firmados y el anclaje giveFeedback siguen en Celo (agentId 9699). Los pagos x402 son $0.05 USDC en Celo y en Base — Base 59768 no es solo identidad ACP. Eth 50032 sirve Agent City y tools ERC-8257; BNB 265982, Agent.family. Concordium aporta accountability ID-backed vía CIS-8 + CIS-8004.',
-      en: 'Signed certificates and the giveFeedback anchor remain on Celo (agentId 9699). x402 payments are $0.05 USDC on Celo and Base — Base 59768 is not ACP identity only. Eth 50032 serves Agent City and ERC-8257 tools; BNB 265982, Agent.family. Concordium adds ID-backed accountability via CIS-8 + CIS-8004.',
+      es: 'Los certificados firmados y el anclaje giveFeedback siguen en Celo (agentId 9699). Los pagos x402 son $0.05 USDC en Celo, Base y BNB (Permit2 + recibo NFT en BNB). Base 59768 no es solo identidad ACP. Eth 50032 sirve Agent City y tools ERC-8257; BNB 265982, Agent.family. Aigora lista el mismo 9699 en Celo. Concordium aporta accountability ID-backed vía CIS-8 + CIS-8004.',
+      en: 'Signed certificates and the giveFeedback anchor remain on Celo (agentId 9699). x402 payments are $0.05 USDC on Celo, Base, and BNB (Permit2 + NFT receipt on BNB). Base 59768 is not ACP identity only. Eth 50032 serves Agent City and ERC-8257 tools; BNB 265982, Agent.family. Aigora lists the same 9699 on Celo. Concordium adds ID-backed accountability via CIS-8 + CIS-8004.',
     } satisfies Bilingual,
     hackathon: {
       es: 'Hackathon Celo Agentic Payments & DeFAI — Track 2 (Most x402 Payments).',
@@ -470,8 +508,8 @@ export const walcertCopy = {
       en: 'Ecosystem presence',
     } satisfies Bilingual,
     intro: {
-      es: 'Además de la identidad on-chain, Walcert está donde los agentes descubren y contratan servicios — marketplaces, discovery x402 y accountability ID-backed.',
-      en: 'Beyond on-chain identity, Walcert is where agents discover and hire services — marketplaces, x402 discovery, and ID-backed accountability.',
+      es: 'Además de la identidad on-chain, Walcert está donde los agentes descubren y contratan servicios — marketplaces Celo/Base/BNB/Eth, discovery x402 y accountability ID-backed.',
+      en: 'Beyond on-chain identity, Walcert is where agents discover and hire services — Celo/Base/BNB/Eth marketplaces, x402 discovery, and ID-backed accountability.',
     } satisfies Bilingual,
     items: [
       {
@@ -675,6 +713,56 @@ export const walcertCopy = {
         ],
       },
       {
+        id: 'aigora',
+        date: { es: '1 sep 2026', en: 'Sep 1, 2026' },
+        title: {
+          es: 'Live en Aigora (Celo)',
+          en: 'Live on Aigora (Celo)',
+        },
+        logo: {
+          src: '/aigora_market.jpg',
+          alt: { es: 'Aigora', en: 'Aigora' },
+        },
+        about: {
+          title: { es: 'Qué es Aigora', en: 'What is Aigora' },
+          body: {
+            es: 'Aigora es un marketplace de agentes en Celo sobre el registry ERC-8004 canónico. El listing es discovery (perfil + services Web), no un adapter de pago ni escrow propio.',
+            en: 'Aigora is an agent marketplace on Celo over the canonical ERC-8004 registry. The listing is discovery (profile + Web services), not a payment adapter or its own escrow.',
+          },
+          href: WALCERT_AIGORA_ABOUT_URL,
+          linkLabel: {
+            es: 'Sitio de Aigora',
+            en: 'Aigora website',
+          },
+        },
+        body: {
+          es: 'Walcert está publicado con el mismo NFT de emisión (Celo agentId 9699) — no hay segundo mint. El perfil lista agent card, certificados, preview y verify; el cobro sigue siendo x402 $0.05 USDC en Celo/Base/BNB.',
+          en: 'Walcert is published with the same issuance NFT (Celo agentId 9699) — no second mint. The profile lists agent card, certificates, preview, and verify; billing remains x402 $0.05 USDC on Celo/Base/BNB.',
+        },
+        facts: [
+          {
+            label: { es: 'ERC-8004 Celo', en: 'ERC-8004 Celo' },
+            value: {
+              es: `agentId ${WALCERT_AGENT_ID}`,
+              en: `agentId ${WALCERT_AGENT_ID}`,
+            },
+          },
+          {
+            label: { es: 'Modelo', en: 'Model' },
+            value: { es: 'Discovery · no escrow', en: 'Discovery · no escrow' },
+          },
+        ],
+        links: [
+          {
+            label: {
+              es: 'Perfil Walcert en Aigora',
+              en: 'Walcert profile on Aigora',
+            },
+            href: WALCERT_AIGORA_PROFILE_URL,
+          },
+        ],
+      },
+      {
         id: 'concordium-cis8004',
         date: { es: '11 ago 2026', en: 'Aug 11, 2026' },
         title: {
@@ -767,8 +855,15 @@ export const walcertCopy = {
       {
         title: { es: 'Anclaje ERC-8004', en: 'ERC-8004 anchor' },
         body: {
-          es: 'giveFeedback en el Reputation Registry con el hash del certificado y el monto pagado — auditable on-chain.',
-          en: 'giveFeedback on the Reputation Registry with the certificate hash and paid amount — auditable on-chain.',
+          es: 'giveFeedback en el Reputation Registry con el hash del certificado y el monto pagado — auditable on-chain en Celo (9699).',
+          en: 'giveFeedback on the Reputation Registry with the certificate hash and paid amount — auditable on-chain on Celo (9699).',
+        },
+      },
+      {
+        title: { es: 'Recibo NFT (BNB)', en: 'NFT receipt (BNB)' },
+        body: {
+          es: 'Si el pago fue x402 en BNB, el JSON trae un voucher; el pagador hace claim de un NFT soulbound en BSC. No reemplaza el anclaje Celo ni es el certificado en sí.',
+          en: 'If payment was x402 on BNB, the JSON includes a voucher; the payer claims a soulbound NFT on BSC. It does not replace the Celo anchor and is not the certificate itself.',
         },
       },
       {
@@ -811,8 +906,8 @@ export const walcertCopy = {
       en: 'A–F certificates · Wallets · Autonomous agent',
     } satisfies Bilingual,
     description: {
-      es: 'Agente ERC-8004 en Celo (9699), Base (59768), Ethereum (50032) y BNB (265982), más CIS-8004 en Concordium (#1686). Certificados A–F; x402 en Celo y Base.',
-      en: 'ERC-8004 on Celo (9699), Base (59768), Ethereum (50032), and BNB (265982), plus CIS-8004 on Concordium (#1686). A–F certificates; x402 on Celo and Base.',
+      es: 'Agente ERC-8004 en Celo (9699), Base (59768), Ethereum (50032) y BNB (265982), más CIS-8004 en Concordium (#1686). Certificados A–F; x402 en Celo, Base y BNB.',
+      en: 'ERC-8004 on Celo (9699), Base (59768), Ethereum (50032), and BNB (265982), plus CIS-8004 on Concordium (#1686). A–F certificates; x402 on Celo, Base, and BNB.',
     } satisfies Bilingual,
     question: {
       es: '¿Qué tan madura y legítima es esta wallet antes de interactuar?',

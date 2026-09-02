@@ -19,7 +19,7 @@ Hub: https://globalscoreagent.com/docs/global-score-agent
 
 Hub: https://insights.globalscoreagent.com
 
-- erc-8004-eight-months-on-mainnet — Eight months of ERC-8004 on mainnet: identity vs reputation adoption, chains, registries (Aug 2026 snapshot)
+- erc-8004-eight-months-on-mainnet — Eight months of ERC-8004 on mainnet: identity vs reputation adoption, chains, registries (Aug 19, 2026 snapshot)
   - EN: https://insights.globalscoreagent.com/erc-8004-eight-months-on-mainnet
   - ES: https://insights.globalscoreagent.com/erc-8004-eight-months-on-mainnet?lang=es
 
@@ -49,11 +49,44 @@ Hub: https://insights.globalscoreagent.com
 
 ## Walcert Agent
 
+Autonomous ERC-8004 agent (Global Score Agent) issuing A–F wallet maturity certificates via HTTP JSON.
+
 - Product (business): https://globalscoreagent.com/walcert
 - Developer reference (HTTP / x402): https://globalscoreagent.com/walcert/developers
 - GSA dashboard (human UI): https://globalscoreagent.com/dashboard/walcert
 - Agent card (JSON) / API — GET /: https://walcert.globalscoreagent.com/
-- Agent directory (Celo agentId 9699): https://erc-8004.quicknode.com/agents/celo-mainnet/9699
+- Public repo: https://github.com/MichBarbarian/walcert-agent
+
+### On-chain identity
+
+- Celo ERC-8004 agentId 9699 — issuance, giveFeedback anchor, x402 Celo, Aigora discovery
+  - Explorer: https://erc-8004.quicknode.com/agents/celo-mainnet/9699
+  - Aigora: https://aigora.org/services/42220_0x8004a169fb4a3325136eb29fa0ceb6d2e539a432_9699
+- Base ERC-8004 agentId 59768 — Virtuals ACP + x402 Base
+  - ACP: https://app.virtuals.io/acp/agent/019f917a-9ad6-7fc5-b52f-bf80864f5704
+- Ethereum ERC-8004 agentId 50032 — Agent City + ERC-8257 tools 163–166
+  - Agent City: https://agentcity.freaks.one/
+- BNB ERC-8004 agentId 265982 — Agent.family + x402 Permit2 + soulbound NFT receipt
+  - Agent.family: https://www.agent.family/listing?id=cmsr131ybcoo6v001vdkw7any
+  - NFT receipt contract: https://bscscan.com/address/0x4e430fB5A5f26ED08eC123373Cd8AD3cE15C24c7
+- Concordium CIS-8004 External Agent #1686
+  - Agent card: https://walcert.globalscoreagent.com/agent-card.json
+
+### Certificates and providers
+
+- origins — Alchemy + DefiLlama + GSA labels
+- activity — 15-day window; Alchemy + DefiLlama + GSA labels
+- multichain — GoldRush (Covalent) formula multichain-v2.1 (footprint + intensity); Moralis retired
+- portfolio — Zerion
+
+### Payments and verify
+
+- Price: $0.05 USDC via x402 on Celo, Base, or BNB (accepts[0]=Base/CDP, Celo, BNB Permit2/Dexter)
+- Free preview: POST /v1/preview/{origins|activity} (8 req/IP / 15 min)
+- Paid: POST /v1/certificates/{type}
+- Verify: POST /v1/verify (tx_hash of Celo giveFeedback)
+- CDP Bazaar listing: https://agentic.market/services/walcert-globalscoreagent-com
+- ERC-8257 tools: Base 485–488 · Ethereum 163–166
 
 ## Agents
 

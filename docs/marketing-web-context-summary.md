@@ -1,7 +1,7 @@
 # Resumen de Contexto del Proyecto — Web pública (Marketing)
 
 Documento de handoff para continuar el desarrollo de la **web oficial** en un chat nuevo de Cursor.  
-**Última actualización:** agosto 2026 — Walcert `/walcert` identidad 5 registros + marketplaces (Agent.family, Agent City, CDP Bazaar) + x402 dual; About/Nosotros + Public API Free Tier.
+**Última actualización:** septiembre 2026 — Walcert sync (x402 BNB + GoldRush + Aigora + SEO/JSON-LD) + link **GSA Insights** en sidebar marketing (`/insights`).
 
 Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) (panel autenticado) y [`docs/AGENT-RULES.md`](AGENT-RULES.md) (reglas globales).
 
@@ -19,9 +19,13 @@ Complementa [`docs/dashboard-context-summary.md`](dashboard-context-summary.md) 
 
 ### Cambios recientes (agosto 2026)
 
-- **Walcert (`/walcert` + `/walcert/developers`):** identidad on-chain de **cinco registros** — Celo 9699 · Base 59768 · Eth 50032 · BNB 265982 · Concordium #1686. Presencia: Virtuals ACP, Agent.family (TermiX), Agent City, CDP Bazaar / agentic.market, Concordium. Logos: `public/agent-family-logo.png`, `agent-city-logo.png`, `agentic-market-logo.png` (+ Virtuals/Concordium). x402 dual **Celo y Base** ($0.05 USDC); anclaje `giveFeedback` sigue en Celo. Developers: tools ERC-8257 (Base 485–488 · Eth 163–166) + listings. Copy: `content/walcert/`. **No** afirmar featured en Bazaar. Dashboard `/dashboard/walcert` sin cambio en este corte. Identidad canónica de emisión: Celo **9699**. `GET https://walcert.globalscoreagent.com/` = **agent card JSON** (no UI humana).
+- **Walcert (`/walcert` + `/walcert/developers`):** identidad on-chain de **cinco registros** — Celo 9699 · Base 59768 · Eth 50032 · BNB 265982 · Concordium #1686. Presencia: Virtuals ACP, Agent.family (TermiX), Agent City, CDP Bazaar / agentic.market, **Aigora (Celo, mismo 9699)**, Concordium. Logos: `public/agent-family-logo.png`, `agent-city-logo.png`, `agentic-market-logo.png`, **`aigora_market.jpg`** (+ Virtuals/Concordium). x402 **triple** $0.05 USDC en Celo, Base y **BNB** (Permit2 + recibo NFT soulbound en BSC; anclaje `giveFeedback` sigue en Celo). Multichain público = **GoldRush** `multichain-v2.1` (no Moralis). Repo público: `MichBarbarian/walcert-agent`. SEO: keywords + JSON-LD (`SoftwareApplication` / `WebAPI` / TechArticle developers) + sección `#agent-facts` + `llms.txt`. Developers: tools ERC-8257 (Base 485–488 · Eth 163–166) + listings + doc BNB. Copy: `content/walcert/`. **No** afirmar featured en Bazaar ni DappBay/Bankr live. Dashboard `/dashboard/walcert` sin cambio en este corte. Identidad canónica de emisión: Celo **9699**. `GET https://walcert.globalscoreagent.com/` = **agent card JSON** (no UI humana).
 - **HUMI perfil público:** `/agents/[id]/humi` y `GET /api/web-page/agents/[id]/humi` leen `web_dashboard.index_humi_live` (mismo `fetchAgentHumiIndex` que el dashboard). El directorio sigue en escalares de `agents`.
 - **About / Nosotros (`/about`):** página bilingüe con producto, founder card (Ibzan Jair Valenzuela Suarez + LinkedIn/X), reconocimiento unificado hackathon ETH UY + pitch BSG 2026 (GlassCard elevated, lightbox de imágenes, links GitHub / Blockchain Summit / DoraHacks). Nav + footer. Se eliminó el redirect legacy `/about` → `/#mission` en `next.config.js`. Copy: `content/about/`. Assets: `public/hackaton_eth_2026.jpg`, `hackaton_eth_2026_2.jpg`, `hackaton_2026_premiacion.jpg`, `blockchain_summit_2026.png`.
+
+### Cambios recientes (septiembre 2026 — nav Insights)
+
+- **Sidebar marketing:** ítem **GSA Insights** → `/insights` (mismo origen). En localhost/previews abre Insights local; en www/apex prod el middleware hace **301** a `insights.globalscoreagent.com`. No hardcodear `INSIGHTS_SITE_URL` en el menú.
 
 ### Cambios recientes (julio 2026)
 
@@ -174,9 +178,11 @@ lib/seo/                      # site URL, JSON-LD, agent metadata pública
 
 ### Walcert (`/walcert`, `/walcert/developers`)
 
-- Identidad: Celo 9699 (emisión + x402 Celo) · Base 59768 (ACP + x402 Base) · Eth 50032 (Agent City + ERC-8257) · BNB 265982 (Agent.family) · Concordium #1686
-- Presencia: Virtuals ACP, Agent.family, Agent City, CDP Bazaar (`agentic.market`; no featured), Concordium
-- Developers: x402 dual $0.05 USDC Celo/Base; tools ERC-8257 Base 485–488 / Eth 163–166; listings
+- Identidad: Celo 9699 (emisión + x402 Celo + Aigora) · Base 59768 (ACP + x402 Base) · Eth 50032 (Agent City + ERC-8257) · BNB 265982 (Agent.family + x402 Permit2 + NFT recibo) · Concordium #1686
+- Presencia: Virtuals ACP, Agent.family, Agent City, CDP Bazaar (`agentic.market`; no featured), Aigora (mismo 9699), Concordium
+- Developers: x402 $0.05 USDC Celo/Base/BNB; tools ERC-8257 Base 485–488 / Eth 163–166; listings; Multichain = GoldRush v2.1
+- SEO / agents: keywords, JSON-LD rico, `#agent-facts`, `llms.txt` / `llms-full.txt`
+- Repo público: `MichBarbarian/walcert-agent` (legacy GSA 404 anónimo)
 - Copy: `content/walcert/copy.ts`, `developers-copy.ts`
 
 ---
@@ -262,4 +268,4 @@ No commits/push salvo petición explícita.
 
 ---
 
-*Última revisión: agosto 2026 — Walcert marketplaces + multi-registro + x402 dual. Actualizar tras cambios de pricing, KPIs, rutas públicas o deploy.*
+*Última revisión: septiembre 2026 — Walcert x402 BNB + NFT, Multichain GoldRush, Aigora, SEO agent-facts, nav Insights `/insights`. Actualizar tras cambios de pricing, KPIs, rutas públicas o deploy.*
